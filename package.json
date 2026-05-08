@@ -1,0 +1,11 @@
+{
+  "name": "shinyshadcn-agent-context",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.6.2",
+  "scripts": {
+    "shadcn:info": "npx shadcn@latest info --json",
+    "shadcn:docs": "npx shadcn@latest docs"
+  },
+  "devDependencies": {}
+}
