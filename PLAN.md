@@ -161,8 +161,37 @@ These are v0.2+ candidates and several need their own ADRs first.
 6. Core static components (button, badge, alert, card, value box).
 7. Navigation and sidebar behavior.
 8. Tabs wrapper and theme runtime.
-9. Example app and vignettes.
-10. R CMD check clean. Tag v0.1.0.
+9. **Local preview:** build pkgdown site and Shinylive showcase
+   locally, review before making the repo public.
+10. Example app and vignettes.
+11. R CMD check clean. Tag v0.1.0.
+
+## Local Preview Before Going Public
+
+Before making the repository public, build and review the full
+presentation locally:
+
+1. **pkgdown site.** Run `pkgdown::build_site()` (or `make pkgdown`)
+   and open `site/docs/index.html` in a browser. Walk through the
+   reference index, every component page, and each article. Verify
+   that live examples render correctly and the layout looks polished.
+2. **Shinylive showcase.** Run `make shinylive-export` (or
+   `tools/export-shinylive.R`) to produce the static export under
+   `site/showcase/`. Serve it locally
+   (`python3 -m http.server -d site/showcase`) and verify in a
+   browser that the app loads, dark mode works, and every gallery
+   section renders.
+3. **Local showcase app.** Run `shinyblocks::run_showcase()` to
+   launch the dogfooded gallery. Confirm every component section is
+   present with both the live render and the source code.
+4. **README & package metadata.** Review `README.md`, `DESCRIPTION`,
+   and `NEWS.md` for anything that looks incomplete or references
+   internal-only artifacts.
+
+Only make the repo public once all four pass. This checkpoint is not
+a formal phase exit; it does not require the full Quality Gate. It is
+a visual sanity check to ensure the first public impression is
+polished.
 
 ## Quality Gate (Every Phase)
 
