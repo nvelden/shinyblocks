@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-`shinyshadcn` will be developed through iterative agent work. As the package grows, review tasks should be handled with a consistent standard that emphasizes correctness, regressions, tests, accessibility, package maintainability, and user-facing behavior.
+`shinyblocks` will be developed through iterative agent work. As the package grows, review tasks should be handled with a consistent standard that emphasizes correctness, regressions, tests, accessibility, package maintainability, and user-facing behavior.
 
 The Posit `critical-code-reviewer` skill provides focused instructions for direct, evidence-based code review.
 

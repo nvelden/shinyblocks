@@ -6,7 +6,7 @@ Accepted (2026-05-08)
 
 ## Context
 
-shinyshadcn ports shadcn/ui's design system into idiomatic R, but
+shinyblocks ports shadcn/ui's design system into idiomatic R, but
 shadcn upstream evolves continuously: token refinements, component
 variant tweaks, accessibility improvements, and occasional larger
 restyles. Without a deliberate sync process, the package either:
@@ -38,7 +38,7 @@ changes, that requires its own ADR.
 
 ### Sync log
 
-`docs/upstream/shadcn-sync.md` is a living log. Each entry records:
+`docs/upstream/sb-sync.md` is a living log. Each entry records:
 
 ```markdown
 ## 2026-05-08 — initial token sync
@@ -52,21 +52,21 @@ changes, that requires its own ADR.
 - Adopted: full token set (oklch, including sidebar and chart
   tokens)
 - Skipped: `@theme inline` block — Tailwind-specific; replaced by
-  our `@theme` mapping in `inst/www/src/shinyshadcn.css`
+  our `@theme` mapping in `inst/www/src/shinyblocks.css`
 - Open follow-ups: none
-- shinyshadcn version released after sync: 0.0.0.9001
+- shinyblocks version released after sync: 0.0.0.9001
 ```
 
 ### Review cadence
 
-- **Every minor release** of shinyshadcn: scan recent shadcn commits
+- **Every minor release** of shinyblocks: scan recent shadcn commits
   since the last sync, log the review, decide adopt/skip per change.
 - **On major shadcn refresh**: trigger an unscheduled sync regardless
-  of shinyshadcn release schedule.
+  of shinyblocks release schedule.
 
 ### Review questionnaire
 
-For each upstream change relevant to a component shinyshadcn ships,
+For each upstream change relevant to a component shinyblocks ships,
 answer in the sync log:
 
 1. Did tokens change? If yes, update vendored block; document in
@@ -82,7 +82,7 @@ answer in the sync log:
 - **Adding a token** is a minor-release change.
 - **Renaming a token** is a major-release change. The old name is
   kept as an alias for one minor cycle, with `lifecycle` deprecation
-  warnings in `shadcn_theme()` if it's overridden.
+  warnings in `block_theme()` if it's overridden.
 - **Removing a token** requires a major-release bump and a NEWS
   entry under "Breaking changes".
 
@@ -94,11 +94,11 @@ answer in the sync log:
 - **Removing a component** requires a major-release bump.
 - **Changing a component's HTML structure** that user CSS could
   reasonably depend on is a major-release change. Internal classes
-  (`ssc-*` only used by package CSS) can change in minor releases.
+  (`sb-*` only used by package CSS) can change in minor releases.
 
 ### What is NOT in the sync log
 
-- shadcn upstream activity unrelated to components shinyshadcn
+- shadcn upstream activity unrelated to components shinyblocks
   ships.
 - Speculative changes that weren't adopted (these go in NEWS only
   if a user might notice; otherwise discard).
@@ -107,7 +107,7 @@ answer in the sync log:
 
 ## Consequences
 
-- The sync log is the answer to "why does shinyshadcn look slightly
+- The sync log is the answer to "why does shinyblocks look slightly
   different from current shadcn?". Future maintainers can read it
   and know.
 - A maintainer can reconstruct what was true at any past minor
@@ -125,5 +125,5 @@ commit and is the baseline for all future review cadences.
 
 - [strategy: Upstream sync](../agent-plans/2026-05-08-port-strategy.md#upstream-sync)
 - [strategy: Release Policy](../agent-plans/2026-05-08-port-strategy.md#release-policy)
-- [docs/upstream/shadcn-sync.md](../upstream/shadcn-sync.md) — the
+- [docs/upstream/sb-sync.md](../upstream/sb-sync.md) — the
   sync log itself.

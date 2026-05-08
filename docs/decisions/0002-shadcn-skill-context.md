@@ -8,7 +8,7 @@ Accepted
 
 The official shadcn/ui skill gives AI agents detailed knowledge of shadcn component APIs, composition rules, CLI commands, theming, registry authoring, and accessibility conventions. The skill activates when it sees a `components.json` file and can run `shadcn info --json` for project context.
 
-`shinyshadcn` is not a React project. It is an R package that should translate shadcn-inspired patterns into Shiny and `htmltools`.
+`shinyblocks` is not a React project. It is an R package that should translate shadcn/ui-inspired patterns into Shiny and `htmltools`.
 
 ## Decision
 

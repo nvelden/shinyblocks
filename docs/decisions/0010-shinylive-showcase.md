@@ -6,7 +6,7 @@ Accepted (2026-05-08)
 
 ## Context
 
-shinyshadcn needs an accompanying interactive showcase app. The original
+shinyblocks needs an accompanying interactive showcase app. The original
 plan allowed deployment to shinyapps.io or shinylive. The project should use
 Shinylive so the showcase runs entirely in the browser as a static site.
 
@@ -23,7 +23,7 @@ constraints:
   future pkgdown output may also need to be composed into the public site. A
   root `docs/` export would collide with those concerns.
 
-The showcase cannot assume `library(shinyshadcn)` works inside webR until the
+The showcase cannot assume `library(shinyblocks)` works inside webR until the
 package is available as a WASM binary. The package is currently pre-CRAN, so
 the export must be designed around a clean staging copy.
 
@@ -33,7 +33,7 @@ The showcase has two modes:
 
 1. **Local package mode**
 
-   `shinyshadcn::run_showcase()` runs the showcase from the installed or
+   `shinyblocks::run_showcase()` runs the showcase from the installed or
    `devtools::load_all()` package. This is the maintainer/developer loop.
 
 2. **Shinylive export mode**
@@ -46,30 +46,30 @@ The showcase has two modes:
    ```text
    app.R
    R/
-     shinyshadcn/        # copied package R helpers needed by showcase
+     shinyblocks/        # copied package R helpers needed by showcase
      showcase/           # showcase-specific app code
    www/
-     shinyshadcn/        # copied package assets from inst/www
+     shinyblocks/        # copied package assets from inst/www
    ```
 
    The staged `app.R` uses `library(shiny)` and `library(htmltools)`, then
    relies on Shiny's automatic `R/` sourcing. It does not call
-   `library(shinyshadcn)` while the package is not available to webR.
+   `library(shinyblocks)` while the package is not available to webR.
 
 ## Asset Dependency Contract
 
-`shinyshadcn_dependency()` must support both package mode and app-asset mode:
+`shinyblocks_dependency()` must support both package mode and app-asset mode:
 
-- package mode: `htmltools::htmlDependency(package = "shinyshadcn", src = "www",
+- package mode: `htmltools::htmlDependency(package = "shinyblocks", src = "www",
   ...)`;
-- app-asset mode: `htmltools::htmlDependency(src = c(href = "shinyshadcn"),
-  ...)`, with assets copied to `www/shinyshadcn/` in the staged app.
+- app-asset mode: `htmltools::htmlDependency(src = c(href = "shinyblocks"),
+  ...)`, with assets copied to `www/shinyblocks/` in the staged app.
 
 The mode can be controlled by an internal option set in staged Shinylive
 exports, for example:
 
 ```r
-options(shinyshadcn.asset_mode = "app")
+options(shinyblocks.asset_mode = "app")
 ```
 
 Normal package users never need to set this option.
@@ -167,7 +167,7 @@ same `site/` artifact to Cloudflare Pages, Netlify, or another static host.
 - The export process must be kept clean; accidental files in the staged app
   directly inflate `app.json`.
 - The staged Shinylive app exercises package-generated HTML and assets, but it
-  does not prove the package can be installed inside webR until shinyshadcn has
+  does not prove the package can be installed inside webR until shinyblocks has
   a WASM binary.
 
 ## References

@@ -6,12 +6,12 @@ Accepted (2026-05-08)
 
 ## Context
 
-shinyshadcn provides `shadcn_tabs()` as a primary navigation primitive.
+shinyblocks provides `block_tabs()` as a primary navigation primitive.
 shadcn/ui's `Tabs` model uses the structure
 `Tabs > TabsList > TabsTrigger`, with `data-state="active|inactive"`
 on each trigger and Floating-UI-driven keyboard behavior via Radix.
 
-Shiny's `tabsetPanel()` provides the input binding shinyshadcn needs
+Shiny's `tabsetPanel()` provides the input binding shinyblocks needs
 for reactive tab switching (`input$tab_id`). Since Shiny 1.7,
 `tabsetPanel()` delegates HTML construction to `bslib::buildTabset()`,
 emitting Bootstrap-flavored markup:
@@ -44,14 +44,14 @@ toggle.
 
 ## Decision
 
-`shadcn_tabs()` wraps `shiny::tabsetPanel()`. The wrapper is
+`block_tabs()` wraps `shiny::tabsetPanel()`. The wrapper is
 **additive decoration only** — it does not restructure the markup.
 
 ```r
-shadcn_tabs <- function(..., id = NULL, selected = NULL, class = NULL) {
+block_tabs <- function(..., id = NULL, selected = NULL, class = NULL) {
   panels <- shiny::tabsetPanel(..., id = id, selected = selected)
   htmltools::tagQuery(panels)$
-    addClass("ssc-tabs")$
+    addClass("sb-tabs")$
     find("ul.nav")$
       each(\(x, i) htmltools::tagAppendAttributes(
         x, role = "tablist", `aria-orientation` = "horizontal"
@@ -65,24 +65,24 @@ shadcn_tabs <- function(..., id = NULL, selected = NULL, class = NULL) {
 CSS targets the existing Bootstrap classes plus our decoration:
 
 ```css
-.ssc-tabs .nav-link        { /* default tab styling */ }
-.ssc-tabs .nav-link.active { /* selected tab styling */ }
-.ssc-tabs .tab-content     { /* content styling */ }
+.sb-tabs .nav-link        { /* default tab styling */ }
+.sb-tabs .nav-link.active { /* selected tab styling */ }
+.sb-tabs .tab-content     { /* content styling */ }
 ```
 
-`shadcn_tab(label, value, ...)` is sugar over `shiny::tabPanel()` —
+`block_tab(label, value, ...)` is sugar over `shiny::tabPanel()` —
 no behavioral changes, just consistent naming with the rest of the
 package.
 
 ### Acknowledged transitive dependency
 
-`tabsetPanel()` calls `bslib::buildTabset()` internally. shinyshadcn
-therefore has a runtime dependency on `bslib` once `shadcn_tabs()`
+`tabsetPanel()` calls `bslib::buildTabset()` internally. shinyblocks
+therefore has a runtime dependency on `bslib` once `block_tabs()`
 ships. bslib ships with modern Shiny anyway. Reimplementing the tab
 input binding from scratch is not worth the maintenance cost.
 
 `DESCRIPTION` should list `bslib` under `Imports:` in the same phase
-that implements `shadcn_tabs()`. It does not need to be imported before
+that implements `block_tabs()`. It does not need to be imported before
 tabs exist.
 
 ### What we explicitly do NOT do
@@ -97,32 +97,32 @@ tabs exist.
 ## Bootstrap Coexistence
 
 Shiny ships Bootstrap 5 by default (loaded via `bootstrapPage()` /
-`fluidPage()` etc., NOT by individual inputs). shinyshadcn does not
-load Bootstrap itself; users who call `shadcn_page()` get a
+`fluidPage()` etc., NOT by individual inputs). shinyblocks does not
+load Bootstrap itself; users who call `block_page()` get a
 Bootstrap-free shell.
 
-Mixed apps that load both shinyshadcn and `fluidPage()` are
+Mixed apps that load both shinyblocks and `fluidPage()` are
 explicitly unsupported but won't catastrophically break:
 
-- shinyshadcn's CSS is loaded after Bootstrap and uses
-  `.ssc-app`-scoped selectors with sufficient specificity to win
-  conflicts on shinyshadcn-rendered components.
+- shinyblocks's CSS is loaded after Bootstrap and uses
+  `.sb-app`-scoped selectors with sufficient specificity to win
+  conflicts on shinyblocks-rendered components.
 - Bootstrap-styled inputs and components retain their Bootstrap
-  appearance unless explicitly wrapped in `shadcn_field()` or
-  `shadcn_input_group()`.
-- Mixing bslib, shinydashboard, or bs4Dash with shinyshadcn is
+  appearance unless explicitly wrapped in `block_field()` or
+  `block_input_group()`.
+- Mixing bslib, shinydashboard, or bs4Dash with shinyblocks is
   documented as not supported in `vignette("coexistence")`.
 
 For tabs specifically, the bslib pull means Bootstrap's tab JS is
-present whether or not the user loaded `fluidPage()`. shinyshadcn
-relies on this for `shadcn_tabs()` to work.
+present whether or not the user loaded `fluidPage()`. shinyblocks
+relies on this for `block_tabs()` to work.
 
 ## Consequences
 
-- `shadcn_tabs()` works out-of-the-box with `input$tab_id` exactly
+- `block_tabs()` works out-of-the-box with `input$tab_id` exactly
   like `tabsetPanel()` — no input binding to maintain.
 - Users who depend on the underlying markup (CSS targeting, JS
-  inspection) see Bootstrap-flavored classes plus our `ssc-tabs`
+  inspection) see Bootstrap-flavored classes plus our `sb-tabs`
   decoration. Document this in the tabs reference page.
 - Bootstrap's tab JS is loaded transitively. If a future ADR moves
   tabs off Bootstrap, this dependency vanishes.

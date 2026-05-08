@@ -15,7 +15,7 @@ what was verified.
 
 ## A. Verify — automated
 
-- [ ] `make build-css` clean; no drift in `inst/www/shinyshadcn.css`.
+- [ ] `make build-css` clean; no drift in `inst/www/shinyblocks.css`.
 - [ ] `make lint` clean.
 - [ ] `make spell` clean.
 - [ ] `make urls` clean.
@@ -59,7 +59,7 @@ what was verified.
 - [ ] `docs/ROADMAP.md` phase ticked off; "Current Status" updated.
 - [ ] Strategy doc amended if scope changed.
 - [ ] ADRs written or updated as needed.
-- [ ] `docs/upstream/shadcn-sync.md` entry if shadcn was reviewed.
+- [ ] `docs/upstream/sb-sync.md` entry if shadcn was reviewed.
 - [ ] Cross-link check across `docs/` clean.
 - [ ] Dev notes added if non-obvious problems were hit.
 

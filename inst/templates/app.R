@@ -1,16 +1,16 @@
 library(shiny)
-library(shinyshadcn)
+library(shinyblocks)
 
-ui <- shadcn_page(
-  title = "shinyshadcn demo",
-  sidebar = shadcn_sidebar(
-    title = "shinyshadcn",
-    shadcn_nav_item("Overview", selected = TRUE),
-    shadcn_nav_item("Reports"),
-    shadcn_nav_item("Settings")
+ui <- block_page(
+  title = "shinyblocks demo",
+  sidebar = block_sidebar(
+    title = "shinyblocks",
+    block_nav_item("Overview", selected = TRUE),
+    block_nav_item("Reports"),
+    block_nav_item("Settings")
   ),
-  header = shadcn_header("Overview"),
-  shadcn_card(
+  header = block_header("Overview"),
+  block_card(
     title = "Active users",
     value = "1,284",
     "A minimal component placeholder."

@@ -1,4 +1,4 @@
-# shinyshadcn
+# shinyblocks
 
 An experimental R package for building Shiny dashboards with a
 shadcn/ui-inspired component system.
@@ -17,16 +17,16 @@ This package is early-stage and the API may change.
 
 ```r
 library(shiny)
-library(shinyshadcn)
+library(shinyblocks)
 
-ui <- shadcn_page(
+ui <- block_page(
   title = "Analytics",
-  sidebar = shadcn_sidebar(
-    shadcn_nav_item("Overview", icon = "layout-dashboard", selected = TRUE),
-    shadcn_nav_item("Reports", icon = "file-chart-column")
+  sidebar = block_sidebar(
+    block_nav_item("Overview", icon = "layout-dashboard", selected = TRUE),
+    block_nav_item("Reports", icon = "file-chart-column")
   ),
-  header = shadcn_header("Analytics"),
-  shadcn_card(
+  header = block_header("Analytics"),
+  block_card(
     title = "Revenue",
     value = "$42,100"
   )
@@ -43,7 +43,7 @@ The package is not on CRAN yet. Once the GitHub repository is
 available, install the development version with:
 
 ```r
-pak::pak("nvelden/shinyshadcn")
+pak::pak("nvelden/shinyblocks")
 ```
 
 ## Development

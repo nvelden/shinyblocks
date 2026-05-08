@@ -1,6 +1,6 @@
-# Contributing to shinyshadcn
+# Contributing to shinyblocks
 
-Thanks for considering a contribution. shinyshadcn is an R package that
+Thanks for considering a contribution. shinyblocks is an R package that
 brings shadcn/ui-inspired design to Shiny. The conventions below keep
 the package coherent with shadcn upstream and idiomatic for R.
 
@@ -27,27 +27,27 @@ If `devtools` is unavailable, use `R CMD check .`.
 - Public functions return `htmltools::tag` or
   `htmltools::tagList` objects. They never have side effects beyond
   emitting HTML.
-- Function names are `shadcn_*`, snake_case.
+- Function names are `block_*`, snake_case.
 - Every exported function accepts `class = NULL` and merges via
   `merge_classes()` — package classes are appended, never overwritten
   by user input.
 - `htmltools::htmlDependency()` is always wrapped in a function
-  (e.g. `shinyshadcn_dependency()`), never bound to a top-level
+  (e.g. `shinyblocks_dependency()`), never bound to a top-level
   variable. Top-level bindings bake the install path into the
   binary build and break across machines.
 - Components with internal regions expose every region as its own
-  primitive: `shadcn_card_header()`, `shadcn_card_title()`, etc. A
+  primitive: `block_card_header()`, `block_card_title()`, etc. A
   flat-argument convenience form may exist but composes into the
   same primitives internally.
 - Group/Item composition is validated at call time via
-  `validate_children()`. `shadcn_nav_item()` outside `shadcn_nav()`
+  `validate_children()`. `block_nav_item()` outside `block_nav()`
   must produce a clear R error, not silent broken markup.
 - Variants and sizes are validated R arguments
   (`match.arg()`-style), not free-form strings.
 - Required accessibility arguments (`title`, `label`) have no
   defaults and error if missing.
-- `shadcn_button()` has no `loading=` or `pending=` argument.
-  Loading state is composed: pass `shadcn_spinner()` as `icon`,
+- `block_button()` has no `loading=` or `pending=` argument.
+  Loading state is composed: pass `block_spinner()` as `icon`,
   set `disabled = TRUE`. This matches shadcn upstream.
 
 ## CSS authoring conventions
@@ -74,7 +74,7 @@ Package CSS lives under `inst/www/` and is shipped with the package.
 
 ## Icon conventions
 
-- `shadcn_icon()` accepts a Lucide icon name (string) validated
+- `block_icon()` accepts a Lucide icon name (string) validated
   against the vendored sprite, or an `htmltools::tag` to inject a
   custom SVG.
 - Icons inside components emit `data-icon="inline-start"` or
