@@ -6,10 +6,14 @@
 #' @return An `htmltools` tag.
 #' @export
 block_sidebar <- function(..., title = NULL) {
-  shiny::tags$aside(
-    class = "sb-sidebar",
-    if (!is.null(title)) shiny::tags$div(class = "sb-sidebar-title", title),
-    shiny::tags$nav(class = "sb-sidebar-nav", ...)
+  attach_shinyblocks_deps(
+    htmltools::tags$aside(
+      class = "sb-sidebar",
+      if (!is.null(title)) {
+        htmltools::tags$div(class = "sb-sidebar-title", title)
+      },
+      htmltools::tags$nav(class = "sb-sidebar-nav", ...)
+    )
   )
 }
 
@@ -20,7 +24,9 @@ block_sidebar <- function(..., title = NULL) {
 #' @return An `htmltools` tag.
 #' @export
 block_header <- function(...) {
-  shiny::tags$header(class = "sb-header", ...)
+  attach_shinyblocks_deps(
+    htmltools::tags$header(class = "sb-header", ...)
+  )
 }
 
 #' Create a sidebar navigation item
@@ -33,11 +39,15 @@ block_header <- function(...) {
 #' @return An `htmltools` tag.
 #' @export
 block_nav_item <- function(label, href = "#", icon = NULL, selected = FALSE) {
-  shiny::tags$a(
-    class = paste("sb-nav-item", if (selected) "is-selected"),
-    href = href,
-    `aria-current` = if (selected) "page" else NULL,
-    if (!is.null(icon)) shiny::tags$span(class = "sb-nav-icon", `data-icon` = icon),
-    shiny::tags$span(class = "sb-nav-label", label)
+  attach_shinyblocks_deps(
+    htmltools::tags$a(
+      class = paste("sb-nav-item", if (selected) "is-selected"),
+      href = href,
+      `aria-current` = if (selected) "page" else NULL,
+      if (!is.null(icon)) {
+        htmltools::tags$span(class = "sb-nav-icon", `data-icon` = icon)
+      },
+      htmltools::tags$span(class = "sb-nav-label", label)
+    )
   )
 }

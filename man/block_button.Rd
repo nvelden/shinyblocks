@@ -15,7 +15,7 @@ block_button(
 
 \item{variant}{Visual variant.}
 
-\item{...}{Additional attributes passed to \code{shiny::tags$button}.}
+\item{...}{Additional attributes passed to \code{htmltools::tags$button}.}
 }
 \value{
 An \code{htmltools} tag.

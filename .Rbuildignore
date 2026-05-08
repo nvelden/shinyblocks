@@ -1,6 +1,7 @@
 ^\.git$
 ^\.github$
 ^\.gitignore$
+^\.lintr$
 ^\.Rproj\.user$
 ^.*\.Rproj$
 ^.*\.Rcheck$
@@ -37,6 +38,7 @@
 # pkgdown
 ^_pkgdown\.yml$
 ^pkgdown$
+^site$
 
 # CI
 ^\.github$

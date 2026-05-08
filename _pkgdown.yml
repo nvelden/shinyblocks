@@ -1,0 +1,26 @@
+destination: site/pkgdown
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: Layout
+    contents:
+      - block_page
+      - block_header
+      - block_sidebar
+  - title: Navigation
+    contents:
+      - block_nav_item
+  - title: Content
+    contents:
+      - block_card
+  - title: Action
+    contents:
+      - block_button
+  - title: Showcase
+    contents:
+      - run_showcase
+
+# Planned v0.1 reference sections added as components land:
+# Forms, Theme, Icon.

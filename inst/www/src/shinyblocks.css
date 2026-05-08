@@ -1,0 +1,116 @@
+/*
+ * shinyblocks — Tailwind v4 source.
+ *
+ * Compiled to ../shinyblocks.css by `make build-css` (or
+ * `npm run build:css`). The compiled file is committed and shipped
+ * on CRAN. End users never run this build.
+ *
+ * Layer ordering: tokens import sets CSS custom properties; @theme
+ * exposes them to Tailwind utilities; @layer components defines
+ * package classes (sb-*) using @apply. User markup never references
+ * Tailwind utilities directly.
+ *
+ * See ADR 0006 (styling foundation) and ADR 0009 (upstream sync).
+ */
+
+@import "tailwindcss";
+@import "./tokens.css";
+
+@theme {
+  /* Map shadcn tokens into Tailwind's color namespace so utilities
+   * like bg-card, text-muted-foreground, border-border resolve. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* Base resets shinyblocks relies on regardless of host Bootstrap.
+ * Scoped to .sb-app to avoid colliding with other frameworks. */
+@layer base {
+  .sb-app {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Hide Shiny's empty placeholder labels. See troubleshooting.md. */
+  .sb-app .shiny-label-null {
+    display: none;
+  }
+
+  /* Visible focus ring across all interactive elements. */
+  .sb-app :where(button, a, [role="button"], [role="tab"], input, select, textarea):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Component layer.
+ *
+ * Phase 1 starts with empty rules for sb-app, sb-page, sb-header,
+ * sb-sidebar, sb-body. Subsequent phases add components. Each
+ * component must:
+ *  - use semantic tokens only (no raw colors),
+ *  - use gap-* not space-y-*,
+ *  - use size-* when w==h,
+ *  - never set z-index manually,
+ *  - never override component classes from user `class =` props.
+ *
+ * See CONTRIBUTING.md for the full conventions list.
+ */
+@layer components {
+  /* Phase 1: shell layout. Implementations land alongside R/page.R,
+   * R/header.R, R/sidebar.R. Empty selectors below are the contract:
+   * the R helpers emit these classes, and CSS rules fill in the
+   * styling per phase. */
+
+  .sb-page {
+    /* Phase 1 */
+  }
+
+  .sb-header {
+    /* Phase 1 */
+  }
+
+  .sb-sidebar {
+    /* Phase 1 */
+  }
+
+  .sb-body {
+    /* Phase 1 */
+  }
+
+  /* Phase 2: icons, buttons, badges, alerts. */
+  /* Phase 3: cards, value boxes, separator, skeleton, spinner, empty. */
+  /* Phase 4: nav, sidebar collapse. */
+  /* Phase 5: tabs, fields, input groups, theme runtime. */
+}
