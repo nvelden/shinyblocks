@@ -1,14 +1,42 @@
+^\.git$
+^\.github$
+^\.gitignore$
+^\.Rproj\.user$
+^.*\.Rproj$
+^.*\.Rcheck$
+
+# Dev-only docs and planning (in git, not in the package tarball)
+^docs$
+^PLAN\.md$
+^CONTRIBUTING\.md$
+^HANDOFF\.md$
 ^AGENTS\.md$
 ^CLAUDE\.md$
-^PLAN\.md$
-^components\.json$
-^docs$
+^README\.Rmd$
+^cran-comments\.md$
+
+# Agent runtime caches
 ^\.agents$
 ^\.claude$
 ^\.codex$
-^\.git$
-^\.gitignore$
-^package\.json$
-^README\.md$
 ^skills-lock\.json$
+
+# Frontend tooling for the dev-time CSS build
+^components\.json$
+^package\.json$
+^package-lock\.json$
+^node_modules$
 ^tsconfig\.json$
+^\.tool-versions$
+^Makefile$
+^tools$
+
+# Tailwind source — only the compiled output ships
+^inst/www/src$
+
+# pkgdown
+^_pkgdown\.yml$
+^pkgdown$
+
+# CI
+^\.github$
