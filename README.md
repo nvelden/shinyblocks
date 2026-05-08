@@ -32,6 +32,11 @@ The Posit R package development skill is also installed for both Codex and Claud
 - `.agents/skills/r-package-development`
 - `.claude/skills/r-package-development`
 
+The Posit critical code reviewer skill is installed for review-focused agent work:
+
+- `.agents/skills/critical-code-reviewer`
+- `.claude/skills/critical-code-reviewer`
+
 `components.json`, `tsconfig.json`, and `package.json` provide enough shadcn project context for AI agents and `npx shadcn@latest info --json`. They are excluded from the R package build.
 
 ## Initial Package Shape

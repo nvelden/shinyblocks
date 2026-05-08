@@ -1,6 +1,13 @@
 {
   "version": 1,
   "skills": {
+    "critical-code-reviewer": {
+      "source": "posit-dev/skills",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": "posit-dev/critical-code-reviewer/SKILL.md",
+      "computedHash": "fb5de7c324b8437491c9a7f696193cb617364dcbba258dac79470d075855e5a5"
+    },
     "r-package-development": {
       "source": "posit-dev/skills",
       "ref": "main",

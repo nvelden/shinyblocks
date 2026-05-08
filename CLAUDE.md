@@ -6,6 +6,8 @@ The official shadcn skill is installed locally under `.claude/skills/shadcn` and
 
 The Posit r-package-development skill is installed locally under `.claude/skills/r-package-development` and `.agents/skills/r-package-development`. Use it for R package structure, roxygen2 documentation, testthat tests, devtools workflows, package checks, and NEWS guidance.
 
+The Posit critical-code-reviewer skill is installed locally under `.claude/skills/critical-code-reviewer` and `.agents/skills/critical-code-reviewer`. Use it when asked for code reviews, PR reviews, critiques, or risk-focused assessments.
+
 Important: this repository is an R package, not a React app. Treat shadcn/ui as design-system source material. Translate concepts into `htmltools`, Shiny tags, CSS variables, and small JavaScript behaviors only when needed.
 
 Start with the planning docs:
