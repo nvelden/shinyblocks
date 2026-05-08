@@ -1,9 +1,14 @@
 ^AGENTS\.md$
 ^CLAUDE\.md$
 ^PLAN\.md$
+^components\.json$
 ^docs$
+^\.agents$
 ^\.claude$
 ^\.codex$
 ^\.git$
 ^\.gitignore$
+^package\.json$
 ^README\.md$
+^skills-lock\.json$
+^tsconfig\.json$

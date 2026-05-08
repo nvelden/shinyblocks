@@ -2,6 +2,14 @@
 
 This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package inspired by shadcn/ui.
 
+## Installed Skills
+
+- `shadcn`: installed locally under `.agents/skills/shadcn` and `.claude/skills/shadcn`.
+
+Use the shadcn skill for shadcn/ui component conventions, naming, composition rules, theming tokens, and accessibility patterns. This repo is not a React app, so translate those patterns into R, `htmltools`, Shiny, and package assets instead of adding React components directly.
+
+The root `components.json` and `package.json` exist only to provide shadcn project context to AI agents and the `shadcn` CLI. They are excluded from the R package build.
+
 ## Working Style
 
 - Read `PLAN.md` and `docs/ROADMAP.md` before implementing.
@@ -9,6 +17,7 @@ This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package 
 - Prefer idiomatic R package structure over custom conventions.
 - Use `htmltools`, `shiny`, and package assets under `inst/` before introducing a frontend build step.
 - Do not add a Node/Tailwind build unless a decision record explicitly approves it.
+- Do not run `npx shadcn@latest add` into this package unless a decision record explicitly approves using generated React source as research material.
 - Use accessible markup and keyboard-friendly interactions.
 - Keep examples runnable with a standard R/Shiny installation.
 
@@ -36,6 +45,13 @@ If `devtools` is unavailable:
 
 ```bash
 R CMD check .
+```
+
+For shadcn reference context:
+
+```bash
+npm exec -- shadcn@latest info --json
+npm exec -- shadcn@latest docs button card sidebar tabs
 ```
 
 ## Coding Constraints
