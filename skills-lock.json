@@ -1,6 +1,13 @@
 {
   "version": 1,
   "skills": {
+    "r-package-development": {
+      "source": "posit-dev/skills",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": "r-lib/r-package-development/SKILL.md",
+      "computedHash": "d979a0d84ed00a99365f8a6adc6dba2a690e3dc74b4e7fdde4f196477467fb06"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
