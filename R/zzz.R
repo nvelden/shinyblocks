@@ -1,6 +1,6 @@
 .onLoad <- function(libname, pkgname) {
   shiny::addResourcePath(
-    prefix = "shinyshadcn",
+    prefix = "shinyblocks",
     directoryPath = system.file("www", package = pkgname)
   )
 }

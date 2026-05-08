@@ -1,7 +1,7 @@
 # Developer Notes
 
 Postmortems and lessons learned during development. Each note
-captures a real problem encountered while building shinyshadcn so the
+captures a real problem encountered while building shinyblocks so the
 next person (or the next AI agent session) doesn't repeat the same
 investigation.
 

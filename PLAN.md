@@ -1,4 +1,4 @@
-# shinyshadcn Plan
+# shinyblocks Plan
 
 A Shiny dashboard package with the authoring ergonomics of `shinydashboard`
 and the visual language of shadcn/ui. End users install from CRAN; they
@@ -29,7 +29,7 @@ specific artifact is ready to become part of the public workflow.
 - R-first API: every public function returns `htmltools::tag` or
   `shiny.tag` objects.
 - **No Node, no Tailwind, no React at user install time.** Tailwind v4
-  is used by maintainers to compile `inst/www/shinyshadcn.css`; the
+  is used by maintainers to compile `inst/www/shinyblocks.css`; the
   compiled file is committed and shipped on CRAN. Same model as
   `bslib` (Sass → compiled Bootstrap) and `bs4Dash` (vendored
   AdminLTE).
@@ -47,38 +47,38 @@ specific artifact is ready to become part of the public workflow.
 ## v0.1 API Surface
 
 Shell:
-- `shadcn_page()`, `shadcn_header()`, `shadcn_sidebar()`, `shadcn_body()`
+- `block_page()`, `block_header()`, `block_sidebar()`, `block_body()`
 
 Navigation:
-- `shadcn_nav()`, `shadcn_nav_item()`
-- `shadcn_tabs()`, `shadcn_tab()` (wraps `shiny::tabsetPanel`)
+- `block_nav()`, `block_nav_item()`
+- `block_tabs()`, `block_tab()` (wraps `shiny::tabsetPanel`)
 
 Card composition:
-- `shadcn_card()`, `shadcn_card_header()`, `shadcn_card_title()`,
-  `shadcn_card_description()`, `shadcn_card_content()`,
-  `shadcn_card_footer()`
+- `block_card()`, `block_card_header()`, `block_card_title()`,
+  `block_card_description()`, `block_card_content()`,
+  `block_card_footer()`
 
 Alert composition:
-- `shadcn_alert()`, `shadcn_alert_title()`, `shadcn_alert_description()`
+- `block_alert()`, `block_alert_title()`, `block_alert_description()`
 
 Content:
-- `shadcn_value_box()`, `shadcn_badge()`, `shadcn_separator()`,
-  `shadcn_skeleton()`, `shadcn_spinner()`, `shadcn_empty()`
+- `block_value_box()`, `block_badge()`, `block_separator()`,
+  `block_skeleton()`, `block_spinner()`, `block_empty()`
 
 Action:
-- `shadcn_button()` with `data-icon` integration
+- `block_button()` with `data-icon` integration
 
 Form layout (wraps Shiny inputs, does not replace them):
-- `shadcn_field()`, `shadcn_field_group()`, `shadcn_field_label()`,
-  `shadcn_field_description()`, `shadcn_field_set()`,
-  `shadcn_field_legend()`, `shadcn_field_invalid()`
-- `shadcn_input_group()`, `shadcn_input_group_addon()`
+- `block_field()`, `block_field_group()`, `block_field_label()`,
+  `block_field_description()`, `block_field_set()`,
+  `block_field_legend()`, `block_field_invalid()`
+- `block_input_group()`, `block_input_group_addon()`
 
 Theme:
-- `shadcn_theme()`, `shadcn_dark_mode_toggle()`, `update_shadcn_theme()`
+- `block_theme()`, `block_dark_mode_toggle()`, `update_block_theme()`
 
 Icon:
-- `shadcn_icon()` backed by a vendored Lucide sprite
+- `block_icon()` backed by a vendored Lucide sprite
 
 Showcase:
 - `run_showcase()` launches the dogfooded gallery app locally; the
@@ -88,7 +88,7 @@ Internal utilities (not exported, but central to the API contract):
 - `merge_classes()` — R equivalent of shadcn's `cn()`; deduplicates
   and joins package classes with user `class =`.
 - `validate_children()` — fast-fails when a Group/Item composition
-  contract is violated (e.g. `shadcn_nav_item` outside `shadcn_nav`).
+  contract is violated (e.g. `block_nav_item` outside `block_nav`).
 
 ## Out of Scope for v0.1
 
@@ -105,7 +105,7 @@ These are v0.2+ candidates and several need their own ADRs first.
 - **Approach:** htmltools R helpers + dev-time Tailwind v4 build +
   small ES modules. Compiled CSS is committed and shipped; users never
   run Node. Same precedent as `bslib` and `bs4Dash`.
-- **Naming:** `shadcn_*` for exported functions; `ssc-` for CSS classes;
+- **Naming:** `block_*` for exported functions; `sb-` for CSS classes;
   Radix-style `data-state` attributes where useful.
 - **Tokens:** vendor shadcn's oklch CSS custom properties verbatim into
   `inst/www/src/tokens.css`; surface them through Tailwind's `@theme`
@@ -151,7 +151,7 @@ These are v0.2+ candidates and several need their own ADRs first.
 
 ## Milestones
 
-1. ADRs 0006–0011 written, formalizing the open decisions.
+1. ADRs 0006–0012 written, formalizing the open decisions.
 2. Asset dependency and static shell.
 3. CSS build pipeline wired up (`Makefile`, `package.json`, CI drift
    check).
@@ -206,14 +206,14 @@ Four artifacts grow continuously alongside the code, not at the end:
   started, theming, components, coexistence, accessibility, and
   troubleshooting.
 - **Showcase app** under `inst/showcase/`, launchable via
-  `shinyshadcn::run_showcase()`. Built with shinyshadcn itself
+  `shinyblocks::run_showcase()`. Built with shinyblocks itself
   (dogfooding). Each component has a gallery card with a live render
   and the source code beside it. Light/dark toggle in the header.
   The hosted version is exported with Shinylive from a clean staging
   directory to `site/showcase/`, then served by the same static site
-  deployment as pkgdown. Until `shinyshadcn` has a webR/WASM binary,
+  deployment as pkgdown. Until `shinyblocks` has a webR/WASM binary,
   the staged app copies the needed package R helpers and assets
-  rather than calling `library(shinyshadcn)`.
+  rather than calling `library(shinyblocks)`.
 - **`docs/troubleshooting.md`** — user-facing common-problem catalog.
   Updated whenever a recurring user issue is fixed.
 - **`docs/dev-notes/`** — internal postmortems. Updated whenever a
@@ -236,5 +236,5 @@ Four artifacts grow continuously alongside the code, not at the end:
   from the showcase).
 - `getting-started`, `theming`, `components`, `coexistence`, and
   `accessibility` vignettes ship.
-- `docs/upstream/shadcn-sync.md` records the shadcn commit the v0.1
+- `docs/upstream/sb-sync.md` records the shadcn commit the v0.1
   tokens were copied from.

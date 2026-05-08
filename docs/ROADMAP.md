@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **Phase 0 complete** — ADRs `0006`–`0011` are accepted.
+> **Phase 0 complete** — ADRs `0006`–`0012` are accepted.
 > Next: start Phase 1A, the asset dependency and static shell slice.
 
 Update this line at every phase exit.
@@ -46,7 +46,7 @@ or phase-exit file.
 ### A. Verify — automated
 
 1. **Build pipeline.** `make build-css` is clean; the committed
-   `inst/www/shinyshadcn.css` matches what the source produces
+   `inst/www/shinyblocks.css` matches what the source produces
    (CI drift check).
 2. **Lint.** `lintr::lint_package()` is clean. Style violations are
    fixed, not silenced.
@@ -94,7 +94,7 @@ or phase-exit file.
    webR first load, enters the app iframe, and verifies the shell,
    sidebar, theme, and at least one component on desktop and mobile.
 11. **Performance budget.** A `tools/budget.R` script prints sizes
-    of `inst/www/shinyshadcn.css`, `shinyshadcn.js`, and
+    of `inst/www/shinyblocks.css`, `shinyblocks.js`, and
     `icons/sprite.svg`. Targets: CSS ≤30 KB minified, JS ≤15 KB,
     sprite ≤25 KB gzipped. Over budget = blocking unless ADR'd.
 12. **Accessibility sweep.** Manual on the showcase: keyboard tab
@@ -121,7 +121,7 @@ or phase-exit file.
     users, not changelog for committers.
 17. **`docs/` updates.** `ROADMAP.md` phase checkbox flipped.
     Strategy doc amended if scope changed. New or amended ADRs
-    committed under `docs/decisions/`. `docs/upstream/shadcn-sync.md`
+    committed under `docs/decisions/`. `docs/upstream/sb-sync.md`
     gets an entry whenever shadcn upstream was reviewed during the
     phase. Cross-link check: a small script greps for
     `](.*\.md)` patterns and verifies every target file exists.
@@ -198,7 +198,7 @@ exact code that produced it.
   `getting-started.Rmd`, `theming.Rmd`, `components.Rmd`,
   `coexistence.Rmd`, `accessibility.Rmd`.
 - Per-component page layout: brief description → signature →
-  embedded live preview (via `inst/www/shinyshadcn.css` styling the
+  embedded live preview (via `inst/www/shinyblocks.css` styling the
   rendered roxygen example) → copyable code block → parameter table
   generated from roxygen → "see also" listing related components
   via `@family`.
@@ -206,11 +206,11 @@ exact code that produced it.
 
 ### B. Showcase app (dogfooded)
 
-A Shiny app under `inst/showcase/` built with shinyshadcn itself,
-launchable via `shinyshadcn::run_showcase()`.
+A Shiny app under `inst/showcase/` built with shinyblocks itself,
+launchable via `shinyblocks::run_showcase()`.
 
 - Sidebar nav with one entry per component category.
-- Each component section is a `shadcn_card` containing:
+- Each component section is a `block_card` containing:
   1. A heading with the function name.
   2. A live rendered example.
   3. A `<pre><code>` block with the source for that example,
@@ -235,15 +235,15 @@ launchable via `shinyshadcn::run_showcase()`.
 - The hosted showcase is exported with Shinylive from a clean staging
   directory, never from the repository root. The staged app copies
   only required showcase files, selected package R helpers, and
-  `inst/www` assets. Until `shinyshadcn` has a WebAssembly binary,
+  `inst/www` assets. Until `shinyblocks` has a WebAssembly binary,
   the staged app uses `library(shiny)` and `library(htmltools)` and
   relies on Shiny's automatic `R/` sourcing instead of
-  `library(shinyshadcn)`.
-- `shinyshadcn_dependency()` supports both package mode
-  (`package = "shinyshadcn", src = "www"`) and Shinylive app-asset
-  mode (`src = c(href = "shinyshadcn")`, assets copied to
-  `www/shinyshadcn/`). The staged export sets an internal option
-  such as `options(shinyshadcn.asset_mode = "app")`; regular package
+  `library(shinyblocks)`.
+- `shinyblocks_dependency()` supports both package mode
+  (`package = "shinyblocks", src = "www"`) and Shinylive app-asset
+  mode (`src = c(href = "shinyblocks")`, assets copied to
+  `www/shinyblocks/`). The staged export sets an internal option
+  such as `options(shinyblocks.asset_mode = "app")`; regular package
   users never set it.
 - Shinylive output goes to `site/showcase/`. This avoids colliding
   with maintainer planning docs under `docs/` and leaves room to
@@ -260,7 +260,7 @@ implementation drifts.
   build that ships compiled CSS; document the build invocation, source
   layout under `inst/www/src/`, the `@theme` token mapping, the CI
   drift check, and the explicit non-use of CDN-loaded Tailwind.
-- `0007-tabs-and-bootstrap.md` — `shadcn_tabs()` as a styled wrapper
+- `0007-tabs-and-bootstrap.md` — `block_tabs()` as a styled wrapper
   around `shiny::tabsetPanel()`; rules for Bootstrap coexistence.
 - `0008-icons-and-dark-mode.md` — Lucide subset selection; sprite
   generation; `data-theme` attribute; first-paint script for
@@ -273,29 +273,32 @@ implementation drifts.
 - `0011-cran-ci.md` — CRAN-readiness GitHub Actions, workflow action
   version verification, routine cross-platform checks, and strict
   manual release checks.
+- `0012-rename-to-shinyblocks.md` — project rename from
+  `shinyshadcn` to `shinyblocks`, public API prefix change to
+  `block_*`, and internal `sb-*` naming.
 
 ## Phase 1A — Asset Dependency and Static Shell
 
 Goal: a minimal static dashboard shell that renders without JavaScript
 and attaches package assets correctly.
 
-- `R/deps.R`: `shinyshadcn_dependency()`, `attach_shinyshadcn_deps()`.
+- `R/deps.R`: `shinyblocks_dependency()`, `attach_shinyblocks_deps()`.
   Attaches the package CSS and, once present, JS/icons through
   `htmltools::htmlDependency()`. The dependency is a function, not a
   top-level object.
 - `R/utils.R`: `merge_classes()` (R equivalent of `cn()`) and
   `validate_children()` (Group/Item contract enforcer). Both are
   used by every component from this phase forward.
-- `R/page.R`: `shadcn_page()`, `shadcn_body()`.
-- `R/header.R`: `shadcn_header()`.
-- `R/sidebar.R`: `shadcn_sidebar()` static layout (no collapse yet).
+- `R/page.R`: `block_page()`, `block_body()`.
+- `R/header.R`: `block_header()`.
+- `R/sidebar.R`: `block_sidebar()` static layout (no collapse yet).
 - Keep CSS handwritten or minimally generated for this slice if that
   lets the shell ship cleanly. Tailwind source plumbing belongs to
   Phase 1B.
 
 Tests: tag shape, semantic landmarks, single dependency attachment.
 
-Exit criterion: a Shiny app using `shadcn_page()` renders the shell
+Exit criterion: a Shiny app using `block_page()` renders the shell
 correctly with JS disabled, using only package assets in `inst/www/`.
 `devtools::test()` and package check pass.
 
@@ -309,17 +312,17 @@ Build pipeline:
 - `inst/www/src/tokens.css`: vendored shadcn oklch tokens (`:root`
   and `[data-theme="dark"]` blocks). Header comment pins the upstream
   commit synced from.
-- `inst/www/src/shinyshadcn.css`: `@import "tailwindcss"`, `@import
+- `inst/www/src/shinyblocks.css`: `@import "tailwindcss"`, `@import
   "./tokens.css"`, `@theme` mapping shadcn tokens into Tailwind
   namespace, and the initial `@layer components` rules.
 - `Makefile` target `build-css` and `package.json` script `build:css`:
-  both invoke `npx @tailwindcss/cli --input inst/www/src/shinyshadcn.css
-  --output inst/www/shinyshadcn.css --minify`.
+  both invoke `npx @tailwindcss/cli --input inst/www/src/shinyblocks.css
+  --output inst/www/shinyblocks.css --minify`.
 - `package.json` gains `tailwindcss` and `@tailwindcss/cli` as
   `devDependencies`.
 - CI step runs `make build-css` and fails on `git status` drift in
-  `inst/www/shinyshadcn.css`.
-- `inst/www/shinyshadcn.css` (compiled) is committed.
+  `inst/www/shinyblocks.css`.
+- `inst/www/shinyblocks.css` (compiled) is committed.
 
 Exit criterion: generated CSS is reproducible, committed output has no
 drift, and no Node tooling is required at package install time.
@@ -349,7 +352,7 @@ working shell exists.
 - **Showcase:** scaffold `inst/showcase/app.R` and the
   `render_example()` helper that reads a source file and renders
   the rendered output beside the code. Add a "Page shell" section
-  showing `shadcn_page()` usage.
+  showing `block_page()` usage.
 - **Shinylive export:** scaffold `tools/export-shinylive.R` and a
   clean staging flow. The script copies only the files needed by the
   showcase into `.shinylive-stage/`, sets app-asset dependency mode,
@@ -413,7 +416,7 @@ requiring unused suggested packages.
 
 ## Phase 2 — Icons and Static Components
 
-- `R/icon.R`: `shadcn_icon()` backed by `inst/www/icons/sprite.svg`.
+- `R/icon.R`: `block_icon()` backed by `inst/www/icons/sprite.svg`.
 - Vendor curated Lucide subset (~80 icons, ISC license, attribution
   in `inst/www/icons/LICENSE`).
 - `R/button.R`: variants (`default`, `secondary`, `outline`, `ghost`,
@@ -430,23 +433,23 @@ requiring unused suggested packages.
 
 ## Phase 3 — Composite Components
 
-- `R/card.R`: full composition primitives — `shadcn_card()`,
-  `shadcn_card_header()`, `shadcn_card_title()`,
-  `shadcn_card_description()`, `shadcn_card_content()`,
-  `shadcn_card_footer()`. Flat-argument convenience form composes
+- `R/card.R`: full composition primitives — `block_card()`,
+  `block_card_header()`, `block_card_title()`,
+  `block_card_description()`, `block_card_content()`,
+  `block_card_footer()`. Flat-argument convenience form composes
   into the same primitives internally.
-- `R/value-box.R`: `shadcn_value_box()` with title, value,
+- `R/value-box.R`: `block_value_box()` with title, value,
   description, trend indicator, icon slots; trend uses
-  `shadcn_badge()`, not custom span.
-- `R/separator.R`: `shadcn_separator(orientation)` — replaces
+  `block_badge()`, not custom span.
+- `R/separator.R`: `block_separator(orientation)` — replaces
   `<hr>` and border divs across the package and showcase.
-- `R/skeleton.R`: `shadcn_skeleton(width, height)` — loading
+- `R/skeleton.R`: `block_skeleton(width, height)` — loading
   placeholder; pairs with Shiny's pending state.
-- `R/spinner.R`: `shadcn_spinner(size)` — animated SVG spinner.
+- `R/spinner.R`: `block_spinner(size)` — animated SVG spinner.
   Required by the button loading-state composition pattern (no
-  `loading=` arg on `shadcn_button()`); the spinner is what users
+  `loading=` arg on `block_button()`); the spinner is what users
   pass as the button's `icon`.
-- `R/empty.R`: `shadcn_empty(title, description, icon)` — empty
+- `R/empty.R`: `block_empty(title, description, icon)` — empty
   states for dashboards.
 - Tests: composition validation (children-class checks), slot
   composition, optional argument handling, separator orientation.
@@ -455,53 +458,53 @@ requiring unused suggested packages.
   with `@family` cross-links.
 - Showcase: gallery sections for each, including a multi-card grid
   demonstrating composition and a "no data" example using
-  `shadcn_empty()`.
+  `block_empty()`.
 
 ## Phase 4 — Navigation and Behavior
 
 - `R/sidebar.R`: collapse/expand, mobile sheet open/close, keyboard
-  navigation. JS module under `inst/www/shinyshadcn.js`.
-- `R/nav.R`: `shadcn_nav()`, `shadcn_nav_item()` with selected state.
+  navigation. JS module under `inst/www/shinyblocks.js`.
+- `R/nav.R`: `block_nav()`, `block_nav_item()` with selected state.
 - Tests: state attributes, keyboard handler smoke tests via headless
   browser if feasible (else deferred to Phase 7).
 - pkgdown: reference pages under **Navigation**; the `theming`
   article gains a sidebar example.
-- Showcase: convert the showcase's own sidebar to use `shadcn_nav()`
+- Showcase: convert the showcase's own sidebar to use `block_nav()`
   with selected state. Gallery section demonstrates collapse and
   mobile sheet behavior.
 
 ## Phase 5 — Tabs, Forms, and Theme Runtime
 
-- `R/tabs.R`: `shadcn_tabs()` + `shadcn_tab()` wrap
+- `R/tabs.R`: `block_tabs()` + `block_tab()` wrap
   `shiny::tabsetPanel()` and use additive decoration only. Preserve
   `ul.nav.shiny-tab-input`, `.nav-link`, `data-bs-toggle`, and
   `data-value` so Shiny's tab input binding and Bootstrap tab JS keep
-  working. Add roles/ARIA and `ssc-tabs` classes; do not emit
+  working. Add roles/ARIA and `sb-tabs` classes; do not emit
   Radix-style replacement markup. Add `bslib` to `Imports` in this
-  phase if `shadcn_tabs()` depends on Shiny's bslib-backed tabset
+  phase if `block_tabs()` depends on Shiny's bslib-backed tabset
   implementation.
-- `R/field.R`: `shadcn_field()`, `shadcn_field_group()`,
-  `shadcn_field_label()`, `shadcn_field_description()`,
-  `shadcn_field_set()`, `shadcn_field_legend()`,
-  `shadcn_field_invalid()`. Wrap Shiny inputs in shadcn-styled field
+- `R/field.R`: `block_field()`, `block_field_group()`,
+  `block_field_label()`, `block_field_description()`,
+  `block_field_set()`, `block_field_legend()`,
+  `block_field_invalid()`. Wrap Shiny inputs in sb-styled field
   markup. Validation states emit `data-invalid` on the field and
   `aria-invalid` on the underlying control.
-- `R/input-group.R`: `shadcn_input_group()`,
-  `shadcn_input_group_addon()`. Prefixed/suffixed input layout for
+- `R/input-group.R`: `block_input_group()`,
+  `block_input_group_addon()`. Prefixed/suffixed input layout for
   search bars, currency inputs, and inline-button inputs. Wraps a
   Shiny input.
-- `R/theme.R`: `shadcn_theme()` accepts named token overrides and
-  emits a scoped `<style>` block. `update_shadcn_theme()` for
+- `R/theme.R`: `block_theme()` accepts named token overrides and
+  emits a scoped `<style>` block. `update_block_theme()` for
   server-side updates via `session$sendCustomMessage`.
-- `R/dark-mode.R`: `shadcn_dark_mode_toggle()` button; toggle JS
+- `R/dark-mode.R`: `block_dark_mode_toggle()` button; toggle JS
   module reads/writes `data-theme` on `<html>`. First-paint inline
-  script in `shadcn_page()` head reads `prefers-color-scheme`.
+  script in `block_page()` head reads `prefers-color-scheme`.
 - Tests: token override emission, dark-mode attribute toggling,
   no flash-of-wrong-theme on initial render.
 - pkgdown: reference pages under **Navigation** (tabs), **Forms**
   (field family), and **Theme**; the `theming` article documents
-  the full token list, `shadcn_theme()` overrides, and dark-mode
-  behavior; a new `forms` article shows `shadcn_field()` wrapping
+  the full token list, `block_theme()` overrides, and dark-mode
+  behavior; a new `forms` article shows `block_field()` wrapping
   Shiny inputs with validation states.
 - Showcase: tabs section; forms section showing every field
   primitive with valid/invalid/disabled states; theme controls in
@@ -524,7 +527,7 @@ construction.
 - Showcase: review every gallery section for clarity; ensure each
   example is the smallest useful demonstration; copy-to-clipboard
   buttons on every code block.
-- `docs/upstream/shadcn-sync.md` initial entry: shadcn commit reviewed,
+- `docs/upstream/sb-sync.md` initial entry: shadcn commit reviewed,
   tokens copied, components mirrored.
 - README on the package homepage links to the pkgdown site, the
   hosted Shinylive showcase, and the local `run_showcase()` entry

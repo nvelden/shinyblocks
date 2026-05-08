@@ -27,12 +27,12 @@ package is on CRAN.)
 
 ## Notes for the reviewer
 
-* shinyshadcn ships a compiled CSS file under
-  `inst/www/shinyshadcn.css`. It is generated from
-  `inst/www/src/shinyshadcn.css` via Tailwind v4 at maintainer
+* shinyblocks ships a compiled CSS file under
+  `inst/www/shinyblocks.css`. It is generated from
+  `inst/www/src/shinyblocks.css` via Tailwind v4 at maintainer
   build time. Source is excluded from the package tarball via
   `.Rbuildignore`. End users do not need Node.
-* shinyshadcn vendors a curated subset of Lucide SVG icons under
+* shinyblocks vendors a curated subset of Lucide SVG icons under
   `inst/www/icons/sprite.svg`. Lucide is ISC-licensed; attribution
   is at `inst/www/icons/LICENSE`.
 * Components emit Bootstrap-flavored classes when wrapping

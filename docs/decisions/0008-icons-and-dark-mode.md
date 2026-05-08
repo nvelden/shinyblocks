@@ -28,7 +28,7 @@ constraints.
 - **R API:**
 
   ```r
-  shadcn_icon(name, class = NULL, ...)
+  block_icon(name, class = NULL, ...)
   ```
 
   - `name` is either a string (validated against the sprite at call
@@ -53,14 +53,14 @@ constraints.
 - **Attribute target:** `<html data-theme="dark">`.
 - **Mechanism:** Shiny's page template (`R/shinyui.R::renderPage()`)
   only writes `lang` on `<html>`. Setting the attribute server-side
-  is not supported. shinyshadcn injects a tiny synchronous **inline
+  is not supported. shinyblocks injects a tiny synchronous **inline
   script in `<head>`** that runs before stylesheet links resolve:
 
   ```html
   <script>
   (function () {
     try {
-      var t = localStorage.getItem('ssc-theme');
+      var t = localStorage.getItem('sb-theme');
       if (!t) {
         t = matchMedia('(prefers-color-scheme: dark)').matches
           ? 'dark' : 'light';
@@ -79,10 +79,10 @@ constraints.
   `[data-theme="dark"]` for symmetry with the light default.
 
 - **Toggling:**
-  - `shadcn_dark_mode_toggle()` exports a button. Its bound JS
+  - `block_dark_mode_toggle()` exports a button. Its bound JS
     handler reads/writes `document.documentElement.dataset.theme`
-    and persists the choice to `localStorage["ssc-theme"]`.
-  - `update_shadcn_theme(session, mode = c("light", "dark", "system"))`
+    and persists the choice to `localStorage["sb-theme"]`.
+  - `update_block_theme(session, mode = c("light", "dark", "system"))`
     sends a custom message; the JS handler applies it. `"system"`
     clears `localStorage` and re-reads `prefers-color-scheme`.
 
@@ -92,8 +92,8 @@ constraints.
   sync if the user's system theme changes during the session and
   no explicit choice has been made.
 
-- **Strict CSP fallback:** `shadcn_page(theme_mode = "light")` and
-  `shadcn_page(theme_mode = "dark")` should be able to render without
+- **Strict CSP fallback:** `block_page(theme_mode = "light")` and
+  `block_page(theme_mode = "dark")` should be able to render without
   injecting the first-paint inline script. In those modes the page gets
   a deterministic theme and does not persist a user preference. The
   default `"system"` mode uses the inline script for no-flash behavior.
@@ -119,7 +119,7 @@ both of which produce flashes.
   a new icon to the package requires a maintainer to edit the
   manifest and run `make build-icons`.
 - Custom user SVGs are first-class through the tag-passthrough path.
-- The dark-mode inline script is the only inline JS shinyshadcn
+- The dark-mode inline script is the only inline JS shinyblocks
   injects. Its CSP impact: requires `'unsafe-inline'` in `script-src`
   unless the host app supports `nonce` injection, which Shiny does
   not do for inline scripts in `tags$head()`. Document this caveat

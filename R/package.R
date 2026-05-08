@@ -1,6 +1,6 @@
-#' shinyshadcn: Shadcn-inspired dashboards for Shiny
+#' shinyblocks: Composable modern UI blocks for Shiny
 #'
-#' `shinyshadcn` provides composable dashboard primitives for Shiny apps.
+#' `shinyblocks` provides composable dashboard primitives for Shiny apps.
 #'
 #' @keywords internal
 "_PACKAGE"
