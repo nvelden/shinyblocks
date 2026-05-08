@@ -534,6 +534,31 @@ construction.
   point. The showcase link warns that first visit can take 1-2
   minutes while webR and package binaries download and cache.
 
+## Local Preview Before Going Public
+
+Before making the repository public, build and review the full
+presentation locally. This is a visual sanity check, not a formal
+phase exit — it does not require the full Quality Gate.
+
+1. **pkgdown site.** Run `pkgdown::build_site()` (or `make pkgdown`)
+   and open `site/docs/index.html` in a browser. Walk the reference
+   index, every component page, and each article. Verify live examples
+   render correctly and the layout looks polished.
+2. **Shinylive showcase.** Run `make shinylive-export` (or
+   `tools/export-shinylive.R`) to produce the static export under
+   `site/showcase/`. Serve locally
+   (`python3 -m http.server -d site/showcase`) and verify in a browser
+   that the app loads, dark mode works, and every gallery section
+   renders.
+3. **Local showcase app.** Run `shinyblocks::run_showcase()` to launch
+   the dogfooded gallery. Confirm every component section is present
+   with both the live render and the source code.
+4. **README & package metadata.** Review `README.md`, `DESCRIPTION`,
+   and `NEWS.md` for anything that looks incomplete or references
+   internal-only artifacts.
+
+Only make the repo public once all four pass.
+
 ## Phase 7 — Hardening and Release
 
 - Full critical code review across the package using the
