@@ -34,8 +34,6 @@ tsconfig.json
 Makefile
 tools/
 docs/
-.github/
-cran-comments.md
 inst/www/src/
 inst/www/icons/
 inst/WORDLIST
