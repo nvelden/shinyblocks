@@ -32,6 +32,11 @@ The Posit R package development skill is also installed for both Codex and Claud
 - `.agents/skills/r-package-development`
 - `.claude/skills/r-package-development`
 
+The Posit R package testing skill is installed for test-focused package work:
+
+- `.agents/skills/testing-r-packages`
+- `.claude/skills/testing-r-packages`
+
 The Posit critical code reviewer skill is installed for review-focused agent work:
 
 - `.agents/skills/critical-code-reviewer`

@@ -6,11 +6,14 @@ This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package 
 
 - `shadcn`: installed locally under `.agents/skills/shadcn` and `.claude/skills/shadcn`.
 - `r-package-development`: installed locally under `.agents/skills/r-package-development` and `.claude/skills/r-package-development`.
+- `testing-r-packages`: installed locally under `.agents/skills/testing-r-packages` and `.claude/skills/testing-r-packages`.
 - `critical-code-reviewer`: installed locally under `.agents/skills/critical-code-reviewer` and `.claude/skills/critical-code-reviewer`.
 
 Use the shadcn skill for shadcn/ui component conventions, naming, composition rules, theming tokens, and accessibility patterns. This repo is not a React app, so translate those patterns into R, `htmltools`, Shiny, and package assets instead of adding React components directly.
 
 Use the r-package-development skill for R package structure, roxygen2 docs, `devtools`, `testthat`, `NEWS.md`, and package checks.
+
+Use the testing-r-packages skill when writing, organizing, or improving `testthat` tests, including fixtures, snapshots, mocking, cleanup, and test structure.
 
 Use the critical-code-reviewer skill when the user asks for a review, critique, pull request review, or risk-focused assessment. Keep review output focused on concrete defects, regressions, missing tests, and maintainability risks.
 
@@ -27,6 +30,7 @@ The root `components.json` and `package.json` exist only to provide shadcn proje
 - Use accessible markup and keyboard-friendly interactions.
 - Keep examples runnable with a standard R/Shiny installation.
 - Follow the r-package-development skill when adding exported functions: roxygen docs, focused tests, and `devtools::document()` when docs change.
+- Follow the testing-r-packages skill for modern `testthat` 3 patterns when adding or refactoring tests.
 
 ## Important Files
 
