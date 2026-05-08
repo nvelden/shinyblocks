@@ -5,8 +5,11 @@ This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package 
 ## Installed Skills
 
 - `shadcn`: installed locally under `.agents/skills/shadcn` and `.claude/skills/shadcn`.
+- `r-package-development`: installed locally under `.agents/skills/r-package-development` and `.claude/skills/r-package-development`.
 
 Use the shadcn skill for shadcn/ui component conventions, naming, composition rules, theming tokens, and accessibility patterns. This repo is not a React app, so translate those patterns into R, `htmltools`, Shiny, and package assets instead of adding React components directly.
+
+Use the r-package-development skill for R package structure, roxygen2 docs, `devtools`, `testthat`, `NEWS.md`, and package checks.
 
 The root `components.json` and `package.json` exist only to provide shadcn project context to AI agents and the `shadcn` CLI. They are excluded from the R package build.
 
@@ -20,6 +23,7 @@ The root `components.json` and `package.json` exist only to provide shadcn proje
 - Do not run `npx shadcn@latest add` into this package unless a decision record explicitly approves using generated React source as research material.
 - Use accessible markup and keyboard-friendly interactions.
 - Keep examples runnable with a standard R/Shiny installation.
+- Follow the r-package-development skill when adding exported functions: roxygen docs, focused tests, and `devtools::document()` when docs change.
 
 ## Important Files
 

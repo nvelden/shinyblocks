@@ -27,6 +27,11 @@ The official shadcn skill is installed for both Codex and Claude:
 - `.agents/skills/shadcn`
 - `.claude/skills/shadcn`
 
+The Posit R package development skill is also installed for both Codex and Claude:
+
+- `.agents/skills/r-package-development`
+- `.claude/skills/r-package-development`
+
 `components.json`, `tsconfig.json`, and `package.json` provide enough shadcn project context for AI agents and `npx shadcn@latest info --json`. They are excluded from the R package build.
 
 ## Initial Package Shape

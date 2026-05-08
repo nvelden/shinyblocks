@@ -4,6 +4,8 @@ You are working on `shinyshadcn`, an R package for shadcn-inspired Shiny dashboa
 
 The official shadcn skill is installed locally under `.claude/skills/shadcn` and `.agents/skills/shadcn`. Use it for component composition rules, semantic token conventions, form patterns, icon rules, and CLI docs.
 
+The Posit r-package-development skill is installed locally under `.claude/skills/r-package-development` and `.agents/skills/r-package-development`. Use it for R package structure, roxygen2 documentation, testthat tests, devtools workflows, package checks, and NEWS guidance.
+
 Important: this repository is an R package, not a React app. Treat shadcn/ui as design-system source material. Translate concepts into `htmltools`, Shiny tags, CSS variables, and small JavaScript behaviors only when needed.
 
 Start with the planning docs:
@@ -20,6 +22,7 @@ Start with the planning docs:
 - Prefer clear API design and documented decisions over large speculative code.
 - Do not introduce React, Tailwind, Vite, or other frontend tooling without an architecture decision record.
 - Do not add shadcn React component source into `R/` or `inst/` unless a decision record explicitly approves it as reference material.
+- When adding user-facing R functions, follow the r-package-development skill: exported functions get roxygen docs, tests live in `tests/testthat`, and docs are regenerated with `devtools::document()`.
 - Use `htmltools` and `shiny` primitives first.
 - For UI components, think in states: default, hover, focus, disabled, active, selected, loading, error.
 - For every component plan, include accessibility notes.
