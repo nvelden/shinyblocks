@@ -2,11 +2,16 @@ Package: shinyshadcn
 Title: Shadcn-Inspired Dashboards for Shiny
 Version: 0.0.0.9000
 Authors@R:
-    person("Niels", "van der Velden", email = "n.s.j.vandervelden@gmail.com", role = c("aut", "cre"))
+    person("Niels", "van der Velden", , "n.s.j.vandervelden@gmail.com",
+           role = c("aut", "cre"))
 Description: Provides composable Shiny dashboard components inspired by
-    shadcn/ui, with R-first helpers, bundled assets, and accessible defaults.
+    shadcn/ui, with R-first helpers, bundled assets, and accessible
+    defaults. End users do not need Node, Tailwind, or React.
 License: MIT + file LICENSE
+URL: https://github.com/nvelden/shinyshadcn
+BugReports: https://github.com/nvelden/shinyshadcn/issues
 Encoding: UTF-8
+Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
