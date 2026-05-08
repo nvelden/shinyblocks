@@ -257,6 +257,10 @@ Four artifacts grow continuously alongside the code, not at the end:
 - Every exported function has roxygen docs (with `@examples` and
   `@family`) and at least one unit test.
 - `devtools::check()` is clean.
+- Third-party widget compatibility verified: ggplot2 plots, DT tables,
+  plotly charts, and rhandsontable outputs render correctly inside
+  `block_card()` / `block_card_content()` without CSS collisions or
+  layout breakage. Documented in `vignette("coexistence")`.
 - pkgdown site deployed; every v0.1 component has a reference page.
 - Showcase app deployed as a Shinylive static app and runnable
   locally via `run_showcase()`. Public docs warn that first visit can

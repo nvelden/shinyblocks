@@ -453,12 +453,24 @@ requiring unused suggested packages.
   states for dashboards.
 - Tests: composition validation (children-class checks), slot
   composition, optional argument handling, separator orientation.
+- **Third-party widget smoke test.** Verify that common Shiny
+  ecosystem outputs render correctly inside `block_card()` /
+  `block_card_content()`. At minimum test:
+  - `shiny::plotOutput()` with a ggplot2 plot
+  - `DT::dataTableOutput()` with a DT table
+  - `plotly::plotlyOutput()` with an interactive plotly chart
+  - `rhandsontable::rHandsontableOutput()` with an editable table
+  
+  These do not need unit tests — a manual visual check in the
+  showcase app is sufficient. The goal is to catch CSS collisions
+  or layout issues early.
 - pkgdown: reference pages under **Content** (card, value box,
   badge, separator, skeleton, empty); composition primitives appear
   with `@family` cross-links.
 - Showcase: gallery sections for each, including a multi-card grid
-  demonstrating composition and a "no data" example using
-  `block_empty()`.
+  demonstrating composition, a "no data" example using
+  `block_empty()`, and a "third-party widgets" section showing a
+  ggplot2 plot and a DT table inside cards.
 
 ## Phase 4 — Navigation and Behavior
 
@@ -521,6 +533,11 @@ construction.
   from the showcase — copy-paste ready for users beginning a project.
 - Vignettes finalized: `getting-started.Rmd`, `theming.Rmd`,
   `components.Rmd`, `coexistence.Rmd`, `accessibility.Rmd`.
+- The `coexistence.Rmd` vignette explicitly documents embedding
+  third-party widget outputs (ggplot2, DT, plotly, leaflet,
+  rhandsontable, etc.) inside shinyblocks containers. Include
+  copy-paste examples showing `plotOutput()` and
+  `DT::dataTableOutput()` inside `block_card()`.
 - pkgdown reference: every page has a thumbnail (rendered from the
   showcase example); category landing pages match the
   shiny.posit.co/r/components grid layout.
