@@ -8,18 +8,19 @@
 #' @return An `htmltools` tag list suitable for a Shiny UI.
 #' @export
 block_page <- function(..., title = NULL, sidebar = NULL, header = NULL) {
-  htmltools::tagList(
-    shiny::tags$head(
-      shiny::tags$title(title %||% "shinyblocks"),
-      shiny::tags$link(rel = "stylesheet", href = "shinyblocks/shinyblocks.css")
-    ),
-    shiny::tags$div(
-      class = "sb-app",
-      sidebar,
-      shiny::tags$main(
-        class = "sb-main",
-        header,
-        shiny::tags$section(class = "sb-content", ...)
+  attach_shinyblocks_deps(
+    htmltools::tagList(
+      htmltools::tags$head(
+        htmltools::tags$title(title %||% "shinyblocks")
+      ),
+      htmltools::tags$div(
+        class = "sb-app",
+        sidebar,
+        htmltools::tags$main(
+          class = "sb-main",
+          header,
+          htmltools::tags$section(class = "sb-content", ...)
+        )
       )
     )
   )

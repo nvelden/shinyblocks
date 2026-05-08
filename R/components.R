@@ -7,11 +7,13 @@
 #' @return An `htmltools` tag.
 #' @export
 block_card <- function(..., title = NULL, value = NULL) {
-  shiny::tags$article(
-    class = "sb-card",
-    if (!is.null(title)) shiny::tags$h3(class = "sb-card-title", title),
-    if (!is.null(value)) shiny::tags$div(class = "sb-card-value", value),
-    shiny::tags$div(class = "sb-card-body", ...)
+  attach_shinyblocks_deps(
+    htmltools::tags$article(
+      class = "sb-card",
+      if (!is.null(title)) htmltools::tags$h3(class = "sb-card-title", title),
+      if (!is.null(value)) htmltools::tags$div(class = "sb-card-value", value),
+      htmltools::tags$div(class = "sb-card-body", ...)
+    )
   )
 }
 
@@ -19,16 +21,22 @@ block_card <- function(..., title = NULL, value = NULL) {
 #'
 #' @param label Button label.
 #' @param variant Visual variant.
-#' @param ... Additional attributes passed to `shiny::tags$button`.
+#' @param ... Additional attributes passed to `htmltools::tags$button`.
 #'
 #' @return An `htmltools` tag.
 #' @export
-block_button <- function(label, variant = c("default", "secondary", "outline", "ghost"), ...) {
+block_button <- function(
+  label,
+  variant = c("default", "secondary", "outline", "ghost"),
+  ...
+) {
   variant <- match.arg(variant)
-  shiny::tags$button(
-    class = paste("sb-button", paste0("sb-button-", variant)),
-    type = "button",
-    ...,
-    label
+  attach_shinyblocks_deps(
+    htmltools::tags$button(
+      class = paste("sb-button", paste0("sb-button-", variant)),
+      type = "button",
+      ...,
+      label
+    )
   )
 }
