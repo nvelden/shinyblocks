@@ -1,77 +1,178 @@
-# Shadcn Fidelity Audit
+# Shadcn Fidelity Audit (2026-05-09)
 
 ## Goal
 
-Tighten `shinyblocks` so exported components are driven by semantic
-tokens, visually track shadcn/ui more closely, and avoid styling
-dependencies on Bootstrap or Selectize defaults.
+Take every exported `block_*()` and verify it matches its shadcn
+counterpart at the level of tokens, classes, states, and hover/focus
+treatment — not just "looks roughly right".
 
-## Assumptions
+Per [ADR 0015](../decisions/0015-component-specs.md), the long-term
+mechanism is one spec doc per component plus a captured reference
+screenshot. This audit is the first systematic pass *building toward*
+those specs and surfacing the drift backlog.
 
-- Runtime remains R + Shiny + `htmltools`, with local CSS/JS assets.
-- Theming must flow through CSS custom properties, not hard-coded
-  light/dark overrides.
-- Exact parity for interaction-heavy controls requires dedicated
-  wrappers instead of styling raw Shiny widgets.
+## Method
 
-## Proposed API
+For each component, fetch the canonical shadcn source from the
+`apps/v4/registry/new-york-v4/ui/<name>.tsx` path of
+[`shadcn-ui/ui`](https://github.com/shadcn-ui/ui) (the `new-york-v4`
+registry is the current default). Compare:
 
-- Add `block_select()` as the first dedicated form control wrapper.
-- Keep `block_field_*()` and `block_input_group_*()` as composition
-  primitives around form controls.
-- Audit existing components against the shadcn contracts for:
-  buttons, badges, alerts, cards, value boxes, nav/sidebar, empty
-  states, separators, skeletons, spinners, and fields.
+1. Base classes — geometry, typography, transition, focus.
+2. Variant strings — fill, foreground, hover, dark-mode.
+3. Size strings — height, padding, gap.
+4. State coverage — hover, focus-visible, disabled, aria-invalid,
+   data-[state=...], data-[orientation=...].
+5. SVG sizing — both nested-selector and explicit-class forms.
 
-## Files To Edit
+Then walk each state on the live showcase
+(`http://127.0.0.1:4321`) against the shadcn docs page in light and
+dark mode.
 
-- `R/select.R`
-- `R/utils.R`
-- `R/field.R`
-- `R/package.R`
-- `DESCRIPTION`
-- `_pkgdown.yml`
-- `NEWS.md`
-- `inst/www/src/shinyblocks.css`
-- `inst/www/shinyblocks.js`
-- `inst/showcase/app.R`
-- `inst/showcase/R/examples/field.R`
-- `tests/testthat/test-shell.R`
-- `tests/testthat/test-showcase.R`
-- `tests/testthat/test-utils.R`
+## 2026-05-09 findings
 
-## Tests / Checks
+### Button
 
-- `devtools::document()`
-- `make build-css`
-- `devtools::test()`
-- `lintr::lint_package()`
-- `pkgdown::check_pkgdown()`
-- `devtools::check()`
-- restart showcase and verify `http://127.0.0.1:4321`
+**Drifts found:**
 
-## Open Questions
+| Drift | shadcn | shinyblocks (before) | Fix |
+| --- | --- | --- | --- |
+| Link variant has no colour | `text-primary underline-offset-4` | `underline-offset-4` only | **Fixed**: added `text-primary` |
+| Outline variant flat | `border bg-background shadow-xs ...` | `border border-input bg-background` | **Fixed**: added `shadow-xs` |
+| Destructive label colour | `text-white` | `text-destructive-foreground` | **Fixed**: now `text-white` |
+| Destructive dark mode | `dark:bg-destructive/60` | unchanged | **Fixed**: `[data-theme="dark"]` rule dims to 60% |
+| Secondary hover ratio | `hover:bg-secondary/80` | 85% mix | **Fixed**: now 80% |
 
-- How far should `block_select()` go in v0.1 on grouped choices and
-  multi-select?
-- Whether `block_checkbox()`, `block_switch()`, and `block_textarea()`
-  should follow immediately after `block_select()` or wait for a second
-  Phase 5 pass.
+**Pending (deferred — bigger surface):**
 
-## Current Findings
+| Drift | Why deferred |
+| --- | --- |
+| Focus-visible uses `outline 2px` not shadcn's 3px ring | Global rule in `.sb-app *:focus-visible` affects every component; switching to per-component `border-ring + ring-[3px] + ring-ring/50` requires removing the global rule and re-adding per-component focus styles. Own slice. |
+| `aria-invalid:border-destructive aria-invalid:ring-destructive/20` | New state across every interactive component. Pair with the focus-ring redesign so both ship together. |
+| `transition-colors` vs `transition-all` | Cosmetic; matters once the focus-ring animates. Pair with above. |
+| `has-[>svg]:px-3` size-aware padding | Tailwind v4 has-selector; needs verification that compiled output matches. Low priority. |
 
-- Implemented primitives already use semantic tokens instead of raw
-  palette values: shell, nav, button, badge, alert, card, value box,
-  separator, skeleton, spinner, empty, fields, and input groups.
-- The main fidelity gap found in the shipped UI was select handling:
-  the field wrapper was inheriting Selectize styling rather than
-  rendering a first-class shadcn-like control.
-- `block_select()` is now back on the wrapper path: Shiny/selectize
-  owns the control runtime, while shinyblocks owns the token-based
-  styling and field composition.
-- `block_textarea()`, `block_checkbox()`, and `block_switch()` are now
-  landed as wrapper-first controls, preserving native Shiny bindings
-  while adding component-owned shell styling.
-- Remaining high-value parity work is now the interaction-state audit:
-  select, tabs, buttons, textarea, checkbox, and switch in light/dark
-  mode rather than adding more primitives.
+### Badge
+
+**Drifts fixed in this commit:**
+
+| Drift | shadcn | shinyblocks (before) |
+| --- | --- | --- |
+| **Shape** | `rounded-full` | `rounded-md` |
+| **Font size** | `text-xs` | `text-sm` |
+| Gap | `gap-1` | none (no SVG support) |
+| `w-fit` for shrink-wrap | yes | no |
+| `overflow-hidden` | yes | no |
+| Border on base | `border border-transparent` | per-variant `border-transparent` |
+| Destructive label | `text-white` + `dark:bg-destructive/60` | `text-destructive-foreground` |
+
+The shape change is the most visible — pill vs rectangle — and is
+the headline regression that needed fixing first.
+
+**Pending:**
+
+- `[a&]:hover:bg-primary/90` — only hover when wrapped in an anchor.
+  shinyblocks badges aren't anchor-wrapped today; revisit when nav
+  badges land.
+- aria-invalid + focus-visible ring (same as button).
+
+### Alert
+
+shadcn moved alerts to a CSS-grid layout driven by `has-[>svg]`
+selectors:
+
+```
+relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5
+rounded-lg border px-4 py-3 text-sm
+has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr]
+has-[>svg]:gap-x-3
+[&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current
+```
+
+shinyblocks alert uses `grid-template-columns: auto minmax(0, 1fr)`
+unconditionally — visually similar but doesn't collapse to a single
+column when there's no icon, and the icon offset is a separate
+`pt-0.5` instead of `translate-y-0.5`. Cosmetic; not a parity bug.
+
+**Pending:**
+
+- Destructive variant: shadcn applies
+  `*:data-[slot=alert-description]:text-destructive/90` to soften the
+  description. shinyblocks doesn't differentiate.
+
+### Tabs
+
+**Major drift.** shadcn ships a data-attribute-driven Tabs that
+supports two `data-variant` values (`default`, `line`), two
+`data-orientation` values (`horizontal`, `vertical`), and an
+`after:` pseudo-element for the line-variant active indicator.
+shinyblocks tabs is built on top of Bootstrap's `.nav-link.active` /
+`.tab-pane` model with CSS overrides — visually close to the default
+shadcn variant, but the line variant, vertical orientation, and
+focus-ring story are not present.
+
+**Pending (own slice):**
+
+- Migrate to data-attribute-driven markup (`data-state=active`,
+  `data-orientation=...`, `data-variant=...`) so the CSS contract
+  matches shadcn's.
+- Add the line variant + vertical orientation.
+- Replace the current Bootstrap-class-leaning hover treatment with
+  shadcn's `hover:text-foreground` flat treatment.
+
+### Select / textarea / checkbox / switch
+
+Per [ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md),
+these are wrappers around native Shiny inputs. The visible "shadcn
+look" comes from CSS that overrides Shiny's defaults. The current
+implementation tracks shadcn's structural shape (custom checkbox
+indicator div, sr-only native input, etc.) but has not been audited
+state-by-state against shadcn's source. Pending — own slice.
+
+## Plan from here
+
+The audit is incremental. Each component gets its own slice that:
+
+1. Pulls the shadcn source from the `apps/v4/registry/new-york-v4`
+   path.
+2. Lists every drift in this doc (or a follow-up dated audit doc).
+3. Applies the safe drifts in CSS source.
+4. Captures the reference screenshot from
+   <https://ui.shadcn.com/docs/components/<name>> and commits it under
+   `docs/component-specs/_screenshots/<slug>.png`.
+5. Writes the spec doc per [ADR 0015](../decisions/0015-component-specs.md)
+   and removes the entry from `backfill_pending_specs` in
+   `tests/testthat/test-doc-coverage.R`.
+
+### Cross-cutting follow-ups
+
+These touch every interactive component and should ship as one slice
+before tagging Phase 5:
+
+- **Focus-visible redesign.** Drop the global
+  `.sb-app *:focus-visible { outline: 2px solid var(--ring); }` rule.
+  Add per-component
+  `focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none`.
+  Affects: button, badge (link/anchor), nav-item, tabs trigger,
+  select trigger, checkbox/switch shells.
+- **`aria-invalid` styling.** Add
+  `aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40`
+  to every interactive base. Hooks into `block_field_invalid()`.
+- **`transition-all` over `transition-colors`** so the new ring
+  animates.
+
+### Snapshot capture
+
+Until shadcn exposes a stable static-asset URL per component, capture
+manually:
+
+1. Open `https://ui.shadcn.com/docs/components/<name>` in a clean
+   browser window (default light theme, default zoom).
+2. Render the canonical example shadcn shows above the fold —
+   typically the default state plus a small variant grid.
+3. Crop tight to the component, no surrounding chrome.
+4. Save as `docs/component-specs/_screenshots/<slug>.png`.
+5. Note the capture date in the spec doc.
+
+The same flow works for dark-mode capture — toggle the shadcn site to
+dark, capture, save as `_screenshots/<slug>-dark.png`.

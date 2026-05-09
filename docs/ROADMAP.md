@@ -41,14 +41,35 @@ passing the **Quality Gate** below before the next phase begins.
 >   `docs/component-specs/<name>.md` and a captured reference
 >   screenshot. The rule applies to new components today; the
 >   backfill happens incrementally.
+> - **shadcn fidelity audit** per
+>   [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](agent-plans/2026-05-09-shadcn-fidelity-audit.md):
+>   token + class drift surfaced against the canonical
+>   `apps/v4/registry/new-york-v4` source. Button + badge safe
+>   drifts already fixed (rounded-full + text-xs on badge,
+>   `text-white` on destructive variants, `text-primary` on link,
+>   `shadow-xs` on outline, dark-mode destructive dim). Three cross-
+>   cutting slices still owed:
+>   1. Focus-visible redesign — drop the global
+>      `.sb-app *:focus-visible` outline, add per-component
+>      `border-ring + ring-[3px] + ring-ring/50` to button, badge,
+>      nav-item, tabs trigger, select trigger, checkbox, switch.
+>   2. `aria-invalid` styling on every interactive base, wired to
+>      `block_field_invalid()`.
+>   3. Tabs refactor to shadcn's `data-state` / `data-orientation` /
+>      `data-variant` attribute model (replaces the current Bootstrap-
+>      class-leaning markup).
 >
 > Next concrete slice:
 >
-> 1. Run the interaction-style parity pass across `select`, tabs,
->    buttons, textarea, checkbox, and switch in both light and dark
->    modes against the component specs.
-> 2. Resume gallery page authoring once the WASM/gallery track is back
->    in active implementation.
+> 1. Land the focus-visible + aria-invalid cross-cut as one commit
+>    so every interactive component picks up the new ring + invalid
+>    treatment together.
+> 2. Refactor tabs to the shadcn data-attribute model; add the line
+>    variant.
+> 3. Capture reference screenshots for the seed specs (button, card)
+>    so the §Per-gate component-sync rule has anchored examples.
+> 4. Resume gallery page authoring once the WASM/gallery track is
+>    back in active implementation.
 
 Update this line at every phase exit.
 

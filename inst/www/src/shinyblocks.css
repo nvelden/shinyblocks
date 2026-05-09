@@ -565,6 +565,14 @@
     @apply disabled:pointer-events-none disabled:opacity-50;
   }
 
+  /* shadcn button variants (apps/v4 new-york-v4 registry):
+   *   destructive uses text-white (matches shadcn intent),
+   *   outline carries shadow-xs, link uses text-primary.
+   *   Hover treatment uses color-mix instead of `bg-foo/90` so the
+   *   tokens stay opaque (Tailwind v4 emits opacity classes that
+   *   require @theme color-mix support; this form is equivalent and
+   *   compiled-CSS friendly). See ADR 0006 + the fidelity audit doc.
+   */
   .sb-button-default {
     @apply bg-primary text-primary-foreground;
   }
@@ -578,11 +586,11 @@
   }
 
   .sb-button-secondary:hover {
-    background: color-mix(in oklch, var(--secondary) 85%, var(--foreground) 3%);
+    background: color-mix(in oklch, var(--secondary) 80%, transparent);
   }
 
   .sb-button-outline {
-    @apply border border-input bg-background;
+    @apply border border-input bg-background shadow-xs;
   }
 
   .sb-button-outline:hover {
@@ -594,15 +602,19 @@
   }
 
   .sb-button-destructive {
-    @apply bg-destructive text-destructive-foreground;
+    @apply bg-destructive text-white;
   }
 
   .sb-button-destructive:hover {
     background: color-mix(in oklch, var(--destructive) 90%, transparent);
   }
 
+  [data-theme="dark"] .sb-button-destructive {
+    background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
+  }
+
   .sb-button-link {
-    @apply underline-offset-4;
+    @apply text-primary underline-offset-4;
   }
 
   .sb-button-link:hover {
@@ -641,16 +653,21 @@
     display: inline-flex;
   }
 
+  /* shadcn badge contract (apps/v4 new-york-v4 registry):
+   *   rounded-full, text-xs, gap-1, border-transparent on base.
+   *   destructive uses text-white (not text-destructive-foreground)
+   *   so it stays light over the red surface in both modes.
+   *   See docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md. */
   .sb-badge {
-    @apply inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 text-sm font-medium whitespace-nowrap;
+    @apply inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap;
   }
 
   .sb-badge-default {
-    @apply border-transparent bg-primary text-primary-foreground;
+    @apply bg-primary text-primary-foreground;
   }
 
   .sb-badge-secondary {
-    @apply border-transparent bg-secondary text-secondary-foreground;
+    @apply bg-secondary text-secondary-foreground;
   }
 
   .sb-badge-outline {
@@ -658,7 +675,11 @@
   }
 
   .sb-badge-destructive {
-    @apply border-transparent bg-destructive text-destructive-foreground;
+    @apply bg-destructive text-white;
+  }
+
+  [data-theme="dark"] .sb-badge-destructive {
+    background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
   }
 
   .sb-alert {
