@@ -61,12 +61,7 @@ test_that("every exported block_*() has a gallery .qmd page", {
   skip("Gallery pages blocked on WASM resolution; see ADR 0013.")
 
   exported <- block_exports()
-  gallery_dir <- file.path(
-    repo_root(),
-    "vignettes",
-    "articles",
-    "components"
-  )
+  gallery_dir <- file.path(repo_root(), "gallery", "components")
   pages <- sub("\\.qmd$", "", list.files(gallery_dir, pattern = "\\.qmd$"))
 
   expected_slugs <- gsub("_", "-", sub("^block_", "", exported))

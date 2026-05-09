@@ -11,7 +11,7 @@
   `data-sb-child`, so a future `block_nav()` parent can validate its
   contents.
 * Documentation gains a Quarto + Shinylive component gallery
-  (`vignettes/articles/components/`) modelled on
+  (`gallery/components/`) modelled on
   <https://shiny.posit.co/r/components/>. Each exported component has
   a page with an embedded live demo and visible source. See
   `docs/decisions/0013-component-gallery-quarto.md`.
@@ -38,7 +38,19 @@
 * `tests/testthat/test-doc-coverage.R` enforces a per-gate sync rule:
   every exported `block_*()` must appear in `_pkgdown.yml`'s
   `reference:` section (active) and have a gallery `.qmd` page under
-  `vignettes/articles/components/` (currently `skip()`'d pending the
+  `gallery/components/` (currently `skip()`'d pending the
   WASM resolution per ADR 0013). The ROADMAP grows a §Per-gate
   component-sync rule section spelling out which artifacts must land
   in the same commit as a new component.
+* The component gallery moves from `vignettes/articles/` to top-level
+  `gallery/`. pkgdown 2.x requires Quarto 1.5+ to render `.qmd` files
+  inside `vignettes/`, and the project pins Quarto 1.4 today —
+  relocating sidesteps the version requirement until the gallery's
+  WASM blocker (ADR 0013) is resolved. `make gallery` and the
+  shinylive Quarto extension move with the directory.
+* New `make verify` and `make verify-stop` targets. `verify` builds
+  pkgdown, launches the showcase on `:4321` and the pkgdown site on
+  `:4322` in the background, HTTP-checks both for `200`, and leaves
+  them running so the maintainer can eyeball them. `make gate` now
+  ends with `verify`, so a phase exit cannot tag without both servers
+  responding. Quality Gate item 14 documents this rule.

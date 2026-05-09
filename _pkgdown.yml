@@ -1,27 +1,15 @@
 destination: site/pkgdown
+url: https://nvelden.github.io/shinyblocks/
 
 template:
   bootstrap: 5
 
-navbar:
-  structure:
-    left:  [intro, components, reference, articles, news]
-    right: [search, github]
-  components:
-    components:
-      text: Components
-      href: articles/components.html
-
-articles:
-  - title: Components
-    desc: >
-      Live demos of every exported component, modelled on
-      <https://shiny.posit.co/r/components/>. See ADR 0013.
-    navbar: ~
-    contents:
-      - components
-      - components/button
-  # New component pages join this list as they land.
+# The component gallery (vignettes/articles/components/) is on hold
+# pending the WASM resolution called out in ADR 0013. When it lands,
+# reinstate the navbar Components entry and the `articles:` block
+# (see git blame for the previous shape) so pkgdown surfaces every
+# .qmd page. Until then, articles auto-discover via pkgdown defaults
+# and the showcase is the visual verification surface.
 
 reference:
   - title: Layout

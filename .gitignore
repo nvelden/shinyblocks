@@ -30,3 +30,7 @@ HANDOFF.md
 
 # Compiled package docs
 inst/doc/
+
+# make verify scratch files
+.verify-pids
+.verify-*.log

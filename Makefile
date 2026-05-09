@@ -1,7 +1,7 @@
 .PHONY: help setup watch-css build-css build-icons dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links gate clean deploy-showcase preview preview-pkgdown \
-	preview-shinylive quarto-setup gallery
+	preview-shinylive quarto-setup gallery verify verify-stop
 
 # Defaults you can override on the command line.
 R          ?= env -u LC_ALL Rscript
@@ -39,6 +39,11 @@ help:
 	@echo "  preview-pkgdown    - build pkgdown site and serve site/pkgdown"
 	@echo "  gallery            - render component gallery (.qmd) and serve"
 	@echo "  preview-shinylive  - build Shinylive export and serve site/showcase"
+	@echo ""
+	@echo "Post-gate verification (Quality Gate item B-13):"
+	@echo "  verify             - build pkgdown, launch showcase + pkgdown,"
+	@echo "                       HTTP-check both, leave them running"
+	@echo "  verify-stop        - stop the verify servers (ports 4321 + 4322)"
 	@echo ""
 	@echo "Component gallery setup (run once per machine):"
 	@echo "  quarto-setup       - install the quarto-ext/shinylive extension"
@@ -105,9 +110,11 @@ doc-links:
 # Quality Gate runs the same sequence as docs/ROADMAP.md. CI runs this.
 # Order matters: cheap automated checks first, semi-automated next,
 # review and document tracked manually. See docs/phase-exits/TEMPLATE.md.
-gate: build-css lint spell urls test docs check pkgdown budget doc-links
+# After the automated steps green, `verify` rebuilds and launches the
+# showcase + pkgdown so the maintainer eyeballs them before tagging.
+gate: build-css lint spell urls test docs check pkgdown budget doc-links verify
 	@echo ""
-	@echo "Automated gate steps green."
+	@echo "Automated gate steps green; showcase + pkgdown running."
 	@echo "Remaining manual steps for phase exit:"
 	@echo "  - shinytest2 showcase smoke + screenshots"
 	@echo "  - manual a11y sweep on showcase"
@@ -115,6 +122,8 @@ gate: build-css lint spell urls test docs check pkgdown budget doc-links
 	@echo "  - NEWS.md and DESCRIPTION version bump"
 	@echo "  - phase-exit checklist file committed"
 	@echo "  - git tag phase-N"
+	@echo ""
+	@echo "When done eyeballing: make verify-stop"
 
 # ---------- Local preview ----------
 #
@@ -161,12 +170,59 @@ preview:
 	@echo "Press Ctrl+C to stop both."
 	@$(MAKE) -j 2 showcase preview-pkgdown
 
+# Post-gate verification: build pkgdown, launch both servers in the
+# background, HTTP-check each one, and leave them running so the
+# maintainer can eyeball both. PIDs go to .verify-pids; use
+# `make verify-stop` to terminate. Run this after `make gate`.
+.verify-pids:
+	@: # placeholder so the file is never an automatic prerequisite
+
+verify:
+	@echo "Stopping any prior verify servers..."
+	@$(MAKE) verify-stop >/dev/null 2>&1 || true
+	@echo "Building pkgdown site..."
+	@$(R) -e 'pkgdown::build_site(preview = FALSE)' >.verify-pkgdown.log 2>&1 \
+		|| { echo "pkgdown build FAILED. See .verify-pkgdown.log."; exit 1; }
+	@echo "Launching showcase on http://127.0.0.1:$(PORT_SHOWCASE)..."
+	@$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase", port = $(PORT_SHOWCASE), launch.browser = FALSE)' \
+		>.verify-showcase.log 2>&1 & echo $$! > .verify-pids
+	@echo "Launching pkgdown server on http://127.0.0.1:$(PORT_PKGDOWN)..."
+	@python3 -m http.server $(PORT_PKGDOWN) --directory site/pkgdown \
+		>.verify-pkgdown-server.log 2>&1 & echo $$! >> .verify-pids
+	@echo "Waiting for both to respond..."
+	@for i in $$(seq 1 60); do \
+		showcase_status=$$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$(PORT_SHOWCASE)/ 2>/dev/null); \
+		pkgdown_status=$$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$(PORT_PKGDOWN)/index.html 2>/dev/null); \
+		if [ "$$showcase_status" = "200" ] && [ "$$pkgdown_status" = "200" ]; then \
+			echo ""; \
+			echo "OK both servers responding 200:"; \
+			echo "  showcase  http://127.0.0.1:$(PORT_SHOWCASE)/"; \
+			echo "  pkgdown   http://127.0.0.1:$(PORT_PKGDOWN)/"; \
+			echo ""; \
+			echo "Stop with: make verify-stop"; \
+			exit 0; \
+		fi; \
+		sleep 1; \
+	done; \
+	echo "FAIL: showcase=$$showcase_status pkgdown=$$pkgdown_status after 60s. Check .verify-*.log."; \
+	$(MAKE) verify-stop; \
+	exit 1
+
+verify-stop:
+	@if [ -f .verify-pids ]; then \
+		while read pid; do kill $$pid 2>/dev/null || true; done < .verify-pids; \
+		rm -f .verify-pids .verify-showcase.log .verify-pkgdown.log .verify-pkgdown-server.log; \
+		echo "Stopped verify servers."; \
+	else \
+		echo "No verify servers running."; \
+	fi
+
 # ---------- Component gallery (Quarto + shinylive, ADR 0013) ----------
 #
 # `quarto-setup` is a one-shot install. `gallery` renders the .qmd
 # pages under vignettes/articles/components/ and serves them locally.
 
-GALLERY_DIR := vignettes/articles
+GALLERY_DIR := gallery
 GALLERY_OUT := site/gallery
 
 quarto-setup:
