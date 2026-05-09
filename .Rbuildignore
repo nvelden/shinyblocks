@@ -42,7 +42,7 @@
 
 # Component gallery — Quarto-rendered, dev-only. See ADR 0013.
 # Holds .qmd pages, _extensions/ shinylive, and _quarto.yml.
-^vignettes/articles$
+^gallery$
 
 # CI
 ^\.github$

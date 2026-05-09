@@ -46,12 +46,12 @@ per exported component, modelled on shiny.posit.co/r/components.
 
 ### Layout
 
-Pages live under `vignettes/articles/`, the pkgdown convention for
+Pages live under `gallery/`, the pkgdown convention for
 articles that are built into the site but not into the CRAN tarball
 (they are listed in `.Rbuildignore`):
 
 ```
-vignettes/articles/
+gallery/
 ├── components.qmd                          # gallery landing
 └── components/
     ├── _examples/                          # shared example sources
@@ -101,7 +101,7 @@ reference categories: **Layout**, **Navigation**, **Content**,
 
 ### Build
 
-- `make gallery` — runs `quarto render vignettes/articles/` and
+- `make gallery` — runs `quarto render gallery/` and
   serves the built site locally.
 - `make pkgdown` already builds the full pkgdown site, which calls
   Quarto under the hood for `.qmd` articles when Quarto is installed.

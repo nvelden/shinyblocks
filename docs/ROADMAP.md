@@ -36,7 +36,7 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > **Recently decided:** [ADR 0013](decisions/0013-component-gallery-quarto.md)
 > commits the package to a Quarto + shinylive component gallery under
-> `vignettes/articles/components/`, modelled on
+> `gallery/components/`, modelled on
 > <https://shiny.posit.co/r/components/>. This adds Quarto + the
 > `quarto-ext/shinylive` extension as a dev/CI dependency. See the
 > [Components Gallery](#components-gallery) section below for the build
@@ -46,7 +46,7 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > 1. Run `make quarto-setup` once locally to install Quarto and the
 >    shinylive extension.
-> 2. Render the scaffolded `vignettes/articles/components/button.qmd`
+> 2. Render the scaffolded `gallery/components/button.qmd`
 >    via `make gallery` — confirm the live demo and code listing both
 >    show up.
 > 3. Add `inst/showcase/R/examples/badge.R` and `alert.R`, wire them
@@ -86,7 +86,7 @@ as `make gate`.
    clean. Full manual PDF checks are release-gate only.
 9. **pkgdown.** `pkgdown::build_site()` succeeds. New components have
    both an auto-generated reference page **and** a gallery page under
-   `vignettes/articles/components/` per [ADR 0013](decisions/0013-component-gallery-quarto.md).
+   `gallery/components/` per [ADR 0013](decisions/0013-component-gallery-quarto.md).
 10. **Multi-artifact coverage.** `test-doc-coverage.R` is green —
     every exported `block_*()` is referenced in `_pkgdown.yml`'s
     `reference:` section, and once WASM is unblocked, also has a
@@ -95,47 +95,49 @@ as `make gate`.
 
 ### B. Verify — semi-automated
 
-10. **Showcase smoke test.** `shinytest2` launches
+11. **Showcase smoke test.** `shinytest2` launches
     `inst/showcase/app.R`, navigates every section, and
     `expect_screenshot()`s each. From Phase 1C onward, also run
     Shinylive export smoke.
-11. **Performance budget.** `tools/budget.R`: CSS ≤30 KB, JS ≤15 KB,
+12. **Performance budget.** `tools/budget.R`: CSS ≤30 KB, JS ≤15 KB,
     sprite ≤25 KB gzipped. Over budget = blocking unless ADR'd.
-12. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
+13. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
     the showcase. Findings → `docs/a11y/notes.md`.
-13. **Local preview — visual sanity check.** Run `make preview` to
-    launch the local showcase and pkgdown site side by side. Walk
-    through every component added or touched in this phase, in both
-    light and dark mode. From Phase 1C onward, also run
-    `make preview-shinylive` to confirm the export still renders.
-    See [§Local Preview Workflow](#local-preview-workflow). This is
-    an *eyes-on-pixels* check — automated tests do not replace it.
+14. **Live preview — both servers running.** `make verify` (also
+    invoked as the last step of `make gate`) builds pkgdown,
+    launches the showcase on `:4321` and the pkgdown site on `:4322`
+    in the background, HTTP-checks both for `200`, and leaves them
+    running. The phase exit cannot tag until *both* respond. Walk
+    through every component touched in this phase in both light and
+    dark mode. From Phase 1C onward, `make preview-shinylive` is the
+    third leg. Stop with `make verify-stop`.
+    See [§Local Preview Workflow](#local-preview-workflow).
 
 ### C. Review
 
-14. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
+15. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
     `@family` on every exported function. `@noRd` on internals.
-15. **Utility audit.** No copy-pasted helpers across `R/*.R`.
-16. **Critical code review.** `critical-code-reviewer` skill against
+16. **Utility audit.** No copy-pasted helpers across `R/*.R`.
+17. **Critical code review.** `critical-code-reviewer` skill against
     the phase diff.
 
 ### D. Document
 
-17. **NEWS.md.** User-visible changes under next dev-version heading.
-18. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
+18. **NEWS.md.** User-visible changes under next dev-version heading.
+19. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
     sync-log entries, cross-link check.
 
 ### E. Version and tag
 
-19. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
+20. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
     `0.1.0`.
-20. **Single tidy commit on main.**
-21. **Git tag.** `git tag phase-N`.
-22. **CI green on main.**
+21. **Single tidy commit on main.**
+22. **Git tag.** `git tag phase-N`.
+23. **CI green on main.**
 
 ### F. Optional from Phase 5 onward
 
-23. **Deployed showcase refresh.**
+24. **Deployed showcase refresh.**
 
 ## Local Preview Workflow
 
@@ -147,9 +149,10 @@ the minimum.
 | --- | --- | --- | --- |
 | `make showcase` | Live showcase app | 4321 | After any new `block_*()` to eyeball it. |
 | `make preview-pkgdown` | Built pkgdown site | 4322 | After `devtools::document()` — confirms reference pages render. |
-| `make gallery` | Quarto-rendered component gallery | 4324 | After editing any `vignettes/articles/components/*.qmd`. |
+| `make gallery` | Quarto-rendered component gallery | 4324 | After editing any `gallery/components/*.qmd`. |
 | `make preview-shinylive` | Static Shinylive export | 4323 | From Phase 1C onward, once `tools/export-shinylive.R` lands. |
-| `make preview` | Showcase + pkgdown together | 4321 + 4322 | Phase exit. Flip between live components and their docs. |
+| `make preview` | Showcase + pkgdown together | 4321 + 4322 | Foreground; Ctrl+C to stop. |
+| `make verify` | Same as preview but background + HTTP-checked | 4321 + 4322 | **Phase exit.** Last step of `make gate`. Stop with `make verify-stop`. |
 
 What to actually look at:
 
@@ -186,7 +189,7 @@ and [ADR 0013](decisions/0013-component-gallery-quarto.md):
 - **pkgdown site** — category-grouped reference. Auto-generated from
   roxygen. CI builds it; a failed build blocks the phase.
 - **Component gallery** — Quarto `.qmd` pages under
-  `vignettes/articles/components/`, modelled on
+  `gallery/components/`, modelled on
   <https://shiny.posit.co/r/components/>. One page per exported
   component, embedded Shinylive demo + visible source. See
   [§Components Gallery](#components-gallery).
@@ -218,7 +221,7 @@ shiny.posit.co/r/components uses):
 ### Layout
 
 ```
-vignettes/articles/
+gallery/
 ├── components.qmd                    # gallery landing
 └── components/
     ├── _examples/<component>.R       # canonical Shiny app per component
@@ -234,7 +237,7 @@ the `.qmd` (live demo + visible code).
 
 - `make quarto-setup` — one-shot install of Quarto +
   `quarto add quarto-ext/shinylive`. Run once per machine.
-- `make gallery` — render `vignettes/articles/` and serve the result.
+- `make gallery` — render `gallery/` and serve the result.
 - `make pkgdown` — full pkgdown site, which renders the gallery as
   part of the articles section when Quarto is installed.
 
@@ -242,12 +245,12 @@ the `.qmd` (live demo + visible code).
 
 When a new `block_*()` is exported, the same commit must add:
 
-1. `vignettes/articles/components/_examples/<component>.R` — runnable
+1. `gallery/components/_examples/<component>.R` — runnable
    Shiny app demonstrating the default and one or two interesting
    variants.
-2. `vignettes/articles/components/<component>.qmd` — using the
+2. `gallery/components/<component>.qmd` — using the
    template above.
-3. An entry in `vignettes/articles/components.qmd` (the gallery index
+3. An entry in `gallery/components.qmd` (the gallery index
    landing page).
 4. The category mapping in `_pkgdown.yml` `articles:` for navbar
    grouping.
@@ -325,7 +328,7 @@ same commit** that lands the API change:
 | --- | --- | --- |
 | `inst/showcase/` | Example file + sections-list row | `test-showcase.R` |
 | `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
-| `vignettes/articles/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
+| `gallery/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
 | `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 17 |
 
 A drifted artifact fails the Quality Gate. The first three are
