@@ -26,6 +26,7 @@ skills-lock.json
 # Local agent files not shipped with the package repository
 AGENTS.md
 CLAUDE.md
+HANDOFF.md
 
 # Compiled package docs
 inst/doc/

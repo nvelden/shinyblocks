@@ -6,8 +6,12 @@
 \usage{
 block_button(
   label,
-  variant = c("default", "secondary", "outline", "ghost"),
-  ...
+  variant = c("default", "secondary", "outline", "ghost", "destructive", "link"),
+  size = c("default", "sm", "lg", "icon"),
+  icon = NULL,
+  icon_position = c("inline-start", "inline-end"),
+  ...,
+  class = NULL
 )
 }
 \arguments{
@@ -15,7 +19,15 @@ block_button(
 
 \item{variant}{Visual variant.}
 
+\item{size}{Button size.}
+
+\item{icon}{Optional icon tag or vendored icon name.}
+
+\item{icon_position}{Whether the icon appears before or after the label.}
+
 \item{...}{Additional attributes passed to \code{htmltools::tags$button}.}
+
+\item{class}{Additional classes.}
 }
 \value{
 An \code{htmltools} tag.
@@ -23,3 +35,4 @@ An \code{htmltools} tag.
 \description{
 Create a modern button
 }
+\concept{action}

@@ -94,19 +94,151 @@
    * styling per phase. */
 
   .sb-page {
-    /* Phase 1 */
+    @apply grid min-h-screen bg-background text-foreground;
+  }
+
+  .sb-page.has-sidebar {
+    grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+  }
+
+  .sb-page-main {
+    @apply flex min-h-screen min-w-0 flex-col;
   }
 
   .sb-header {
-    /* Phase 1 */
+    @apply flex min-h-16 items-center border-b border-border bg-background px-6 text-sm font-medium;
   }
 
   .sb-sidebar {
-    /* Phase 1 */
+    @apply min-h-screen border-r border-sidebar-border bg-sidebar text-sidebar-foreground;
+  }
+
+  .sb-sidebar-title {
+    @apply border-b border-sidebar-border px-6 py-4 text-sm font-semibold;
+  }
+
+  .sb-sidebar-nav {
+    @apply flex flex-col gap-1 p-3;
   }
 
   .sb-body {
-    /* Phase 1 */
+    @apply flex flex-1 flex-col gap-4 p-6;
+  }
+
+  .sb-nav-item {
+    @apply flex min-h-9 items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground;
+  }
+
+  .sb-nav-item:hover {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .sb-nav-item.is-selected {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;
+  }
+
+  .sb-icon {
+    @apply size-4 shrink-0;
+  }
+
+  .sb-nav-item > [data-icon],
+  .sb-button > [data-icon] {
+    @apply size-4 shrink-0;
+  }
+
+  .sb-button {
+    @apply inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .sb-button-default {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .sb-button-default:hover {
+    opacity: 0.9;
+  }
+
+  .sb-button-secondary {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  .sb-button-secondary:hover {
+    opacity: 0.9;
+  }
+
+  .sb-button-outline {
+    @apply border border-input bg-background;
+  }
+
+  .sb-button-outline:hover {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .sb-button-ghost:hover {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .sb-button-destructive {
+    @apply bg-destructive text-destructive-foreground;
+  }
+
+  .sb-button-destructive:hover {
+    opacity: 0.9;
+  }
+
+  .sb-button-link {
+    @apply underline-offset-4;
+  }
+
+  .sb-button-link:hover {
+    @apply underline;
+  }
+
+  .sb-button-size-default {
+    @apply h-9 px-4 py-2;
+  }
+
+  .sb-button-size-sm {
+    @apply h-8 rounded-md px-3 text-sm;
+  }
+
+  .sb-button-size-lg {
+    @apply h-10 rounded-md px-6 text-sm;
+  }
+
+  .sb-button-size-icon {
+    @apply size-9 p-0;
+  }
+
+  /* Card — flat-argument convenience styling. Phase 3 will add the full
+   * composition primitives (sb-card-header, sb-card-content, sb-card-footer)
+   * alongside this minimal shape. */
+  .sb-card {
+    @apply flex flex-col gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm;
+  }
+
+  .sb-card-title {
+    @apply text-base font-semibold leading-none tracking-tight;
+  }
+
+  .sb-card-value {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  .sb-card-body {
+    @apply text-sm text-muted-foreground;
+  }
+
+  @media (max-width: 767px) {
+    .sb-page.has-sidebar {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sb-sidebar {
+      @apply min-h-0 border-b border-r-0;
+    }
   }
 
   /* Phase 2: icons, buttons, badges, alerts. */

@@ -4,12 +4,14 @@
 \alias{block_sidebar}
 \title{Create a dashboard sidebar}
 \usage{
-block_sidebar(..., title = NULL)
+block_sidebar(..., title = NULL, class = NULL)
 }
 \arguments{
 \item{...}{Sidebar content.}
 
 \item{title}{Optional sidebar title.}
+
+\item{class}{Additional classes.}
 }
 \value{
 An \code{htmltools} tag.
@@ -17,3 +19,10 @@ An \code{htmltools} tag.
 \description{
 Create a dashboard sidebar
 }
+\seealso{
+Other layout: 
+\code{\link{block_body}()},
+\code{\link{block_header}()},
+\code{\link{block_page}()}
+}
+\concept{layout}

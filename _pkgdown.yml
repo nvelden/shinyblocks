@@ -7,6 +7,7 @@ reference:
   - title: Layout
     contents:
       - block_page
+      - block_body
       - block_header
       - block_sidebar
   - title: Navigation
@@ -18,9 +19,12 @@ reference:
   - title: Action
     contents:
       - block_button
+  - title: Icon
+    contents:
+      - block_icon
   - title: Showcase
     contents:
       - run_showcase
 
 # Planned v0.1 reference sections added as components land:
-# Forms, Theme, Icon.
+# Forms, Theme.

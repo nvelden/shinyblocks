@@ -4,7 +4,14 @@
 \alias{block_page}
 \title{Create a modern Shiny page}
 \usage{
-block_page(..., title = NULL, sidebar = NULL, header = NULL)
+block_page(
+  ...,
+  title = NULL,
+  sidebar = NULL,
+  header = NULL,
+  theme_mode = c("system", "light", "dark"),
+  class = NULL
+)
 }
 \arguments{
 \item{...}{Page body content.}
@@ -14,6 +21,10 @@ block_page(..., title = NULL, sidebar = NULL, header = NULL)
 \item{sidebar}{Optional sidebar content.}
 
 \item{header}{Optional header content.}
+
+\item{theme_mode}{Initial theme mode.}
+
+\item{class}{Additional classes for the app root.}
 }
 \value{
 An \code{htmltools} tag list suitable for a Shiny UI.
@@ -21,3 +32,10 @@ An \code{htmltools} tag list suitable for a Shiny UI.
 \description{
 Create a modern Shiny page
 }
+\seealso{
+Other layout: 
+\code{\link{block_body}()},
+\code{\link{block_header}()},
+\code{\link{block_sidebar}()}
+}
+\concept{layout}

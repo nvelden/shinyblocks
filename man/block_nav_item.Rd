@@ -4,16 +4,18 @@
 \alias{block_nav_item}
 \title{Create a sidebar navigation item}
 \usage{
-block_nav_item(label, href = "#", icon = NULL, selected = FALSE)
+block_nav_item(label, href = "#", icon = NULL, selected = FALSE, class = NULL)
 }
 \arguments{
 \item{label}{Navigation label.}
 
 \item{href}{Destination URL.}
 
-\item{icon}{Optional icon name.}
+\item{icon}{Optional icon tag or vendored icon name.}
 
 \item{selected}{Whether the item is selected.}
+
+\item{class}{Additional classes.}
 }
 \value{
 An \code{htmltools} tag.
@@ -21,3 +23,4 @@ An \code{htmltools} tag.
 \description{
 Create a sidebar navigation item
 }
+\concept{navigation}
