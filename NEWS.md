@@ -2,6 +2,17 @@
 
 ## 0.0.0.9000
 
+* Visual-parity contract per [ADR 0015](docs/decisions/0015-component-specs.md):
+  every exported `block_*()` ships with a short
+  `docs/component-specs/<name>.md` capturing the shadcn reference
+  link, visual states, token contract, deliberate divergences, and a
+  reference screenshot. `tests/testthat/test-doc-coverage.R` enforces
+  the rule; existing components are backfilled incrementally via a
+  shrinking `backfill_pending_specs` allowlist. Quality Gate item 15
+  walks every state listed in the spec against the live showcase
+  during phase exit. Seed specs land for `block_button()` and
+  `block_card()`; the template lives at
+  `docs/component-specs/_template.md`.
 * Initial R package scaffold with exported Shiny/htmltools helpers for
   pages, sidebars, headers, navigation items, cards, and buttons.
 * `block_card()` now ships with styling for its title, value, and body
@@ -35,9 +46,10 @@
   Phase 5 form wrappers around standard Shiny inputs, including
   helper text, addons, fieldset composition, and invalid-state
   markup.
-* `block_select()` adds a dedicated shadcn-style select wrapper with
-  token-driven trigger, menu, and option states, replacing the earlier
-  dependence on default Selectize dropdown styling in form examples.
+* `block_select()` now follows the new wrap-by-default input policy:
+  it is a thin wrapper around Shiny's select/selectize path with
+  token-driven Selectize styling, instead of a package-owned select
+  runtime.
 * New components round out Phase 3: `block_value_box()` for
   high-signal metrics, `block_separator()` (horizontal + vertical,
   ARIA-aware), `block_skeleton()` for loading placeholders,

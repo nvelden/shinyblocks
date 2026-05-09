@@ -10,7 +10,7 @@ passing the **Quality Gate** below before the next phase begins.
 > **In progress: Phase 5 — tabs, forms, and theme runtime.**
 >
 > Landed and verified locally:
-> - **Phase 0** — ADRs `0006`–`0013` accepted.
+> - **Phase 0** — ADRs `0006`–`0015` accepted.
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
 >   CSS, dependency plumbing, showcase scaffold, and core package
 >   infrastructure.
@@ -36,6 +36,12 @@ passing the **Quality Gate** below before the next phase begins.
 > - additional first-class form controls (`checkbox`, `switch`,
 >   `textarea`, and related wrappers)
 > - gallery `.qmd` pages once the WASM/gallery track resumes
+> - component-spec backfill per [ADR 0015](decisions/0015-component-specs.md):
+>   31 components are in `backfill_pending_specs` in
+>   `tests/testthat/test-doc-coverage.R`; each one needs a
+>   `docs/component-specs/<name>.md` and a captured reference
+>   screenshot. The rule applies to new components today; the
+>   backfill happens incrementally.
 >
 > Next concrete slice:
 >
@@ -102,32 +108,40 @@ as `make gate`.
     dark mode. From Phase 1C onward, `make preview-shinylive` is the
     third leg. Stop with `make verify-stop`.
     See [§Local Preview Workflow](#local-preview-workflow).
+15. **Interaction-style parity.** For every component touched in the
+    phase, walk every state listed in
+    `docs/component-specs/<name>.md` against the live showcase. The
+    spec's reference screenshot from
+    <https://ui.shadcn.com/docs/components/...> is the shadcn ground
+    truth — divergences are only acceptable if explicitly listed in
+    the spec's "Deliberate divergences" section. Per
+    [ADR 0015](decisions/0015-component-specs.md).
 
 ### C. Review
 
-15. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
+16. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
     `@family` on every exported function. `@noRd` on internals.
-16. **Utility audit.** No copy-pasted helpers across `R/*.R`.
-17. **Critical code review.** `critical-code-reviewer` skill against
+17. **Utility audit.** No copy-pasted helpers across `R/*.R`.
+18. **Critical code review.** `critical-code-reviewer` skill against
     the phase diff.
 
 ### D. Document
 
-18. **NEWS.md.** User-visible changes under next dev-version heading.
-19. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
+19. **NEWS.md.** User-visible changes under next dev-version heading.
+20. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
     sync-log entries, cross-link check.
 
 ### E. Version and tag
 
-20. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
+21. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
     `0.1.0`.
-21. **Single tidy commit on main.**
-22. **Git tag.** `git tag phase-N`.
-23. **CI green on main.**
+22. **Single tidy commit on main.**
+23. **Git tag.** `git tag phase-N`.
+24. **CI green on main.**
 
 ### F. Optional from Phase 5 onward
 
-24. **Deployed showcase refresh.**
+25. **Deployed showcase refresh.**
 
 ## Local Preview Workflow
 
@@ -311,7 +325,7 @@ case where they are removed entirely.
 ## Per-gate component-sync rule
 
 When a phase-exit slice adds, renames, or removes any exported
-`block_*()`, the following four artifacts must be in sync **in the
+`block_*()`, the following five artifacts must be in sync **in the
 same commit** that lands the API change:
 
 | Artifact | What goes in | Enforced by |
@@ -319,10 +333,16 @@ same commit** that lands the API change:
 | `inst/showcase/` | Example file + sections-list row | `test-showcase.R` |
 | `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
 | `gallery/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
-| `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 17 |
+| `docs/component-specs/<name>.md` | Visual-parity spec per [ADR 0015](decisions/0015-component-specs.md) — shadcn link, states, token contract, divergences, reference screenshot | `test-doc-coverage.R` (active for new components; existing components in a `backfill_pending_specs` allowlist) |
+| `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 19 |
 
-A drifted artifact fails the Quality Gate. The first three are
+A drifted artifact fails the Quality Gate. The first four are
 mechanically checked; `NEWS.md` is reviewer-checked at gate exit.
+
+The component spec is the anchor for Quality Gate item 15 (interaction-
+style parity) — the reviewer walks every state listed in the spec
+against the live showcase, with the spec's reference screenshot as the
+shadcn ground truth.
 
 ### Gallery exception during the WASM hold
 

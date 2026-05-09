@@ -72,8 +72,101 @@ test_that("every exported block_*() has a gallery .qmd page", {
     character(),
     label = paste(
       "Components exported but missing a gallery page under",
-      "vignettes/articles/components/. Missing:",
+      "gallery/components/. Missing:",
       paste(missing, collapse = ", ")
+    )
+  )
+})
+
+# Components currently without a docs/component-specs/<name>.md spec.
+# Each entry must come paired with a written spec (and a captured
+# reference screenshot) before being removed from this list. See
+# ADR 0015 and docs/component-specs/README.md for the authoring flow.
+# When this list is empty, drop it and the test enforces specs
+# unconditionally for every export.
+backfill_pending_specs <- c(
+  "block_alert",
+  "block_alert_description",
+  "block_alert_title",
+  "block_badge",
+  "block_body",
+  "block_card_content",
+  "block_card_description",
+  "block_card_footer",
+  "block_card_header",
+  "block_card_title",
+  "block_empty",
+  "block_field",
+  "block_field_description",
+  "block_field_group",
+  "block_field_invalid",
+  "block_field_label",
+  "block_field_legend",
+  "block_field_set",
+  "block_header",
+  "block_icon",
+  "block_input_group",
+  "block_input_group_addon",
+  "block_nav",
+  "block_nav_item",
+  "block_page",
+  "block_select",
+  "block_separator",
+  "block_sidebar",
+  "block_skeleton",
+  "block_spinner",
+  "block_value_box"
+)
+
+spec_path <- function(fn_name) {
+  slug <- gsub("_", "-", sub("^block_", "", fn_name))
+  file.path(repo_root(), "docs", "component-specs", paste0(slug, ".md"))
+}
+
+test_that("every exported block_*() has a component spec doc", {
+  exported <- block_exports()
+
+  required <- setdiff(exported, backfill_pending_specs)
+  expect_gt(
+    length(required),
+    0,
+    label = paste(
+      "No components require a spec. Either backfill_pending_specs",
+      "is wrong or every component has been backfilled — if the",
+      "latter, drop the allowlist (see ADR 0015)."
+    )
+  )
+
+  missing <- required[!vapply(required, function(fn) {
+    file.exists(spec_path(fn))
+  }, logical(1))]
+
+  expect_identical(
+    missing,
+    character(),
+    label = paste(
+      "Components exported but missing a spec under",
+      "docs/component-specs/. Each new block_*() must ship with a",
+      "spec per ADR 0015. Missing:",
+      paste(missing, collapse = ", ")
+    )
+  )
+})
+
+test_that("backfill_pending_specs stays honest about what is missing", {
+  drift <- intersect(
+    backfill_pending_specs,
+    Filter(function(fn) file.exists(spec_path(fn)), block_exports())
+  )
+
+  expect_identical(
+    drift,
+    character(),
+    label = paste(
+      "These components have a spec but are still listed in",
+      "backfill_pending_specs. Remove them from the list in",
+      "tests/testthat/test-doc-coverage.R so the gap stays honest:",
+      paste(drift, collapse = ", ")
     )
   )
 })
