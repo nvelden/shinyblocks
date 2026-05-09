@@ -83,6 +83,17 @@ sections <- list(
     file = "button.R"
   ),
   list(
+    id = "field",
+    label = "Field",
+    icon = "edit",
+    title = "Fields and input groups",
+    lead = paste(
+      "Composable form primitives plus a first-class sb select:",
+      "labels, helper text, input addons, fieldsets, and invalid states."
+    ),
+    file = "field.R"
+  ),
+  list(
     id = "icon",
     label = "Icon",
     icon = "image",
@@ -137,9 +148,16 @@ ui <- block_page(
   title = "shinyblocks — component gallery",
   sidebar = block_sidebar(
     title = "shinyblocks",
-    lapply(sections, function(s) {
-      block_nav_item(s$label, href = paste0("#", s$id), icon = s$icon)
-    })
+    collapsible = TRUE,
+    do.call(
+      block_nav,
+      c(
+        lapply(sections, function(s) {
+          block_nav_item(s$label, href = paste0("#", s$id), icon = s$icon)
+        }),
+        list(class = "sb-sidebar-nav")
+      )
+    )
   ),
   header = block_header("Component gallery"),
   htmltools::div(

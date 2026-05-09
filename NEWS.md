@@ -28,6 +28,16 @@
   flat-argument convenience form. Pre-built region tags are reused
   via `data-sb-child` markers; bare strings/tags are wrapped
   automatically.
+* `block_field()`, `block_field_group()`, `block_field_invalid()`,
+  `block_field_label()`, `block_field_description()`,
+  `block_field_set()`, `block_field_legend()`,
+  `block_input_group()`, and `block_input_group_addon()` add
+  Phase 5 form wrappers around standard Shiny inputs, including
+  helper text, addons, fieldset composition, and invalid-state
+  markup.
+* `block_select()` adds a dedicated shadcn-style select wrapper with
+  token-driven trigger, menu, and option states, replacing the earlier
+  dependence on default Selectize dropdown styling in form examples.
 * New components round out Phase 3: `block_value_box()` for
   high-signal metrics, `block_separator()` (horizontal + vertical,
   ARIA-aware), `block_skeleton()` for loading placeholders,

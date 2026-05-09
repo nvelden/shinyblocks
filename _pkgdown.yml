@@ -20,6 +20,7 @@ reference:
       - block_sidebar
   - title: Navigation
     contents:
+      - block_nav
       - block_nav_item
   - title: Content
     contents:
@@ -38,6 +39,18 @@ reference:
       - block_skeleton
       - block_spinner
       - block_empty
+  - title: Forms
+    contents:
+      - block_field_group
+      - block_field
+      - block_field_label
+      - block_field_description
+      - block_field_set
+      - block_field_legend
+      - block_field_invalid
+      - block_input_group
+      - block_input_group_addon
+      - block_select
   - title: Action
     contents:
       - block_button

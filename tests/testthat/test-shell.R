@@ -14,8 +14,12 @@ test_that("block_page renders the shell landmarks", {
   head <- paste(rendered$head, collapse = "")
 
   expect_match(html, '<div class="sb-app">', fixed = TRUE)
-  expect_match(html, '<div class="sb-page has-sidebar">', fixed = TRUE)
-  expect_match(html, '<aside class="sb-sidebar">', fixed = TRUE)
+  expect_match(html, 'class="sb-page has-sidebar"', fixed = TRUE)
+  expect_match(html, 'data-sidebar-enhanced="false"', fixed = TRUE)
+  expect_match(html, 'data-sidebar-mobile-open="false"', fixed = TRUE)
+  expect_match(html, 'class="sb-sidebar"', fixed = TRUE)
+  expect_match(html, 'class="sb-sidebar-backdrop"', fixed = TRUE)
+  expect_match(html, 'class="sb-sidebar-mobile-trigger"', fixed = TRUE)
   expect_match(html, '<header class="sb-header">', fixed = TRUE)
   expect_match(html, '<main class="sb-body">', fixed = TRUE)
   expect_match(head, "document.documentElement.dataset.theme", fixed = TRUE)
@@ -52,6 +56,33 @@ test_that("nav items advertise themselves as nav-item children", {
   expect_invisible(
     ns$validate_children(list(item), "nav-item", "block_nav")
   )
+})
+
+test_that("nav containers merge classes and wrap items", {
+  nav <- block_nav(
+    block_nav_item("Home"),
+    block_nav_item("Reports"),
+    class = "custom"
+  )
+
+  expect_identical(tag_attr(nav, "class"), "sb-nav custom")
+})
+
+test_that("sidebar collapse attrs and toggle render", {
+  sidebar <- block_sidebar(
+    title = "Navigation",
+    block_nav_item("Home"),
+    collapsible = TRUE,
+    collapsed = TRUE,
+    id = "main-sidebar"
+  )
+  html <- render_html(sidebar)
+
+  expect_identical(tag_attr(sidebar, "data-collapsible"), "true")
+  expect_identical(tag_attr(sidebar, "data-collapsed"), "true")
+  expect_identical(tag_attr(sidebar, "id"), "main-sidebar")
+  expect_match(html, 'class="sb-sidebar-toggle"', fixed = TRUE)
+  expect_match(html, 'aria-expanded="false"', fixed = TRUE)
 })
 
 test_that("nav items and buttons decorate icons", {
@@ -96,6 +127,99 @@ test_that("button classes merge with user classes", {
     classes,
     "sb-button sb-button-outline sb-button-size-lg custom"
   )
+})
+
+test_that("field wrappers expose expected classes and child markers", {
+  field <- block_field(
+    block_field_label("Email", `for` = "email"),
+    shiny::textInput("email", NULL),
+    block_field_description("We won't share it."),
+    class = "custom"
+  )
+  fieldset <- block_field_set(
+    block_field_legend("Notifications"),
+    field
+  )
+  group <- block_field_group(fieldset)
+
+  expect_identical(tag_attr(field, "class"), "sb-field custom")
+  expect_identical(tag_attr(field, "data-sb-child"), "field")
+  expect_identical(tag_attr(fieldset, "data-sb-child"), "field-set")
+  expect_identical(tag_attr(group, "data-sb-child"), "field-group")
+})
+
+test_that("field labels and descriptions expose expected attributes", {
+  label <- block_field_label("Email", `for` = "email", class = "custom")
+  description <- block_field_description(
+    "Helper text",
+    id = "email-help",
+    class = "custom"
+  )
+  legend <- block_field_legend("Preferences", class = "custom")
+
+  expect_identical(tag_attr(label, "for"), "email")
+  expect_identical(tag_attr(label, "class"), "sb-field-label custom")
+  expect_identical(tag_attr(description, "id"), "email-help")
+  expect_identical(
+    tag_attr(description, "class"),
+    "sb-field-description custom"
+  )
+  expect_identical(tag_attr(legend, "class"), "sb-field-legend custom")
+})
+
+test_that("invalid fields decorate controls and append an error message", {
+  invalid <- render_html(
+    block_field_invalid(
+      block_field(
+        block_field_label("API key", `for` = "api_key"),
+        shiny::textInput("api_key", NULL)
+      ),
+      "API key is required."
+    )
+  )
+
+  expect_match(invalid, 'data-invalid="true"', fixed = TRUE)
+  expect_match(invalid, 'aria-invalid="true"', fixed = TRUE)
+  expect_match(invalid, 'aria-describedby="sb-field-error-', fixed = TRUE)
+  expect_match(
+    invalid,
+    'class="sb-field-description sb-field-error"',
+    fixed = TRUE
+  )
+})
+
+test_that("input groups merge user classes and render addons", {
+  input_group <- block_input_group(
+    block_input_group_addon(block_icon("search"), class = "addon-custom"),
+    shiny::textInput("query", NULL),
+    class = "custom"
+  )
+  html <- render_html(input_group)
+
+  expect_identical(tag_attr(input_group, "class"), "sb-input-group custom")
+  expect_match(html, 'class="sb-input-group-addon addon-custom"', fixed = TRUE)
+  expect_match(html, "sb-icon-search", fixed = TRUE)
+})
+
+test_that("block_select renders trigger, content, and native select", {
+  select <- block_select(
+    "plan",
+    choices = c(Free = "free", Pro = "pro"),
+    selected = "pro",
+    class = "custom"
+  )
+  html <- render_html(select)
+
+  expect_identical(tag_attr(select, "class"), "sb-select custom")
+  expect_match(
+    html,
+    'class="sb-select-native shiny-input-select"',
+    fixed = TRUE
+  )
+  expect_match(html, 'class="sb-select-trigger"', fixed = TRUE)
+  expect_match(html, 'class="sb-select-content"', fixed = TRUE)
+  expect_match(html, 'data-value="pro"', fixed = TRUE)
+  expect_match(html, 'class="sb-select-item is-selected"', fixed = TRUE)
 })
 
 test_that("badge variants map to classes", {

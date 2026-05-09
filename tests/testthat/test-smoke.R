@@ -1,5 +1,6 @@
 test_that("core helpers return tags", {
   expect_s3_class(block_sidebar("Item"), "shiny.tag")
+  expect_s3_class(block_nav(block_nav_item("Home")), "shiny.tag")
   expect_s3_class(block_header("Header"), "shiny.tag")
   expect_s3_class(block_body("Body"), "shiny.tag")
   expect_s3_class(block_card("Body"), "shiny.tag")
@@ -19,6 +20,7 @@ test_that("core helpers return tags", {
   expect_s3_class(block_spinner(), "shiny.tag")
   expect_s3_class(block_empty("Nothing here"), "shiny.tag")
   expect_s3_class(block_icon("search"), "shiny.tag")
+  expect_s3_class(block_select("plan", choices = c("Free", "Pro")), "shiny.tag")
 })
 
 test_that("showcase app sources without launching", {

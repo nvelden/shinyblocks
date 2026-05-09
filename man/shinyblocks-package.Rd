@@ -8,6 +8,13 @@
 \description{
 \code{shinyblocks} provides composable dashboard primitives for Shiny apps.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://nvelden.github.io/shinyblocks/}
+}
+
+}
 \author{
 \strong{Maintainer}: Niels van der Velden \email{n.s.j.vandervelden@gmail.com}
 

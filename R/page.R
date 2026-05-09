@@ -19,6 +19,15 @@ block_page <- function(
   class = NULL
 ) {
   theme_mode <- match_arg(theme_mode, c("system", "light", "dark"))
+  sidebar <- prepare_sidebar(sidebar)
+  sidebar_collapsed <- if (!is.null(sidebar)) {
+    sidebar$attribs[["data-collapsed"]] %||% "false"
+  } else {
+    "false"
+  }
+  sidebar_trigger <- if (!is.null(sidebar)) {
+    sidebar_mobile_trigger(sidebar$attribs$id)
+  }
 
   attach_shinyblocks_deps(
     htmltools::tagList(
@@ -33,10 +42,25 @@ block_page <- function(
             "sb-page",
             if (!is.null(sidebar)) "has-sidebar"
           ),
+          `data-sidebar-enhanced` = "false",
+          `data-sidebar-mobile-open` = "false",
+          `data-sidebar-collapsed` = sidebar_collapsed,
           sidebar,
+          if (!is.null(sidebar)) {
+            htmltools::tags$div(
+              class = "sb-sidebar-backdrop",
+              `aria-hidden` = "true"
+            )
+          },
           htmltools::tags$div(
             class = "sb-page-main",
-            header,
+            if (!is.null(header) || !is.null(sidebar_trigger)) {
+              htmltools::tags$div(
+                class = "sb-header-shell",
+                sidebar_trigger,
+                header
+              )
+            },
             block_body(...)
           )
         )
@@ -88,4 +112,27 @@ block_theme_script <- function(theme_mode) {
   }
 
   htmltools::tags$script(htmltools::HTML(script))
+}
+
+prepare_sidebar <- function(sidebar) {
+  if (is.null(sidebar)) {
+    return(NULL)
+  }
+
+  if (is.null(sidebar$attribs$id) || !nzchar(sidebar$attribs$id)) {
+    sidebar$attribs$id <- "sb-sidebar"
+  }
+
+  sidebar
+}
+
+sidebar_mobile_trigger <- function(sidebar_id) {
+  htmltools::tags$button(
+    class = "sb-sidebar-mobile-trigger",
+    type = "button",
+    `aria-label` = "Open sidebar",
+    `aria-controls` = sidebar_id,
+    `aria-expanded` = "false",
+    block_icon("menu")
+  )
 }

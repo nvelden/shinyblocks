@@ -70,3 +70,35 @@
       Error:
       ! `orientation` must be one of "horizontal", "vertical".
 
+# block_nav validates child types
+
+    Code
+      block_nav(htmltools::tags$div("Bad child"))
+    Condition
+      Error:
+      ! All children of `block_nav()` must be `nav-item` items.
+
+# block_field_invalid validates field input
+
+    Code
+      block_field_invalid(htmltools::tags$div("Bad field"), "Nope")
+    Condition
+      Error:
+      ! `field` must be created by `block_field()`.
+
+# block_select validates choices and selected value
+
+    Code
+      block_select("plan", choices = character())
+    Condition
+      Error:
+      ! `choices` must contain at least one option.
+
+---
+
+    Code
+      block_select("plan", choices = c("Free", "Pro"), selected = "Team")
+    Condition
+      Error:
+      ! `selected` must match one of `choices`.
+
