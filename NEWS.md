@@ -2,6 +2,20 @@
 
 ## 0.0.0.9000
 
+* First shadcn-fidelity audit pass per
+  [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md).
+  Compared against the canonical
+  `apps/v4/registry/new-york-v4` source, three classes of drift were
+  fixed in `inst/www/src/shinyblocks.css`: badges now use
+  `rounded-full` + `text-xs` (the current shadcn pill shape, not the
+  earlier rounded-rectangle), `block_button(variant = "link")` picks
+  up `text-primary`, `block_button(variant = "outline")` carries
+  `shadow-xs`, and destructive button + badge variants use
+  `text-white` with a `[data-theme="dark"]` 60%-opacity dim that
+  matches shadcn's dark-mode treatment. Three cross-cutting drifts
+  (focus-ring redesign to the shadcn 3px ring, `aria-invalid`
+  styling, tabs data-attribute refactor) are queued as the next
+  Phase 5 slices.
 * Visual-parity contract per [ADR 0015](docs/decisions/0015-component-specs.md):
   every exported `block_*()` ships with a short
   `docs/component-specs/<name>.md` capturing the shadcn reference
