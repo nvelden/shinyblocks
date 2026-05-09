@@ -2,6 +2,14 @@
 
 ## 0.0.0.9000
 
+* Phase 5 hand-off plan landed at
+  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](docs/agent-plans/2026-05-09-phase-5-handoff.md):
+  six slice-sized implementation steps (focus-visible redesign,
+  `aria-invalid` cross-cut, tabs refactor, reference screenshots,
+  spec backfill, gallery resumption) with files to edit, concrete
+  CSS patterns, tests to update, and definition-of-done per slice.
+  The next implementer can pick up Phase 5 finish from there without
+  rereading the conversation history.
 * First shadcn-fidelity audit pass per
   [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md).
   Compared against the canonical
