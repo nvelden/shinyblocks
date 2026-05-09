@@ -7,6 +7,7 @@ Authors@R:
 Description: Provides composable Shiny dashboard components inspired by
     shadcn/ui, with R-first helpers, bundled assets, and accessible
     defaults. End users do not need Node, Tailwind, or React.
+URL: https://nvelden.github.io/shinyblocks/
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-US
@@ -17,6 +18,9 @@ Collate:
     'utils.R'
     'icon.R'
     'components.R'
+    'field.R'
+    'input-group.R'
+    'select.R'
     'layout.R'
     'package.R'
     'page.R'

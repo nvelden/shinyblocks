@@ -13,11 +13,18 @@ htmltools::tagList(
     "."
   ),
   htmltools::tags$p(
+    "This showcase also enables ",
+    htmltools::tags$code("block_sidebar(collapsible = TRUE)"),
+    ", so the desktop sidebar can be collapsed and the mobile trigger",
+    " opens it as a sheet."
+  ),
+  htmltools::tags$p(
     htmltools::tags$strong("How to verify:"),
     paste(
-      " resize the window to confirm the sidebar collapses below",
-      "the header on narrow viewports, and tab through the page",
-      "to confirm focus rings appear on every interactive element."
+      " use the sidebar toggle on desktop, resize below the mobile",
+      "breakpoint to confirm the header trigger opens the sidebar,",
+      "and tab through the nav to confirm arrow/home/end keyboard",
+      "movement and visible focus rings."
     )
   )
 )

@@ -16,6 +16,7 @@ node_modules/
 dist/
 tmp/
 site/
+.verify*
 
 # Local agent and assistant runtime caches
 .agents/

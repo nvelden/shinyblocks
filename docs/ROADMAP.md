@@ -7,55 +7,45 @@ passing the **Quality Gate** below before the next phase begins.
 
 ## Current Status
 
-> **In progress: Phase 2 — icons and static components.**
+> **In progress: Phase 5 — tabs, forms, and theme runtime.**
 >
-> Landed (not yet through a formal phase-exit gate):
-> - **Phase 0** — ADRs `0006`–`0012` accepted.
-> - **Phase 1A** — `block_page()`, `block_body()`, `block_header()`,
->   `block_sidebar()`, `attach_shinyblocks_deps()`, plus shell tests.
-> - **Phase 1B** — Tailwind v4 source under `inst/www/src/`,
->   committed compiled `inst/www/shinyblocks.css`, `make build-css`.
-> - **Phase 1C** — `_pkgdown.yml`, `inst/showcase/app.R` scaffold,
->   `Makefile` inner-loop and gate targets, `tools/budget.R`,
->   `tools/check-doc-links.R`, `inst/WORDLIST`, `tests/testthat/setup.R`.
->   Still owed: split CRAN CI matrix into `R-CMD-check.yaml` +
->   `cran-release-check.yaml`, add `tools/export-shinylive.R`.
-> - **Phase 2** — `block_icon()` with vendored Lucide sprite,
->   `block_button()` with variants and sizes, `block_badge()` with
->   four variants, `block_alert()` + `block_alert_title()` +
->   `block_alert_description()` with composable slots and ARIA
->   `role="alert"`. Still owed: showcase examples for badge and
->   alert so the Local Preview can eyeball them.
-> - **Phase 3 (early)** — `block_card()` flat-argument convenience
->   shape with CSS. Composition primitives, `block_value_box()`,
->   `block_separator()`, `block_skeleton()`, `block_spinner()`, and
->   `block_empty()` still owed.
-> - **Phase 4 (early)** — `block_nav_item()` with `data-sb-child`
->   marker. `block_nav()`, sidebar collapse, mobile sheet, and the
->   `inst/www/shinyblocks.js` module still owed.
+> Landed and verified locally:
+> - **Phase 0** — ADRs `0006`–`0013` accepted.
+> - **Phase 1** — package shell, Tailwind v4 source, committed compiled
+>   CSS, dependency plumbing, showcase scaffold, and core package
+>   infrastructure.
+> - **Phase 2** — `block_icon()`, `block_button()`, `block_badge()`,
+>   `block_alert()`, `block_alert_title()`, `block_alert_description()`,
+>   plus showcase/docs/test coverage.
+> - **Phase 3** — `block_card()` composition primitives,
+>   `block_value_box()`, `block_separator()`, `block_skeleton()`,
+>   `block_spinner()`, and `block_empty()`.
+> - **Phase 4** — `block_nav()`, `block_nav_item()`, collapsible
+>   `block_sidebar()`, page-level sidebar state, and
+>   `inst/www/shinyblocks.js` for desktop collapse, mobile open/close,
+>   backdrop click, outside click, `Escape`, and nav keyboard movement.
+> - **Phase 5 (current slice)** — `block_field_group()`, `block_field()`,
+>   `block_field_label()`, `block_field_description()`,
+>   `block_field_set()`, `block_field_legend()`,
+>   `block_field_invalid()`, `block_input_group()`,
+>   `block_input_group_addon()`, and `block_select()`.
 >
-> **Recently decided:** [ADR 0013](decisions/0013-component-gallery-quarto.md)
-> commits the package to a Quarto + shinylive component gallery under
-> `gallery/components/`, modelled on
-> <https://shiny.posit.co/r/components/>. This adds Quarto + the
-> `quarto-ext/shinylive` extension as a dev/CI dependency. See the
-> [Components Gallery](#components-gallery) section below for the build
-> and authoring contract.
+> Still owed in Phase 5:
+> - `block_tabs()`
+> - theme runtime helpers
+> - additional first-class form controls (`checkbox`, `switch`,
+>   `textarea`, and related wrappers)
+> - gallery `.qmd` pages once the WASM/gallery track resumes
 >
-> Next concrete slice (Phase 2 finish + gallery proof of concept):
+> Next concrete slice:
 >
-> 1. Run `make quarto-setup` once locally to install Quarto and the
->    shinylive extension.
-> 2. Render the scaffolded `gallery/components/button.qmd`
->    via `make gallery` — confirm the live demo and code listing both
->    show up.
-> 3. Add `inst/showcase/R/examples/badge.R` and `alert.R`, wire them
->    into `inst/showcase/app.R`, run `make preview` to eyeball.
-> 4. Author `badge.qmd`, `alert.qmd`, `card.qmd`, `icon.qmd`, plus the
->    layout/navigation pages (`page.qmd`, `header.qmd`, `sidebar.qmd`,
->    `nav-item.qmd`) and the gallery index `components.qmd`.
-> 5. Run the Quality Gate to formally exit Phases 1A → 2 in one
->    bundled phase-exit file.
+> 1. Add `block_tabs()` as an additive wrapper around Shiny tabs.
+> 2. Add the next dedicated form controls so fields stop relying on raw
+>    Shiny widget styling.
+> 3. Implement `block_theme()`, dark-mode toggle, and runtime theme
+>    updates against the existing token contract.
+> 4. Resume gallery page authoring once the WASM/gallery track is back
+>    in active implementation.
 
 Update this line at every phase exit.
 

@@ -4,12 +4,25 @@
 \alias{block_sidebar}
 \title{Create a dashboard sidebar}
 \usage{
-block_sidebar(..., title = NULL, class = NULL)
+block_sidebar(
+  ...,
+  title = NULL,
+  collapsible = FALSE,
+  collapsed = FALSE,
+  id = NULL,
+  class = NULL
+)
 }
 \arguments{
 \item{...}{Sidebar content.}
 
 \item{title}{Optional sidebar title.}
+
+\item{collapsible}{Whether the sidebar can collapse on larger screens.}
+
+\item{collapsed}{Whether the sidebar starts collapsed on larger screens.}
+
+\item{id}{Optional sidebar DOM id.}
 
 \item{class}{Additional classes.}
 }

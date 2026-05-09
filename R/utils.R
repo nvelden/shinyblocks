@@ -99,3 +99,36 @@ as_component_child <- function(value, type, builder) {
 
   builder(value)
 }
+
+append_idref <- function(existing, value) {
+  refs <- unique(c(strsplit(existing %||% "", "\\s+")[[1]], value))
+  refs <- refs[nzchar(refs)]
+
+  if (length(refs) == 0) {
+    return(NULL)
+  }
+
+  paste(refs, collapse = " ")
+}
+
+normalize_choices <- function(choices) {
+  values <- unlist(choices, recursive = TRUE, use.names = TRUE)
+
+  if (length(values) == 0) {
+    stop("`choices` must contain at least one option.", call. = FALSE)
+  }
+
+  labels <- names(values)
+  if (is.null(labels)) {
+    labels <- as.character(values)
+  } else {
+    missing <- is.na(labels) | !nzchar(labels)
+    labels[missing] <- as.character(values[missing])
+  }
+
+  data.frame(
+    value = as.character(unname(values)),
+    label = as.character(labels),
+    stringsAsFactors = FALSE
+  )
+}

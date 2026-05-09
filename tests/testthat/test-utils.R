@@ -72,3 +72,25 @@ test_that("block_separator validates orientation", {
     block_separator(orientation = "diagonal")
   })
 })
+
+test_that("block_nav validates child types", {
+  expect_snapshot(error = TRUE, {
+    block_nav(htmltools::tags$div("Bad child"))
+  })
+})
+
+test_that("block_field_invalid validates field input", {
+  expect_snapshot(error = TRUE, {
+    block_field_invalid(htmltools::tags$div("Bad field"), "Nope")
+  })
+})
+
+test_that("block_select validates choices and selected value", {
+  expect_snapshot(error = TRUE, {
+    block_select("plan", choices = character())
+  })
+
+  expect_snapshot(error = TRUE, {
+    block_select("plan", choices = c("Free", "Pro"), selected = "Team")
+  })
+})
