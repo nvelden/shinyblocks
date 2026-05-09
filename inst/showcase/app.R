@@ -1,6 +1,8 @@
 library(shiny)
 library(shinyblocks)
 
+source(file.path("R", "render_example.R"), local = TRUE)
+
 ui <- block_page(
   title = "shinyblocks showcase",
   sidebar = block_sidebar(

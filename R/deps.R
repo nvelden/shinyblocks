@@ -4,7 +4,8 @@ shinyblocks_dependency <- function() {
       name = "shinyblocks",
       version = shinyblocks_version(),
       src = c(href = "shinyblocks"),
-      stylesheet = "shinyblocks.css"
+      stylesheet = "shinyblocks.css",
+      attachment = c(sprite = "icons/sprite.svg")
     )
   } else {
     htmltools::htmlDependency(
@@ -12,6 +13,7 @@ shinyblocks_dependency <- function() {
       version = shinyblocks_version(),
       src = "www",
       stylesheet = "shinyblocks.css",
+      attachment = c(sprite = "icons/sprite.svg"),
       package = "shinyblocks"
     )
   }

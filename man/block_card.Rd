@@ -4,7 +4,7 @@
 \alias{block_card}
 \title{Create a dashboard card}
 \usage{
-block_card(..., title = NULL, value = NULL)
+block_card(..., title = NULL, value = NULL, class = NULL)
 }
 \arguments{
 \item{...}{Card body content.}
@@ -12,6 +12,8 @@ block_card(..., title = NULL, value = NULL)
 \item{title}{Optional card title.}
 
 \item{value}{Optional primary value.}
+
+\item{class}{Additional classes.}
 }
 \value{
 An \code{htmltools} tag.
@@ -19,3 +21,4 @@ An \code{htmltools} tag.
 \description{
 Create a dashboard card
 }
+\concept{content}

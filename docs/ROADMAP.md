@@ -7,8 +7,33 @@ passing the **Quality Gate** below before the next phase begins.
 
 ## Current Status
 
-> **Phase 0 complete** — ADRs `0006`–`0012` are accepted.
-> Next: start Phase 1A, the asset dependency and static shell slice.
+> **In progress: Phase 2 — icons and static components.**
+>
+> Landed (not yet through a formal phase-exit gate):
+> - **Phase 0** — ADRs `0006`–`0012` accepted.
+> - **Phase 1A** — `block_page()`, `block_body()`, `block_header()`,
+>   `block_sidebar()`, `attach_shinyblocks_deps()`, plus shell tests.
+> - **Phase 1B** — Tailwind v4 source under `inst/www/src/`,
+>   committed compiled `inst/www/shinyblocks.css`, `make build-css`.
+> - **Phase 1C** — `_pkgdown.yml`, `inst/showcase/app.R` scaffold,
+>   `Makefile` inner-loop and gate targets, `tools/budget.R`,
+>   `tools/check-doc-links.R`, `inst/WORDLIST`, `tests/testthat/setup.R`.
+>   Still owed: split CRAN CI matrix into `R-CMD-check.yaml` +
+>   `cran-release-check.yaml`, add `tools/export-shinylive.R`.
+> - **Phase 2 (partial)** — `block_icon()` with vendored Lucide sprite,
+>   `block_button()` with variants and sizes. `block_badge()` and
+>   `block_alert()` still owed.
+> - **Phase 3 (early)** — `block_card()` flat-argument convenience
+>   shape with CSS. Composition primitives, `block_value_box()`,
+>   `block_separator()`, `block_skeleton()`, `block_spinner()`, and
+>   `block_empty()` still owed.
+> - **Phase 4 (early)** — `block_nav_item()` with `data-sb-child`
+>   marker. `block_nav()`, sidebar collapse, mobile sheet, and the
+>   `inst/www/shinyblocks.js` module still owed.
+>
+> Next concrete slice: finish Phase 2 (`block_badge()` and
+> `block_alert()`), then run the Quality Gate to formally exit Phases
+> 1A → 2 in one bundled phase-exit file.
 
 Update this line at every phase exit.
 

@@ -14,6 +14,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Collate:
     'deps.R'
+    'utils.R'
+    'icon.R'
     'components.R'
     'layout.R'
     'package.R'

@@ -2,6 +2,13 @@
 # Loaded once before any test file. Keep minimal; per-test setup
 # uses withr.
 
+# testthat sets reproducible language output itself. In local shells
+# with LC_ALL pinned, withr warns that the language override cannot
+# take effect; clearing LC_ALL keeps the suite warning-free.
+if (nzchar(Sys.getenv("LC_ALL"))) {
+  Sys.unsetenv("LC_ALL")
+}
+
 # Make package internals available without prefixing in test code.
 # Helpers like merge_classes() and validate_children() live in
 # R/utils.R; this lets tests assert on their behavior directly.
