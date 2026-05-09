@@ -87,6 +87,11 @@ as `make gate`.
 9. **pkgdown.** `pkgdown::build_site()` succeeds. New components have
    both an auto-generated reference page **and** a gallery page under
    `vignettes/articles/components/` per [ADR 0013](decisions/0013-component-gallery-quarto.md).
+10. **Multi-artifact coverage.** `test-doc-coverage.R` is green —
+    every exported `block_*()` is referenced in `_pkgdown.yml`'s
+    `reference:` section, and once WASM is unblocked, also has a
+    matching gallery `.qmd` page. See
+    [§Per-gate component-sync rule](#per-gate-component-sync-rule).
 
 ### B. Verify — semi-automated
 
@@ -309,6 +314,39 @@ Components that are emitted transitively (e.g. `block_body` via
 `block_page`) still appear in the rendered HTML through their parent
 and need no separate section. The class-coverage test catches the
 case where they are removed entirely.
+
+## Per-gate component-sync rule
+
+When a phase-exit slice adds, renames, or removes any exported
+`block_*()`, the following four artifacts must be in sync **in the
+same commit** that lands the API change:
+
+| Artifact | What goes in | Enforced by |
+| --- | --- | --- |
+| `inst/showcase/` | Example file + sections-list row | `test-showcase.R` |
+| `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
+| `vignettes/articles/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
+| `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 17 |
+
+A drifted artifact fails the Quality Gate. The first three are
+mechanically checked; `NEWS.md` is reviewer-checked at gate exit.
+
+### Gallery exception during the WASM hold
+
+[ADR 0013](decisions/0013-component-gallery-quarto.md) requires a
+gallery `.qmd` per component, but live demos depend on a webR-loadable
+shinyblocks binary at `repo.r-wasm.org`. The path-B WASM build was
+deferred — the gallery currently has only `button.qmd`. The matching
+test in `test-doc-coverage.R` is `skip()`'d with a pointer to ADR 0013.
+
+When WASM lands:
+
+1. Drop the `skip()` call in `test-doc-coverage.R`.
+2. Author one `.qmd` page (and matching `_examples/<component>.R`)
+   per exported `block_*()` so the test passes.
+3. Update `_pkgdown.yml` `articles:` to list every page.
+
+Until then, the showcase is the visual verification surface.
 
 ---
 

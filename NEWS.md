@@ -35,3 +35,10 @@
   optional icon, description, and action slots.
 * Internal: deduplicated `as_alert_child()` and `as_component_child()`
   into a single helper; both call sites now share the same code path.
+* `tests/testthat/test-doc-coverage.R` enforces a per-gate sync rule:
+  every exported `block_*()` must appear in `_pkgdown.yml`'s
+  `reference:` section (active) and have a gallery `.qmd` page under
+  `vignettes/articles/components/` (currently `skip()`'d pending the
+  WASM resolution per ADR 0013). The ROADMAP grows a §Per-gate
+  component-sync rule section spelling out which artifacts must land
+  in the same commit as a new component.
