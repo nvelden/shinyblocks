@@ -59,17 +59,30 @@ passing the **Quality Gate** below before the next phase begins.
 >      `data-variant` attribute model (replaces the current Bootstrap-
 >      class-leaning markup).
 >
-> Next concrete slice:
+> **Hand-off plan:** the next implementer should read
+> [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md)
+> first. It is the consolidated, slice-sized plan for finishing
+> Phase 5: per-slice scope, files to edit, concrete CSS patterns,
+> tests to update, validation steps, and definition-of-done.
 >
-> 1. Land the focus-visible + aria-invalid cross-cut as one commit
->    so every interactive component picks up the new ring + invalid
->    treatment together.
-> 2. Refactor tabs to the shadcn data-attribute model; add the line
->    variant.
-> 3. Capture reference screenshots for the seed specs (button, card)
->    so the §Per-gate component-sync rule has anchored examples.
-> 4. Resume gallery page authoring once the WASM/gallery track is
->    back in active implementation.
+> Slices, in order:
+>
+> 1. **Focus-visible redesign** — drop the global
+>    `.sb-app *:focus-visible` rule, add per-component
+>    `border-ring + ring-[3px] + ring-ring/50` to button, badge,
+>    nav-item, tabs trigger, select, checkbox, switch.
+> 2. **`aria-invalid` cross-cut** — destructive ring on every
+>    interactive base, hooked to `block_field_invalid()`.
+> 3. **Tabs refactor** to shadcn's `data-state` /
+>    `data-orientation` / `data-variant` attribute model; add the
+>    line variant.
+> 4. **Reference screenshots** for the seed specs (button, card).
+> 5. **Spec-doc backfill** — 31 entries in
+>    `backfill_pending_specs`, walked component by component using
+>    [`docs/component-specs/_template.md`](component-specs/_template.md).
+> 6. **Gallery resumption** — blocked on the WASM track. When
+>    unblocked, author one `gallery/components/<name>.qmd` per
+>    export and drop the `skip()` in the gallery coverage test.
 
 Update this line at every phase exit.
 
