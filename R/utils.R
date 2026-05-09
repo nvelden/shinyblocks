@@ -85,7 +85,7 @@ set_icon_position <- function(
   icon
 }
 
-as_alert_child <- function(value, type, builder) {
+as_component_child <- function(value, type, builder) {
   if (is.null(value)) {
     return(NULL)
   }

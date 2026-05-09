@@ -66,3 +66,9 @@ test_that("block_alert validates required title and variant", {
     block_alert("Notice", variant = "warning")
   })
 })
+
+test_that("block_separator validates orientation", {
+  expect_snapshot(error = TRUE, {
+    block_separator(orientation = "diagonal")
+  })
+})

@@ -9,7 +9,12 @@ sb_section <- function(id, title, lead, example_path, active = FALSE) {
     style = "display: flex; flex-direction: column; gap: 1rem;",
     htmltools::tags$h2(
       id = paste0(id, "-title"),
-      style = "font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; margin: 0;",
+      style = paste(
+        "font-size: 1.25rem;",
+        "font-weight: 600;",
+        "letter-spacing: -0.025em;",
+        "margin: 0;"
+      ),
       title
     ),
     if (!is.null(lead)) {

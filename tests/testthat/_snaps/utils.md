@@ -62,3 +62,11 @@
       Error:
       ! `variant` must be one of "default", "destructive".
 
+# block_separator validates orientation
+
+    Code
+      block_separator(orientation = "diagonal")
+    Condition
+      Error:
+      ! `orientation` must be one of "horizontal", "vertical".
+

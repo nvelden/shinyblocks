@@ -262,6 +262,76 @@
     @apply text-sm text-muted-foreground;
   }
 
+  .sb-value-box {
+    @apply grid gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .sb-value-box-icon {
+    @apply flex items-start pt-0.5 text-muted-foreground;
+  }
+
+  .sb-value-box-body {
+    @apply flex min-w-0 flex-col gap-1;
+  }
+
+  .sb-value-box-title {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  .sb-value-box-value {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  .sb-value-box-description {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .sb-separator {
+    @apply shrink-0 bg-border;
+  }
+
+  .sb-separator-horizontal {
+    @apply h-px w-full;
+  }
+
+  .sb-separator-vertical {
+    @apply h-full w-px self-stretch;
+    min-height: 1.5rem;
+  }
+
+  .sb-skeleton {
+    @apply animate-pulse rounded-md bg-muted;
+  }
+
+  .sb-spinner {
+    @apply inline-flex size-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground;
+  }
+
+  .sb-empty {
+    @apply flex flex-col items-center justify-center gap-4 rounded-xl border border-border bg-card px-6 py-10 text-center text-card-foreground;
+  }
+
+  .sb-empty-icon {
+    @apply flex items-center justify-center rounded-full bg-muted p-3 text-muted-foreground;
+  }
+
+  .sb-empty-body {
+    @apply flex max-w-md flex-col items-center gap-2;
+  }
+
+  .sb-empty-title {
+    @apply text-base font-semibold tracking-tight;
+  }
+
+  .sb-empty-description {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .sb-empty-action {
+    @apply pt-2;
+  }
+
   /* Card — flat-argument convenience styling. Phase 3 will add the full
    * composition primitives (sb-card-header, sb-card-content, sb-card-footer)
    * alongside this minimal shape. */
@@ -269,16 +339,32 @@
     @apply flex flex-col gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm;
   }
 
+  .sb-card-header {
+    @apply flex flex-col gap-1.5;
+  }
+
   .sb-card-title {
     @apply text-base font-semibold leading-none tracking-tight;
+  }
+
+  .sb-card-description {
+    @apply text-sm text-muted-foreground;
   }
 
   .sb-card-value {
     @apply text-2xl font-semibold tracking-tight;
   }
 
+  .sb-card-content {
+    @apply flex flex-col gap-4;
+  }
+
   .sb-card-body {
     @apply text-sm text-muted-foreground;
+  }
+
+  .sb-card-footer {
+    @apply flex items-center;
   }
 
   @media (max-width: 767px) {

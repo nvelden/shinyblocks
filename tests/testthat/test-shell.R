@@ -115,6 +115,55 @@ test_that("badge classes merge with user classes", {
   expect_identical(classes, "sb-badge sb-badge-default custom")
 })
 
+test_that("card flat arguments compose into card regions", {
+  card <- render_html(
+    block_card(
+      title = "Revenue",
+      description = "Last 30 days",
+      value = "$42k",
+      footer = block_button("View report"),
+      "Up 12% month over month."
+    )
+  )
+
+  expect_match(card, 'class="sb-card-header"', fixed = TRUE)
+  expect_match(card, 'class="sb-card-title"', fixed = TRUE)
+  expect_match(card, 'class="sb-card-description"', fixed = TRUE)
+  expect_match(card, 'class="sb-card-content"', fixed = TRUE)
+  expect_match(card, 'class="sb-card-footer"', fixed = TRUE)
+  expect_match(card, 'class="sb-card-value"', fixed = TRUE)
+})
+
+test_that("card composition helpers render expected child markers", {
+  header <- block_card_header(
+    block_card_title("Revenue"),
+    block_card_description("Last 30 days")
+  )
+  content <- block_card_content("Chart")
+  footer <- block_card_footer(block_button("Open"))
+  card <- block_card(header, content, footer, class = "custom")
+
+  expect_identical(tag_attr(header, "data-sb-child"), "card-header")
+  expect_identical(tag_attr(content, "data-sb-child"), "card-content")
+  expect_identical(tag_attr(footer, "data-sb-child"), "card-footer")
+  expect_identical(tag_attr(card, "class"), "sb-card custom")
+})
+
+test_that("card helper classes merge with user classes", {
+  expect_identical(
+    tag_attr(block_card_header("Header", class = "custom"), "class"),
+    "sb-card-header custom"
+  )
+  expect_identical(
+    tag_attr(block_card_content("Body", class = "custom"), "class"),
+    "sb-card-content custom"
+  )
+  expect_identical(
+    tag_attr(block_card_footer("Footer", class = "custom"), "class"),
+    "sb-card-footer custom"
+  )
+})
+
 test_that("alerts render role, variants, and icon markup", {
   alert <- render_html(
     block_alert(
@@ -146,4 +195,71 @@ test_that("alerts accept composed title and description tags", {
     tag_attr(alert, "class"),
     "sb-alert sb-alert-default"
   )
+})
+
+test_that("value boxes render expected regions", {
+  box <- render_html(
+    block_value_box(
+      "Revenue",
+      "$42k",
+      description = "Up 12% month over month.",
+      icon = "trending-up"
+    )
+  )
+
+  expect_match(box, 'class="sb-value-box"', fixed = TRUE)
+  expect_match(box, 'class="sb-value-box-title"', fixed = TRUE)
+  expect_match(box, 'class="sb-value-box-value"', fixed = TRUE)
+  expect_match(box, 'class="sb-value-box-description"', fixed = TRUE)
+  expect_match(box, 'data-icon="inline-start"', fixed = TRUE)
+})
+
+test_that("value boxes merge user classes", {
+  classes <- tag_attr(
+    block_value_box("Revenue", "$42k", class = "custom"),
+    "class"
+  )
+
+  expect_identical(classes, "sb-value-box custom")
+})
+
+test_that("separators expose orientation and aria correctly", {
+  vertical <- block_separator(orientation = "vertical", decorative = FALSE)
+  decorative <- block_separator()
+
+  expect_identical(
+    tag_attr(vertical, "class"),
+    "sb-separator sb-separator-vertical"
+  )
+  expect_identical(tag_attr(vertical, "role"), "separator")
+  expect_identical(tag_attr(vertical, "aria-orientation"), "vertical")
+  expect_identical(tag_attr(decorative, "aria-hidden"), "true")
+})
+
+test_that("skeletons and spinners expose expected attributes", {
+  skeleton <- block_skeleton(class = "custom")
+  spinner <- block_spinner(label = "Loading table", class = "custom")
+
+  expect_identical(tag_attr(skeleton, "class"), "sb-skeleton custom")
+  expect_identical(tag_attr(skeleton, "aria-hidden"), "true")
+  expect_identical(tag_attr(spinner, "class"), "sb-spinner custom")
+  expect_identical(tag_attr(spinner, "role"), "status")
+  expect_identical(tag_attr(spinner, "aria-label"), "Loading table")
+})
+
+test_that("empty states render icon, description, and action", {
+  empty <- render_html(
+    block_empty(
+      "No results",
+      description = "Try broadening your search.",
+      icon = "folder",
+      action = block_button("Clear filters")
+    )
+  )
+
+  expect_match(empty, 'class="sb-empty"', fixed = TRUE)
+  expect_match(empty, 'class="sb-empty-title"', fixed = TRUE)
+  expect_match(empty, 'class="sb-empty-description"', fixed = TRUE)
+  expect_match(empty, 'class="sb-empty-action"', fixed = TRUE)
+  expect_match(empty, 'data-icon="inline-start"', fixed = TRUE)
 })

@@ -5,7 +5,10 @@ htmltools::tagList(
   ),
   block_alert(
     "Build failed",
-    description = "Three components failed to render. Check the console for details.",
+    description = paste(
+      "Three components failed to render.",
+      "Check the console for details."
+    ),
     variant = "destructive",
     icon = "alert-triangle"
   ),
