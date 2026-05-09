@@ -4,14 +4,25 @@
 \alias{block_card}
 \title{Create a dashboard card}
 \usage{
-block_card(..., title = NULL, value = NULL, class = NULL)
+block_card(
+  ...,
+  title = NULL,
+  description = NULL,
+  value = NULL,
+  footer = NULL,
+  class = NULL
+)
 }
 \arguments{
-\item{...}{Card body content.}
+\item{...}{Card body content or composed card region tags.}
 
 \item{title}{Optional card title.}
 
+\item{description}{Optional card description.}
+
 \item{value}{Optional primary value.}
+
+\item{footer}{Optional card footer content.}
 
 \item{class}{Additional classes.}
 }
@@ -26,6 +37,16 @@ Other content:
 \code{\link{block_alert}()},
 \code{\link{block_alert_description}()},
 \code{\link{block_alert_title}()},
-\code{\link{block_badge}()}
+\code{\link{block_badge}()},
+\code{\link{block_card_content}()},
+\code{\link{block_card_description}()},
+\code{\link{block_card_footer}()},
+\code{\link{block_card_header}()},
+\code{\link{block_card_title}()},
+\code{\link{block_empty}()},
+\code{\link{block_separator}()},
+\code{\link{block_skeleton}()},
+\code{\link{block_spinner}()},
+\code{\link{block_value_box}()}
 }
 \concept{content}

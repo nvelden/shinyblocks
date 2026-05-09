@@ -16,7 +16,11 @@ block_class_for <- function(fn_name) {
 }
 
 test_that("every showcase example evaluates to a tag", {
-  showcase_dir <- system.file("showcase", package = "shinyblocks", mustWork = TRUE)
+  showcase_dir <- system.file(
+    "showcase",
+    package = "shinyblocks",
+    mustWork = TRUE
+  )
   example_files <- list.files(
     file.path(showcase_dir, "R", "examples"),
     pattern = "\\.R$",
@@ -91,7 +95,10 @@ test_that("every exported block_*() renders into the showcase UI", {
   rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
 
   exported <- getNamespaceExports("shinyblocks")
-  components <- setdiff(grep("^block_", exported, value = TRUE), showcase_internal)
+  components <- setdiff(
+    grep("^block_", exported, value = TRUE),
+    showcase_internal
+  )
 
   expect_gt(length(components), 0)
 

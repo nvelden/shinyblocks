@@ -22,3 +22,16 @@
   enforces an authoring contract: any new exported `block_*()` must
   land with a matching example file under `inst/showcase/R/examples/`
   and a row in the showcase's sections list, or the test suite fails.
+* `block_card()` gains composition primitives — `block_card_header()`,
+  `block_card_title()`, `block_card_description()`,
+  `block_card_content()`, `block_card_footer()` — alongside the
+  flat-argument convenience form. Pre-built region tags are reused
+  via `data-sb-child` markers; bare strings/tags are wrapped
+  automatically.
+* New components round out Phase 3: `block_value_box()` for
+  high-signal metrics, `block_separator()` (horizontal + vertical,
+  ARIA-aware), `block_skeleton()` for loading placeholders,
+  `block_spinner()` with `role="status"`, and `block_empty()` with
+  optional icon, description, and action slots.
+* Internal: deduplicated `as_alert_child()` and `as_component_child()`
+  into a single helper; both call sites now share the same code path.

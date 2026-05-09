@@ -14,6 +14,10 @@ htmltools::tagList(
   ),
   htmltools::tags$p(
     htmltools::tags$strong("How to verify:"),
-    " resize the window to confirm the sidebar collapses below the header on narrow viewports, and tab through the page to confirm focus rings appear on every interactive element."
+    paste(
+      " resize the window to confirm the sidebar collapses below",
+      "the header on narrow viewports, and tab through the page",
+      "to confirm focus rings appear on every interactive element."
+    )
   )
 )

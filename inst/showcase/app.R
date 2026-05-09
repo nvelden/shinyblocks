@@ -13,7 +13,10 @@ sections <- list(
     label = "Layout shell",
     icon = "layout-dashboard",
     title = "Layout shell",
-    lead = "block_page() / block_sidebar() / block_header() / block_body() — the dashboard primitives that frame this gallery.",
+    lead = paste(
+      "block_page() / block_sidebar() / block_header() /",
+      "block_body() — the dashboard primitives that frame this gallery."
+    ),
     file = "layout.R"
   ),
   list(
@@ -21,7 +24,10 @@ sections <- list(
     label = "Nav item",
     icon = "list",
     title = "Navigation items",
-    lead = "Sidebar links with a selected state. The same primitive powers this app's own sidebar.",
+    lead = paste(
+      "Sidebar links with a selected state.",
+      "The same primitive powers this app's own sidebar."
+    ),
     file = "nav_item.R"
   ),
   list(
@@ -29,8 +35,22 @@ sections <- list(
     label = "Card",
     icon = "layout-grid",
     title = "Cards",
-    lead = "Tokenised surfaces for grouped content with optional title and value slots.",
+    lead = paste(
+      "Tokenised surfaces for grouped content",
+      "with optional title and value slots."
+    ),
     file = "card.R"
+  ),
+  list(
+    id = "value-box",
+    label = "Value box",
+    icon = "trending-up",
+    title = "Value boxes",
+    lead = paste(
+      "High-signal metrics with optional leading icons",
+      "and short supporting copy."
+    ),
+    file = "value_box.R"
   ),
   list(
     id = "badge",
@@ -45,7 +65,10 @@ sections <- list(
     label = "Alert",
     icon = "alert-circle",
     title = "Alerts",
-    lead = "Inline messages with role=\"alert\", composable title and description slots, and a leading icon.",
+    lead = paste(
+      "Inline messages with role=\"alert\", composable title",
+      "and description slots, and a leading icon."
+    ),
     file = "alert.R"
   ),
   list(
@@ -53,7 +76,10 @@ sections <- list(
     label = "Button",
     icon = "play",
     title = "Buttons",
-    lead = "Six variants (default, secondary, outline, ghost, destructive, link), four sizes, and optional inline icons.",
+    lead = paste(
+      "Six variants (default, secondary, outline, ghost,",
+      "destructive, link), four sizes, and optional inline icons."
+    ),
     file = "button.R"
   ),
   list(
@@ -61,8 +87,49 @@ sections <- list(
     label = "Icon",
     icon = "image",
     title = "Icons",
-    lead = "Vendored Lucide sprite — every glyph used inside shinyblocks is referenced from one local SVG.",
+    lead = paste(
+      "Vendored Lucide sprite — every glyph used inside shinyblocks",
+      "is referenced from one local SVG."
+    ),
     file = "icon.R"
+  ),
+  list(
+    id = "separator",
+    label = "Separator",
+    icon = "minus",
+    title = "Separators",
+    lead = paste(
+      "Horizontal and vertical dividers for visual grouping",
+      "without handwritten border markup."
+    ),
+    file = "separator.R"
+  ),
+  list(
+    id = "skeleton",
+    label = "Skeleton",
+    icon = "circle-dashed",
+    title = "Skeletons",
+    lead = "Loading placeholders for cards, rows, and dense dashboards.",
+    file = "skeleton.R"
+  ),
+  list(
+    id = "spinner",
+    label = "Spinner",
+    icon = "loader-2",
+    title = "Spinners",
+    lead = "Small status indicators that compose cleanly into buttons.",
+    file = "spinner.R"
+  ),
+  list(
+    id = "empty",
+    label = "Empty",
+    icon = "folder",
+    title = "Empty states",
+    lead = paste(
+      "Structured empty states with icon, copy, and optional action",
+      "instead of custom centered divs."
+    ),
+    file = "empty.R"
   )
 )
 
@@ -76,14 +143,29 @@ ui <- block_page(
   ),
   header = block_header("Component gallery"),
   htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem;",
+    style = paste(
+      "display: flex;",
+      "flex-direction: column;",
+      "gap: 0.5rem;",
+      "margin-bottom: 0.5rem;"
+    ),
     htmltools::tags$h1(
-      style = "font-size: 1.5rem; font-weight: 600; letter-spacing: -0.025em; margin: 0;",
+      style = paste(
+        "font-size: 1.5rem;",
+        "font-weight: 600;",
+        "letter-spacing: -0.025em;",
+        "margin: 0;"
+      ),
       "Component gallery"
     ),
     htmltools::tags$p(
       style = "color: var(--muted-foreground); margin: 0;",
-      "Live demos of every exported shinyblocks component. The gallery's own UI uses block_page(), block_sidebar(), block_header(), and block_body() — what you see is the package documenting itself."
+      paste(
+        "Live demos of every exported shinyblocks component.",
+        "The gallery's own UI uses block_page(), block_sidebar(),",
+        "block_header(), and block_body() — what you see is the",
+        "package documenting itself."
+      )
     )
   ),
   lapply(seq_along(sections), function(i) {
@@ -106,7 +188,9 @@ ui <- block_page(
       if (on) { s.removeAttribute('hidden'); matched = true; }
       else { s.setAttribute('hidden', ''); }
     });
-    document.querySelectorAll('.sb-sidebar-nav .sb-nav-item').forEach(function (a) {
+    document.querySelectorAll(
+      '.sb-sidebar-nav .sb-nav-item'
+    ).forEach(function (a) {
       var href = a.getAttribute('href') || '';
       var on = href === '#' + id;
       a.classList.toggle('is-selected', on);
