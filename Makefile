@@ -1,6 +1,7 @@
 .PHONY: help setup watch-css build-css build-icons dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links gate clean deploy-showcase
+	doc-links gate clean deploy-showcase preview preview-pkgdown \
+	preview-shinylive quarto-setup gallery
 
 # Defaults you can override on the command line.
 R          ?= env -u LC_ALL Rscript
@@ -33,6 +34,15 @@ help:
 	@echo "  doc-links       - tools/check-doc-links.R"
 	@echo "  gate            - run the full Quality Gate"
 	@echo ""
+	@echo "Local preview (visual sanity check after a phase slice):"
+	@echo "  preview            - showcase + pkgdown side by side"
+	@echo "  preview-pkgdown    - build pkgdown site and serve site/pkgdown"
+	@echo "  gallery            - render component gallery (.qmd) and serve"
+	@echo "  preview-shinylive  - build Shinylive export and serve site/showcase"
+	@echo ""
+	@echo "Component gallery setup (run once per machine):"
+	@echo "  quarto-setup       - install the quarto-ext/shinylive extension"
+	@echo ""
 	@echo "Release-only:"
 	@echo "  deploy-showcase - push showcase to its hosted deployment"
 	@echo "  clean           - remove generated artifacts"
@@ -51,8 +61,8 @@ watch-css:
 dev:
 	$(R) -e 'devtools::load_all(".")'
 
-showcase:
-	$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase")'
+# `showcase` lives in the Local Preview section so it shares port
+# defaults with the other preview targets.
 
 check-fast: lint test build-css
 	@echo "check-fast OK"
@@ -105,6 +115,86 @@ gate: build-css lint spell urls test docs check pkgdown budget doc-links
 	@echo "  - NEWS.md and DESCRIPTION version bump"
 	@echo "  - phase-exit checklist file committed"
 	@echo "  - git tag phase-N"
+
+# ---------- Local preview ----------
+#
+# Visual sanity check you can run after any slice. Each target uses a
+# different port so two can run side by side without colliding:
+#   showcase           -> http://127.0.0.1:4321
+#   preview-pkgdown    -> http://127.0.0.1:4322
+#   preview-shinylive  -> http://127.0.0.1:4323
+#   gallery            -> http://127.0.0.1:4324
+
+PORT_SHOWCASE   ?= 4321
+PORT_PKGDOWN    ?= 4322
+PORT_SHINYLIVE  ?= 4323
+PORT_GALLERY    ?= 4324
+
+# Re-bind showcase to a known port for the preview workflow.
+showcase:
+	$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase", port = $(PORT_SHOWCASE), launch.browser = FALSE)'
+
+preview-pkgdown:
+	$(R) -e 'pkgdown::build_site(preview = FALSE)'
+	@echo ""
+	@echo "Serving pkgdown site at http://127.0.0.1:$(PORT_PKGDOWN)"
+	@echo "Press Ctrl+C to stop."
+	python3 -m http.server $(PORT_PKGDOWN) --directory site/pkgdown
+
+preview-shinylive:
+	@if [ ! -f tools/export-shinylive.R ]; then \
+		echo "tools/export-shinylive.R missing — Phase 1C punch-list item."; \
+		echo "Once it lands, this target will run it and serve site/showcase."; \
+		exit 1; \
+	fi
+	$(R) tools/export-shinylive.R
+	@echo ""
+	@echo "Serving Shinylive showcase at http://127.0.0.1:$(PORT_SHINYLIVE)"
+	@echo "Press Ctrl+C to stop."
+	python3 -m http.server $(PORT_SHINYLIVE) --directory site/showcase
+
+# Run the showcase + pkgdown together. Useful before a phase exit so
+# you can flip between the live components and their reference pages.
+preview:
+	@echo "Starting showcase at http://127.0.0.1:$(PORT_SHOWCASE)"
+	@echo "Starting pkgdown  at http://127.0.0.1:$(PORT_PKGDOWN)"
+	@echo "Press Ctrl+C to stop both."
+	@$(MAKE) -j 2 showcase preview-pkgdown
+
+# ---------- Component gallery (Quarto + shinylive, ADR 0013) ----------
+#
+# `quarto-setup` is a one-shot install. `gallery` renders the .qmd
+# pages under vignettes/articles/components/ and serves them locally.
+
+GALLERY_DIR := vignettes/articles
+GALLERY_OUT := site/gallery
+
+quarto-setup:
+	@command -v quarto >/dev/null 2>&1 || { \
+		echo "quarto CLI not found. Install from https://quarto.org/docs/get-started/"; \
+		exit 1; \
+	}
+	@if [ -d $(GALLERY_DIR)/_extensions/quarto-ext/shinylive ]; then \
+		echo "shinylive extension already installed under $(GALLERY_DIR)/_extensions/. Skipping."; \
+	else \
+		echo "Installing quarto-ext/shinylive into $(GALLERY_DIR)…"; \
+		cd $(GALLERY_DIR) && quarto add quarto-ext/shinylive --no-prompt; \
+	fi
+
+gallery:
+	@command -v quarto >/dev/null 2>&1 || { \
+		echo "quarto CLI not found. Run 'make quarto-setup' first."; \
+		exit 1; \
+	}
+	@if [ ! -d $(GALLERY_DIR)/_extensions/quarto-ext/shinylive ]; then \
+		echo "shinylive extension missing. Run 'make quarto-setup' first."; \
+		exit 1; \
+	fi
+	cd $(GALLERY_DIR) && quarto render
+	@echo ""
+	@echo "Serving component gallery at http://127.0.0.1:$(PORT_GALLERY)"
+	@echo "Press Ctrl+C to stop."
+	python3 -m http.server $(PORT_GALLERY) --directory $(GALLERY_OUT)
 
 # ---------- Release-only ----------
 

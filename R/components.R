@@ -76,3 +76,124 @@ block_button <- function(
     )
   )
 }
+
+#' Create a badge
+#'
+#' @param label Badge label.
+#' @param variant Visual variant.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_badge <- function(
+  label,
+  variant = c("default", "secondary", "outline", "destructive"),
+  class = NULL
+) {
+  variant <- match_arg(
+    variant,
+    c("default", "secondary", "outline", "destructive")
+  )
+
+  attach_shinyblocks_deps(
+    htmltools::tags$span(
+      class = merge_classes(
+        "sb-badge",
+        paste0("sb-badge-", variant),
+        class
+      ),
+      label
+    )
+  )
+}
+
+#' Create an alert title
+#'
+#' @param ... Alert title content.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_alert_title <- function(..., class = NULL) {
+  attach_shinyblocks_deps(
+    htmltools::tags$h5(
+      class = merge_classes("sb-alert-title", class),
+      `data-sb-child` = "alert-title",
+      ...
+    )
+  )
+}
+
+#' Create an alert description
+#'
+#' @param ... Alert description content.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_alert_description <- function(..., class = NULL) {
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes("sb-alert-description", class),
+      `data-sb-child` = "alert-description",
+      ...
+    )
+  )
+}
+
+#' Create an alert
+#'
+#' @param title Alert title. Required for accessibility.
+#' @param ... Additional alert body content.
+#' @param description Optional alert description.
+#' @param icon Optional icon tag or vendored icon name.
+#' @param variant Visual variant.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_alert <- function(
+  title,
+  ...,
+  description = NULL,
+  icon = "info",
+  variant = c("default", "destructive"),
+  class = NULL
+) {
+  if (missing(title) || is.null(title)) {
+    stop("`title` is required.", call. = FALSE)
+  }
+
+  variant <- match_arg(variant, c("default", "destructive"))
+  title_tag <- as_alert_child(title, "alert-title", block_alert_title)
+  description_tag <- as_alert_child(
+    description,
+    "alert-description",
+    block_alert_description
+  )
+  icon_tag <- set_icon_position(icon, "inline-start")
+
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes(
+        "sb-alert",
+        paste0("sb-alert-", variant),
+        class
+      ),
+      role = "alert",
+      if (!is.null(icon_tag)) {
+        htmltools::tags$div(class = "sb-alert-icon", icon_tag)
+      },
+      htmltools::tags$div(
+        class = "sb-alert-content",
+        title_tag,
+        description_tag,
+        ...
+      )
+    )
+  )
+}

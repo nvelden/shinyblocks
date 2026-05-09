@@ -1,0 +1,48 @@
+---
+title: Button
+description: Action triggers with shadcn-style variants and sizes.
+---
+
+A `block_button()` renders a styled `<button type="button">` with six
+variants (`default`, `secondary`, `outline`, `ghost`, `destructive`,
+`link`) and four sizes (`default`, `sm`, `lg`, `icon`). Optional icons
+sit before or after the label.
+
+```{shinylive-r}
+#| standalone: true
+#| components: [viewer]
+#| viewerHeight: 480
+{{< include _examples/button.R >}}
+```
+
+```r
+{{< include _examples/button.R >}}
+```
+
+## Relevant functions
+
+- [`block_button(label, variant, size, icon, icon_position, ..., class)`](../../reference/block_button.html)
+- [`block_icon(name, class, ...)`](../../reference/block_icon.html)
+
+## Details
+
+`block_button()` always emits `type="button"` so it never accidentally
+submits a parent `<form>`. Variants map to single CSS classes
+(`sb-button-default`, `sb-button-secondary`, …), so theme overrides
+target one selector each. The `icon` argument accepts either a name
+from the vendored Lucide sprite (see `block_icon()`) or a pre-built
+`htmltools` tag, and `icon_position` chooses whether it sits before or
+after the label.
+
+The `size = "icon"` variant produces a square button sized for a
+single glyph — pair it with `icon = ...` and an empty `label` for
+toolbar-style controls.
+
+## See also
+
+- [Badge](badge.html) — non-interactive labels with the same variant
+  vocabulary.
+- [Alert](alert.html) — uses the same icon helper for its leading
+  glyph.
+- [Icon](icon.html) — the vendored Lucide sprite that powers the
+  `icon =` argument.

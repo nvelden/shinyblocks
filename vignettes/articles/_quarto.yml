@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: ../../site/gallery
+  render:
+    - "*.qmd"
+    - "components/*.qmd"
+
+website:
+  title: shinyblocks components
+  description: >
+    Live demos of every shinyblocks component. Modelled on
+    https://shiny.posit.co/r/components/ — see ADR 0013.
+  navbar:
+    left:
+      - href: components.qmd
+        text: Components
+    right:
+      - icon: github
+        href: https://github.com/
+
+format:
+  html:
+    theme: default
+    toc: true
+    toc-location: right
+
+filters:
+  - shinylive

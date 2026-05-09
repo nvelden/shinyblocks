@@ -50,3 +50,19 @@ test_that("block_button validates variant and size", {
     block_button("Save", size = "xl")
   })
 })
+
+test_that("block_badge validates variant", {
+  expect_snapshot(error = TRUE, {
+    block_badge("New", variant = "primary")
+  })
+})
+
+test_that("block_alert validates required title and variant", {
+  expect_snapshot(error = TRUE, {
+    block_alert(NULL)
+  })
+
+  expect_snapshot(error = TRUE, {
+    block_alert("Notice", variant = "warning")
+  })
+})

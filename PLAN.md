@@ -36,6 +36,12 @@ specific artifact is ready to become part of the public workflow.
 - Theming is token-based (CSS custom properties) and override-friendly.
 - Components degrade to clean HTML/CSS when JavaScript is disabled.
 - Accessibility is part of the component contract, not an afterthought.
+- Every exported component has a **gallery page** with an embedded
+  Shinylive demo and visible source, modelled on
+  <https://shiny.posit.co/r/components/>. See
+  [ADR 0013](docs/decisions/0013-component-gallery-quarto.md) and the
+  [Components Gallery](docs/ROADMAP.md#components-gallery) section of
+  the roadmap.
 
 For the full v0.1 API surface, scope decisions, naming conventions,
 component composition rules, and out-of-scope items, see the
@@ -61,6 +67,11 @@ component composition rules, and out-of-scope items, see the
 Phase details live in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Local Preview Before Going Public
+
+The Quality Gate runs a `make preview` checkpoint at every phase
+exit — see [`docs/ROADMAP.md` §Local Preview Workflow](docs/ROADMAP.md#local-preview-workflow)
+for the recurring flow and port assignments. The list below is the
+final pre-public sweep on top of that.
 
 Before making the repository public, build and review the full
 presentation locally:

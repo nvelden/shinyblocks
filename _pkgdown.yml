@@ -3,6 +3,26 @@ destination: site/pkgdown
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left:  [intro, components, reference, articles, news]
+    right: [search, github]
+  components:
+    components:
+      text: Components
+      href: articles/components.html
+
+articles:
+  - title: Components
+    desc: >
+      Live demos of every exported component, modelled on
+      <https://shiny.posit.co/r/components/>. See ADR 0013.
+    navbar: ~
+    contents:
+      - components
+      - components/button
+  # New component pages join this list as they land.
+
 reference:
   - title: Layout
     contents:
@@ -16,6 +36,10 @@ reference:
   - title: Content
     contents:
       - block_card
+      - block_badge
+      - block_alert
+      - block_alert_title
+      - block_alert_description
   - title: Action
     contents:
       - block_button

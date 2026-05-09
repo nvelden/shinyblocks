@@ -212,6 +212,56 @@
     @apply size-9 p-0;
   }
 
+  .sb-badge {
+    @apply inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 text-sm font-medium whitespace-nowrap;
+  }
+
+  .sb-badge-default {
+    @apply border-transparent bg-primary text-primary-foreground;
+  }
+
+  .sb-badge-secondary {
+    @apply border-transparent bg-secondary text-secondary-foreground;
+  }
+
+  .sb-badge-outline {
+    @apply border-border text-foreground;
+  }
+
+  .sb-badge-destructive {
+    @apply border-transparent bg-destructive text-destructive-foreground;
+  }
+
+  .sb-alert {
+    @apply grid gap-3 rounded-lg border p-4;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .sb-alert-default {
+    @apply border-border bg-card text-card-foreground;
+  }
+
+  .sb-alert-destructive {
+    @apply bg-card text-destructive;
+    border-color: color-mix(in oklch, var(--destructive) 40%, transparent);
+  }
+
+  .sb-alert-icon {
+    @apply pt-0.5;
+  }
+
+  .sb-alert-content {
+    @apply flex min-w-0 flex-col gap-1.5;
+  }
+
+  .sb-alert-title {
+    @apply text-sm font-medium;
+  }
+
+  .sb-alert-description {
+    @apply text-sm text-muted-foreground;
+  }
+
   /* Card — flat-argument convenience styling. Phase 3 will add the full
    * composition primitives (sb-card-header, sb-card-content, sb-card-footer)
    * alongside this minimal shape. */
