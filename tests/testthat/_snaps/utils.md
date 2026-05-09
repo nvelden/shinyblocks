@@ -38,3 +38,27 @@
       Error:
       ! `size` must be one of "default", "sm", "lg", "icon".
 
+# block_badge validates variant
+
+    Code
+      block_badge("New", variant = "primary")
+    Condition
+      Error:
+      ! `variant` must be one of "default", "secondary", "outline", "destructive".
+
+# block_alert validates required title and variant
+
+    Code
+      block_alert(NULL)
+    Condition
+      Error:
+      ! `title` is required.
+
+---
+
+    Code
+      block_alert("Notice", variant = "warning")
+    Condition
+      Error:
+      ! `variant` must be one of "default", "destructive".
+

@@ -4,6 +4,10 @@ test_that("core helpers return tags", {
   expect_s3_class(block_body("Body"), "shiny.tag")
   expect_s3_class(block_card("Body"), "shiny.tag")
   expect_s3_class(block_button("Button"), "shiny.tag")
+  expect_s3_class(block_badge("New"), "shiny.tag")
+  expect_s3_class(block_alert("Notice"), "shiny.tag")
+  expect_s3_class(block_alert_title("Title"), "shiny.tag")
+  expect_s3_class(block_alert_description("Body"), "shiny.tag")
   expect_s3_class(block_icon("search"), "shiny.tag")
 })
 

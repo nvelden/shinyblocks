@@ -10,3 +10,8 @@
 * `block_nav_item()` advertises itself as a `nav-item` child via
   `data-sb-child`, so a future `block_nav()` parent can validate its
   contents.
+* Documentation gains a Quarto + Shinylive component gallery
+  (`vignettes/articles/components/`) modelled on
+  <https://shiny.posit.co/r/components/>. Each exported component has
+  a page with an embedded live demo and visible source. See
+  `docs/decisions/0013-component-gallery-quarto.md`.

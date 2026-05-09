@@ -84,3 +84,18 @@ set_icon_position <- function(
   icon$attribs[["data-icon"]] <- position
   icon
 }
+
+as_alert_child <- function(value, type, builder) {
+  if (is.null(value)) {
+    return(NULL)
+  }
+
+  if (
+    inherits(value, "shiny.tag") &&
+      identical(value$attribs[["data-sb-child"]], type)
+  ) {
+    return(value)
+  }
+
+  builder(value)
+}

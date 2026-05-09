@@ -97,3 +97,53 @@ test_that("button classes merge with user classes", {
     "sb-button sb-button-outline sb-button-size-lg custom"
   )
 })
+
+test_that("badge variants map to classes", {
+  destructive <- tag_attr(
+    block_badge("Blocked", variant = "destructive"),
+    "class"
+  )
+  outline <- tag_attr(block_badge("Draft", variant = "outline"), "class")
+
+  expect_match(destructive, "sb-badge-destructive", fixed = TRUE)
+  expect_match(outline, "sb-badge-outline", fixed = TRUE)
+})
+
+test_that("badge classes merge with user classes", {
+  classes <- tag_attr(block_badge("New", class = "custom"), "class")
+
+  expect_identical(classes, "sb-badge sb-badge-default custom")
+})
+
+test_that("alerts render role, variants, and icon markup", {
+  alert <- render_html(
+    block_alert(
+      "Heads up",
+      description = "Action needed.",
+      variant = "destructive",
+      icon = "alert-triangle"
+    )
+  )
+
+  expect_match(alert, 'role="alert"', fixed = TRUE)
+  expect_match(alert, 'class="sb-alert sb-alert-destructive"', fixed = TRUE)
+  expect_match(alert, 'class="sb-alert-title"', fixed = TRUE)
+  expect_match(alert, 'class="sb-alert-description"', fixed = TRUE)
+  expect_match(alert, 'data-icon="inline-start"', fixed = TRUE)
+})
+
+test_that("alerts accept composed title and description tags", {
+  title <- block_alert_title("Maintenance")
+  description <- block_alert_description("Scheduled tonight.")
+  alert <- block_alert(title, description = description, icon = NULL)
+
+  expect_identical(tag_attr(title, "data-sb-child"), "alert-title")
+  expect_identical(
+    tag_attr(description, "data-sb-child"),
+    "alert-description"
+  )
+  expect_identical(
+    tag_attr(alert, "class"),
+    "sb-alert sb-alert-default"
+  )
+})
