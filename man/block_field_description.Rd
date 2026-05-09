@@ -21,6 +21,7 @@ Create field helper text
 }
 \seealso{
 Other forms: 
+\code{\link{block_checkbox}()},
 \code{\link{block_field}()},
 \code{\link{block_field_group}()},
 \code{\link{block_field_invalid}()},
@@ -29,6 +30,8 @@ Other forms:
 \code{\link{block_field_set}()},
 \code{\link{block_input_group}()},
 \code{\link{block_input_group_addon}()},
-\code{\link{block_select}()}
+\code{\link{block_select}()},
+\code{\link{block_switch}()},
+\code{\link{block_textarea}()}
 }
 \concept{forms}

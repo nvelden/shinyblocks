@@ -10,6 +10,7 @@ block_page(
   sidebar = NULL,
   header = NULL,
   theme_mode = c("system", "light", "dark"),
+  theme = NULL,
   class = NULL
 )
 }
@@ -23,6 +24,8 @@ block_page(
 \item{header}{Optional header content.}
 
 \item{theme_mode}{Initial theme mode.}
+
+\item{theme}{Optional \code{block_theme()} overrides.}
 
 \item{class}{Additional classes for the app root.}
 }

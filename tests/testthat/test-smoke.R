@@ -21,6 +21,13 @@ test_that("core helpers return tags", {
   expect_s3_class(block_empty("Nothing here"), "shiny.tag")
   expect_s3_class(block_icon("search"), "shiny.tag")
   expect_s3_class(block_select("plan", choices = c("Free", "Pro")), "shiny.tag")
+  expect_s3_class(block_textarea("notes"), "shiny.tag")
+  expect_s3_class(block_checkbox("agree", "Agree"), "shiny.tag")
+  expect_s3_class(block_switch("alerts", "Alerts"), "shiny.tag")
+  expect_s3_class(block_tab("Overview", "Body"), "shiny.tag")
+  expect_s3_class(block_tabs(block_tab("Overview", "Body")), "shiny.tag")
+  expect_s3_class(block_theme(primary = "oklch(0.5 0.2 250)"), "shiny.tag")
+  expect_s3_class(block_dark_mode_toggle(), "shiny.tag")
 })
 
 test_that("showcase app sources without launching", {

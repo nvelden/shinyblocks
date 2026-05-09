@@ -66,7 +66,12 @@ dependencies on Bootstrap or Selectize defaults.
 - The main fidelity gap found in the shipped UI was select handling:
   the field wrapper was inheriting Selectize styling rather than
   rendering a first-class shadcn-like control.
-- `block_select()` is the first dedicated form control added to close
-  that gap while preserving Shiny reactivity through a real `<select>`.
-- Remaining high-value parity work is in not-yet-built form controls
-  and tabs rather than the already-landed static primitives.
+- `block_select()` is now back on the wrapper path: Shiny/selectize
+  owns the control runtime, while shinyblocks owns the token-based
+  styling and field composition.
+- `block_textarea()`, `block_checkbox()`, and `block_switch()` are now
+  landed as wrapper-first controls, preserving native Shiny bindings
+  while adding component-owned shell styling.
+- Remaining high-value parity work is now the interaction-state audit:
+  select, tabs, buttons, textarea, checkbox, and switch in light/dark
+  mode rather than adding more primitives.

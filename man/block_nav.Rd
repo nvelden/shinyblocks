@@ -19,6 +19,8 @@ Create a navigation container
 }
 \seealso{
 Other navigation: 
-\code{\link{block_nav_item}()}
+\code{\link{block_nav_item}()},
+\code{\link{block_tab}()},
+\code{\link{block_tabs}()}
 }
 \concept{navigation}

@@ -94,3 +94,38 @@ test_that("block_select validates choices and selected value", {
     block_select("plan", choices = c("Free", "Pro"), selected = "Team")
   })
 })
+
+test_that("block_textarea validates rows", {
+  expect_snapshot(error = TRUE, {
+    block_textarea("notes", rows = 0)
+  })
+})
+
+test_that("block_theme validates named and known tokens", {
+  expect_snapshot(error = TRUE, {
+    block_theme("bad")
+  })
+
+  expect_snapshot(error = TRUE, {
+    block_theme(not_a_token = "red")
+  })
+})
+
+test_that("update_block_theme sends a custom message", {
+  message <- NULL
+  session <- list(
+    sendCustomMessage = function(type, payload) {
+      message <<- list(type = type, payload = payload)
+    }
+  )
+
+  expect_invisible(update_block_theme(session, mode = "dark"))
+  expect_identical(message$type, "sb:theme")
+  expect_identical(message$payload$mode, "dark")
+})
+
+test_that("update_block_theme requires a session", {
+  expect_snapshot(error = TRUE, {
+    update_block_theme(NULL)
+  })
+})

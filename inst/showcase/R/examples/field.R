@@ -36,6 +36,32 @@ htmltools::tagList(
           block_field_description("Paste a live key to continue.")
         ),
         "API keys must start with sk-live-."
+      ),
+      block_field(
+        block_field_label("Internal note", `for` = "showcase_note"),
+        block_textarea(
+          "showcase_note",
+          placeholder = "Record rollout details for the next operator."
+        ),
+        block_field_description("Stored with the current workspace.")
+      ),
+      block_field(
+        block_checkbox(
+          "showcase_marketing",
+          "Email me product updates",
+          value = TRUE
+        ),
+        block_field_description("Optional outbound product communication.")
+      ),
+      block_field(
+        block_switch(
+          "showcase_incidents",
+          "Send incident alerts",
+          value = TRUE
+        ),
+        block_field_description(
+          "Immediate notifications for production issues."
+        )
       )
     )
   )

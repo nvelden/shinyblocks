@@ -1,8 +1,140 @@
 (function () {
-  function selectRoots() {
+  function currentThemeMode() {
+    try {
+      return localStorage.getItem("sb-theme") || "system";
+    } catch (e) {
+      return "system";
+    }
+  }
+
+  function resolvedTheme(mode) {
+    if (mode === "system") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    return mode;
+  }
+
+  function applyTheme(mode) {
+    var resolved = resolvedTheme(mode);
+
+    try {
+      localStorage.setItem("sb-theme", mode);
+    } catch (e) {}
+
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.dataset.themeMode = mode;
+
+    Array.prototype.slice.call(
+      document.querySelectorAll("[data-sb-theme-toggle]")
+    ).forEach(function (button) {
+      var dark = resolved === "dark";
+      button.setAttribute("aria-pressed", dark ? "true" : "false");
+      button.setAttribute(
+        "aria-label",
+        dark ? "Switch to light mode" : "Switch to dark mode"
+      );
+    });
+  }
+
+  function wireThemeToggles() {
+    Array.prototype.slice.call(
+      document.querySelectorAll("[data-sb-theme-toggle]")
+    ).forEach(function (button) {
+      button.addEventListener("click", function () {
+        var next = document.documentElement.dataset.theme === "dark"
+          ? "light"
+          : "dark";
+        applyTheme(next);
+      });
+    });
+  }
+
+  function tabs() {
     return Array.prototype.slice.call(
-      document.querySelectorAll(".sb-select")
+      document.querySelectorAll(".sb-tabs[data-sb-tabs='true']")
     );
+  }
+
+  function tabTriggers(tabset) {
+    return Array.prototype.slice.call(
+      tabset.querySelectorAll(".sb-tabs-list [role='tab']")
+    );
+  }
+
+  function activateTab(tabset, trigger, options) {
+    var config = options || {};
+    var updateInput = config.updateInput !== false;
+    var triggers = tabTriggers(tabset);
+    var targetId = (trigger.getAttribute("aria-controls") || "")
+      .replace(/^#/, "");
+    var panes = Array.prototype.slice.call(
+      tabset.querySelectorAll(".sb-tabs-content > .tab-pane")
+    );
+
+    triggers.forEach(function (item) {
+      var active = item === trigger;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-selected", active ? "true" : "false");
+      item.setAttribute("tabindex", active ? "0" : "-1");
+
+      if (item.parentElement) {
+        item.parentElement.classList.toggle("active", active);
+      }
+    });
+
+    panes.forEach(function (pane) {
+      var active = pane.id === targetId;
+      pane.classList.toggle("active", active);
+      if (active) {
+        pane.removeAttribute("hidden");
+      } else {
+        pane.setAttribute("hidden", "hidden");
+      }
+    });
+
+    if (updateInput && window.Shiny && window.Shiny.setInputValue) {
+      var tabsetId = tabset.querySelector(".sb-tabs-list");
+      var value = trigger.getAttribute("data-value");
+      if (tabsetId && tabsetId.id && value) {
+        window.Shiny.setInputValue(tabsetId.id, value, { priority: "event" });
+      }
+    }
+  }
+
+  function wireTabs(tabset) {
+    var triggers = tabTriggers(tabset);
+    if (!triggers.length) return;
+
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener("click", function (event) {
+        event.preventDefault();
+        activateTab(tabset, trigger);
+      });
+
+      trigger.addEventListener("keydown", function (event) {
+        var index = triggers.indexOf(trigger);
+        var next = null;
+
+        if (event.key === "ArrowRight") next = triggers[index + 1] || triggers[0];
+        if (event.key === "ArrowLeft") next = triggers[index - 1] || triggers[triggers.length - 1];
+        if (event.key === "Home") next = triggers[0];
+        if (event.key === "End") next = triggers[triggers.length - 1];
+
+        if (!next) return;
+        event.preventDefault();
+        next.focus();
+        activateTab(tabset, next);
+      });
+    });
+
+    var initial = triggers.find(function (trigger) {
+      return trigger.getAttribute("aria-selected") === "true" ||
+        trigger.classList.contains("active");
+    }) || triggers[0];
+
+    activateTab(tabset, initial, { updateInput: false });
   }
 
   function sidebarPages() {
@@ -15,155 +147,6 @@
     return Array.prototype.slice.call(
       container.querySelectorAll(".sb-nav-item")
     );
-  }
-
-  function selectItems(root) {
-    return Array.prototype.slice.call(
-      root.querySelectorAll(".sb-select-item")
-    );
-  }
-
-  function setSelectOpen(root, open) {
-    var trigger = root.querySelector(".sb-select-trigger");
-    var content = root.querySelector(".sb-select-content");
-    if (!trigger || !content) return;
-
-    root.setAttribute("data-state", open ? "open" : "closed");
-    trigger.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) content.removeAttribute("hidden");
-    else content.setAttribute("hidden", "");
-  }
-
-  function syncSelect(root) {
-    var select = root.querySelector(".sb-select-native");
-    var value = root.querySelector(".sb-select-value");
-    if (!select || !value) return;
-
-    var items = selectItems(root);
-    var selected = select.options[select.selectedIndex];
-    var selectedValue = selected ? selected.value : "";
-    var selectedLabel = selected ? selected.textContent : "";
-    var placeholder = root.getAttribute("data-placeholder") || "";
-
-    root.setAttribute("data-value", selectedValue);
-    value.textContent = selectedValue ? selectedLabel : placeholder;
-    value.classList.toggle("is-placeholder", !selectedValue);
-
-    items.forEach(function (item) {
-      var active = item.getAttribute("data-value") === selectedValue;
-      item.classList.toggle("is-selected", active);
-      item.setAttribute("aria-selected", active ? "true" : "false");
-    });
-  }
-
-  function focusSelectItem(root, index) {
-    var items = selectItems(root);
-    if (!items.length) return;
-    var bounded = Math.max(0, Math.min(index, items.length - 1));
-    items.forEach(function (item) {
-      item.classList.remove("is-highlighted");
-    });
-    items[bounded].classList.add("is-highlighted");
-    items[bounded].focus();
-  }
-
-  function selectedSelectIndex(root) {
-    var select = root.querySelector(".sb-select-native");
-    if (!select) return 0;
-
-    for (var i = 0; i < select.options.length; i += 1) {
-      if (select.options[i].value === select.value && select.value !== "") {
-        return Math.max(0, i - (root.getAttribute("data-placeholder") ? 1 : 0));
-      }
-    }
-
-    return 0;
-  }
-
-  function chooseSelectValue(root, value) {
-    var select = root.querySelector(".sb-select-native");
-    var trigger = root.querySelector(".sb-select-trigger");
-    if (!select || !trigger) return;
-
-    select.value = value;
-    select.dispatchEvent(new Event("change", { bubbles: true }));
-    syncSelect(root);
-    setSelectOpen(root, false);
-    trigger.focus();
-  }
-
-  function wireSelect(root) {
-    var select = root.querySelector(".sb-select-native");
-    var trigger = root.querySelector(".sb-select-trigger");
-    if (!select || !trigger) return;
-
-    syncSelect(root);
-    setSelectOpen(root, false);
-
-    trigger.addEventListener("click", function () {
-      var open = root.getAttribute("data-state") === "open";
-      setSelectOpen(root, !open);
-      if (!open) focusSelectItem(root, selectedSelectIndex(root));
-    });
-
-    trigger.addEventListener("keydown", function (event) {
-      if (
-        event.key !== "ArrowDown" &&
-        event.key !== "ArrowUp" &&
-        event.key !== "Enter" &&
-        event.key !== " "
-      ) {
-        return;
-      }
-
-      event.preventDefault();
-      setSelectOpen(root, true);
-      focusSelectItem(root, selectedSelectIndex(root));
-    });
-
-    select.addEventListener("change", function () {
-      syncSelect(root);
-    });
-
-    selectItems(root).forEach(function (item, index) {
-      item.addEventListener("click", function () {
-        chooseSelectValue(root, item.getAttribute("data-value"));
-      });
-
-      item.addEventListener("keydown", function (event) {
-        if (event.key === "ArrowDown") {
-          event.preventDefault();
-          focusSelectItem(root, index + 1);
-        }
-        if (event.key === "ArrowUp") {
-          event.preventDefault();
-          focusSelectItem(root, index - 1);
-        }
-        if (event.key === "Home") {
-          event.preventDefault();
-          focusSelectItem(root, 0);
-        }
-        if (event.key === "End") {
-          event.preventDefault();
-          focusSelectItem(root, selectItems(root).length - 1);
-        }
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          chooseSelectValue(root, item.getAttribute("data-value"));
-        }
-        if (event.key === "Escape") {
-          event.preventDefault();
-          setSelectOpen(root, false);
-          trigger.focus();
-        }
-      });
-    });
-
-    document.addEventListener("click", function (event) {
-      if (!root.contains(event.target)) {
-        setSelectOpen(root, false);
-      }
-    });
   }
 
   function setCollapsed(page, collapsed) {
@@ -266,8 +249,15 @@
   }
 
   function init() {
-    selectRoots().forEach(wireSelect);
+    wireThemeToggles();
+    tabs().forEach(wireTabs);
     sidebarPages().forEach(wirePage);
+  }
+
+  if (window.Shiny && window.Shiny.addCustomMessageHandler) {
+    window.Shiny.addCustomMessageHandler("sb:theme", function (message) {
+      applyTheme(message.mode || "system");
+    });
   }
 
   if (document.readyState === "loading") {
