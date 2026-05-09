@@ -77,7 +77,9 @@ as `make gate`.
    the phase checked against authoritative sources. Recorded in the
    relevant ADR, sync log, or phase-exit file.
 6. **Tests.** `devtools::test()` clean. Every new exported function
-   has tag-shape, validation, ARIA, and `merge_classes()` tests.
+   has tag-shape, validation, ARIA, and `merge_classes()` tests, plus
+   a section in `inst/showcase/` enforced by `test-showcase.R` (see
+   [§Showcase App](#showcase-app)).
 7. **Documentation.** `devtools::document()` no warnings. Generated
    `man/` committed.
 8. **Package check.** `devtools::check(remote = TRUE, manual = FALSE)`
@@ -184,8 +186,11 @@ and [ADR 0013](decisions/0013-component-gallery-quarto.md):
   component, embedded Shinylive demo + visible source. See
   [§Components Gallery](#components-gallery).
 - **Showcase app** — `inst/showcase/`, launchable via
-  `run_showcase()`. Dogfooded with shinyblocks. Hosted version
-  exported via Shinylive to `site/showcase/`.
+  `run_showcase()`. Dogfooded — its own UI is built with shinyblocks
+  primitives. Sidebar filters one component at a time. Authoring
+  contract enforced by `test-showcase.R`. See
+  [§Showcase App](#showcase-app). Hosted version exported via
+  Shinylive to `site/showcase/`.
 
 ## Components Gallery
 
@@ -243,6 +248,67 @@ When a new `block_*()` is exported, the same commit must add:
    grouping.
 
 Pages that ship without a gallery entry block the Quality Gate.
+
+## Showcase App
+
+The dogfooded showcase under `inst/showcase/` is the second consumer
+of every component. It is a single-page Shiny app whose own UI is
+built entirely with `shinyblocks` — `block_page()`, `block_sidebar()`,
+`block_header()`, `block_body()`, `block_nav_item()`. Clicking a
+sidebar item filters the body to that one section so each component
+renders in isolation; the URL hash deep-links the active section.
+
+It exists for two reasons: (1) the package documents itself by *being*
+a shinyblocks dashboard; (2) it is a fast verification surface for the
+maintainer — far cheaper than rebuilding the Quarto gallery to confirm
+a CSS change.
+
+### Layout
+
+```
+inst/showcase/
+├── app.R                            # block_page shell + sections list
+└── R/
+    ├── render_example.R             # eval an example file -> tag + code
+    ├── section.R                    # sb_section() helper, hides non-active
+    └── examples/<component>.R       # tag/tagList per component
+```
+
+The `sections` list at the top of `app.R` drives both the sidebar nav
+and the body — one row per component, each pointing at its example
+file under `R/examples/`.
+
+### Authoring contract
+
+When a new `block_*()` is exported, the same commit must add:
+
+1. `inst/showcase/R/examples/<component>.R` — a `htmltools::tagList`
+   showing the default plus interesting variants, evaluable in a
+   fresh environment with shinyblocks loaded.
+2. A row in the `sections` list in `inst/showcase/app.R` (id, label,
+   icon, title, lead, file).
+3. Run `make showcase` and eyeball it. The new section should appear
+   in the sidebar, render correctly when selected, and deep-link via
+   `#<id>`.
+
+`tests/testthat/test-showcase.R` enforces this contract end-to-end —
+exporting a new `block_*()` without referencing it from the showcase
+fails the test suite. Specifically the suite asserts:
+
+- Every file under `inst/showcase/R/examples/` evaluates to a
+  `shiny.tag` or `shiny.tag.list`.
+- Every section in the `sections` list has a matching
+  `data-sb-section` element and a matching `href="#..."` sidebar link
+  in the rendered UI.
+- Every exported `block_*()` puts its conventional class
+  (`sb-<name>`) somewhere in the rendered showcase UI.
+- The first section is rendered visible; all others render with the
+  `hidden` attribute so the JS filter has a stable starting state.
+
+Components that are emitted transitively (e.g. `block_body` via
+`block_page`) still appear in the rendered HTML through their parent
+and need no separate section. The class-coverage test catches the
+case where they are removed entirely.
 
 ---
 

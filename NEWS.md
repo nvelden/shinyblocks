@@ -15,3 +15,10 @@
   <https://shiny.posit.co/r/components/>. Each exported component has
   a page with an embedded live demo and visible source. See
   `docs/decisions/0013-component-gallery-quarto.md`.
+* The dogfooded showcase under `inst/showcase/` is now a proper
+  component gallery — its own UI is built entirely with shinyblocks
+  primitives, the sidebar filters one component at a time, and every
+  section is deep-linkable via the URL hash. `test-showcase.R`
+  enforces an authoring contract: any new exported `block_*()` must
+  land with a matching example file under `inst/showcase/R/examples/`
+  and a row in the showcase's sections list, or the test suite fails.
