@@ -88,10 +88,32 @@ sections <- list(
     icon = "edit",
     title = "Fields and input groups",
     lead = paste(
-      "Composable form primitives plus a first-class sb select:",
-      "labels, helper text, input addons, fieldsets, and invalid states."
+      "Composable form primitives plus first-class select, textarea,",
+      "checkbox, and switch controls with helper text and invalid states."
     ),
     file = "field.R"
+  ),
+  list(
+    id = "tabs",
+    label = "Tabs",
+    icon = "layout-list",
+    title = "Tabs",
+    lead = paste(
+      "Additive decoration around Shiny tabs:",
+      "reactive tab switching with shadcn-style triggers and content."
+    ),
+    file = "tabs.R"
+  ),
+  list(
+    id = "theme",
+    label = "Theme",
+    icon = "sun",
+    title = "Theme runtime",
+    lead = paste(
+      "Page-scoped token overrides, persistent dark mode,",
+      "and a server-side theme updater hook."
+    ),
+    file = "theme.R"
   ),
   list(
     id = "icon",

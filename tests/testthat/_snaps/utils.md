@@ -102,3 +102,35 @@
       Error:
       ! `selected` must match one of `choices`.
 
+# block_textarea validates rows
+
+    Code
+      block_textarea("notes", rows = 0)
+    Condition
+      Error:
+      ! `rows` must be a positive number.
+
+# block_theme validates named and known tokens
+
+    Code
+      block_theme("bad")
+    Condition
+      Error:
+      ! `block_theme()` requires named token overrides.
+
+---
+
+    Code
+      block_theme(not_a_token = "red")
+    Condition
+      Error:
+      ! Unknown theme token(s): `not_a_token`.
+
+# update_block_theme requires a session
+
+    Code
+      update_block_theme(NULL)
+    Condition
+      Error:
+      ! `session` is required.
+

@@ -50,6 +50,18 @@
   it is a thin wrapper around Shiny's select/selectize path with
   token-driven Selectize styling, instead of a package-owned select
   runtime.
+* `block_tab()` and `block_tabs()` add shadcn-style tab triggers and
+  content styling on top of Shiny's existing tabset binding, preserving
+  reactive tab switching without a custom input runtime.
+* `block_theme()`, `block_dark_mode_toggle()`, and
+  `update_block_theme()` add page-scoped token overrides, a persistent
+  dark-mode toggle, and a server-side theme mode updater.
+* `block_tabs()` now ships local tab activation behavior and hides
+  inactive panels without relying on Bootstrap tab runtime.
+* Tabs trigger sizing, spacing, and showcase content now track the
+  shadcn tabs contract more closely.
+* `block_textarea()`, `block_checkbox()`, and `block_switch()` add
+  first-class wrapped Shiny form controls to the forms layer.
 * New components round out Phase 3: `block_value_box()` for
   high-signal metrics, `block_separator()` (horizontal + vertical,
   ARIA-aware), `block_skeleton()` for loading placeholders,

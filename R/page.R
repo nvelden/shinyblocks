@@ -5,6 +5,7 @@
 #' @param sidebar Optional sidebar content.
 #' @param header Optional header content.
 #' @param theme_mode Initial theme mode.
+#' @param theme Optional `block_theme()` overrides.
 #' @param class Additional classes for the app root.
 #'
 #' @return An `htmltools` tag list suitable for a Shiny UI.
@@ -16,6 +17,7 @@ block_page <- function(
   sidebar = NULL,
   header = NULL,
   theme_mode = c("system", "light", "dark"),
+  theme = NULL,
   class = NULL
 ) {
   theme_mode <- match_arg(theme_mode, c("system", "light", "dark"))
@@ -33,7 +35,8 @@ block_page <- function(
     htmltools::tagList(
       htmltools::tags$head(
         htmltools::tags$title(title %||% "shinyblocks"),
-        block_theme_script(theme_mode)
+        block_theme_script(theme_mode),
+        theme
       ),
       htmltools::tags$div(
         class = merge_classes("sb-app", class),

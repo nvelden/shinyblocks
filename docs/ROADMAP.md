@@ -28,13 +28,12 @@ passing the **Quality Gate** below before the next phase begins.
 >   `block_field_label()`, `block_field_description()`,
 >   `block_field_set()`, `block_field_legend()`,
 >   `block_field_invalid()`, `block_input_group()`,
->   `block_input_group_addon()`, and `block_select()`.
+>   `block_input_group_addon()`, `block_select()`, `block_textarea()`,
+>   `block_checkbox()`, `block_switch()`, `block_tab()`, `block_tabs()`,
+>   `block_theme()`, `block_dark_mode_toggle()`, and
+>   `update_block_theme()`.
 >
 > Still owed in Phase 5:
-> - `block_tabs()`
-> - theme runtime helpers
-> - additional first-class form controls (`checkbox`, `switch`,
->   `textarea`, and related wrappers)
 > - gallery `.qmd` pages once the WASM/gallery track resumes
 > - component-spec backfill per [ADR 0015](decisions/0015-component-specs.md):
 >   31 components are in `backfill_pending_specs` in
@@ -45,12 +44,10 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Next concrete slice:
 >
-> 1. Add `block_tabs()` as an additive wrapper around Shiny tabs.
-> 2. Add the next dedicated form controls so fields stop relying on raw
->    Shiny widget styling.
-> 3. Implement `block_theme()`, dark-mode toggle, and runtime theme
->    updates against the existing token contract.
-> 4. Resume gallery page authoring once the WASM/gallery track is back
+> 1. Run the interaction-style parity pass across `select`, tabs,
+>    buttons, textarea, checkbox, and switch in both light and dark
+>    modes against the component specs.
+> 2. Resume gallery page authoring once the WASM/gallery track is back
 >    in active implementation.
 
 Update this line at every phase exit.

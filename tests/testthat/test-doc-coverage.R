@@ -124,6 +124,10 @@ spec_path <- function(fn_name) {
 }
 
 test_that("every exported block_*() has a component spec doc", {
+  if (!dir.exists(file.path(repo_root(), "docs", "component-specs"))) {
+    skip("component specs are repo-only and not present in R CMD check build")
+  }
+
   exported <- block_exports()
 
   required <- setdiff(exported, backfill_pending_specs)
@@ -154,6 +158,10 @@ test_that("every exported block_*() has a component spec doc", {
 })
 
 test_that("backfill_pending_specs stays honest about what is missing", {
+  if (!dir.exists(file.path(repo_root(), "docs", "component-specs"))) {
+    skip("component specs are repo-only and not present in R CMD check build")
+  }
+
   drift <- intersect(
     backfill_pending_specs,
     Filter(function(fn) file.exists(spec_path(fn)), block_exports())

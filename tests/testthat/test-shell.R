@@ -25,6 +25,17 @@ test_that("block_page renders the shell landmarks", {
   expect_match(head, "document.documentElement.dataset.theme", fixed = TRUE)
 })
 
+test_that("block_page includes optional theme overrides in head", {
+  page <- block_page(
+    title = "Example",
+    theme = block_theme(primary = "oklch(0.5 0.2 250)")
+  )
+  head <- paste(htmltools::renderTags(page)$head, collapse = "")
+
+  expect_match(head, "sb-theme-overrides", fixed = TRUE)
+  expect_match(head, "--primary: oklch(0.5 0.2 250);", fixed = TRUE)
+})
+
 test_that("layout helpers merge user classes", {
   expect_identical(
     tag_attr(block_header("Header", class = "custom"), "class"),
@@ -66,6 +77,37 @@ test_that("nav containers merge classes and wrap items", {
   )
 
   expect_identical(tag_attr(nav, "class"), "sb-nav custom")
+})
+
+test_that("block_tabs preserves Shiny tabset markup and adds sb classes", {
+  tabs <- block_tabs(
+    id = "demo_tabs",
+    selected = "usage",
+    block_tab("Overview", value = "overview", "Overview body"),
+    block_tab("Usage", value = "usage", "Usage body"),
+    class = "custom"
+  )
+  html <- render_html(tabs)
+
+  expect_match(
+    html,
+    'class="tabbable sb-tabs custom" data-sb-tabs="true"',
+    fixed = TRUE
+  )
+  expect_match(
+    html,
+    'class="nav nav-tabs shiny-tab-input sb-tabs-list"',
+    fixed = TRUE
+  )
+  expect_match(html, 'role="tablist"', fixed = TRUE)
+  expect_match(html, 'aria-orientation="horizontal"', fixed = TRUE)
+  expect_match(html, 'data-bs-toggle="tab"', fixed = TRUE)
+  expect_match(html, 'role="tab"', fixed = TRUE)
+  expect_match(html, 'aria-selected="true"', fixed = TRUE)
+  expect_match(html, 'tabindex="-1"', fixed = TRUE)
+  expect_match(html, 'class="tab-content sb-tabs-content"', fixed = TRUE)
+  expect_match(html, 'role="tabpanel"', fixed = TRUE)
+  expect_match(html, 'hidden="hidden"', fixed = TRUE)
 })
 
 test_that("sidebar collapse attrs and toggle render", {
@@ -129,6 +171,19 @@ test_that("button classes merge with user classes", {
   )
 })
 
+test_that("dark mode toggle renders expected button attrs", {
+  toggle <- block_dark_mode_toggle(class = "custom")
+  html <- render_html(toggle)
+
+  expect_identical(
+    tag_attr(toggle, "class"),
+    "sb-button sb-button-outline sb-button-size-sm sb-dark-mode-toggle custom"
+  )
+  expect_identical(tag_attr(toggle, "data-sb-theme-toggle"), "true")
+  expect_match(html, "sb-dark-mode-icon-light", fixed = TRUE)
+  expect_match(html, "sb-dark-mode-icon-dark", fixed = TRUE)
+})
+
 test_that("field wrappers expose expected classes and child markers", {
   field <- block_field(
     block_field_label("Email", `for` = "email"),
@@ -146,6 +201,64 @@ test_that("field wrappers expose expected classes and child markers", {
   expect_identical(tag_attr(field, "data-sb-child"), "field")
   expect_identical(tag_attr(fieldset, "data-sb-child"), "field-set")
   expect_identical(tag_attr(group, "data-sb-child"), "field-group")
+})
+
+test_that("textarea wraps Shiny markup and supports placeholder", {
+  textarea <- block_textarea(
+    "notes",
+    value = "hello",
+    placeholder = "Write a note",
+    rows = 5,
+    class = "custom"
+  )
+  html <- render_html(textarea)
+
+  expect_identical(tag_attr(textarea, "class"), "sb-textarea custom")
+  expect_match(html, "sb-textarea-control", fixed = TRUE)
+  expect_match(html, 'placeholder="Write a note"', fixed = TRUE)
+  expect_match(html, 'rows="5"', fixed = TRUE)
+})
+
+test_that("checkbox and switch preserve Shiny input bindings", {
+  checkbox <- block_checkbox(
+    "marketing",
+    "Email me updates",
+    value = TRUE,
+    class = "custom"
+  )
+  switch <- block_switch(
+    "alerts",
+    "Send incident alerts",
+    value = TRUE,
+    class = "custom"
+  )
+  checkbox_html <- render_html(checkbox)
+  switch_html <- render_html(switch)
+
+  expect_identical(
+    tag_attr(checkbox, "class"),
+    "form-group shiny-input-container sb-checkbox custom"
+  )
+  expect_identical(
+    tag_attr(switch, "class"),
+    "form-group shiny-input-container sb-switch custom"
+  )
+  expect_match(
+    checkbox_html,
+    'class="shiny-input-checkbox sb-checkbox-control"',
+    fixed = TRUE
+  )
+  expect_match(checkbox_html, 'checked="checked"', fixed = TRUE)
+  expect_match(checkbox_html, 'class="sb-checkbox-indicator"', fixed = TRUE)
+  expect_match(checkbox_html, "Email me updates", fixed = TRUE)
+  expect_match(
+    switch_html,
+    'class="shiny-input-checkbox sb-checkbox-control sb-switch-control"',
+    fixed = TRUE
+  )
+  expect_match(switch_html, 'role="switch"', fixed = TRUE)
+  expect_match(switch_html, 'class="sb-switch-track"', fixed = TRUE)
+  expect_match(switch_html, "Send incident alerts", fixed = TRUE)
 })
 
 test_that("field labels and descriptions expose expected attributes", {
@@ -201,7 +314,7 @@ test_that("input groups merge user classes and render addons", {
   expect_match(html, "sb-icon-search", fixed = TRUE)
 })
 
-test_that("block_select renders trigger, content, and native select", {
+test_that("block_select wraps a shiny select input", {
   select <- block_select(
     "plan",
     choices = c(Free = "free", Pro = "pro"),
@@ -213,13 +326,15 @@ test_that("block_select renders trigger, content, and native select", {
   expect_identical(tag_attr(select, "class"), "sb-select custom")
   expect_match(
     html,
-    'class="sb-select-native shiny-input-select"',
+    'class="form-group shiny-input-container"',
     fixed = TRUE
   )
-  expect_match(html, 'class="sb-select-trigger"', fixed = TRUE)
-  expect_match(html, 'class="sb-select-content"', fixed = TRUE)
-  expect_match(html, 'data-value="pro"', fixed = TRUE)
-  expect_match(html, 'class="sb-select-item is-selected"', fixed = TRUE)
+  expect_match(
+    html,
+    'class="shiny-input-select sb-select-control"',
+    fixed = TRUE
+  )
+  expect_match(html, 'data-for="plan"', fixed = TRUE)
 })
 
 test_that("badge variants map to classes", {

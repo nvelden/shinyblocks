@@ -25,6 +25,8 @@ Create a sidebar navigation item
 }
 \seealso{
 Other navigation: 
-\code{\link{block_nav}()}
+\code{\link{block_nav}()},
+\code{\link{block_tab}()},
+\code{\link{block_tabs}()}
 }
 \concept{navigation}

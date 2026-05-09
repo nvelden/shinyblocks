@@ -22,6 +22,8 @@ reference:
     contents:
       - block_nav
       - block_nav_item
+      - block_tabs
+      - block_tab
   - title: Content
     contents:
       - block_card
@@ -51,6 +53,14 @@ reference:
       - block_input_group
       - block_input_group_addon
       - block_select
+      - block_textarea
+      - block_checkbox
+      - block_switch
+  - title: Theme
+    contents:
+      - block_theme
+      - block_dark_mode_toggle
+      - update_block_theme
   - title: Action
     contents:
       - block_button
