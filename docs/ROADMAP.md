@@ -35,52 +35,39 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Still owed in Phase 5:
 > - gallery `.qmd` pages once the WASM/gallery track resumes
-> - component-spec backfill per [ADR 0015](decisions/0015-component-specs.md):
->   31 components are in `backfill_pending_specs` in
->   `tests/testthat/test-doc-coverage.R`; each one needs a
->   `docs/component-specs/<name>.md` and a captured reference
->   screenshot. The rule applies to new components today; the
->   backfill happens incrementally.
+> - reference screenshots still need to be captured for the spec docs;
+>   the written component-spec backfill is now complete and
+>   `test-doc-coverage.R` enforces specs for every exported `block_*()`
+>   unconditionally.
 > - **shadcn fidelity audit** per
 >   [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](agent-plans/2026-05-09-shadcn-fidelity-audit.md):
 >   token + class drift surfaced against the canonical
 >   `apps/v4/registry/new-york-v4` source. Button + badge safe
 >   drifts already fixed (rounded-full + text-xs on badge,
 >   `text-white` on destructive variants, `text-primary` on link,
->   `shadow-xs` on outline, dark-mode destructive dim). Three cross-
->   cutting slices still owed:
->   1. Focus-visible redesign — drop the global
->      `.sb-app *:focus-visible` outline, add per-component
->      `border-ring + ring-[3px] + ring-ring/50` to button, badge,
->      nav-item, tabs trigger, select trigger, checkbox, switch.
->   2. `aria-invalid` styling on every interactive base, wired to
->      `block_field_invalid()`.
->   3. Tabs refactor to shadcn's `data-state` / `data-orientation` /
->      `data-variant` attribute model (replaces the current Bootstrap-
->      class-leaning markup).
+>   `shadow-xs` on outline, dark-mode destructive dim). The structural
+>   slices are now landed:
+>   1. Focus-visible redesign on component-owned bases.
+>   2. `aria-invalid` destructive rings on interactive controls.
+>   3. Tabs refactor to the shadcn data-attribute model with the
+>      line variant.
+>   Remaining fidelity work is the screenshot-backed parity review and
+>   any follow-up tuning it surfaces.
 >
 > **Hand-off plan:** the next implementer should read
-> [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md)
-> first. It is the consolidated, slice-sized plan for finishing
-> Phase 5: per-slice scope, files to edit, concrete CSS patterns,
-> tests to update, validation steps, and definition-of-done.
+> [`docs/agent-plans/2026-05-10-screenshot-parity-handoff.md`](agent-plans/2026-05-10-screenshot-parity-handoff.md)
+> first. It is the current, slice-sized plan for the remaining
+> screenshot-backed parity work in Phase 5.
 >
 > Slices, in order:
 >
-> 1. **Focus-visible redesign** — drop the global
->    `.sb-app *:focus-visible` rule, add per-component
->    `border-ring + ring-[3px] + ring-ring/50` to button, badge,
->    nav-item, tabs trigger, select, checkbox, switch.
-> 2. **`aria-invalid` cross-cut** — destructive ring on every
->    interactive base, hooked to `block_field_invalid()`.
-> 3. **Tabs refactor** to shadcn's `data-state` /
->    `data-orientation` / `data-variant` attribute model; add the
->    line variant.
-> 4. **Reference screenshots** for the seed specs (button, card).
-> 5. **Spec-doc backfill** — 31 entries in
->    `backfill_pending_specs`, walked component by component using
->    [`docs/component-specs/_template.md`](component-specs/_template.md).
-> 6. **Gallery resumption** — blocked on the WASM track. When
+> 1. **Seed screenshots** — `button`, `card`, `select`, `tabs`.
+> 2. **High-risk interaction captures + parity pass** — `checkbox`,
+>    `switch`, `textarea`, `dark-mode-toggle`, `badge`, `nav-item`,
+>    `sidebar`.
+> 3. **Remaining spec screenshots** — work down
+>    `docs/component-specs/SCREENSHOT-QUEUE.md`.
+> 4. **Gallery resumption** — blocked on the WASM track. When
 >    unblocked, author one `gallery/components/<name>.qmd` per
 >    export and drop the `skip()` in the gallery coverage test.
 
@@ -126,8 +113,9 @@ as `make gate`.
     `inst/showcase/app.R`, navigates every section, and
     `expect_screenshot()`s each. From Phase 1C onward, also run
     Shinylive export smoke.
-12. **Performance budget.** `tools/budget.R`: CSS ≤30 KB, JS ≤15 KB,
-    sprite ≤25 KB gzipped. Over budget = blocking unless ADR'd.
+12. **Performance budget.** `tools/budget.R`: CSS ≤10 KB gzipped,
+    JS ≤15 KB raw, sprite ≤25 KB gzipped. Over budget = blocking
+    unless ADR'd.
 13. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
     the showcase. Findings → `docs/a11y/notes.md`.
 14. **Live preview — both servers running.** `make verify` (also

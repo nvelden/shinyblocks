@@ -9,7 +9,8 @@
   spacing, radius, border, and text sizing.
 - **placeholder** — muted foreground placeholder text inside the
   control.
-- **focus-visible** — 2px `--ring` outline with 2px offset.
+- **focus-visible** — 3px `--ring` shadow at 50% opacity with the
+  border promoted to `--ring`.
 - **disabled** — reduced opacity and no pointer interaction.
 - **invalid** — destructive-tinted border when wrapped in
   `block_field_invalid()`.

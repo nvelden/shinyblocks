@@ -83,6 +83,7 @@ test_that("block_tabs preserves Shiny tabset markup and adds sb classes", {
   tabs <- block_tabs(
     id = "demo_tabs",
     selected = "usage",
+    variant = "line",
     block_tab("Overview", value = "overview", "Overview body"),
     block_tab("Usage", value = "usage", "Usage body"),
     class = "custom"
@@ -96,17 +97,22 @@ test_that("block_tabs preserves Shiny tabset markup and adds sb classes", {
   )
   expect_match(
     html,
-    'class="nav nav-tabs shiny-tab-input sb-tabs-list"',
+    'class="nav shiny-tab-input sb-tabs-list"',
     fixed = TRUE
   )
+  expect_match(html, 'data-variant="line"', fixed = TRUE)
   expect_match(html, 'role="tablist"', fixed = TRUE)
   expect_match(html, 'aria-orientation="horizontal"', fixed = TRUE)
   expect_match(html, 'data-bs-toggle="tab"', fixed = TRUE)
+  expect_match(html, 'class="nav-link sb-tabs-trigger"', fixed = TRUE)
   expect_match(html, 'role="tab"', fixed = TRUE)
+  expect_match(html, 'data-state="active"', fixed = TRUE)
+  expect_match(html, 'data-state="inactive"', fixed = TRUE)
   expect_match(html, 'aria-selected="true"', fixed = TRUE)
   expect_match(html, 'tabindex="-1"', fixed = TRUE)
   expect_match(html, 'class="tab-content sb-tabs-content"', fixed = TRUE)
   expect_match(html, 'role="tabpanel"', fixed = TRUE)
+  expect_match(html, 'class="tab-pane sb-tabs-panel"', fixed = TRUE)
   expect_match(html, 'hidden="hidden"', fixed = TRUE)
 })
 
@@ -299,6 +305,46 @@ test_that("invalid fields decorate controls and append an error message", {
     'class="sb-field-description sb-field-error"',
     fixed = TRUE
   )
+})
+
+test_that("aria-invalid reaches wrapped control types", {
+  textarea <- render_html(
+    block_field_invalid(
+      block_field(block_textarea("notes")),
+      "Textarea invalid."
+    )
+  )
+  select <- render_html(
+    block_field_invalid(
+      block_field(block_select("plan", choices = c("Free", "Pro"))),
+      "Select invalid."
+    )
+  )
+  checkbox <- render_html(
+    block_field_invalid(
+      block_field(block_checkbox("agree", "Agree")),
+      "Checkbox invalid."
+    )
+  )
+  switch <- render_html(
+    block_field_invalid(
+      block_field(block_switch("alerts", "Alerts")),
+      "Switch invalid."
+    )
+  )
+
+  expect_match(textarea, 'aria-invalid="true"', fixed = TRUE)
+  expect_match(select, 'aria-invalid="true"', fixed = TRUE)
+  expect_match(checkbox, 'aria-invalid="true"', fixed = TRUE)
+  expect_match(switch, 'aria-invalid="true"', fixed = TRUE)
+  expect_match(checkbox, 'class="sb-checkbox-indicator"', fixed = TRUE)
+  expect_match(switch, 'class="sb-switch-track"', fixed = TRUE)
+})
+
+test_that("buttons accept aria-invalid passthrough attrs", {
+  button <- render_html(block_button("Delete", `aria-invalid` = "true"))
+
+  expect_match(button, 'aria-invalid="true"', fixed = TRUE)
 })
 
 test_that("input groups merge user classes and render addons", {

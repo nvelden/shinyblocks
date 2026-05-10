@@ -6,15 +6,15 @@
 # non-zero if any asset is over budget; otherwise prints a summary.
 #
 # Targets (gzipped where indicated):
-#   inst/www/shinyblocks.css           <= 30 KB minified
+#   inst/www/shinyblocks.css           <= 10 KB gzipped
 #   inst/www/shinyblocks.js            <= 15 KB
 #   inst/www/icons/sprite.svg          <= 25 KB gzipped
 
 targets <- list(
   list(
     path = "inst/www/shinyblocks.css",
-    limit_kb = 30,
-    metric = "minified"
+    limit_kb = 10,
+    metric = "gzipped"
   ),
   list(
     path = "inst/www/shinyblocks.js",

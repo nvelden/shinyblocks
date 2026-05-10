@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-css build-icons dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links gate clean deploy-showcase preview preview-pkgdown \
+	doc-links spec-screenshots spec-screenshots-md gate clean deploy-showcase preview preview-pkgdown \
 	preview-shinylive quarto-setup gallery verify verify-stop
 
 # Defaults you can override on the command line.
@@ -31,6 +31,8 @@ help:
 	@echo "  check           - R CMD check --as-cran"
 	@echo "  pkgdown         - pkgdown::build_site()"
 	@echo "  budget          - tools/budget.R (asset size report)"
+	@echo "  spec-screenshots - report missing component-spec screenshots"
+	@echo "  spec-screenshots-md - regenerate docs/component-specs/SCREENSHOT-QUEUE.md"
 	@echo "  doc-links       - tools/check-doc-links.R"
 	@echo "  gate            - run the full Quality Gate"
 	@echo ""
@@ -103,6 +105,12 @@ pkgdown:
 
 budget:
 	$(R) tools/budget.R
+
+spec-screenshots:
+	$(R) tools/spec-screenshots.R
+
+spec-screenshots-md:
+	$(R) tools/spec-screenshots.R --markdown
 
 doc-links:
 	$(R) tools/check-doc-links.R

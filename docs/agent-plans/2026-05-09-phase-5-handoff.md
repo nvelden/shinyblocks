@@ -219,10 +219,9 @@ specs.
 
 ### Slice 5 — Spec-doc backfill (incremental)
 
-**Why:** ADR 0015 requires every exported `block_*()` to have a spec
-doc. The `backfill_pending_specs` allowlist in
-[`tests/testthat/test-doc-coverage.R`](../../tests/testthat/test-doc-coverage.R)
-lists 31 components owed.
+**Status:** completed. Every exported `block_*()` now has a written spec
+doc. The remaining ADR 0015 work is reference-screenshot capture and
+ongoing parity review against those captures.
 
 **Scope per component (recipe):**
 
@@ -235,28 +234,12 @@ lists 31 components owed.
 3. Capture light + dark screenshots from
    `https://ui.shadcn.com/docs/components/<slug>` per slice 4.
 4. Document any deliberate divergences with reasoning.
-5. Remove the matching entry from `backfill_pending_specs` in the
-   test file.
-6. Run `devtools::test(filter = "doc-coverage")` — the drift check
-   in `test-doc-coverage.R` will fail if the entry is still in the
-   list while the file exists.
-
-**Suggested order** (highest-leverage first):
-1. `block_alert` and the alert slot constructors
-2. `block_input_group` + `block_input_group_addon`
-3. `block_field` + the field-* family (wrappers, lower visual
-   surface)
-4. `block_select`, `block_textarea`, `block_checkbox`, `block_switch`
-5. Layout primitives (`block_page`, `block_header`, `block_sidebar`,
-   `block_body`)
-6. Remaining: `block_separator`, `block_skeleton`, `block_spinner`,
-   `block_empty`, `block_value_box`, `block_nav`, `block_nav_item`,
-   `block_icon`
+5. Run `devtools::test(filter = "doc-coverage")` — the test now
+   enforces specs for every exported `block_*()` unconditionally.
 
 **Definition of done for Phase 5:**
-- `backfill_pending_specs` is empty.
-- The skip in `test-doc-coverage.R` for the spec test is removed (or
-  the allowlist is dropped entirely).
+- all spec docs are present
+- reference screenshots are captured for each spec
 
 ---
 
@@ -303,7 +286,7 @@ Before tagging, every slice above must be green and:
    screenshot is the shadcn ground truth.
 4. Critical-code-reviewer skill against the phase diff.
 5. Manual a11y sweep on the showcase per Quality Gate item 13.
-6. Performance budget: CSS ≤30 KB, JS ≤15 KB, sprite ≤25 KB gzipped.
+6. Performance budget: CSS ≤10 KB gzipped, JS ≤15 KB raw, sprite ≤25 KB gzipped.
 
 ## Files to read before starting
 

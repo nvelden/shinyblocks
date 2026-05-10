@@ -1,5 +1,6 @@
 sb_section <- function(id, title, lead, example_path, active = FALSE) {
   ex <- render_example(example_path)
+  scoped_render <- scope_showcase_theme(ex$rendered, id)
 
   htmltools::tags$section(
     id = id,
@@ -23,7 +24,10 @@ sb_section <- function(id, title, lead, example_path, active = FALSE) {
         lead
       )
     },
-    ex$rendered,
+    htmltools::tags$div(
+      `data-sb-preview` = id,
+      scoped_render
+    ),
     htmltools::tags$details(
       htmltools::tags$summary(
         style = paste(

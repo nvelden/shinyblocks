@@ -75,18 +75,14 @@
 
     triggers.forEach(function (item) {
       var active = item === trigger;
-      item.classList.toggle("active", active);
       item.setAttribute("aria-selected", active ? "true" : "false");
       item.setAttribute("tabindex", active ? "0" : "-1");
-
-      if (item.parentElement) {
-        item.parentElement.classList.toggle("active", active);
-      }
+      item.setAttribute("data-state", active ? "active" : "inactive");
     });
 
     panes.forEach(function (pane) {
       var active = pane.id === targetId;
-      pane.classList.toggle("active", active);
+      pane.setAttribute("data-state", active ? "active" : "inactive");
       if (active) {
         pane.removeAttribute("hidden");
       } else {
@@ -131,7 +127,7 @@
 
     var initial = triggers.find(function (trigger) {
       return trigger.getAttribute("aria-selected") === "true" ||
-        trigger.classList.contains("active");
+        trigger.getAttribute("data-state") === "active";
     }) || triggers[0];
 
     activateTab(tabset, initial, { updateInput: false });

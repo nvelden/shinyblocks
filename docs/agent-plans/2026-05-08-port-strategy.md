@@ -465,8 +465,9 @@ prevents the source and the shipped CSS from diverging.
 **Class scoping:** Tailwind compiles only utilities used in
 `inst/www/src/**/*.css` — utilities are referenced through `@apply`
 inside our own component layer, never sprinkled into user markup. The
-compiled file is therefore small (estimate: 15–30 KB minified, 4–8 KB
-gzipped) and stable across releases.
+compiled file is budgeted on compressed delivery size rather than raw
+minified bytes: ≤10 KB gzipped for CSS, which reflects how the asset is
+actually shipped to browsers.
 
 **What end users see:** one `<link rel="stylesheet">` tag pointing at
 the compiled file, attached automatically by
