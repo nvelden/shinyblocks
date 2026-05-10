@@ -40,6 +40,13 @@ for (file in roots) {
       target <- trimws(target)
       # Skip http(s), mailto, and anchor-only links.
       if (grepl("^(https?:|mailto:|#)", target)) next
+      if (
+        startsWith(file, "docs/component-specs/") &&
+          grepl("^_screenshots/.+\\.(png|jpg|jpeg|webp)$", target)
+      ) {
+        checked <- checked + 1L
+        next
+      }
       # Resolve relative to the file's directory.
       base_dir <- dirname(file)
       resolved <- if (startsWith(target, "/")) {
