@@ -13,7 +13,7 @@
  * See ADR 0006 (styling foundation) and ADR 0009 (upstream sync).
  */
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @import "./tokens.css";
 
 @theme {
@@ -67,11 +67,6 @@
     display: none;
   }
 
-  /* Visible focus ring across all interactive elements. */
-  .sb-app :where(button, a, [role="button"], [role="tab"], input, select, textarea):focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-  }
 }
 
 /* Component layer.
@@ -133,10 +128,19 @@
 
   .sb-nav-item {
     @apply flex min-h-9 items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground;
+    outline: none;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .sb-nav-item:hover {
     @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .sb-nav-item:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
   }
 
   .sb-nav-item.is-selected {
@@ -186,6 +190,10 @@
     @apply flex flex-col gap-2;
   }
 
+  .sb-tabs[data-orientation="vertical"] {
+    @apply flex-row items-start;
+  }
+
   .sb-tabs-list {
     @apply inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground;
     width: fit-content;
@@ -193,40 +201,103 @@
     gap: 0.25rem;
   }
 
+  .sb-tabs-list[data-orientation="vertical"] {
+    @apply h-auto flex-col items-stretch;
+  }
+
+  .sb-tabs-list[data-variant="line"] {
+    @apply rounded-none bg-transparent p-0;
+    border-bottom: 1px solid var(--border) !important;
+    gap: 0;
+  }
+
+  .sb-tabs-list[data-variant="line"][data-orientation="vertical"] {
+    border-bottom: 0 !important;
+    border-right: 1px solid var(--border);
+  }
+
   .sb-tabs-list > li {
     @apply list-none;
   }
 
-  .sb-tabs .nav-link {
+  .sb-tabs-trigger {
     @apply inline-flex h-8 items-center justify-center rounded-md px-2.5 py-1 text-sm font-medium whitespace-nowrap text-muted-foreground shadow-none;
     border: 0 !important;
     background: transparent !important;
     margin-bottom: 0 !important;
+    outline: none;
     transition:
       color 0.15s ease,
       background-color 0.15s ease,
       box-shadow 0.15s ease;
   }
 
-  .sb-tabs .nav-link:hover {
+  .sb-tabs-trigger[data-orientation="vertical"] {
+    @apply justify-start;
+  }
+
+  .sb-tabs-trigger[data-variant="line"] {
+    @apply rounded-none px-4;
+    height: 2.25rem;
+    position: relative;
+  }
+
+  .sb-tabs-trigger[data-variant="line"]::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: -1px;
+    height: 2px;
+    background-color: transparent;
+  }
+
+  .sb-tabs-trigger[data-variant="line"][data-orientation="vertical"]::after {
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: auto;
+    right: -1px;
+    width: 2px;
+    height: auto;
+  }
+
+  .sb-tabs-trigger:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-tabs-trigger:hover {
     color: var(--foreground) !important;
   }
 
-  .sb-tabs .nav-link.active,
-  .sb-tabs .nav-item.show .nav-link {
+  .sb-tabs-trigger[data-state="active"] {
     @apply bg-background text-foreground shadow-xs;
+  }
+
+  .sb-tabs-trigger[data-variant="line"][data-state="active"] {
+    @apply bg-transparent shadow-none;
+  }
+
+  .sb-tabs-trigger[data-variant="line"][data-state="active"]::after {
+    background-color: var(--foreground);
   }
 
   .sb-tabs .tab-content.sb-tabs-content {
     @apply flex flex-col;
     margin-top: 0.5rem;
+    min-width: 0;
+    flex: 1;
   }
 
-  .sb-tabs .tab-pane {
+  .sb-tabs .tab-content.sb-tabs-content[data-orientation="vertical"] {
+    margin-top: 0;
+    margin-left: 1rem;
+  }
+
+  .sb-tabs-panel {
     @apply outline-none;
   }
 
-  .sb-tabs .tab-pane[hidden] {
+  .sb-tabs-panel[hidden] {
     display: none !important;
   }
 
@@ -253,6 +324,55 @@
 
   .sb-select {
     @apply w-full;
+    position: relative;
+  }
+
+  .sb-select::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--muted-foreground);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .sb-select:has(.selectize-control)::after {
+    content: none;
+    display: none !important;
+  }
+
+  .sb-app .sb-select select.sb-select-control {
+    @apply min-h-9 w-full rounded-md border border-input text-sm shadow-xs;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    padding-right: 2.25rem;
+    color-scheme: light;
+  }
+
+  .sb-app .sb-select select.sb-select-control:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+    outline: none;
+  }
+
+  [data-theme="dark"] .sb-app .sb-select select.sb-select-control {
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    color-scheme: dark;
   }
 
   .sb-textarea {
@@ -321,8 +441,17 @@
   }
 
   .sb-checkbox-control:focus-visible + .sb-checkbox-indicator {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-checkbox-control[aria-invalid="true"] + .sb-checkbox-indicator {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-checkbox-control[aria-invalid="true"] + .sb-checkbox-indicator {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
   }
 
   .sb-checkbox-control:disabled + .sb-checkbox-indicator,
@@ -379,8 +508,16 @@
   }
 
   .sb-switch-control:focus-visible + .sb-switch-track {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-switch-control[aria-invalid="true"] + .sb-switch-track {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-switch-control[aria-invalid="true"] + .sb-switch-track {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
   }
 
   .sb-input-group {
@@ -406,7 +543,11 @@
   .sb-app .sb-select .selectize-control.single .selectize-input,
   .sb-app .sb-select .selectize-control.multi .selectize-input {
     @apply flex min-h-9 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs;
-    background-image: none;
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    background-image: none !important;
+    background-clip: padding-box;
+    padding-right: 2.25rem;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
@@ -414,36 +555,37 @@
   .sb-app .sb-select .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.multi .selectize-input.input-active {
     @apply rounded-md border border-input bg-background text-sm text-foreground shadow-xs;
-    background-image: none;
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    background-image: none !important;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input::after,
   .sb-app .sb-select .selectize-control.single .selectize-input::after {
     content: "";
-    width: 0.4rem;
-    height: 0.4rem;
-    border-right: 1.5px solid var(--muted-foreground);
-    border-bottom: 1.5px solid var(--muted-foreground);
-    border-top: 0;
-    border-left: 0;
-    right: 0.95rem;
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--muted-foreground);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    right: 1rem;
     top: 50%;
-    margin-top: -0.3rem;
-    transform: rotate(45deg);
-  }
-
-  .sb-app .sb-field .selectize-control.single.dropdown-active .selectize-input::after,
-  .sb-app .sb-select .selectize-control.single.dropdown-active .selectize-input::after {
-    margin-top: -0.1rem;
-    transform: rotate(225deg);
+    margin-top: -0.5rem;
+    transform: none;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input.focus,
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.single .selectize-input.focus,
   .sb-app .sb-select .selectize-control.single .selectize-input.input-active {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input > input,
@@ -455,6 +597,30 @@
   .sb-app .sb-select .selectize-control.single .selectize-input .item,
   .sb-app .sb-select .selectize-control.multi .selectize-input .item {
     @apply text-sm leading-5;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: inherit !important;
+  }
+
+  .sb-app .sb-field .selectize-control.single .selectize-input > input,
+  .sb-app .sb-field .selectize-control.multi .selectize-input > input,
+  .sb-app .sb-select .selectize-control.single .selectize-input > input,
+  .sb-app .sb-select .selectize-control.multi .selectize-input > input {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    caret-color: currentColor;
+    flex: 1 1 auto;
+    line-height: inherit !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    opacity: 1;
+    padding: 0 !important;
+    width: auto !important;
   }
 
   .sb-app .sb-field .selectize-dropdown,
@@ -521,6 +687,17 @@
     border-color: var(--ring);
   }
 
+  .sb-field:has(select[aria-invalid="true"]) .selectize-control .selectize-input,
+  .sb-select:has(select[aria-invalid="true"]) .selectize-control .selectize-input {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-field:has(select[aria-invalid="true"]) .selectize-control .selectize-input,
+  [data-theme="dark"] .sb-select:has(select[aria-invalid="true"]) .selectize-control .selectize-input {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
+  }
+
   .sb-app .sb-input-group .shiny-input-container {
     @apply min-w-0 flex-1;
   }
@@ -528,6 +705,10 @@
   .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
     @apply flex min-h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs;
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
   }
 
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
@@ -539,9 +720,34 @@
     box-shadow: none;
   }
 
+  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"],
+  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"],
+  [data-theme="dark"] .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
+  }
+
   .sb-app .sb-input-group:focus-within {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-input-group:has([aria-invalid="true"]) {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-input-group:has([aria-invalid="true"]) {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
   }
 
   .sb-field[data-invalid="true"] :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
@@ -560,9 +766,28 @@
   }
 
   .sb-button {
-    @apply inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors;
-    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+    @apply inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap;
     @apply disabled:pointer-events-none disabled:opacity-50;
+    outline: none;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .sb-button:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-button[aria-invalid="true"] {
+    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+  }
+
+  [data-theme="dark"] .sb-button[aria-invalid="true"] {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
   }
 
   /* shadcn button variants (apps/v4 new-york-v4 registry):

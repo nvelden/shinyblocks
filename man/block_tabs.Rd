@@ -4,7 +4,14 @@
 \alias{block_tabs}
 \title{Create styled tabs}
 \usage{
-block_tabs(..., id = NULL, selected = NULL, class = NULL)
+block_tabs(
+  ...,
+  id = NULL,
+  selected = NULL,
+  variant = c("default", "line"),
+  orientation = c("horizontal", "vertical"),
+  class = NULL
+)
 }
 \arguments{
 \item{...}{\code{block_tab()} or \code{shiny::tabPanel()} items.}
@@ -12,6 +19,10 @@ block_tabs(..., id = NULL, selected = NULL, class = NULL)
 \item{id}{Optional input id.}
 
 \item{selected}{Optional selected tab value.}
+
+\item{variant}{Visual variant: \code{default} or \code{line}.}
+
+\item{orientation}{Layout orientation: \code{horizontal} or \code{vertical}.}
 
 \item{class}{Additional classes.}
 }

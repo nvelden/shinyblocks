@@ -84,6 +84,42 @@
   shadcn tabs contract more closely.
 * `block_textarea()`, `block_checkbox()`, and `block_switch()` add
   first-class wrapped Shiny form controls to the forms layer.
+* Focus-visible styling now lives on the component bases themselves
+  instead of a global `.sb-app *:focus-visible` outline fallback.
+* Interactive controls now honour `aria-invalid="true"` with a
+  destructive ring on the visible shell, including wrapped select,
+  textarea, checkbox, and switch inputs.
+* Tabs now use a shadcn-style data-attribute contract
+  (`data-state`, `data-orientation`, `data-variant`) and include the
+  line variant in the showcase.
+* Component spec backfill now covers alert, alert-title,
+  alert-description, input-group, input-group-addon, and select.
+* The showcase theme example is now locally scoped and no longer
+  changes the global primary button colour; `block_select()` also gets
+  a stronger native-select fallback shell for dark mode.
+* `block_select()` now applies stronger dark-mode styling to the
+  Selectize-enhanced trigger itself, and hides the fallback chevron
+  once Selectize has taken over the control.
+* Component spec backfill now covers the field family:
+  `block_field_group()`, `block_field()`, `block_field_label()`,
+  `block_field_description()`, `block_field_set()`,
+  `block_field_legend()`, and `block_field_invalid()`.
+* Component spec backfill now also covers the layout shell:
+  `block_page()`, `block_body()`, `block_header()`, and
+  `block_sidebar()`.
+* Component spec backfill now also covers navigation and utility
+  primitives: `block_icon()`, `block_nav()`, `block_nav_item()`,
+  `block_separator()`, `block_skeleton()`, `block_spinner()`,
+  `block_empty()`, and `block_value_box()`.
+* Component spec backfill is now complete for every exported
+  `block_*()`; `test-doc-coverage.R` enforces the spec-doc contract
+  without a temporary allowlist.
+* Internal: the asset budget gate now enforces CSS on gzipped delivery
+  size (`≤10 KB`) instead of a stale raw/minified threshold.
+* Internal: added `tools/spec-screenshots.R` and `make spec-screenshots`
+  to report which component-spec screenshots are still missing.
+* Internal: added `make spec-screenshots-md` to generate a committed
+  screenshot queue under `docs/component-specs/`.
 * New components round out Phase 3: `block_value_box()` for
   high-signal metrics, `block_separator()` (horizontal + vertical,
   ARIA-aware), `block_skeleton()` for loading placeholders,

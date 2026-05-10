@@ -8,7 +8,8 @@
 - **default** — square control with border, subtle shadow, and inline
   label text.
 - **checked** — primary-filled surface with a visible check mark.
-- **focus-visible** — 2px `--ring` outline around the control.
+- **focus-visible** — 3px `--ring` shadow at 50% opacity with the
+  indicator border promoted to `--ring`.
 - **disabled** — reduced opacity for both indicator and label.
 - **invalid** — destructive-tinted border when wrapped in
   `block_field_invalid()`.

@@ -45,9 +45,10 @@ Adopt option 3.
 - End users see one `<link rel="stylesheet">` per `block_page()`. No
   Node, no CDN, no runtime build, no Tailwind in the browser.
 - Tailwind utility classes are referenced through `@apply` inside our
-  own component layer only. They are not exposed to user markup, so
-  Tailwind's purger has full visibility into what to keep — output
-  size estimate is 15–30 KB minified, 4–8 KB gzipped.
+  own component layer only. They are not exposed to user markup. As the
+  component surface grew, the raw compiled CSS outgrew the initial
+  estimate; the enforced delivery budget is therefore the compressed
+  asset size: ≤10 KB gzipped for `inst/www/shinyblocks.css`.
 
 ## Why not handwritten CSS
 

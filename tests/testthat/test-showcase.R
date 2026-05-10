@@ -154,3 +154,26 @@ test_that("only the first showcase section is initially visible", {
     )
   }
 })
+
+test_that("theme showcase overrides are scoped to the preview wrapper", {
+  env <- source_showcase()
+  rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
+
+  expect_match(
+    rendered,
+    'data-sb-preview="theme"',
+    fixed = TRUE
+  )
+  expect_match(
+    rendered,
+    paste0(
+      '[data-sb-preview="theme"]{',
+      "--accent: oklch(0.3 0.03 260);--radius: 0.5rem;}"
+    ),
+    fixed = TRUE
+  )
+  expect_false(grepl(
+    "\\.sb-app\\{--accent: oklch\\(0\\.3 0\\.03 260\\)",
+    rendered
+  ))
+})

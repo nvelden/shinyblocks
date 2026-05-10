@@ -16,7 +16,10 @@
 - **destructive** — `--destructive` fill, `--destructive-foreground`
   label, hover dim.
 - **link** — no fill, no border, underline-offset 4 on hover.
-- **focus-visible** — 2px outline at `--ring`, offset 2.
+- **focus-visible** — component-owned 3px ring using `--ring` at 50%
+  opacity, no global outline fallback.
+- **invalid** — destructive-tinted ring and border when
+  `aria-invalid="true"` is present.
 - **disabled** — `pointer-events: none`, opacity `0.5`. Applies across
   all variants.
 - **with icon** — leading or trailing 1rem icon from the vendored
@@ -38,6 +41,7 @@
 | Destructive fill | `--destructive` |
 | Destructive label | `--destructive-foreground` |
 | Focus ring | `--ring` |
+| Invalid ring | `--destructive`, `--border` |
 | Radius | `--radius-md` |
 
 ## Deliberate divergences from shadcn

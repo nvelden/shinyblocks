@@ -1,6 +1,6 @@
 htmltools::tagList(
   block_theme(
-    primary = "oklch(0.58 0.22 262)",
+    accent = "oklch(0.3 0.03 260)",
     radius = "0.5rem"
   ),
   htmltools::div(

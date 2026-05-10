@@ -10,7 +10,8 @@
 - **dark** — moon icon becomes visible when the document theme resolves
   to dark.
 - **hover** — follows outline button hover treatment.
-- **focus-visible** — follows the shared `--ring` outline contract.
+- **focus-visible** — follows the button-owned 3px `--ring` shadow at
+  50% opacity.
 - **pressed** — `aria-pressed` reflects whether dark mode is active.
 
 ## Token contract

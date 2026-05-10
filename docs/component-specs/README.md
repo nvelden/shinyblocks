@@ -16,12 +16,15 @@ rationale.
    are the artifact.
 3. Capture the canonical shadcn screenshot and commit it under
    `_screenshots/<slug>.png`. Note the capture date in the spec.
-4. Remove the matching entry from `backfill_pending` in
-   [`tests/testthat/test-doc-coverage.R`](../../tests/testthat/test-doc-coverage.R).
+4. Run [`tools/spec-screenshots.R`](../../tools/spec-screenshots.R)
+   (or `make spec-screenshots`) to keep the screenshot inventory honest.
+5. Regenerate [`SCREENSHOT-QUEUE.md`](SCREENSHOT-QUEUE.md) with
+   `make spec-screenshots-md` when the capture queue changes.
 
-The `test-doc-coverage.R` suite enforces (a) every component not in
-`backfill_pending` has a spec, and (b) no `backfill_pending` entry
-quietly gains a spec without being removed from the list.
+The `test-doc-coverage.R` suite now enforces that every exported
+`block_*()` has a written spec doc. Screenshot capture is still manual,
+so the inventory script above is the tracking tool for the remaining
+visual-reference work.
 
 ## Screenshot capture
 

@@ -9,7 +9,8 @@
   inline label text.
 - **checked** — primary-filled track with the thumb translated to the
   trailing edge.
-- **focus-visible** — 2px `--ring` outline around the track.
+- **focus-visible** — 3px `--ring` shadow at 50% opacity around the
+  track.
 - **disabled** — reduced opacity for both track and label.
 - **invalid** — destructive-tinted border when wrapped in
   `block_field_invalid()`.
