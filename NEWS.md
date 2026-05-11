@@ -2,6 +2,27 @@
 
 ## 0.0.0.9000
 
+* Visual-parity harness adopted per
+  [ADR 0016](docs/decisions/0016-visual-parity-harness.md). Mechanical
+  computed-style + DOM diff against a pinned shadcn-react reference
+  replaces reviewer-only parity for the bulk of drift. A proof of
+  concept at [`tools/parity/select-poc.mjs`](tools/parity/select-poc.mjs)
+  validated the approach against `block_select()` — caught
+  18 trigger drifts and a double-hover dropdown bug that the
+  spec-doc review missed. A follow-up CSS fix on the same select
+  reduced trigger drift from 18 to 7 properties (the remaining ones
+  are colour-space normalisation, expected state mismatches, and
+  structural divergences by design), and eliminated the double-hover
+  (dropdown now lights exactly one row on mouse hover instead of
+  two). The full harness is Slice 6 in
+  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](docs/agent-plans/2026-05-09-phase-5-handoff.md).
+* `block_select()` trigger and dropdown now match shadcn more
+  closely: `rounded-lg` (was `rounded-md` — 10px vs 4px), transparent
+  background (was solid), 32px height (was 34px), absolutely-
+  positioned 16px chevron with the Lucide `chevron-down` mask, and a
+  selected option that uses `font-weight: 500` instead of a fill so
+  it no longer competes with the keyboard-cursor / pointer-hover
+  state.
 * Phase 5 hand-off plan landed at
   [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](docs/agent-plans/2026-05-09-phase-5-handoff.md):
   six slice-sized implementation steps (focus-visible redesign,
@@ -120,6 +141,20 @@
   to report which component-spec screenshots are still missing.
 * Internal: added `make spec-screenshots-md` to generate a committed
   screenshot queue under `docs/component-specs/`.
+* Internal: added `make spec-screenshots-check` so stale screenshot
+  queue docs fail fast.
+* Internal: `make gate` and the phase-exit checklist now include the
+  screenshot-queue freshness check.
+* Internal: added `make spec-screenshots-seed`, a macOS/Safari helper
+  for first-pass capture of the seed screenshot set (`button`, `card`,
+  `select`, `tabs`).
+* Internal: the component-spec screenshot queue is now fully populated
+  (`40` captured-dated references), and the Safari helper has been
+  generalized to `make spec-screenshots-high-risk` and
+  `make spec-screenshots-all` for repeatable refreshes.
+* Internal: added `make showcase-capture` / `tools/capture-showcase-parity.sh`
+  so local light/dark showcase sections can be captured reproducibly
+  during the parity pass.
 * New components round out Phase 3: `block_value_box()` for
   high-signal metrics, `block_separator()` (horizontal + vertical,
   ARIA-aware), `block_skeleton()` for loading placeholders,

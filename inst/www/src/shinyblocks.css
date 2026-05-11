@@ -538,16 +538,27 @@
     @apply text-sm;
   }
 
+  /* shadcn Select trigger contract (Radix variant, current registry):
+   *   h-8, rounded-lg, transparent bg, flex with space for chevron on
+   *   the right. The mechanical-parity harness in tools/parity/
+   *   reports these as drifts when they're wrong — see ADR 0016. */
   .sb-app .sb-field .selectize-control.single .selectize-input,
   .sb-app .sb-field .selectize-control.multi .selectize-input,
   .sb-app .sb-select .selectize-control.single .selectize-input,
   .sb-app .sb-select .selectize-control.multi .selectize-input {
-    @apply flex min-h-9 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs;
-    background: var(--background) !important;
+    @apply flex w-full items-center border border-input text-sm text-foreground;
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+    height: 2rem !important;
+    min-height: 2rem !important;
+    border-radius: var(--radius-lg) !important;
+    border-color: var(--input) !important;
+    background: transparent !important;
     color: var(--foreground) !important;
     background-image: none !important;
     background-clip: padding-box;
-    padding-right: 2.25rem;
+    padding: 0.5rem 2rem 0.5rem 0.625rem !important;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
@@ -562,9 +573,14 @@
 
   .sb-app .sb-field .selectize-control.single .selectize-input::after,
   .sb-app .sb-select .selectize-control.single .selectize-input::after {
-    content: "";
-    width: 1rem;
-    height: 1rem;
+    content: "" !important;
+    position: absolute !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    right: 0.5rem !important;
+    top: 50% !important;
+    margin-top: -0.5rem !important;
+    border: 0 !important;
     background-color: var(--muted-foreground);
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     mask-repeat: no-repeat;
@@ -574,9 +590,6 @@
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
     -webkit-mask-size: contain;
-    right: 1rem;
-    top: 50%;
-    margin-top: -0.5rem;
     transform: none;
   }
 
@@ -658,10 +671,17 @@
     color: var(--accent-foreground) !important;
   }
 
+  /* shadcn marks the selected option with a check icon, not a fill.
+   * Selectize has no check-icon slot, so we keep the medium font
+   * weight on `.selected` and let only the keyboard-cursor row
+   * (`.active`) and the pointer-hovered row (`:hover`) carry the
+   * accent fill. Without this, `.selected` + a mouse hover on a
+   * different row produced two lit rows simultaneously (caught by
+   * the parity harness, ADR 0016). */
   .sb-app .sb-field .selectize-dropdown .option.selected,
   .sb-app .sb-select .selectize-dropdown .option.selected {
-    background: var(--accent) !important;
-    color: var(--accent-foreground) !important;
+    background: transparent !important;
+    color: var(--popover-foreground) !important;
     font-weight: 500;
   }
 

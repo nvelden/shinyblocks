@@ -10,7 +10,7 @@ passing the **Quality Gate** below before the next phase begins.
 > **In progress: Phase 5 — tabs, forms, and theme runtime.**
 >
 > Landed and verified locally:
-> - **Phase 0** — ADRs `0006`–`0015` accepted.
+> - **Phase 0** — ADRs `0006`–`0016` accepted.
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
 >   CSS, dependency plumbing, showcase scaffold, and core package
 >   infrastructure.
@@ -35,8 +35,8 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Still owed in Phase 5:
 > - gallery `.qmd` pages once the WASM/gallery track resumes
-> - reference screenshots still need to be captured for the spec docs;
->   the written component-spec backfill is now complete and
+> - reference screenshots are now captured for every component spec;
+>   `docs/component-specs/SCREENSHOT-QUEUE.md` is at zero missing and
 >   `test-doc-coverage.R` enforces specs for every exported `block_*()`
 >   unconditionally.
 > - **shadcn fidelity audit** per
@@ -61,12 +61,21 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Slices, in order:
 >
-> 1. **Seed screenshots** — `button`, `card`, `select`, `tabs`.
-> 2. **High-risk interaction captures + parity pass** — `checkbox`,
->    `switch`, `textarea`, `dark-mode-toggle`, `badge`, `nav-item`,
->    `sidebar`.
-> 3. **Remaining spec screenshots** — work down
->    `docs/component-specs/SCREENSHOT-QUEUE.md`.
+> 1. **High-risk parity pass** — `checkbox`, `switch`, `textarea`,
+>    `dark-mode-toggle`, `badge`, `nav-item`, `sidebar`, plus any
+>    follow-up CSS/spec divergence updates.
+> 2. **Remaining screenshot-backed parity review** — work straight
+>    down `docs/component-specs/SCREENSHOT-QUEUE.md` as a review list
+>    rather than a missing-capture queue.
+> 3. **Visual-parity harness (ADR 0016)** — promote the
+>    `tools/parity/select-poc.mjs` proof of concept to a real Vite +
+>    React reference app under `parity/` with a Playwright capture +
+>    computed-style diff. Slice 6 in the hand-off doc has the
+>    detailed scope. The POC has already shown the approach catches
+>    drift the spec-doc review misses (it reduced `block_select`
+>    trigger drift from 18 to 7 properties and surfaced the
+>    double-hover bug as a 2-rows-lit assertion). One CSS fix slice
+>    based on the POC findings already landed.
 > 4. **Gallery resumption** — blocked on the WASM track. When
 >    unblocked, author one `gallery/components/<name>.qmd` per
 >    export and drop the `skip()` in the gallery coverage test.
@@ -106,19 +115,23 @@ as `make gate`.
     `reference:` section, and once WASM is unblocked, also has a
     matching gallery `.qmd` page. See
     [§Per-gate component-sync rule](#per-gate-component-sync-rule).
+11. **Screenshot queue freshness.** `make spec-screenshots-check`
+    passes. If the committed screenshot queue under
+    `docs/component-specs/SCREENSHOT-QUEUE.md` is stale, regenerate it
+    before tagging or handoff.
 
 ### B. Verify — semi-automated
 
-11. **Showcase smoke test.** `shinytest2` launches
+12. **Showcase smoke test.** `shinytest2` launches
     `inst/showcase/app.R`, navigates every section, and
     `expect_screenshot()`s each. From Phase 1C onward, also run
     Shinylive export smoke.
-12. **Performance budget.** `tools/budget.R`: CSS ≤10 KB gzipped,
+13. **Performance budget.** `tools/budget.R`: CSS ≤10 KB gzipped,
     JS ≤15 KB raw, sprite ≤25 KB gzipped. Over budget = blocking
     unless ADR'd.
-13. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
+14. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
     the showcase. Findings → `docs/a11y/notes.md`.
-14. **Live preview — both servers running.** `make verify` (also
+15. **Live preview — both servers running.** `make verify` (also
     invoked as the last step of `make gate`) builds pkgdown,
     launches the showcase on `:4321` and the pkgdown site on `:4322`
     in the background, HTTP-checks both for `200`, and leaves them
@@ -127,7 +140,7 @@ as `make gate`.
     dark mode. From Phase 1C onward, `make preview-shinylive` is the
     third leg. Stop with `make verify-stop`.
     See [§Local Preview Workflow](#local-preview-workflow).
-15. **Interaction-style parity.** For every component touched in the
+16. **Interaction-style parity.** For every component touched in the
     phase, walk every state listed in
     `docs/component-specs/<name>.md` against the live showcase. The
     spec's reference screenshot from
@@ -138,29 +151,29 @@ as `make gate`.
 
 ### C. Review
 
-16. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
+17. **Roxygen audit.** `@param`, `@return`, `@export`, `@examples`,
     `@family` on every exported function. `@noRd` on internals.
-17. **Utility audit.** No copy-pasted helpers across `R/*.R`.
-18. **Critical code review.** `critical-code-reviewer` skill against
+18. **Utility audit.** No copy-pasted helpers across `R/*.R`.
+19. **Critical code review.** `critical-code-reviewer` skill against
     the phase diff.
 
 ### D. Document
 
-19. **NEWS.md.** User-visible changes under next dev-version heading.
-20. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
+20. **NEWS.md.** User-visible changes under next dev-version heading.
+21. **`docs/` updates.** Roadmap status, strategy/ADR amendments,
     sync-log entries, cross-link check.
 
 ### E. Version and tag
 
-21. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
+22. **Version bump.** `0.0.0.9000 → 9001 → 9002 → ...`; Phase 7 →
     `0.1.0`.
-22. **Single tidy commit on main.**
-23. **Git tag.** `git tag phase-N`.
-24. **CI green on main.**
+23. **Single tidy commit on main.**
+24. **Git tag.** `git tag phase-N`.
+25. **CI green on main.**
 
 ### F. Optional from Phase 5 onward
 
-25. **Deployed showcase refresh.**
+26. **Deployed showcase refresh.**
 
 ## Local Preview Workflow
 
@@ -352,7 +365,7 @@ same commit** that lands the API change:
 | `inst/showcase/` | Example file + sections-list row | `test-showcase.R` |
 | `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
 | `gallery/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
-| `docs/component-specs/<name>.md` | Visual-parity spec per [ADR 0015](decisions/0015-component-specs.md) — shadcn link, states, token contract, divergences, reference screenshot | `test-doc-coverage.R` (active for new components; existing components in a `backfill_pending_specs` allowlist) |
+| `docs/component-specs/<name>.md` | Visual-parity spec per [ADR 0015](decisions/0015-component-specs.md) — shadcn link, states, token contract, divergences, reference screenshot | `test-doc-coverage.R` |
 | `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 19 |
 
 A drifted artifact fails the Quality Gate. The first four are
