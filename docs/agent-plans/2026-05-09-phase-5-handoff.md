@@ -243,7 +243,101 @@ ongoing parity review against those captures.
 
 ---
 
-### Slice 6 — Gallery resumption (blocked on WASM)
+### Slice 6 — Visual-parity harness ([ADR 0016](../decisions/0016-visual-parity-harness.md))
+
+**Why:** spec docs + reference screenshots are reviewer-anchored and
+demonstrably miss subtle drift (a 2026-05-11 audit found three
+visible bugs in `block_select()` that human review didn't catch:
+radius 4px vs 10px, a leftover Selectize arrow, and a "double hover"
+in the dropdown). [ADR 0016](../decisions/0016-visual-parity-harness.md)
+adopts a mechanical computed-style + DOM diff harness against a
+pinned shadcn-react reference. A proof of concept is already in the
+repo at [`tools/parity/select-poc.mjs`](../../tools/parity/select-poc.mjs)
+and demonstrated the approach (reduced select trigger drift from 18
+to 7 properties and fixed the double-hover).
+
+**Scope:** Promote the POC to a real harness:
+
+1. Stand up `parity/` — a Vite + React app pinned to a known
+   shadcn-ui version, with one route per component
+   (`/button`, `/select`, `/card`, …). Each route renders the
+   canonical shadcn demo. Light/dark mode via `?theme=dark`.
+2. `tools/parity/capture-styles.mjs` — replaces the POC. Loads
+   `http://localhost:5173/<component>` (the React app) and
+   `http://127.0.0.1:4321/#<section>` (the shinyblocks showcase) in
+   the same Chromium, captures `getComputedStyle` for a fixed
+   property set per component per (state, theme), writes
+   `docs/component-specs/_parity/<name>.json` baselines.
+3. `tools/parity/diff-styles.mjs` — compares baseline to live
+   shinyblocks, reports drift, exits non-zero on drift.
+4. `tools/parity/normalise.mjs` — colour-space normaliser
+   (`oklch(0.922 0 0)` and `lab(91% 0 0)` are the same colour but
+   different strings; the harness should diff in a common space).
+   The POC didn't normalise; closing this gap is a real task.
+5. `make parity` runs all of the above.
+
+**Files to edit / create:**
+- `parity/` (new directory) — Vite + React + shadcn-ui (per ADR 0016
+  §Architecture).
+- `parity/package.json` — pin `shadcn-ui`, `react`, `react-dom`,
+  `tailwindcss`, `@radix-ui/react-select`, etc.
+- `tools/parity/capture-styles.mjs`, `diff-styles.mjs`,
+  `normalise.mjs`, `README.md`.
+- `Makefile` — add `parity-setup` (one-shot Playwright install +
+  React app `npm install`) and `parity` (run the harness).
+- `.Rbuildignore` — exclude `^parity$` and `^tools/parity$`.
+- `package.json` — `playwright` is already added as a devDependency.
+- `docs/component-specs/_parity/` (new directory) — baseline JSONs,
+  one per component.
+- `tests/testthat/test-doc-coverage.R` — optional: add a coverage
+  check that every exported `block_*()` has a baseline JSON (mirror
+  the spec coverage pattern).
+
+**Property set per component:**
+Start with the trigger element of each component. Properties worth
+diffing live in `TRIGGER_PROPS` in the POC; expand component by
+component (badge needs `flex` properties, alert needs
+`grid-template-columns`, etc.).
+
+**Per-state captures:**
+- default, hover, focus-visible, active, disabled, aria-invalid.
+- For composite components (select, tabs, popover-based): default,
+  open, item-focused.
+- Light + dark, every state.
+
+**Tests:**
+- `parity/` is dev-only; no R tests cover it.
+- The `make parity` script's exit code is the gate signal.
+
+**CI integration:**
+Add a GitHub Actions job that:
+1. `npm ci` (root) and `npm ci` (parity/).
+2. `npx playwright install chromium`.
+3. `make showcase` in background.
+4. `make parity-setup` (boots the React app on :5173 in background).
+5. `make parity` — exit non-zero on drift.
+
+**Definition of done:**
+- POC supersedes: `tools/parity/select-poc.mjs` can be deleted once
+  the real harness covers select.
+- At least one component (button) has a committed baseline JSON and
+  passes `make parity` cleanly.
+- `Makefile` and `parity/README.md` document the workflow.
+- ADR 0016 marked Implemented in its header (Status: Accepted →
+  Implemented).
+- CI runs the harness on PR and fails on drift.
+
+**POC artifacts to learn from before reimplementing:**
+- [`tools/parity/select-poc.mjs`](../../tools/parity/select-poc.mjs) —
+  see how `.evaluate()` captures computed styles, how Selectize
+  pseudo-elements are queried, how the dropdown open-state and
+  hover are triggered.
+- The 2026-05-11 select fix commit — shows the kind of drifts the
+  harness surfaces and the CSS shape that closes them.
+
+---
+
+### Slice 7 — Gallery resumption (blocked on WASM)
 
 **Why blocked:** [ADR 0013](../decisions/0013-component-gallery-quarto.md)
 requires a gallery `.qmd` page per component, but live shinylive

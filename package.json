@@ -14,6 +14,7 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.4",
     "lucide-static": "^1.14.0",
+    "playwright": "^1.59.1",
     "tailwindcss": "^4.2.4"
   }
 }
