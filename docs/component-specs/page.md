@@ -29,5 +29,5 @@
 
 ![Page](_screenshots/page.png)
 
-Capture pending — use a representative shadcn block layout once the
-reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/blocks> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

@@ -26,5 +26,5 @@
 
 ![Field label](_screenshots/field-label.png)
 
-Capture pending — use the shadcn input/form examples as the reference
-once screenshots are being captured.
+Captured from <https://ui.shadcn.com/docs/components/input> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

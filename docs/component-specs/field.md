@@ -28,5 +28,5 @@
 
 ![Field](_screenshots/field.png)
 
-Capture pending — use the shadcn form examples as the visual
-reference once screenshots are being captured.
+Captured from <https://ui.shadcn.com/docs/components/input> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

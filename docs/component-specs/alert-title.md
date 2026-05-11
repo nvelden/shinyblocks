@@ -23,5 +23,5 @@
 
 ![Alert title](_screenshots/alert-title.png)
 
-Capture pending — use the canonical alert screenshot and crop the title
-region if a standalone example is needed.
+Captured from <https://ui.shadcn.com/docs/components/alert> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

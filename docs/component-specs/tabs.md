@@ -45,7 +45,5 @@
 
 ![Tabs](_screenshots/tabs.png)
 
-Capture pending — pull the canonical screenshot from
-<https://ui.shadcn.com/docs/components/tabs> showing the default tab
-set. Refresh and update the date whenever shadcn updates the canonical
-look.
+Captured from <https://ui.shadcn.com/docs/components/tabs> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

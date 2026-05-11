@@ -9,32 +9,28 @@ component-spec backfill is complete.
   `docs/component-specs/`.
 - `tests/testthat/test-doc-coverage.R` enforces spec presence for all
   exports.
-- Screenshot capture is still manual.
 - `tools/spec-screenshots.R` and
   `docs/component-specs/SCREENSHOT-QUEUE.md` track the remaining image
   backlog.
-- Current queue size: 40 missing screenshots.
+- Screenshot capture helpers now exist for:
+  - `make spec-screenshots-seed`
+  - `make spec-screenshots-high-risk`
+  - `make spec-screenshots-all`
+  - `make showcase-capture SECTION=<section> OUT=<path> THEME=light|dark`
+- Theme-forced local captures require Safari's
+  `Allow JavaScript from Apple Events` setting.
+- Current queue size: 0 missing screenshots, 40 captured-dated.
+- The committed screenshots are first-pass references. Re-crop any spec
+  that needs a tighter visual target during the parity pass.
+- The queue remains priority-sorted into `seed`, `high-risk`, and
+  `remaining`, but it is now a review list rather than an empty
+  placeholder.
 
 ## Next stage
 
-### Slice 1 — Seed captures
+### Slice 1 — High-risk interaction parity
 
-Capture the anchor images first:
-- `button`
-- `card`
-- `select`
-- `tabs`
-
-For each:
-1. open the shadcn docs page from the matching spec
-2. capture the canonical light-mode example tightly cropped
-3. save to `docs/component-specs/_screenshots/<slug>.png`
-4. replace "Capture pending" in the spec with the actual capture date
-
-### Slice 2 — High-risk interaction components
-
-Capture the components where the parity review is most likely to force
-CSS changes:
+Walk the highest-risk components against the captured references:
 - `checkbox`
 - `switch`
 - `textarea`
@@ -43,15 +39,19 @@ CSS changes:
 - `nav-item`
 - `sidebar`
 
-Then walk those same components in the local showcase, light and dark,
-against the captured references.
+For each:
+1. open the captured spec screenshot
+2. walk the matching local showcase state in light and dark mode
+3. land any CSS/runtime fixes needed for parity
+4. update the spec's "Deliberate divergences" section if the delta is
+   intentional
 
-### Slice 3 — Remaining spec screenshots
+### Slice 2 — Remaining screenshot-backed review
 
-Work straight down `docs/component-specs/SCREENSHOT-QUEUE.md` until the
-queue is empty.
+Work straight down `docs/component-specs/SCREENSHOT-QUEUE.md` until each
+captured reference has been reviewed against the local showcase.
 
-### Slice 4 — Parity follow-up
+### Slice 3 — Parity follow-up
 
 Any deltas found during the screenshot-backed review should land with:
 - CSS/JS/R changes as needed
@@ -61,7 +61,7 @@ Any deltas found during the screenshot-backed review should land with:
 - targeted tests
 - showcase + docs preview checks
 
-### Slice 5 — Gallery resumption
+### Slice 4 — Gallery resumption
 
 Still blocked on ADR 0013 / WASM. Do not start this until the webR path
 is unblocked.
@@ -70,6 +70,9 @@ is unblocked.
 
 - `make spec-screenshots`
 - `make spec-screenshots-md`
+- `make spec-screenshots-seed`
+- `make spec-screenshots-high-risk`
+- `make spec-screenshots-all`
 - `make build-css`
 - `Rscript -e "devtools::test(filter = 'doc-coverage|showcase|shell|smoke')"`
 - `Rscript -e "lintr::lint_package()"`
@@ -77,9 +80,9 @@ is unblocked.
 
 ## Definition of done for the next stage
 
-- `docs/component-specs/SCREENSHOT-QUEUE.md` is either empty or
-  materially smaller with committed screenshots
-- seed specs (`button`, `card`, `select`, `tabs`) have real screenshots
-- the showcase has been visually checked against those references
+- the captured references are reviewed against the live showcase,
+  starting with the high-risk set
 - any parity fixes discovered by that comparison are landed and
   documented
+- `docs/component-specs/SCREENSHOT-QUEUE.md` stays at zero missing via
+  `make spec-screenshots-check`

@@ -50,7 +50,5 @@
 
 ![Card](_screenshots/card.png)
 
-Capture pending — pull the canonical screenshot from
-<https://ui.shadcn.com/docs/components/card> showing a card with
-title, description, content, and footer. Refresh and update the date
-whenever shadcn updates the canonical look.
+Captured from <https://ui.shadcn.com/docs/components/card> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

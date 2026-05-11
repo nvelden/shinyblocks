@@ -27,5 +27,5 @@
 
 ![Input group addon](_screenshots/input-group-addon.png)
 
-Capture pending — use the canonical input styling plus a prefixed-addon
-composition treatment when capturing the screenshot.
+Captured from the local shinyblocks showcase on 2026-05-11.
+Refresh and update the date whenever the shinyblocks reference treatment changes.

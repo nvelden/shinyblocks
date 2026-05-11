@@ -26,5 +26,5 @@
 
 ![Separator](_screenshots/separator.png)
 
-Capture pending — use the canonical shadcn separator docs page once
-screenshots are being captured.
+Captured from <https://ui.shadcn.com/docs/components/separator> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

@@ -25,5 +25,5 @@
 
 ![Field group](_screenshots/field-group.png)
 
-Capture pending — use a representative form grouping from the shadcn
-form docs once the reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/docs/components/input> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

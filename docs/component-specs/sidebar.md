@@ -31,5 +31,5 @@
 
 ![Sidebar](_screenshots/sidebar.png)
 
-Capture pending — use the canonical shadcn sidebar docs page once the
-reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/docs/components/sidebar> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.
