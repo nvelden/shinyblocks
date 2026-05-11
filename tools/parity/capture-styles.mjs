@@ -23,10 +23,7 @@ function cssName(property) {
 async function captureSelector(page, selector, props) {
   return await page.evaluate(
     ([target, names]) => {
-      const normaliseColor = (property, raw) => {
-        if (!property.toLowerCase().includes("color")) {
-          return raw;
-        }
+      const toRgba = (raw) => {
         const ctx = document.createElement("canvas").getContext("2d");
         if (!ctx) {
           return raw;
@@ -39,6 +36,18 @@ async function captureSelector(page, selector, props) {
         ctx.fillRect(0, 0, 1, 1);
         const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
         return `rgba(${r}, ${g}, ${b}, ${Math.round((a / 255) * 1000) / 1000})`;
+      };
+      const normaliseColor = (property, raw) => {
+        if (property === "boxShadow") {
+          return raw.replace(
+            /(rgba?\([^)]+\)|hsla?\([^)]+\)|oklab\([^)]+\)|oklch\([^)]+\)|okl\([^)]+\)|#[0-9a-f]+|transparent)/gi,
+            (match) => toRgba(match)
+          );
+        }
+        if (!property.toLowerCase().includes("color")) {
+          return raw;
+        }
+        return toRgba(raw);
       };
       const el = document.querySelector(target);
       if (!el) {

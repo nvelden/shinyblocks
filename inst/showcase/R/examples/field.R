@@ -41,9 +41,33 @@ htmltools::tagList(
         block_field_label("Internal note", `for` = "showcase_note"),
         block_textarea(
           "showcase_note",
-          placeholder = "Record rollout details for the next operator."
+          placeholder = "Record rollout details for the next operator.",
+          class = "sb-parity-textarea-default"
         ),
         block_field_description("Stored with the current workspace.")
+      ),
+      block_field(
+        block_field_label("Runbook", `for` = "showcase_runbook"),
+        block_textarea(
+          "showcase_runbook",
+          value = "Escalate to the on-call operator if retries fail.",
+          rows = 2,
+          disabled = TRUE,
+          class = "sb-parity-textarea-disabled"
+        ),
+        block_field_description("Disabled textarea state.")
+      ),
+      block_field_invalid(
+        block_field(
+          block_field_label("Rollback plan", `for` = "showcase_rollback"),
+          block_textarea(
+            "showcase_rollback",
+            value = "Document rollback steps before continuing.",
+            class = "sb-parity-textarea-invalid"
+          ),
+          block_field_description("Invalid textarea state.")
+        ),
+        "A rollback plan is required before deployment."
       ),
       block_field(
         block_checkbox(

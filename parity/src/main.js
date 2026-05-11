@@ -91,6 +91,34 @@ const SELECT_OPTION_CLASS = [
   "text-sm",
   "text-popover-foreground"
 ].join(" ");
+const TEXTAREA_CLASS = [
+  "parity-textarea",
+  "flex",
+  "field-sizing-content",
+  "min-h-16",
+  "w-full",
+  "rounded-md",
+  "border",
+  "border-input",
+  "bg-transparent",
+  "px-3",
+  "py-2",
+  "text-sm",
+  "text-foreground",
+  "shadow-xs",
+  "outline-none",
+  "transition-[color,box-shadow]",
+  "placeholder:text-muted-foreground",
+  "focus-visible:border-ring",
+  "focus-visible:ring-[3px]",
+  "focus-visible:ring-ring/50",
+  "aria-invalid:border-destructive",
+  "aria-invalid:ring-[3px]",
+  "aria-invalid:ring-destructive/20",
+  "dark:aria-invalid:ring-destructive/40",
+  "disabled:cursor-not-allowed",
+  "disabled:opacity-50"
+].join(" ");
 
 const SLIDER_ROOT_CLASS = "parity-slider-root";
 const SLIDER_ROOT_DISABLED_CLASS = "parity-slider-root parity-slider-root-disabled";
@@ -112,6 +140,7 @@ function setTheme() {
   const params = new URLSearchParams(window.location.search);
   const theme = params.get("theme") === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
 function Stage(props) {
@@ -286,6 +315,47 @@ function SliderRoute() {
   );
 }
 
+function TextareaRoute() {
+  return e(
+    Stage,
+    { component: "textarea" },
+    e(
+      "div",
+      { className: "parity-stack" },
+      e(
+        "div",
+        { className: "flex max-w-md flex-col gap-3" },
+        e("textarea", {
+          className: TEXTAREA_CLASS,
+          rows: 2,
+          placeholder: "Record rollout details for the next operator.",
+          "data-parity-state": "default"
+        }),
+        e("textarea", {
+          className: TEXTAREA_CLASS,
+          rows: 2,
+          defaultValue: "Focused textarea reference content.",
+          "data-parity-state": "focus"
+        }),
+        e("textarea", {
+          className: TEXTAREA_CLASS,
+          rows: 2,
+          defaultValue: "Escalate to the on-call operator if retries fail.",
+          "data-parity-state": "disabled",
+          disabled: true
+        }),
+        e("textarea", {
+          className: TEXTAREA_CLASS,
+          rows: 2,
+          defaultValue: "Document rollback steps before continuing.",
+          "data-parity-state": "invalid",
+          "aria-invalid": "true"
+        })
+      )
+    )
+  );
+}
+
 function CheckboxShape(props) {
   const rootClass = props.disabled ? CHECKBOX_ROOT_DISABLED_CLASS : CHECKBOX_ROOT_CLASS;
   const indicatorClass = props.checked ? CHECKBOX_INDICATOR_CHECKED_CLASS : CHECKBOX_INDICATOR_CLASS;
@@ -430,6 +500,9 @@ function App() {
   }
   if (component === "switch" || path === "/switch") {
     return e(SwitchRoute);
+  }
+  if (component === "textarea" || path === "/textarea") {
+    return e(TextareaRoute);
   }
   return e(NotFound);
 }

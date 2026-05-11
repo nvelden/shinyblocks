@@ -8,6 +8,7 @@ Current scope:
 - `select.json`
 - `slider.json`
 - `switch.json`
+- `textarea.json`
 
 These files are generated from the dev-only React reference app under
 `parity/` and diffed against the local shinyblocks showcase.

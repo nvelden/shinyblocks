@@ -8,6 +8,14 @@ function normaliseZero(value) {
     .replace(/\btransparent\b/g, "rgba(0, 0, 0, 0)");
 }
 
+function roundNumberString(raw, digits = 3) {
+  const number = Number(raw);
+  if (Number.isNaN(number)) {
+    return raw;
+  }
+  return String(Math.round(number * 10 ** digits) / 10 ** digits);
+}
+
 export function normaliseValue(property, value) {
   let out = collapseWhitespace(value);
   if (out === "none") {
@@ -22,8 +30,15 @@ export function normaliseValue(property, value) {
 
   if (property === "boxShadow") {
     return out
-      .replace(/(?:rgba\(0, 0, 0, 0\) 0 0 0 0,\s*)+/g, "")
       .replace(/okl(?:ab|ch)\(([^)]+)\)/g, (_match, body) => `okl(${body})`)
+      .replace(/rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/gi, (_match, r, g, b, a) => {
+        return `rgba(${r}, ${g}, ${b}, ${roundNumberString(a, 2)})`;
+      })
+      .replace(/(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)(px|rem|em)/gi, (_match, value, unit) => {
+        return `${roundNumberString(value, 2)}${unit}`;
+      })
+      .replace(/(?:rgba\(0, 0, 0, 0\) 0 0(?:px)? 0 0(?:px)?(?:,\s*)?)+/g, "")
+      .replace(/(?:,\s*)?rgba\(0, 0, 0, 0\) 0 0(?:px)? 0 0(?:px)?/g, "")
       .replace(/,\s+/g, ", ");
   }
 

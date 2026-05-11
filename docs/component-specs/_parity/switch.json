@@ -1,7 +1,7 @@
 {
   "component": "switch",
   "source": "http://127.0.0.1:5173/?component=switch",
-  "captured_at": "2026-05-11T17:07:16.316Z",
+  "captured_at": "2026-05-11T17:23:41.161Z",
   "props": {
     "text": [
       "opacity"
@@ -24,7 +24,7 @@
         "track": {
           "backgroundColor": "rgba(229, 229, 229, 1)",
           "borderRadius": "3.35544e+07px",
-          "boxShadow": "okl(0.145 0 0 / 0.05) 0 0 0 1px inset",
+          "boxShadow": "rgba(20, 20, 20, 0.05) 0 0 0 1px inset",
           "display": "flex",
           "height": "20px",
           "width": "36px"
@@ -50,7 +50,7 @@
         "track": {
           "backgroundColor": "rgba(229, 229, 229, 1)",
           "borderRadius": "3.35544e+07px",
-          "boxShadow": "okl(0.145 0 0 / 0.05) 0 0 0 1px inset",
+          "boxShadow": "rgba(20, 20, 20, 0.05) 0 0 0 1px inset",
           "display": "flex",
           "height": "20px",
           "width": "36px"
@@ -65,7 +65,7 @@
         "track": {
           "backgroundColor": "rgba(38, 38, 38, 1)",
           "borderRadius": "3.35544e+07px",
-          "boxShadow": "okl(0.985 0 0 / 0.05) 0 0 0 1px inset",
+          "boxShadow": "rgba(255, 255, 255, 0.05) 0 0 0 1px inset",
           "display": "flex",
           "height": "20px",
           "width": "36px"
@@ -91,7 +91,7 @@
         "track": {
           "backgroundColor": "rgba(38, 38, 38, 1)",
           "borderRadius": "3.35544e+07px",
-          "boxShadow": "okl(0.985 0 0 / 0.05) 0 0 0 1px inset",
+          "boxShadow": "rgba(255, 255, 255, 0.05) 0 0 0 1px inset",
           "display": "flex",
           "height": "20px",
           "width": "36px"
