@@ -28,17 +28,27 @@ if (!Array.isArray(icons) || icons.length === 0) {
 
 const symbols = [];
 for (const name of icons) {
-  const svgPath = join(
+  const lucidePath = join(
     root,
     "node_modules/lucide-static/icons",
     `${name}.svg`
   );
+  const customPath = join(
+    root,
+    "inst/www/icons/custom",
+    `${name}.svg`
+  );
+  
   let svg;
   try {
-    svg = await readFile(svgPath, "utf8");
+    svg = await readFile(lucidePath, "utf8");
   } catch (e) {
-    console.error(`Missing icon "${name}" at ${svgPath}`);
-    process.exit(1);
+    try {
+      svg = await readFile(customPath, "utf8");
+    } catch (e2) {
+      console.error(`Missing icon "${name}" at ${lucidePath} and ${customPath}`);
+      process.exit(1);
+    }
   }
   // Extract the inner contents of the <svg> element. lucide-static
   // ships viewBox="0 0 24 24" stroke-based icons.

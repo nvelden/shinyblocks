@@ -192,7 +192,19 @@ ui <- block_page(
       )
     )
   ),
-  header = block_header("Component gallery"),
+  header = block_header(
+    "Component gallery",
+    htmltools::div(style = "flex: 1;"),
+    block_button(
+      label = NULL,
+      icon = block_icon("circle-half-stroke"),
+      variant = "ghost",
+      size = "icon",
+      class = "sb-dark-mode-toggle",
+      `data-sb-theme-toggle` = "true",
+      `aria-label` = "Toggle theme"
+    )
+  ),
   htmltools::div(
     style = paste(
       "display: flex;",

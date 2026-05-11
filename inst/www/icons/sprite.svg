@@ -50,7 +50,12 @@
   <path d="M20.279 17.609a10 10 0 0 1-2.7 2.69" />
   <path d="M21.818 10.1a10 10 0 0 1 0 3.8" />
   <path d="M3.721 6.391a10 10 0 0 1 2.7-2.69" />
-  <path d="M6.391 20.279a10 10 0 0 1-2.69-2.7" /></symbol><symbol id="sb-icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v1.14.0 - ISC -->
+  <path d="M6.391 20.279a10 10 0 0 1-2.69-2.7" /></symbol><symbol id="sb-icon-circle-half-stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+<path d="M12 3l0 18"></path>
+<path d="M12 9l4.65 -4.65"></path>
+<path d="M12 14.3l7.37 -7.37"></path>
+<path d="M12 19.6l8.85 -8.85"></path></symbol><symbol id="sb-icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v1.14.0 - ISC -->
 
   <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></symbol><symbol id="sb-icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><!-- @license lucide-static v1.14.0 - ISC -->
