@@ -94,6 +94,17 @@ sections <- list(
     file = "field.R"
   ),
   list(
+    id = "slider",
+    label = "Slider",
+    icon = "sliders-horizontal",
+    title = "Slider",
+    lead = paste(
+      "Wraps shiny::sliderInput with token-driven track, range, and",
+      "thumb styling that tracks the shadcn slider contract."
+    ),
+    file = "slider.R"
+  ),
+  list(
     id = "tabs",
     label = "Tabs",
     icon = "layout-list",

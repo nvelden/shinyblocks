@@ -144,6 +144,81 @@ block_switch <- function(
   )
 }
 
+#' Create a styled slider input
+#'
+#' Wraps [`shiny::sliderInput()`] with token-driven track, range, and
+#' thumb styling that tracks the shadcn slider contract. Wrap-by-
+#' default per ADR 0014.
+#'
+#' @param input_id Input id.
+#' @param value Initial value. Length 1 for a single-handle slider;
+#'   length 2 for a range slider.
+#' @param min Numeric lower bound.
+#' @param max Numeric upper bound.
+#' @param step Step size. Defaults to `NULL` (Shiny's auto-step).
+#' @param ticks Whether to show tick marks on the rail.
+#' @param width Optional CSS width value.
+#' @param disabled Whether the control is disabled.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family forms
+#' @export
+block_slider <- function(
+  input_id,
+  value,
+  min,
+  max,
+  step = NULL,
+  ticks = FALSE,
+  width = NULL,
+  disabled = FALSE,
+  class = NULL
+) {
+  if (missing(value) || !is.numeric(value) || length(value) < 1 ||
+        length(value) > 2 || any(is.na(value))) {
+    stop(
+      "`value` must be one or two numeric values.",
+      call. = FALSE
+    )
+  }
+  if (missing(min) || !is.numeric(min) || length(min) != 1 || is.na(min)) {
+    stop("`min` must be a single numeric value.", call. = FALSE)
+  }
+  if (missing(max) || !is.numeric(max) || length(max) != 1 || is.na(max)) {
+    stop("`max` must be a single numeric value.", call. = FALSE)
+  }
+  if (min >= max) {
+    stop("`min` must be strictly less than `max`.", call. = FALSE)
+  }
+
+  slider_tag <- shiny::sliderInput(
+    inputId = input_id,
+    label = NULL,
+    min = min,
+    max = max,
+    value = value,
+    step = step,
+    ticks = isTRUE(ticks),
+    width = width %||% "100%"
+  )
+
+  query <- htmltools::tagQuery(slider_tag)
+  query$find("input")$addClass("sb-slider-control")
+
+  if (disabled) {
+    query$find("input")$addAttrs(disabled = NA)
+  }
+
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes("sb-slider", class),
+      `data-disabled` = if (disabled) "true" else NULL,
+      query$allTags()
+    )
+  )
+}
+
 boolean_control_input <- function(input_id, value, disabled) {
   checkbox_tag <- shiny::checkboxInput(input_id, NULL, value = value)
   query <- htmltools::tagQuery(checkbox_tag)

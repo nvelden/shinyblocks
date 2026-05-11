@@ -225,6 +225,62 @@ test_that("textarea wraps Shiny markup and supports placeholder", {
   expect_match(html, 'rows="5"', fixed = TRUE)
 })
 
+test_that("slider wraps Shiny markup and exposes the data-disabled flag", {
+  slider <- block_slider(
+    "volume",
+    value = 50,
+    min = 0,
+    max = 100,
+    class = "custom"
+  )
+  range <- block_slider("price", value = c(25, 75), min = 0, max = 100)
+  disabled <- block_slider(
+    "off",
+    value = 30,
+    min = 0,
+    max = 100,
+    disabled = TRUE
+  )
+
+  expect_identical(tag_attr(slider, "class"), "sb-slider custom")
+  expect_null(tag_attr(slider, "data-disabled"))
+  expect_identical(tag_attr(disabled, "data-disabled"), "true")
+
+  slider_html <- render_html(slider)
+  expect_match(slider_html, "sb-slider-control", fixed = TRUE)
+  expect_match(slider_html, 'data-min="0"', fixed = TRUE)
+  expect_match(slider_html, 'data-max="100"', fixed = TRUE)
+  expect_match(slider_html, 'data-from="50"', fixed = TRUE)
+
+  range_html <- render_html(range)
+  expect_match(range_html, 'data-type="double"', fixed = TRUE)
+  expect_match(range_html, 'data-from="25"', fixed = TRUE)
+  expect_match(range_html, 'data-to="75"', fixed = TRUE)
+})
+
+test_that("block_slider validates its arguments", {
+  expect_error(
+    block_slider("x", value = "fifty", min = 0, max = 100),
+    "must be one or two numeric values",
+    fixed = TRUE
+  )
+  expect_error(
+    block_slider("x", value = c(1, 2, 3), min = 0, max = 100),
+    "must be one or two numeric values",
+    fixed = TRUE
+  )
+  expect_error(
+    block_slider("x", value = 50, min = 100, max = 100),
+    "strictly less than",
+    fixed = TRUE
+  )
+  expect_error(
+    block_slider("x", value = 50),
+    "min",
+    fixed = TRUE
+  )
+})
+
 test_that("checkbox and switch preserve Shiny input bindings", {
   checkbox <- block_checkbox(
     "marketing",
