@@ -39,6 +39,5 @@
 
 ![Select](_screenshots/select.png)
 
-Capture pending — pull the canonical screenshot from
-<https://ui.shadcn.com/docs/components/select> and refresh it when the
-upstream component changes.
+Captured from <https://ui.shadcn.com/docs/components/select> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

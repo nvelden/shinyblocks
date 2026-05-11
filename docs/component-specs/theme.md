@@ -26,5 +26,5 @@
 
 ![Theme](_screenshots/theme.png)
 
-Capture pending — use a shadcn-themed surface showing custom token
-overrides, then refresh the date when the canonical look changes.
+Captured from the local shinyblocks showcase on 2026-05-11.
+Refresh and update the date whenever the shinyblocks reference treatment changes.

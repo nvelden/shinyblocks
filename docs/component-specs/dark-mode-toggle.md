@@ -34,5 +34,5 @@
 
 ![Dark mode toggle](_screenshots/dark-mode-toggle.png)
 
-Capture pending — use the canonical shadcn button styling paired with a
-theme toggle treatment, then refresh when the look changes.
+Captured from the local shinyblocks showcase on 2026-05-11.
+Refresh and update the date whenever the shinyblocks reference treatment changes.

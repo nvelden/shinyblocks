@@ -34,5 +34,5 @@
 
 ![Badge](_screenshots/badge.png)
 
-Capture pending — use the canonical shadcn badge docs page once the
-reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/docs/components/badge> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

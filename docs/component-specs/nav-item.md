@@ -28,5 +28,5 @@
 
 ![Nav item](_screenshots/nav-item.png)
 
-Capture pending — use the canonical shadcn sidebar docs page once
-screenshots are being captured.
+Captured from <https://ui.shadcn.com/docs/components/sidebar> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

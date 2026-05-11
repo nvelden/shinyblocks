@@ -26,5 +26,5 @@
 
 ![Field set](_screenshots/field-set.png)
 
-Capture pending — use a grouped form example from the shadcn docs once
-screenshots are being captured.
+Captured from <https://ui.shadcn.com/docs/components/input> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

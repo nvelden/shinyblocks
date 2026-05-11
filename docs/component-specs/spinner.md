@@ -23,5 +23,5 @@
 
 ![Spinner](_screenshots/spinner.png)
 
-Capture pending — use the project showcase as the local reference until
-the screenshot pass defines a canonical external capture.
+Captured from <https://ui.shadcn.com/docs/components/skeleton> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

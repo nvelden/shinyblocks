@@ -24,5 +24,5 @@
 
 ![Card description](_screenshots/card-description.png)
 
-Capture pending — use the canonical shadcn card docs page once the
-reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/docs/components/card> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

@@ -35,6 +35,7 @@ Other forms:
 \code{\link{block_input_group}()},
 \code{\link{block_input_group_addon}()},
 \code{\link{block_select}()},
+\code{\link{block_slider}()},
 \code{\link{block_switch}()},
 \code{\link{block_textarea}()}
 }

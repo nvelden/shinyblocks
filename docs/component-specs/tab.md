@@ -31,7 +31,5 @@
 
 ![Tab](_screenshots/tab.png)
 
-Capture pending — pull the canonical screenshot from
-<https://ui.shadcn.com/docs/components/tabs> showing one tab within a
-tabs set. Refresh and update the date whenever shadcn updates the
-canonical look.
+Captured from <https://ui.shadcn.com/docs/components/tabs> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

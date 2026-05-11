@@ -29,5 +29,5 @@
 
 ![Header](_screenshots/header.png)
 
-Capture pending — use a representative shadcn dashboard/header block
-once the reference screenshot pass resumes.
+Captured from <https://ui.shadcn.com/blocks> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

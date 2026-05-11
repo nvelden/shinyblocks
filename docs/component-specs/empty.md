@@ -27,5 +27,5 @@
 
 ![Empty](_screenshots/empty.png)
 
-Capture pending — use a representative shadcn empty-state block once
-the screenshot pass resumes.
+Captured from <https://ui.shadcn.com/blocks> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

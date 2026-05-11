@@ -27,5 +27,5 @@
 
 ![Icon](_screenshots/icon.png)
 
-Capture pending — use a representative icon-in-button example from the
-shadcn docs once the screenshot pass resumes.
+Captured from <https://ui.shadcn.com/docs/components/button> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.

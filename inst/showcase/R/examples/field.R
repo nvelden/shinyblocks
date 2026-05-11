@@ -49,18 +49,34 @@ htmltools::tagList(
         block_checkbox(
           "showcase_marketing",
           "Email me product updates",
+          value = FALSE
+        ),
+        block_field_description("Unchecked default checkbox state.")
+      ),
+      block_field(
+        block_checkbox(
+          "showcase_beta",
+          "Join beta releases",
           value = TRUE
         ),
-        block_field_description("Optional outbound product communication.")
+        block_field_description("Checked checkbox state.")
       ),
       block_field(
         block_switch(
           "showcase_incidents",
           "Send incident alerts",
+          value = FALSE
+        ),
+        block_field_description("Off/default switch state.")
+      ),
+      block_field(
+        block_switch(
+          "showcase_auto_resolve",
+          "Auto-resolve low-severity pages",
           value = TRUE
         ),
         block_field_description(
-          "Immediate notifications for production issues."
+          "On/checked switch state."
         )
       )
     )

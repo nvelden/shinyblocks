@@ -26,5 +26,5 @@
 
 ![Alert description](_screenshots/alert-description.png)
 
-Capture pending — use the canonical alert screenshot and crop the
-description region if a standalone example is needed.
+Captured from <https://ui.shadcn.com/docs/components/alert> on 2026-05-11.
+Refresh and update the date whenever shadcn updates the canonical look.
