@@ -45,6 +45,14 @@ const THUMB_PROPS = [
   "width",
   "height",
   "display",
+  // Positioning props were missing in the first pass — that's how the
+  // off-centre-thumb bug shipped past the harness. Listed here now
+  // and cross-checked against the rail via getBoundingClientRect()
+  // below.
+  "position",
+  "top",
+  "marginTop",
+  "transform",
 ];
 
 function styleOf(selector, props) {
@@ -60,15 +68,20 @@ function styleOf(selector, props) {
   return out;
 }
 
-async function captureShadcn(page) {
-  await page.goto(SHADCN_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector('[data-slot="slider-track"]', {
-    state: "visible",
-    timeout: 10000,
-  });
+async function setShadcnTheme(page, mode) {
+  // shadcn's docs site toggles dark via `class="dark"` on <html>.
+  await page.evaluate((m) => {
+    const html = document.documentElement;
+    html.classList.remove("dark", "light");
+    if (m === "dark") html.classList.add("dark");
+    else html.classList.add("light");
+  }, mode);
+  await page.waitForTimeout(150);
+}
 
+async function captureShadcnOnce(page, railProps, rangeProps, thumbProps) {
   return await page.evaluate(
-    ([railProps, rangeProps, thumbProps]) => {
+    ([rp, rgP, tp]) => {
       const grab = (selector, props) => {
         const el = document.querySelector(selector);
         if (!el) return { __missing: selector };
@@ -81,14 +94,73 @@ async function captureShadcn(page) {
         }
         return out;
       };
-
       return {
-        rail: grab('[data-slot="slider-track"]', railProps),
-        range: grab('[data-slot="slider-range"]', rangeProps),
-        thumb: grab('[data-slot="slider-thumb"]', thumbProps),
+        rail: grab('[data-slot="slider-track"]', rp),
+        range: grab('[data-slot="slider-range"]', rgP),
+        thumb: grab('[data-slot="slider-thumb"]', tp),
       };
     },
-    [RAIL_PROPS, RANGE_PROPS, THUMB_PROPS],
+    [railProps, rangeProps, thumbProps],
+  );
+}
+
+async function captureShadcn(page) {
+  await page.goto(SHADCN_URL, { waitUntil: "networkidle" });
+  await page.waitForSelector('[data-slot="slider-track"]', {
+    state: "visible",
+    timeout: 10000,
+  });
+
+  await setShadcnTheme(page, "light");
+  const light = await captureShadcnOnce(
+    page,
+    RAIL_PROPS,
+    RANGE_PROPS,
+    THUMB_PROPS,
+  );
+
+  await setShadcnTheme(page, "dark");
+  const dark = await captureShadcnOnce(
+    page,
+    RAIL_PROPS,
+    RANGE_PROPS,
+    THUMB_PROPS,
+  );
+
+  return { light, dark };
+}
+
+async function setShinyblocksTheme(page, mode) {
+  // shinyblocks toggles dark via data-theme="dark" on <html>.
+  await page.evaluate((m) => {
+    document.documentElement.dataset.theme = m;
+  }, mode);
+  await page.waitForTimeout(150);
+}
+
+async function captureShinyblocksOnce(page, railProps, rangeProps, thumbProps) {
+  return await page.evaluate(
+    ([section, rp, rgP, tp]) => {
+      const grab = (selector, props) => {
+        const el = document.querySelector(selector);
+        if (!el) return { __missing: selector };
+        const s = window.getComputedStyle(el);
+        const out = {};
+        for (const p of props) {
+          out[p] = s.getPropertyValue(
+            p.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`),
+          );
+        }
+        return out;
+      };
+      const root = `[data-sb-section="${section}"] .sb-slider .irs--shiny`;
+      return {
+        rail: grab(`${root} .irs-line`, rp),
+        range: grab(`${root} .irs-bar`, rgP),
+        thumb: grab(`${root} .irs-handle`, tp),
+      };
+    },
+    [SECTION, railProps, rangeProps, thumbProps],
   );
 }
 
@@ -103,30 +175,22 @@ async function captureShinyblocks(page) {
     { state: "visible", timeout: 10000 },
   );
 
-  const closed = await page.evaluate(
-    ([section, railProps, rangeProps, thumbProps]) => {
-      const grab = (selector, props) => {
-        const el = document.querySelector(selector);
-        if (!el) return { __missing: selector };
-        const s = window.getComputedStyle(el);
-        const out = {};
-        for (const p of props) {
-          out[p] = s.getPropertyValue(
-            p.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`),
-          );
-        }
-        return out;
-      };
-
-      const root = `[data-sb-section="${section}"] .sb-slider .irs--shiny`;
-      return {
-        rail: grab(`${root} .irs-line`, railProps),
-        range: grab(`${root} .irs-bar`, rangeProps),
-        thumb: grab(`${root} .irs-handle`, thumbProps),
-      };
-    },
-    [SECTION, RAIL_PROPS, RANGE_PROPS, THUMB_PROPS],
+  await setShinyblocksTheme(page, "light");
+  const lightClosed = await captureShinyblocksOnce(
+    page,
+    RAIL_PROPS,
+    RANGE_PROPS,
+    THUMB_PROPS,
   );
+  await setShinyblocksTheme(page, "dark");
+  const darkClosed = await captureShinyblocksOnce(
+    page,
+    RAIL_PROPS,
+    RANGE_PROPS,
+    THUMB_PROPS,
+  );
+  await setShinyblocksTheme(page, "light");
+  const closed = lightClosed;
 
   // Hover state on the thumb — shadcn shows a 4px --ring/50 ring.
   const thumbSelector = `[data-sb-section="${SECTION}"] .sb-slider .irs--shiny .irs-handle`;
@@ -173,7 +237,31 @@ async function captureShinyblocks(page) {
     [SECTION],
   );
 
-  return { ...closed, hoverThumb, labels };
+  // Geometry cross-check: compare the vertical centre of the rail
+  // and the thumb. They must coincide (within sub-pixel rounding)
+  // or the thumb visually floats off the track. Property-level diffs
+  // miss this because each element's top/height looks fine in
+  // isolation — only the *relative* geometry matters.
+  const geometry = await page.evaluate(
+    ([section]) => {
+      const root = `[data-sb-section="${section}"] .sb-slider .irs--shiny`;
+      const rail = document.querySelector(`${root} .irs-line`);
+      const thumb = document.querySelector(`${root} .irs-handle`);
+      if (!rail || !thumb) return null;
+      const r = rail.getBoundingClientRect();
+      const t = thumb.getBoundingClientRect();
+      return {
+        railCenterY: r.top + r.height / 2,
+        thumbCenterY: t.top + t.height / 2,
+        delta: Math.abs(r.top + r.height / 2 - (t.top + t.height / 2)),
+        railRect: { top: r.top, height: r.height },
+        thumbRect: { top: t.top, height: t.height },
+      };
+    },
+    [SECTION],
+  );
+
+  return { ...closed, hoverThumb, labels, geometry, dark: darkClosed };
 }
 
 function diffRole(label, shadcn, sb, props) {
@@ -209,9 +297,55 @@ async function main() {
   const sb = await captureShinyblocks(page);
 
   let drifts = 0;
-  drifts += diffRole("rail (track)", shadcn.rail, sb.rail, RAIL_PROPS);
-  drifts += diffRole("range (filled)", shadcn.range, sb.range, RANGE_PROPS);
-  drifts += diffRole("thumb (handle)", shadcn.thumb, sb.thumb, THUMB_PROPS);
+  console.log("\n# LIGHT MODE");
+  drifts += diffRole("rail (track)", shadcn.light.rail, sb.rail, RAIL_PROPS);
+  drifts += diffRole(
+    "range (filled)",
+    shadcn.light.range,
+    sb.range,
+    RANGE_PROPS,
+  );
+  drifts += diffRole(
+    "thumb (handle)",
+    shadcn.light.thumb,
+    sb.thumb,
+    THUMB_PROPS,
+  );
+
+  console.log("\n# DARK MODE");
+  drifts += diffRole(
+    "rail (track)",
+    shadcn.dark.rail,
+    sb.dark.rail,
+    RAIL_PROPS,
+  );
+  drifts += diffRole(
+    "range (filled)",
+    shadcn.dark.range,
+    sb.dark.range,
+    RANGE_PROPS,
+  );
+  drifts += diffRole(
+    "thumb (handle)",
+    shadcn.dark.thumb,
+    sb.dark.thumb,
+    THUMB_PROPS,
+  );
+
+  console.log("\n== geometry: thumb centred on rail? ==");
+  if (sb.geometry) {
+    console.log(`  rail center Y   = ${sb.geometry.railCenterY.toFixed(2)}`);
+    console.log(`  thumb center Y  = ${sb.geometry.thumbCenterY.toFixed(2)}`);
+    console.log(`  vertical delta  = ${sb.geometry.delta.toFixed(2)} px`);
+    if (sb.geometry.delta > 1.5) {
+      console.log(
+        `  ✗ thumb is not vertically centred on the rail (delta > 1.5px)`,
+      );
+      drifts++;
+    } else {
+      console.log(`  ✓ thumb centred on rail`);
+    }
+  }
 
   console.log("\n== thumb hover ring ==");
   console.log(`  shadcn  (hover triggers ring-4 ring-ring/50)`);

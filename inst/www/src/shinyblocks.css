@@ -402,8 +402,27 @@
     @apply mb-0;
   }
 
+  /* ion.rangeSlider's defaults for .irs--shiny use a ~40px tall
+   * container with the rail at top:25px and handle at top:17px.
+   * Pinning the container to 24px (h-6) AND vertically centring
+   * each role with `top: 50%; transform: translateY(-50%)` makes
+   * the geometry self-consistent and survives ion's own JS that
+   * may rewrite inline `top` on the handles. Verified by the
+   * thumb-centred-on-rail check in tools/parity/slider-poc.mjs
+   * (ADR 0016). */
   .sb-slider .irs--shiny {
-    height: 1.5rem;
+    height: 1.5rem !important;
+  }
+
+  /* ion.rangeSlider nests `.irs-line` inside an inner `<span class="irs">`
+   * wrapper that defaults to 6px tall. With the wrapper that short,
+   * `top: 50%` on the rail calculates against 6px instead of the 24px
+   * outer container, and the rail ends up 12px above the thumb (which
+   * positions against the outer container directly). Forcing the inner
+   * wrapper to fill its parent makes the 50% math consistent for all
+   * three roles. */
+  .sb-slider .irs--shiny > .irs {
+    height: 100% !important;
   }
 
   .sb-slider .irs--shiny .irs-line {
@@ -411,7 +430,8 @@
     border: 0 !important;
     border-radius: 9999px !important;
     height: 0.375rem !important; /* h-1.5 */
-    top: 0.5625rem;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     overflow: hidden !important;
   }
 
@@ -422,7 +442,8 @@
      * matching shadcn's source (range has no border-radius). */
     border-radius: 0 !important;
     height: 0.375rem !important;
-    top: 0.5625rem;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
   }
 
   .sb-slider .irs--shiny .irs-handle {
@@ -435,7 +456,8 @@
       0 1px 3px 0 color-mix(in oklch, var(--foreground) 10%, transparent) !important;
     width: 1rem !important;
     height: 1rem !important;
-    top: 0.25rem;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     cursor: pointer;
     transition:
       box-shadow 0.15s ease,
