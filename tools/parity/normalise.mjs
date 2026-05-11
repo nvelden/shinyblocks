@@ -20,6 +20,13 @@ export function normaliseValue(property, value) {
     return out.toLowerCase();
   }
 
+  if (property === "boxShadow") {
+    return out
+      .replace(/(?:rgba\(0, 0, 0, 0\) 0 0 0 0,\s*)+/g, "")
+      .replace(/okl(?:ab|ch)\(([^)]+)\)/g, (_match, body) => `okl(${body})`)
+      .replace(/,\s+/g, ", ");
+  }
+
   if (/^rgba?\(/i.test(out)) {
     return out
       .replace(/rgba?\(([^)]+)\)/i, (_match, body) => {
@@ -37,10 +44,6 @@ export function normaliseValue(property, value) {
 
   if (/^#/.test(out)) {
     return out.toLowerCase();
-  }
-
-  if (property === "boxShadow") {
-    return out.replace(/,\s+/g, ", ");
   }
 
   return out;

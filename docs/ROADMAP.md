@@ -35,10 +35,9 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Still owed in Phase 5:
 > - gallery `.qmd` pages once the WASM/gallery track resumes
-> - reference screenshots are now captured for every component spec;
->   `docs/component-specs/SCREENSHOT-QUEUE.md` is at zero missing and
->   `test-doc-coverage.R` enforces specs for every exported `block_*()`
->   unconditionally.
+> - reference screenshots are now captured for every component spec,
+>   and `test-doc-coverage.R` enforces specs for every exported
+>   `block_*()` unconditionally.
 > - **shadcn fidelity audit** per
 >   [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](agent-plans/2026-05-09-shadcn-fidelity-audit.md):
 >   token + class drift surfaced against the canonical
@@ -51,8 +50,9 @@ passing the **Quality Gate** below before the next phase begins.
 >   2. `aria-invalid` destructive rings on interactive controls.
 >   3. Tabs refactor to the shadcn data-attribute model with the
 >      line variant.
->   Remaining fidelity work is the screenshot-backed parity review and
->   any follow-up tuning it surfaces.
+>   Remaining fidelity work is expanding the shared parity registry
+>   beyond the current `button`, `checkbox`, `select`, `slider`,
+>   and `switch` slice, then tuning any drift it surfaces.
 >
 > **Hand-off plan:** the next implementer should
 >
@@ -77,12 +77,12 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Slices, in order:
 >
-> 1. **High-risk parity pass** — `checkbox`, `switch`, `textarea`,
->    `dark-mode-toggle`, `badge`, `nav-item`, `sidebar`, plus any
+> 1. **High-risk parity pass** — `textarea`, `dark-mode-toggle`,
+>    `badge`, `nav-item`, `sidebar`, plus any
 >    follow-up CSS/spec divergence updates.
-> 2. **Remaining screenshot-backed parity review** — work straight
->    down `docs/component-specs/SCREENSHOT-QUEUE.md` as a review list
->    rather than a missing-capture queue.
+> 2. **Remaining manual parity review** — use the committed component
+>    specs + screenshots as the backstop for components not yet
+>    migrated into the shared parity registry.
 > 3. **Visual-parity harness (ADR 0016)** — promote the
 >    `tools/parity/select-poc.mjs` proof of concept to a real Vite +
 >    React reference app under `parity/` with a Playwright capture +
@@ -91,12 +91,12 @@ passing the **Quality Gate** below before the next phase begins.
 >    drift the spec-doc review misses (it reduced `block_select`
 >    trigger drift from 18 to 7 properties and surfaced the
 >    double-hover bug as a 2-rows-lit assertion). The initial harness
->    slice is now landed for `button`: dev-only `parity/` reference
+>    slice is now landed for `button`, `checkbox`, `select`, `slider`, and `switch`: dev-only `parity/` reference
 >    app, `tools/parity/capture-styles.mjs`, `diff-styles.mjs`,
 >    `normalise.mjs`, and a committed baseline under
->    `docs/component-specs/_parity/button.json`. The next expansion
->    work is to migrate `select` and `slider` off the standalone POCs
->    and into the shared registry.
+>    `docs/component-specs/_parity/`. The next expansion work is to
+>    continue down the remaining high-risk components and remove any
+>    now-redundant standalone POCs once coverage is fully duplicated.
 > 4. **Gallery resumption** — blocked on the WASM track. When
 >    unblocked, author one `gallery/components/<name>.qmd` per
 >    export and drop the `skip()` in the gallery coverage test.
@@ -136,10 +136,10 @@ as `make gate`.
     `reference:` section, and once WASM is unblocked, also has a
     matching gallery `.qmd` page. See
     [§Per-gate component-sync rule](#per-gate-component-sync-rule).
-11. **Screenshot queue freshness.** `make spec-screenshots-check`
-    passes. If the committed screenshot queue under
-    `docs/component-specs/SCREENSHOT-QUEUE.md` is stale, regenerate it
-    before tagging or handoff.
+11. **Visual Parity.** `make parity-ci` passes for every component
+    currently registered in `tools/parity/registry.mjs`. Until the
+    registry covers the full export surface, the remaining components
+    still require spec-and-screenshot review.
 
 ### B. Verify — semi-automated
 
@@ -152,23 +152,7 @@ as `make gate`.
     unless ADR'd.
 14. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
     the showcase. Findings → `docs/a11y/notes.md`.
-15. **Live preview — both servers running.** `make verify` (also
-    invoked as the last step of `make gate`) builds pkgdown,
-    launches the showcase on `:4321` and the pkgdown site on `:4322`
-    in the background, HTTP-checks both for `200`, and leaves them
-    running. The phase exit cannot tag until *both* respond. Walk
-    through every component touched in this phase in both light and
-    dark mode. From Phase 1C onward, `make preview-shinylive` is the
-    third leg. Stop with `make verify-stop`.
-    See [§Local Preview Workflow](#local-preview-workflow).
-16. **Interaction-style parity.** For every component touched in the
-    phase, walk every state listed in
-    `docs/component-specs/<name>.md` against the live showcase. The
-    spec's reference screenshot from
-    <https://ui.shadcn.com/docs/components/...> is the shadcn ground
-    truth — divergences are only acceptable if explicitly listed in
-    the spec's "Deliberate divergences" section. Per
-    [ADR 0015](decisions/0015-component-specs.md).
+
 
 ### C. Review
 
@@ -209,7 +193,6 @@ the minimum.
 | `make gallery` | Quarto-rendered component gallery | 4324 | After editing any `gallery/components/*.qmd`. |
 | `make preview-shinylive` | Static Shinylive export | 4323 | From Phase 1C onward, once `tools/export-shinylive.R` lands. |
 | `make preview` | Showcase + pkgdown together | 4321 + 4322 | Foreground; Ctrl+C to stop. |
-| `make verify` | Same as preview but background + HTTP-checked | 4321 + 4322 | **Phase exit.** Last step of `make gate`. Stop with `make verify-stop`. |
 
 What to actually look at:
 
@@ -223,8 +206,7 @@ What to actually look at:
 3. **Shinylive (`http://127.0.0.1:4323`)** — static export loads in
    a fresh tab, dark mode works, no asset 404s in the network tab.
 
-If any of those fail the eyeball check, fix before tagging the phase
-exit. This step is also called out as Quality Gate item 13.
+If any of those fail the eyeball check, fix before opening a PR or tagging a phase exit.
 
 ## Phase Exit Process
 

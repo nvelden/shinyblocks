@@ -498,7 +498,7 @@
   }
 
   .sb-slider[data-disabled="true"] .irs--shiny .irs-handle {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
   }
 
   /* Dark-mode slider refinement.
@@ -677,9 +677,11 @@
   .sb-app .sb-field .selectize-control.multi .selectize-input,
   .sb-app .sb-select .selectize-control.single .selectize-input,
   .sb-app .sb-select .selectize-control.multi .selectize-input {
-    @apply flex w-full items-center border border-input text-sm text-foreground;
+    @apply flex w-full items-center justify-between gap-2 border border-input text-sm text-foreground shadow-xs;
     display: flex !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
     position: relative !important;
     height: 2rem !important;
     min-height: 2rem !important;
@@ -689,17 +691,20 @@
     color: var(--foreground) !important;
     background-image: none !important;
     background-clip: padding-box;
-    padding: 0.5rem 2rem 0.5rem 0.625rem !important;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05) !important;
+    padding: 0 2rem 0 0.625rem !important;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-field .selectize-control.multi .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.multi .selectize-input.input-active {
-    @apply rounded-md border border-input bg-background text-sm text-foreground shadow-xs;
+    @apply rounded-lg border bg-background text-sm text-foreground shadow-xs;
     background: var(--background) !important;
     color: var(--foreground) !important;
     background-image: none !important;
+    border-color: var(--ring) !important;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent), 0 1px 2px rgb(0 0 0 / 0.05) !important;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input::after,
@@ -728,8 +733,8 @@
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.single .selectize-input.focus,
   .sb-app .sb-select .selectize-control.single .selectize-input.input-active {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+    border-color: var(--ring) !important;
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent), 0 1px 2px rgb(0 0 0 / 0.05) !important;
   }
 
   .sb-app .sb-field .selectize-control.single .selectize-input > input,
@@ -835,7 +840,7 @@
   .sb-app .sb-field .selectize-control.single .selectize-input.input-active,
   .sb-app .sb-select .selectize-control.single .selectize-input.focus,
   .sb-app .sb-select .selectize-control.single .selectize-input.input-active {
-    border-color: var(--ring);
+    border-color: var(--ring) !important;
   }
 
   .sb-field:has(select[aria-invalid="true"]) .selectize-control .selectize-input,

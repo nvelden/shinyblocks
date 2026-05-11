@@ -49,7 +49,8 @@ htmltools::tagList(
         block_checkbox(
           "showcase_marketing",
           "Email me product updates",
-          value = FALSE
+          value = FALSE,
+          class = "sb-parity-checkbox-default"
         ),
         block_field_description("Unchecked default checkbox state.")
       ),
@@ -57,15 +58,27 @@ htmltools::tagList(
         block_checkbox(
           "showcase_beta",
           "Join beta releases",
-          value = TRUE
+          value = TRUE,
+          class = "sb-parity-checkbox-checked"
         ),
         block_field_description("Checked checkbox state.")
+      ),
+      block_field(
+        block_checkbox(
+          "showcase_marketing_disabled",
+          "Paused notifications",
+          value = FALSE,
+          disabled = TRUE,
+          class = "sb-parity-checkbox-disabled"
+        ),
+        block_field_description("Disabled checkbox state.")
       ),
       block_field(
         block_switch(
           "showcase_incidents",
           "Send incident alerts",
-          value = FALSE
+          value = FALSE,
+          class = "sb-parity-switch-default"
         ),
         block_field_description("Off/default switch state.")
       ),
@@ -73,10 +86,23 @@ htmltools::tagList(
         block_switch(
           "showcase_auto_resolve",
           "Auto-resolve low-severity pages",
-          value = TRUE
+          value = TRUE,
+          class = "sb-parity-switch-checked"
         ),
         block_field_description(
           "On/checked switch state."
+        )
+      ),
+      block_field(
+        block_switch(
+          "showcase_switch_disabled",
+          "Mute low-priority alerts",
+          value = FALSE,
+          disabled = TRUE,
+          class = "sb-parity-switch-disabled"
+        ),
+        block_field_description(
+          "Disabled switch state."
         )
       )
     )

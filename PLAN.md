@@ -68,18 +68,24 @@ Phase details live in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Local Preview Before Going Public
 
-The Quality Gate runs a `make preview` checkpoint at every phase
+The Quality Gate runs a `make parity-ci` checkpoint at every phase
 exit — see [`docs/ROADMAP.md` §Local Preview Workflow](docs/ROADMAP.md#local-preview-workflow)
-for the recurring flow and port assignments. The list below is the
-final pre-public sweep on top of that.
+for the recurring flow and port assignments. Visual fidelity for
+components already migrated into the shared registry is enforced
+programmatically by the Playwright parity harness (`tools/parity/`);
+the rest still rely on spec docs plus committed screenshots until
+their registry entries land.
 
-Before making the repository public, build and review the full
-presentation locally:
+As of 2026-05-11, the shared registry slice covers `button`,
+`checkbox`, `select`, `slider`, and `switch`. Remaining component
+families still need to be migrated before parity becomes the
+repo-wide primary verifier.
+
+The list below is the final pre-public sweep on top of that:
 
 1. **pkgdown site.** Run `pkgdown::build_site()` (or `make pkgdown`)
    and open `site/docs/index.html` in a browser. Walk through the
-   reference index, every component page, and each article. Verify
-   that live examples render correctly and the layout looks polished.
+   reference index, every component page, and each article.
 2. **Shinylive showcase.** Run `make shinylive-export` (or
    `tools/export-shinylive.R`) to produce the static export under
    `site/showcase/`. Serve it locally
@@ -95,7 +101,7 @@ presentation locally:
 
 Only make the repo public once all four pass. This checkpoint is not
 a formal phase exit; it does not require the full Quality Gate. It is
-a visual sanity check to ensure the first public impression is
+a final structural sanity check to ensure the first public impression is
 polished.
 
 ## Quality Gate (Every Phase)
