@@ -364,6 +364,11 @@ Add a GitHub Actions job that:
   Implemented).
 - CI runs the harness on PR and fails on drift.
 
+**Implementation note (2026-05-11):**
+- The initial scaffold now exists for `button`. Follow-up work should
+  extend the shared registry to `select` and `slider`, then wire the
+  harness into CI once those known high-risk components are covered.
+
 **POC artifacts to learn from before reimplementing:**
 - [`tools/parity/select-poc.mjs`](../../tools/parity/select-poc.mjs) —
   see how `.evaluate()` captures computed styles, how Selectize

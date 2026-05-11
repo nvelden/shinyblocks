@@ -201,6 +201,7 @@ Read the output:
 | Container height wrong | Pin with `!important` (ion.rangeSlider/Selectize defaults often win without it) |
 | Inner wrapper messes up positioning | Set wrapper `height: 100% !important;` so percentage offsets work |
 | Custom widget renders its own arrow/chevron next to ours | Hide the widget default with `!important; display: none` or `visibility: hidden`; mask in the Lucide glyph via `::after` with `mask-image:` |
+| Custom background colors not visible or looking "white/glossy" in dark mode | Widget is likely rendering a `background-image` gradient over your color. Add `background-image: none !important;` to clear it. |
 
 Iterate: fix → `make build-css` → re-run harness → repeat until the
 remaining drifts are all documented divergences.
@@ -263,6 +264,7 @@ deliberate divergences. <bullet list of fixes>.
 - **Selectize trigger had `rounded-md` instead of `rounded-lg`.** Symptom: trigger looks rectangular vs shadcn's lozenge. Cause: relied on Selectize default for radius. Fix: explicit `border-radius: var(--radius-lg) !important;`.
 - **Double-hover in select dropdown.** Symptom: keyboard-selected row and pointer-hovered row both lit up at the same time. Cause: `.option.selected` styled with the same accent fill as `.option:hover`. Fix: drop the `.option.selected` background; mark selected with font weight only.
 - **Container height wrong.** ion.rangeSlider/Selectize set their container heights via their own CSS. Without `!important`, your shorter container loses. Always pin.
+- **Dark mode colors look solid white / glossy.** Symptom: Setting `background-color: var(--ring)` in dark mode results in a solid bright element instead of dark gray. Cause: `ion.rangeSlider` (and other Shiny widgets like Selectize) often use glossy `linear-gradient` declarations as a `background-image` in their default skins, which sits *on top* of `background-color`. Fix: Explicitly override with `background-image: none !important;` to ensure custom token colors are actually visible.
 
 ## Checklist (every component PR)
 

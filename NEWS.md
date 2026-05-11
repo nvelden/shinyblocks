@@ -2,6 +2,10 @@
 
 ## 0.0.0.9000
 
+* Added the initial ADR 0016 visual-parity harness scaffold: a
+  dev-only `parity/` React reference app, shared Playwright
+  capture/diff scripts, parity make targets, and the first committed
+  computed-style baseline for `button`.
 * New agent skill `shinyblocks-component` lands at
   [`docs/skills/shinyblocks-component.md`](docs/skills/shinyblocks-component.md)
   (the tracked canonical copy), with a `make skills-install` target

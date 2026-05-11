@@ -90,8 +90,13 @@ passing the **Quality Gate** below before the next phase begins.
 >    detailed scope. The POC has already shown the approach catches
 >    drift the spec-doc review misses (it reduced `block_select`
 >    trigger drift from 18 to 7 properties and surfaced the
->    double-hover bug as a 2-rows-lit assertion). One CSS fix slice
->    based on the POC findings already landed.
+>    double-hover bug as a 2-rows-lit assertion). The initial harness
+>    slice is now landed for `button`: dev-only `parity/` reference
+>    app, `tools/parity/capture-styles.mjs`, `diff-styles.mjs`,
+>    `normalise.mjs`, and a committed baseline under
+>    `docs/component-specs/_parity/button.json`. The next expansion
+>    work is to migrate `select` and `slider` off the standalone POCs
+>    and into the shared registry.
 > 4. **Gallery resumption** — blocked on the WASM track. When
 >    unblocked, author one `gallery/components/<name>.qmd` per
 >    export and drop the `skip()` in the gallery coverage test.
