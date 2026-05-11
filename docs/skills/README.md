@@ -36,12 +36,15 @@ the next launch and trigger it on matching prompts ("add a
 component", "port shadcn X to shinyblocks", etc. — see the skill's
 description for the full trigger list).
 
+If one mirror path is not writable in your local runtime, the other is
+still useful. The repo's `make skills-install` target treats the
+mirrors as best-effort rather than failing the whole setup.
+
 ## When to edit
 
 Edit `docs/skills/<name>.md` (the tracked file). If you have local
 mirrors under `.claude/skills/` and `.agents/skills/`, re-copy after
-each edit. A future `make skills-install` target may automate this
-two-way mirror.
+each edit, or run `make skills-install`.
 
 ## Why not commit `.claude/skills/` directly?
 

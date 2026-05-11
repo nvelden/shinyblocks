@@ -4,6 +4,10 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_DIR="$ROOT_DIR/docs/component-specs/_screenshots"
 MODE="${1:-all}"
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+SLUG_ARGS=("$@")
 
 mkdir -p "$OUT_DIR"
 
@@ -18,7 +22,12 @@ if ! command -v screencapture >/dev/null 2>&1; then
 fi
 
 if [[ "$MODE" != "seed" && "$MODE" != "high-risk" && "$MODE" != "all" ]]; then
-  echo "Usage: bash tools/capture-spec-screenshots.sh [seed|high-risk|all]" >&2
+  SLUG_ARGS=("$MODE" "${SLUG_ARGS[@]-}")
+  MODE="explicit"
+fi
+
+if [[ "$MODE" == "explicit" ]] && [[ ${#SLUG_ARGS[@]} -eq 0 ]]; then
+  echo "Usage: bash tools/capture-spec-screenshots.sh [seed|high-risk|all|<slug> ...]" >&2
   exit 1
 fi
 
@@ -66,6 +75,7 @@ remote_specs=(
   "separator|https://ui.shadcn.com/docs/components/separator"
   "sidebar|https://ui.shadcn.com/docs/components/sidebar"
   "skeleton|https://ui.shadcn.com/docs/components/skeleton"
+  "slider|https://ui.shadcn.com/docs/components/slider"
   "spinner|https://ui.shadcn.com/docs/components/skeleton"
   "switch|https://ui.shadcn.com/docs/components/switch"
   "tab|https://ui.shadcn.com/docs/components/tabs"
@@ -98,6 +108,10 @@ contains() {
 
 should_capture() {
   local slug="$1"
+  if [[ "$MODE" == "explicit" ]]; then
+    contains "$slug" "${SLUG_ARGS[@]}"
+    return
+  fi
   case "$MODE" in
     seed)
       contains "$slug" "${seed_specs[@]}"
