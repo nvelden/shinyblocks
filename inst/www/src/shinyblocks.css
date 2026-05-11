@@ -384,6 +384,99 @@
     @apply mb-0 w-full;
   }
 
+  /* shadcn Slider contract (apps/v4 new-york-v4 registry):
+   *   Track  = relative grow overflow-hidden rounded-full bg-muted h-1.5
+   *   Range  = absolute bg-primary h-full
+   *   Thumb  = block size-4 rounded-full border border-primary
+   *            bg-white shadow-sm ring-ring/50 hover:ring-4
+   *            focus-visible:ring-4
+   * Wrap-by-default per ADR 0014: shiny::sliderInput renders an
+   * ion.rangeSlider widget at runtime; these rules override its
+   * defaults to match shadcn. Parity is verified by the harness
+   * under tools/parity/. */
+  .sb-slider {
+    @apply mb-0 w-full;
+  }
+
+  .sb-slider .form-group {
+    @apply mb-0;
+  }
+
+  .sb-slider .irs--shiny {
+    height: 1.5rem;
+  }
+
+  .sb-slider .irs--shiny .irs-line {
+    background-color: var(--muted) !important;
+    border: 0 !important;
+    border-radius: 9999px !important;
+    height: 0.375rem !important; /* h-1.5 */
+    top: 0.5625rem;
+    overflow: hidden !important;
+  }
+
+  .sb-slider .irs--shiny .irs-bar {
+    background-color: var(--primary) !important;
+    border: 0 !important;
+    /* No radius on the range — the rail's overflow-hidden clips it,
+     * matching shadcn's source (range has no border-radius). */
+    border-radius: 0 !important;
+    height: 0.375rem !important;
+    top: 0.5625rem;
+  }
+
+  .sb-slider .irs--shiny .irs-handle {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 9999px !important;
+    box-shadow:
+      0 1px 2px 0 color-mix(in oklch, var(--foreground) 5%, transparent),
+      0 1px 3px 0 color-mix(in oklch, var(--foreground) 10%, transparent) !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    top: 0.25rem;
+    cursor: pointer;
+    transition:
+      box-shadow 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .sb-slider .irs--shiny .irs-handle:hover,
+  .sb-slider .irs--shiny .irs-handle.state_hover {
+    box-shadow:
+      0 0 0 4px color-mix(in oklch, var(--ring) 50%, transparent) !important;
+  }
+
+  .sb-slider .sb-slider-control:focus-visible + .irs .irs-handle,
+  .sb-slider .irs--shiny .irs-handle:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 4px color-mix(in oklch, var(--ring) 50%, transparent) !important;
+  }
+
+  /* The ion.rangeSlider min/max edge labels and current-value
+   * bubbles aren't part of shadcn's slider. Hide them for parity;
+   * a future block_slider(show_value = TRUE) variant can opt back in. */
+  .sb-slider .irs--shiny .irs-min,
+  .sb-slider .irs--shiny .irs-max,
+  .sb-slider .irs--shiny .irs-single,
+  .sb-slider .irs--shiny .irs-from,
+  .sb-slider .irs--shiny .irs-to,
+  .sb-slider .irs--shiny .irs-grid {
+    display: none !important;
+  }
+
+  .sb-slider[data-disabled="true"] .irs--shiny,
+  .sb-slider .irs--shiny.irs-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .sb-slider[data-disabled="true"] .irs--shiny .irs-handle {
+    cursor: not-allowed;
+  }
+
   .sb-checkbox-shell,
   .sb-switch-shell {
     @apply w-full;
