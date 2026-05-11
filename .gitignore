@@ -35,3 +35,4 @@ inst/doc/
 # make verify scratch files
 .verify-pids
 .verify-*.log
+.parity-pids

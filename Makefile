@@ -2,6 +2,7 @@
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links spec-screenshots spec-screenshots-md spec-screenshots-check \
 	spec-screenshots-seed spec-screenshots-high-risk spec-screenshots-all \
+	parity-install parity-build-css parity-setup parity parity-stop \
 	gate clean deploy-showcase preview preview-pkgdown \
 	preview-shinylive quarto-setup gallery verify verify-stop \
 	skills-install
@@ -42,6 +43,11 @@ help:
 	@echo "  spec-screenshots-high-risk - capture high-risk screenshots via Safari (macOS)"
 	@echo "  spec-screenshots-all - capture all missing screenshots via Safari (macOS)"
 	@echo "  showcase-capture - capture a local showcase section via Safari"
+	@echo "  parity-install - install parity/ React app dependencies"
+	@echo "  parity-build-css - compile parity reference CSS"
+	@echo "  parity-setup    - launch the parity reference app on :5173"
+	@echo "  parity          - run the button parity diff against the showcase"
+	@echo "  parity-stop     - stop the parity reference app"
 	@echo "  doc-links       - tools/check-doc-links.R"
 	@echo "  gate            - run the full Quality Gate"
 	@echo ""
@@ -195,10 +201,45 @@ PORT_SHOWCASE   ?= 4321
 PORT_PKGDOWN    ?= 4322
 PORT_SHINYLIVE  ?= 4323
 PORT_GALLERY    ?= 4324
+PORT_PARITY     ?= 5173
 
 # Re-bind showcase to a known port for the preview workflow.
 showcase:
 	$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase", port = $(PORT_SHOWCASE), launch.browser = FALSE)'
+
+parity-install:
+	cd parity && npm ci
+
+parity-build-css:
+	$(TAILWIND) --input parity/src/tailwind.css --output parity/public/parity.css --minify
+
+.parity-pids:
+	@: # placeholder so the file is never an automatic prerequisite
+
+parity-setup:
+	@echo "Stopping any prior parity server..."
+	@$(MAKE) parity-stop >/dev/null 2>&1 || true
+	@echo "Building parity CSS..."
+	@$(MAKE) parity-build-css >/dev/null
+	@echo "Bundling parity app..."
+	@cd parity && npm run build >/dev/null
+	@echo "Starting parity app at http://127.0.0.1:$(PORT_PARITY)"
+	@/bin/sh -c 'python3 -m http.server $(PORT_PARITY) --directory "$(CURDIR)/parity/dist" > "$(CURDIR)/.verify-parity.log" 2>&1 & echo $$! > "$(CURDIR)/.parity-pids"'
+	@sleep 2
+	@curl -sSI "http://127.0.0.1:$(PORT_PARITY)/?component=button&theme=light" >/dev/null || ( \
+		echo "Parity app did not come up. See .verify-parity.log"; \
+		exit 1 \
+	)
+	@echo "Parity app responding on :$(PORT_PARITY)"
+
+parity:
+	node tools/parity/diff-styles.mjs --component button
+
+parity-stop:
+	@if [ -f .parity-pids ]; then \
+		kill $$(cat .parity-pids) >/dev/null 2>&1 || true; \
+		rm -f .parity-pids; \
+	fi
 
 preview-pkgdown:
 	$(R) -e 'pkgdown::build_site(preview = FALSE)'

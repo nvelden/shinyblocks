@@ -1,0 +1,17 @@
+{
+  "name": "shinyblocks-parity",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only shadcn parity reference app for shinyblocks.",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}

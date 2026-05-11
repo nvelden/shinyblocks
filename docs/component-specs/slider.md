@@ -20,18 +20,18 @@
 
 ## Token contract
 
-| Visual role | Token |
-| --- | --- |
-| Rail (track) fill | `--muted` |
-| Range fill | `--primary` |
-| Thumb surface | `#ffffff` (literal white, matches shadcn) |
-| Thumb border | `--primary` |
-| Thumb shadow | `--foreground` at 5% / 10% (shadow-sm) |
-| Hover / focus ring | `--ring` at 50% opacity, 4px wide |
-| Disabled opacity | `0.5` |
-| Rail / range / thumb radius | `9999px` (fully rounded) |
-| Rail / range height | `0.375rem` (6px) |
-| Thumb size | `1rem` (16px) |
+| Visual role | Token (light) | Token (dark override) |
+| --- | --- | --- |
+| Rail (track) fill | `--muted` | `--ring` |
+| Range fill | `--primary` | same |
+| Thumb surface | `#ffffff` (literal white, matches shadcn) | same |
+| Thumb border | `--primary` | `--border` |
+| Thumb shadow | `--foreground` at 5% / 10% (shadow-sm) | same |
+| Hover / focus ring | `--ring` at 50% opacity, 4px wide | same |
+| Disabled opacity | `0.5` | same |
+| Rail / range / thumb radius | `9999px` (fully rounded) | same |
+| Rail / range height | `0.375rem` (6px) | same |
+| Thumb size | `1rem` (16px) | same |
 
 ## Deliberate divergences from shadcn
 
@@ -51,6 +51,12 @@
 - No vertical orientation today. shadcn supports
   `data-orientation="vertical"`; Shiny's slider doesn't surface a
   vertical mode. Future work; track as a separate slice.
+- **Dark-mode colour refinement.** In dark mode, the default token
+  mapping produces a near-invisible track (`--muted` = `oklch(0.269)` on
+  `oklch(0.145)` background). shinyblocks overrides the slider track in
+  dark mode to `--ring` (`oklch(0.439)` — a visible medium-dark gray)
+  and the handle border to `--border`. The range bar keeps `--primary`
+  (near-white in dark mode, providing clear fill-vs-track contrast).
 - **Source-spec vs docs-render mismatches.** `tools/parity/slider-poc.mjs`
   diffs `getComputedStyle()` against
   <https://ui.shadcn.com/docs/components/slider> and reports a few

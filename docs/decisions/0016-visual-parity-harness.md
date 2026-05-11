@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (2026-05-11)
+Implemented (initial slice, 2026-05-11)
 
 ## Context
 
