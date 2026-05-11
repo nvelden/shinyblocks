@@ -62,6 +62,18 @@
     @apply flex flex-wrap items-center gap-4;
   }
 
+  .parity-textarea[aria-invalid="true"]:not(:focus-visible) {
+    box-shadow:
+      0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent),
+      0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  }
+
+  .dark .parity-textarea[aria-invalid="true"]:not(:focus-visible) {
+    box-shadow:
+      0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent),
+      0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  }
+
   .parity-title {
     @apply text-2xl font-semibold;
   }

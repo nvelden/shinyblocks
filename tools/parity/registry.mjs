@@ -102,6 +102,39 @@ export const SWITCH_TRACK_PROPS = [
   "width"
 ];
 
+export const TEXTAREA_PROPS = [
+  "backgroundColor",
+  "borderRadius",
+  "borderTopColor",
+  "borderTopStyle",
+  "borderTopWidth",
+  "boxShadow",
+  "color",
+  "cursor",
+  "display",
+  "fontSize",
+  "fontWeight",
+  "height",
+  "letterSpacing",
+  "lineHeight",
+  "minHeight",
+  "opacity",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft",
+  "resize"
+];
+
+async function prepareFocusState(page, state, selector) {
+  if (state !== "focus") {
+    return;
+  }
+
+  await page.locator(selector).first().focus();
+  await page.waitForTimeout(150);
+}
+
 async function prepareSelectOpenState(page, _state, selector) {
   await page.locator(selector).first().click();
   await page.waitForSelector('[data-sb-section="field"] .sb-select .selectize-dropdown', {
@@ -376,6 +409,29 @@ export const REGISTRY = {
     },
     states: ["default", "checked", "disabled"],
     themes: ["light", "dark"]
+  },
+  textarea: {
+    component: "textarea",
+    parityUrl: "http://127.0.0.1:5173/?component=textarea",
+    showcaseUrl: "http://127.0.0.1:4321/#field",
+    showcaseReadySelector: '[data-sb-section="field"]:not([hidden])',
+    referenceSelectors: {
+      default: '[data-parity-component="textarea"] [data-parity-state="default"]',
+      focus: '[data-parity-component="textarea"] [data-parity-state="focus"]',
+      disabled: '[data-parity-component="textarea"] [data-parity-state="disabled"]',
+      invalid: '[data-parity-component="textarea"] [data-parity-state="invalid"]'
+    },
+    showcaseSelectors: {
+      default: '[data-sb-section="field"] .sb-parity-textarea-default textarea',
+      focus: '[data-sb-section="field"] .sb-parity-textarea-default textarea',
+      disabled: '[data-sb-section="field"] .sb-parity-textarea-disabled textarea',
+      invalid: '[data-sb-section="field"] .sb-parity-textarea-invalid textarea'
+    },
+    props: TEXTAREA_PROPS,
+    states: ["default", "focus", "disabled", "invalid"],
+    themes: ["light", "dark"],
+    prepareReferenceState: prepareFocusState,
+    prepareShowcaseState: prepareFocusState
   }
 };
 

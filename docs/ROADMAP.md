@@ -52,7 +52,7 @@ passing the **Quality Gate** below before the next phase begins.
 >      line variant.
 >   Remaining fidelity work is expanding the shared parity registry
 >   beyond the current `button`, `checkbox`, `select`, `slider`,
->   and `switch` slice, then tuning any drift it surfaces.
+>   `switch`, and `textarea` slice, then tuning any drift it surfaces.
 >
 > **Hand-off plan:** the next implementer should
 >
@@ -77,7 +77,7 @@ passing the **Quality Gate** below before the next phase begins.
 >
 > Slices, in order:
 >
-> 1. **High-risk parity pass** — `textarea`, `dark-mode-toggle`,
+> 1. **High-risk parity pass** — `dark-mode-toggle`,
 >    `badge`, `nav-item`, `sidebar`, plus any
 >    follow-up CSS/spec divergence updates.
 > 2. **Remaining manual parity review** — use the committed component
@@ -91,7 +91,7 @@ passing the **Quality Gate** below before the next phase begins.
 >    drift the spec-doc review misses (it reduced `block_select`
 >    trigger drift from 18 to 7 properties and surfaced the
 >    double-hover bug as a 2-rows-lit assertion). The initial harness
->    slice is now landed for `button`, `checkbox`, `select`, `slider`, and `switch`: dev-only `parity/` reference
+>    slice is now landed for `button`, `checkbox`, `select`, `slider`, `switch`, and `textarea`: dev-only `parity/` reference
 >    app, `tools/parity/capture-styles.mjs`, `diff-styles.mjs`,
 >    `normalise.mjs`, and a committed baseline under
 >    `docs/component-specs/_parity/`. The next expansion work is to

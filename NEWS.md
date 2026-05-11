@@ -42,6 +42,16 @@
   opacity, with a new disabled switch fixture in the field showcase to
   anchor the live comparison. The baseline lives at
   `docs/component-specs/_parity/switch.json`.
+* `block_textarea()` is now migrated into the shared ADR 0016 parity
+  registry. The shared harness captures default, focus-visible,
+  disabled, and invalid textarea states across light/dark mode, with
+  stable field-showcase fixtures and a new baseline at
+  `docs/component-specs/_parity/textarea.json`. The shared text-control
+  CSS was tightened at the same time so text inputs keep `shadow-xs`
+  under focus/invalid rings, disabled controls get the shadcn
+  `not-allowed` + `opacity-50` contract, and `block_textarea()`
+  defaults to the 2-row shadcn baseline instead of a taller native
+  shell.
 * New agent skill `shinyblocks-component` lands at
   [`docs/skills/shinyblocks-component.md`](docs/skills/shinyblocks-component.md)
   (the tracked canonical copy), with a `make skills-install` target

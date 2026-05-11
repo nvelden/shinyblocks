@@ -8,7 +8,7 @@ block_textarea(
   input_id,
   value = "",
   placeholder = NULL,
-  rows = 4,
+  rows = 2,
   width = NULL,
   disabled = FALSE,
   class = NULL

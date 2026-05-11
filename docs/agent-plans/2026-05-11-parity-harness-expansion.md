@@ -16,7 +16,7 @@ not over-claim its coverage.
   - `make parity-ci` now iterates over the shared registry instead of
     hardcoding `button`.
   - The shared registry + committed baselines now cover `button`,
-    `checkbox`, `select`, `slider`, and `switch`.
+    `checkbox`, `select`, `slider`, `switch`, and `textarea`.
   - The shared capture/diff path supports role-mapped components and
     state-specific selectors for wrapper controls.
 - Remaining scope:
@@ -80,6 +80,7 @@ not over-claim its coverage.
 - `make parity COMPONENT=slider`
 - `make parity COMPONENT=checkbox`
 - `make parity COMPONENT=switch`
+- `make parity COMPONENT=textarea`
 - `make parity-ci`
 - `Rscript -e 'devtools::test()'`
 - `Rscript -e 'pkgdown::build_site(preview = FALSE)'`
@@ -100,7 +101,9 @@ not over-claim its coverage.
    Suggested order:
    - action/content primitives: `badge`, `alert`, `separator`,
      `skeleton`, `spinner`, `empty`
-   - form wrappers: `textarea`
+   - form wrappers: complete for `select`, `slider`, `checkbox`,
+     `switch`, and `textarea`; next wrapper work is whichever
+     remaining high-risk control lands next
    - composites/navigation: `tabs`, `nav-item`, `sidebar`,
      `dark-mode-toggle`
 
