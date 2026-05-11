@@ -16,45 +16,14 @@ rationale.
    are the artifact.
 3. Capture the canonical shadcn screenshot and commit it under
    `_screenshots/<slug>.png`. Note the capture date in the spec.
-4. Run [`tools/spec-screenshots.R`](../../tools/spec-screenshots.R)
-   (or `make spec-screenshots`) to keep the screenshot inventory honest.
-5. Regenerate [`SCREENSHOT-QUEUE.md`](SCREENSHOT-QUEUE.md) with
-   `make spec-screenshots-md` when the capture queue changes.
-6. Run `make spec-screenshots-check` before a handoff or commit if the
-   queue file should already be up to date.
 
-The generated queue is priority-sorted:
-- `seed` — anchor captures for the parity pass (`button`, `card`,
-  `select`, `tabs`)
-- `high-risk` — interaction-heavy components most likely to force CSS
-  follow-up
-- `remaining` — everything else
+The `test-doc-coverage.R` suite enforces that every exported
+`block_*()` has a written spec doc.
 
-Status values in the generated queue:
-- `missing` — no committed screenshot file yet
-- `captured-undated` — screenshot file exists but the spec still needs a
-  real capture-date note
-- `captured-dated` — screenshot file exists and the spec records a
-  capture date
-
-On macOS, Safari capture helpers exist for the seed, high-risk, and
-full queue passes:
-- `make spec-screenshots-seed`
-- `make spec-screenshots-high-risk`
-- `make spec-screenshots-all`
-- `make showcase-capture SECTION=field OUT=/tmp/field-dark.png THEME=dark`
-  for local showcase parity review
-
-For theme-forced local captures, Safari must have
-`Allow JavaScript from Apple Events` enabled under Developer settings.
-
-Treat the output as maintainer assistance. The committed screenshots are
-first-pass review artifacts; tighten the crop if a spec needs a more
-focused reference image.
-
-The `test-doc-coverage.R` suite now enforces that every exported
-`block_*()` has a written spec doc. The screenshot queue is therefore
-the parity-review worklist, not a backlog of undocumented components.
+For components already migrated into the Playwright parity harness,
+the committed computed-style baselines live separately under
+[`_parity/`](_parity/). Those JSON snapshots complement the written
+specs; they do not replace them.
 
 ## Screenshot capture
 

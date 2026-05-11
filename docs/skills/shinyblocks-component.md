@@ -122,63 +122,37 @@ For wrap-by-default components, the divergences section is usually 3–5 entries
 
 ## Step 5 — Parity harness
 
-Copy [`tools/parity/slider-poc.mjs`](../../tools/parity/slider-poc.mjs) (the most complete POC) as the template. Adapt:
+The visual parity harness programmatically diffs your `block_*()` against a pinned shadcn-react reference app using Playwright.
 
-1. **`SHADCN_URL`** — the docs page for your component.
-2. **`SHOWCASE_URL`** — `http://127.0.0.1:4321/#<section-id>`.
-3. **`SECTION`** — the section id you added to `inst/showcase/app.R`.
-4. **Selectors** — find the matching elements in both apps. For wrappers, the DOM differs (Selectize vs Radix, ion.rangeSlider vs Radix Slider, etc.) — map roles, not selectors.
-5. **`PROPS` arrays** — split by role if the component has multiple parts (rail/range/thumb, trigger/dropdown/option).
+1. **Wire the React reference:** Edit `parity/src/main.js` to render the canonical shadcn component for your target. Expose it under a specific `data-parity-component` attribute.
+2. **Register it:** Edit `tools/parity/registry.mjs`. Add a `PROPS` array for the CSS properties you want diffed, and add a block to the `REGISTRY` mapping your Shiny selectors to the React selectors.
+3. **Capture the baseline:** Generate the baseline JSON file from the React reference app:
+   ```bash
+   make parity-setup
+   node tools/parity/capture-styles.mjs --component <name> --write-baseline
+   ```
+   This creates `docs/component-specs/_parity/<name>.json`.
+4. **Register the gate path:** once the component is in `registry.mjs`,
+   `make parity COMPONENT=<name>` should run clean locally and
+   `make parity-ci` will pick it up automatically.
 
 **Property set must include** at minimum:
-
 - Geometry: `width`, `height`, `display`, `position`, `top`, `marginTop`, `transform`.
 - Visual: `backgroundColor`, `color`, `borderRadius`, `borderTopColor`, `borderTopWidth`, `borderTopStyle`, `boxShadow`.
 - Typography (if text-bearing): `fontSize`, `fontWeight`, `lineHeight`, `letterSpacing`, `padding*`.
 
-**Cross-element geometry check** — for multi-role components, add a
-`getBoundingClientRect()` assertion that two parts are aligned. This
-is the lesson from the slider POC; property-by-property diff missed
-the off-centre thumb until we added this. Example pattern:
-
-```js
-const geometry = await page.evaluate(() => {
-  const a = document.querySelector("...");
-  const b = document.querySelector("...");
-  const ra = a.getBoundingClientRect();
-  const rb = b.getBoundingClientRect();
-  return {
-    aCenterY: ra.top + ra.height / 2,
-    bCenterY: rb.top + rb.height / 2,
-    delta: Math.abs((ra.top + ra.height / 2) - (rb.top + rb.height / 2)),
-  };
-});
-// Fail if delta > 1.5px.
-```
-
-**Dark mode capture** — toggle `data-theme="dark"` on `<html>` (and
-`class="dark"` on the shadcn side) before re-capturing. Diff each
-mode against the matching shadcn mode. Don't assume "if light mode
-matches, dark mode matches" — the slider POC confirmed dark-mode
-tokens flow correctly, but only because dark mode was captured.
-
-**Interactive states** — for components with hover/focus/open/etc.,
-use `page.hover()`, `page.focus()`, or `page.click()` before
-recapturing.
+**Dark mode & Interactive states** — Ensure your config handles `hover` and `disabled` states in both `light` and `dark` themes.
 
 **Hidden-label audit** — for wrappers around Shiny widgets, audit
 that any widget-default chrome you wanted to hide actually has
-`display: none`. The slider POC does this for `.irs-min`, `.irs-max`,
-`.irs-single`, etc.
+`display: none !important`.
 
 ## Step 6 — Run the harness, iterate
 
 ```bash
-# In one terminal:
-make showcase                # starts the live shinyblocks app on :4321
-
-# In another:
-node tools/parity/<name>-poc.mjs
+make parity-setup  # Builds the React app and starts the server
+make showcase      # (In another terminal) Starts the Shiny app
+make parity COMPONENT=<name>
 ```
 
 Read the output:
@@ -223,10 +197,7 @@ Categories you'll see:
 ## Step 8 — Run the gate
 
 ```bash
-make build-css                # CSS source matches compiled output
-Rscript -e 'devtools::document()'   # NAMESPACE + man/ in sync
-Rscript -e 'devtools::test()'       # all R tests including doc-coverage
-make verify                   # showcase + pkgdown both responding 200
+make gate
 ```
 
 If `test-doc-coverage.R` reports a missing pkgdown entry or missing
@@ -235,8 +206,8 @@ spec, you skipped step 3 or 4. Go back.
 If `test-showcase.R` reports a missing showcase section, you didn't
 add the row to `inst/showcase/app.R`'s `sections` list. Go back.
 
-If `make verify` fails to render: read `.verify-pkgdown.log` and
-`.verify-showcase.log` for the actual error.
+If `make parity-ci` fails to render or diff: read the console output
+to resolve the drift.
 
 ## Step 9 — Commit
 
@@ -273,8 +244,7 @@ Before committing, run through this:
 - [ ] `Rscript -e 'devtools::document()'` clean
 - [ ] `Rscript -e 'devtools::test()'` clean (including `test-doc-coverage.R` and `test-showcase.R`)
 - [ ] `make build-css` clean (committed CSS matches source)
-- [ ] `make verify` brings up both servers at 200
-- [ ] `node tools/parity/<name>-poc.mjs` runs, remaining drifts all listed in the spec's divergences
+- [ ] `make parity COMPONENT=<name>` runs, remaining drifts all listed in the spec's divergences
 - [ ] Spec doc has all five sections filled out
 - [ ] NEWS bullet mentions the component
 - [ ] One commit, not several

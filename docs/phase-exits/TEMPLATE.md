@@ -44,7 +44,9 @@ what was verified.
       `python3 -m http.server`; Shinylive browser smoke passes with
       long first-load timeout, iframe handling, desktop, and mobile.
 - [ ] `make budget` reports CSS (gzipped), JS, and sprite within targets.
-- [ ] `make spec-screenshots-check` reports the screenshot queue is up to date.
+- [ ] `make parity-ci` passes for every currently-registered parity
+      component; any unregistered components were reviewed against
+      their committed spec docs + screenshots.
 - [ ] Manual a11y sweep done; notes in `docs/a11y/notes.md`.
 
 ## C. Review

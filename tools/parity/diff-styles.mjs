@@ -50,6 +50,35 @@ async function captureSelector(page, selector, props) {
   );
 }
 
+function selectorForState(selectors, state) {
+  if (typeof selectors === "string") {
+    return selectors;
+  }
+  return selectors?.[state] ?? selectors?.default;
+}
+
+function roleSelectorMap(roles, kind, state) {
+  return Object.fromEntries(
+    Object.entries(roles).map(([roleName, roleConfig]) => [
+      roleName,
+      selectorForState(roleConfig[`${kind}Selectors`], state)
+    ])
+  );
+}
+
+async function captureRoles(page, roles, selectors) {
+  const out = {};
+  for (const [roleName, roleConfig] of Object.entries(roles)) {
+    const selector = selectors[roleName];
+    if (!selector) {
+      throw new Error(`Missing selector for role "${roleName}".`);
+    }
+    await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+    out[roleName] = normaliseStyles(await captureSelector(page, selector, roleConfig.props));
+  }
+  return out;
+}
+
 async function setShowcaseTheme(page, theme) {
   await page.evaluate((mode) => {
     document.documentElement.dataset.theme = mode;
@@ -65,17 +94,35 @@ async function captureShowcaseState(page, config, theme, state) {
   });
   await setShowcaseTheme(page, theme);
 
-  const selector =
-    state === "disabled" ? config.showcaseSelectors.disabled : config.showcaseSelectors.default;
-  await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+  const selectors = config.roles
+    ? roleSelectorMap(config.roles, "showcase", state)
+    : selectorForState(config.showcaseSelectors, state);
+  if (!selectors) {
+    throw new Error(`Missing showcase selector(s) for ${config.component} state "${state}".`);
+  }
+  if (!config.roles) {
+    await page.waitForSelector(selectors, { state: "visible", timeout: 10000 });
+  }
   await page.mouse.move(1270, 10);
-  await page.waitForTimeout(250);
-  if (state === "hover") {
-    await page.locator(selector).first().hover();
+  await page.waitForTimeout(100);
+  if (config.prepareShowcaseState) {
+    await config.prepareShowcaseState(page, state, selectors);
+  } else if (state === "hover") {
+    await page.locator(selectors).first().hover();
     await page.waitForTimeout(250);
   }
 
-  return normaliseStyles(await captureSelector(page, selector, config.props));
+  if (config.roles) {
+    return {
+      captured: await captureRoles(page, config.roles, selectors),
+      selectors
+    };
+  }
+
+  return {
+    captured: normaliseStyles(await captureSelector(page, selectors, config.props)),
+    selectors
+  };
 }
 
 async function main() {
@@ -100,22 +147,41 @@ async function main() {
   let drifts = 0;
   for (const theme of config.themes) {
     for (const state of config.states) {
-      const live = await captureShowcaseState(page, config, theme, state);
+      const { captured: live, selectors } = await captureShowcaseState(page, config, theme, state);
       const expected = baseline.themes?.[theme]?.[state];
       if (!expected) {
         throw new Error(`Missing baseline for ${config.component} ${theme}/${state}.`);
       }
 
-      console.log(`\n== ${config.component} :: ${theme} :: ${state} ==`);
-      for (const prop of config.props) {
-        const a = normaliseValue(prop, expected[prop] ?? "");
-        const b = normaliseValue(prop, live[prop] ?? "");
-        if (a === b) {
-          console.log(`  ${prop.padEnd(20)} match  ${a}`);
-          continue;
+      if (config.roles) {
+        for (const [roleName, roleConfig] of Object.entries(config.roles)) {
+          console.log(`\n== ${config.component} :: ${theme} :: ${state} :: ${roleName} ==`);
+          for (const prop of roleConfig.props) {
+            const a = normaliseValue(prop, expected?.[roleName]?.[prop] ?? "");
+            const b = normaliseValue(prop, live?.[roleName]?.[prop] ?? "");
+            if (a === b) {
+              console.log(`  ${prop.padEnd(20)} match  ${a}`);
+              continue;
+            }
+            drifts += 1;
+            console.log(`  ${prop.padEnd(20)} drift  expected=${a}  shinyblocks=${b}`);
+          }
         }
-        drifts += 1;
-        console.log(`  ${prop.padEnd(20)} drift  expected=${a}  shinyblocks=${b}`);
+        if (config.extraShowcaseChecks) {
+          drifts += await config.extraShowcaseChecks(page, theme, state, selectors, live, expected);
+        }
+      } else {
+        console.log(`\n== ${config.component} :: ${theme} :: ${state} ==`);
+        for (const prop of config.props) {
+          const a = normaliseValue(prop, expected[prop] ?? "");
+          const b = normaliseValue(prop, live[prop] ?? "");
+          if (a === b) {
+            console.log(`  ${prop.padEnd(20)} match  ${a}`);
+            continue;
+          }
+          drifts += 1;
+          console.log(`  ${prop.padEnd(20)} drift  expected=${a}  shinyblocks=${b}`);
+        }
       }
     }
   }

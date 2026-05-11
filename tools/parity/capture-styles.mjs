@@ -58,20 +58,60 @@ async function captureSelector(page, selector, props) {
   );
 }
 
+function selectorForState(selectors, state) {
+  if (typeof selectors === "string") {
+    return selectors;
+  }
+  return selectors?.[state] ?? selectors?.default;
+}
+
+function roleSelectorMap(roles, kind, state) {
+  return Object.fromEntries(
+    Object.entries(roles).map(([roleName, roleConfig]) => [
+      roleName,
+      selectorForState(roleConfig[`${kind}Selectors`], state)
+    ])
+  );
+}
+
+async function captureRoles(page, roles, selectors) {
+  const out = {};
+  for (const [roleName, roleConfig] of Object.entries(roles)) {
+    const selector = selectors[roleName];
+    if (!selector) {
+      throw new Error(`Missing selector for role "${roleName}".`);
+    }
+    await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+    out[roleName] = normaliseStyles(await captureSelector(page, selector, roleConfig.props));
+  }
+  return out;
+}
+
 async function captureReferenceState(page, config, theme, state) {
   const url = new URL(config.parityUrl);
   url.searchParams.set("theme", theme);
   await page.goto(url.toString(), { waitUntil: "networkidle" });
-  const selector =
-    state === "disabled" ? config.referenceSelectors.disabled : config.referenceSelectors.default;
-  await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
+  const selectors = config.roles
+    ? roleSelectorMap(config.roles, "reference", state)
+    : selectorForState(config.referenceSelectors, state);
+  if (!selectors) {
+    throw new Error(`Missing reference selector(s) for ${config.component} state "${state}".`);
+  }
+  if (!config.roles) {
+    await page.waitForSelector(selectors, { state: "visible", timeout: 10000 });
+  }
   await page.mouse.move(1270, 10);
-  await page.waitForTimeout(250);
-  if (state === "hover") {
-    await page.locator(selector).hover();
+  await page.waitForTimeout(100);
+  if (config.prepareReferenceState) {
+    await config.prepareReferenceState(page, state, selectors);
+  } else if (state === "hover") {
+    await page.locator(selectors).hover();
     await page.waitForTimeout(250);
   }
-  return normaliseStyles(await captureSelector(page, selector, config.props));
+  if (config.roles) {
+    return await captureRoles(page, config.roles, selectors);
+  }
+  return normaliseStyles(await captureSelector(page, selectors, config.props));
 }
 
 async function main() {
@@ -96,7 +136,14 @@ async function main() {
     component: config.component,
     source: config.parityUrl,
     captured_at: new Date().toISOString(),
-    props: config.props.map(cssName),
+    props: config.roles
+      ? Object.fromEntries(
+          Object.entries(config.roles).map(([roleName, roleConfig]) => [
+            roleName,
+            roleConfig.props.map(cssName)
+          ])
+        )
+      : config.props.map(cssName),
     themes: {}
   };
 

@@ -6,6 +6,42 @@
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed
   computed-style baseline for `button`.
+* Internal: `make parity` now accepts `COMPONENT=<name>`, and
+  `make parity-ci` iterates over every component currently registered
+  in `tools/parity/registry.mjs` instead of pretending the button-only
+  baseline covers the whole package. Phase-exit docs and the
+  `shinyblocks-component` skill now describe the actual shared-harness
+  workflow (`parity/src/main.js`, registered components, manual spec +
+  screenshot backstop for everything not yet migrated).
+* `block_select()` is now migrated into the shared ADR 0016 parity
+  registry. The dev-only React reference app exposes a local select
+  trigger in closed and open states, `docs/component-specs/_parity/select.json`
+  is committed as the baseline, and `make parity-ci` now verifies both
+  `button` and `select`. The selectize wrapper CSS was tightened at the
+  same time so the visible trigger now matches the shadcn contract more
+  closely: `shadow-xs` at rest, `justify-between` + `gap-2`, zero
+  vertical padding inside the fixed 32px shell, and a token-driven open
+  ring that suppresses Selectize's default blue focus shadow.
+* `block_slider()` is now migrated into the shared ADR 0016 parity
+  registry as the first multi-role component. The shared harness now
+  captures and diffs `root`, `rail`, `range`, and `thumb` roles across
+  light/dark, default/hover/disabled states, with extra live checks for
+  thumb-vs-rail centering and hidden ion.rangeSlider labels. The local
+  baseline lives at `docs/component-specs/_parity/slider.json`, and the
+  disabled thumb cursor is now forced to `not-allowed` with
+  `!important` so the live widget matches the parity contract.
+* `block_checkbox()` is now migrated into the shared ADR 0016 parity
+  registry. The shared harness captures unchecked, checked, and
+  disabled states across light/dark mode using the visible checkbox
+  shell plus label-text opacity, with a new disabled checkbox fixture in
+  the field showcase to anchor the live comparison. The baseline lives
+  at `docs/component-specs/_parity/checkbox.json`.
+* `block_switch()` is now migrated into the shared ADR 0016 parity
+  registry. The shared harness captures off, on, and disabled states
+  across light/dark mode using the visible switch track plus label-text
+  opacity, with a new disabled switch fixture in the field showcase to
+  anchor the live comparison. The baseline lives at
+  `docs/component-specs/_parity/switch.json`.
 * New agent skill `shinyblocks-component` lands at
   [`docs/skills/shinyblocks-component.md`](docs/skills/shinyblocks-component.md)
   (the tracked canonical copy), with a `make skills-install` target
