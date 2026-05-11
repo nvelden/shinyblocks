@@ -81,11 +81,16 @@ skills-install:
 		name=$$(basename $$skill .md); \
 		if [ "$$name" = "README" ]; then continue; fi; \
 		echo "Installing skill: $$name"; \
-		mkdir -p .claude/skills/$$name .agents/skills/$$name; \
+		mkdir -p .claude/skills/$$name; \
 		cp $$skill .claude/skills/$$name/SKILL.md; \
-		cp $$skill .agents/skills/$$name/SKILL.md; \
+		if mkdir -p .agents/skills/$$name 2>/dev/null && \
+			cp $$skill .agents/skills/$$name/SKILL.md 2>/dev/null; then \
+			echo "  - mirrored to .agents/skills/$$name"; \
+		else \
+			echo "  - warning: could not mirror to .agents/skills/$$name"; \
+		fi; \
 	done
-	@echo "Local skills installed under .claude/skills/ and .agents/skills/."
+	@echo "Local skills installed under .claude/skills/."
 
 watch-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --watch

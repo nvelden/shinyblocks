@@ -16,10 +16,10 @@ the result against shadcn mechanically.
 
 Read in this order. Each is short and load-bearing.
 
-1. [`docs/decisions/0014-wrap-by-default-form-inputs.md`](../../../docs/decisions/0014-wrap-by-default-form-inputs.md) — wrap-by-default policy for form inputs. **Do not** reinvent input runtimes when a Shiny widget already exists.
-2. [`docs/decisions/0015-component-specs.md`](../../../docs/decisions/0015-component-specs.md) — every component ships with a spec doc + reference screenshot.
-3. [`docs/decisions/0016-visual-parity-harness.md`](../../../docs/decisions/0016-visual-parity-harness.md) — the mechanical computed-style + DOM diff harness against pinned shadcn-react. POCs are in `tools/parity/`.
-4. [`docs/ROADMAP.md` §Per-gate component-sync rule](../../../docs/ROADMAP.md#per-gate-component-sync-rule) — the artifact-sync contract.
+1. [`docs/decisions/0014-wrap-by-default-form-inputs.md`](../decisions/0014-wrap-by-default-form-inputs.md) — wrap-by-default policy for form inputs. **Do not** reinvent input runtimes when a Shiny widget already exists.
+2. [`docs/decisions/0015-component-specs.md`](../decisions/0015-component-specs.md) — every component ships with a spec doc + reference screenshot.
+3. [`docs/decisions/0016-visual-parity-harness.md`](../decisions/0016-visual-parity-harness.md) — the mechanical computed-style + DOM diff harness against pinned shadcn-react. POCs are in `tools/parity/`.
+4. [`docs/ROADMAP.md` §Per-gate component-sync rule](../ROADMAP.md#per-gate-component-sync-rule) — the artifact-sync contract.
 5. The canonical shadcn source for the component you're adding:
    `https://raw.githubusercontent.com/shadcn-ui/ui/main/apps/v4/registry/new-york-v4/ui/<name>.tsx`.
 
@@ -103,25 +103,26 @@ The per-gate sync rule says all seven land in the **same commit**:
 | Spec doc | `docs/component-specs/<slug>.md` | Five sections per template — link, states, tokens, divergences, reference screenshot |
 | NEWS bullet | `NEWS.md` | One bullet under the dev-version heading |
 
-The rule is enforced by [`tests/testthat/test-doc-coverage.R`](../../../tests/testthat/test-doc-coverage.R) — every export must have a pkgdown entry **and** a spec doc, or the test fails.
+The rule is enforced by [`tests/testthat/test-doc-coverage.R`](../../tests/testthat/test-doc-coverage.R) — every export must have a pkgdown entry **and** a spec doc, or the test fails.
 
-The showcase part is enforced by [`tests/testthat/test-showcase.R`](../../../tests/testthat/test-showcase.R) — every export must put its `sb-<name>` class somewhere in the rendered showcase UI.
+The showcase part is enforced by [`tests/testthat/test-showcase.R`](../../tests/testthat/test-showcase.R) — every export must put its `sb-<name>` class somewhere in the rendered showcase UI.
 
 ## Step 4 — Spec doc
 
-Copy [`docs/component-specs/_template.md`](../../../docs/component-specs/_template.md) to `<slug>.md` where slug is the function name minus `block_`, with `_` → `-`. Fill in the five sections:
+Copy [`docs/component-specs/_template.md`](../component-specs/_template.md) to `<slug>.md` where slug is the function name minus `block_`, with `_` → `-`. Fill in the five sections:
 
 1. **Reference link** — `https://ui.shadcn.com/docs/components/<slug>`.
 2. **States** — every visual state to verify. Default, hover, focus-visible, active, disabled, aria-invalid, plus component-specific open/checked/selected/etc.
 3. **Token contract** — table mapping visual roles to CSS variables.
 4. **Deliberate divergences** — anywhere shinyblocks knowingly differs. Each entry with reasoning.
-5. **Reference screenshot** — `![<name>](_screenshots/<slug>.png)` plus the capture date.
+5. **Reference screenshot** — add a markdown image pointing at
+   ``_screenshots/<slug>.png`` plus the capture date in the spec doc.
 
 For wrap-by-default components, the divergences section is usually 3–5 entries (different DOM, hidden default labels, etc.). Write them honestly.
 
 ## Step 5 — Parity harness
 
-Copy [`tools/parity/slider-poc.mjs`](../../../tools/parity/slider-poc.mjs) (the most complete POC) as the template. Adapt:
+Copy [`tools/parity/slider-poc.mjs`](../../tools/parity/slider-poc.mjs) (the most complete POC) as the template. Adapt:
 
 1. **`SHADCN_URL`** — the docs page for your component.
 2. **`SHOWCASE_URL`** — `http://127.0.0.1:4321/#<section-id>`.
@@ -258,7 +259,7 @@ deliberate divergences. <bullet list of fixes>.
 
 ## Pitfalls (real bugs that have shipped)
 
-- **Off-centre thumb in slider.** Symptom: thumb visually floats above the rail. Cause: harness `THUMB_PROPS` didn't include `top`/`transform`, and didn't cross-check rail vs thumb bounding rects. Fix: add positioning to property set and a centring assertion (the [slider-poc.mjs](../../../tools/parity/slider-poc.mjs) is the corrected template).
+- **Off-centre thumb in slider.** Symptom: thumb visually floats above the rail. Cause: harness `THUMB_PROPS` didn't include `top`/`transform`, and didn't cross-check rail vs thumb bounding rects. Fix: add positioning to property set and a centring assertion (the [slider-poc.mjs](../../tools/parity/slider-poc.mjs) is the corrected template).
 - **Selectize trigger had `rounded-md` instead of `rounded-lg`.** Symptom: trigger looks rectangular vs shadcn's lozenge. Cause: relied on Selectize default for radius. Fix: explicit `border-radius: var(--radius-lg) !important;`.
 - **Double-hover in select dropdown.** Symptom: keyboard-selected row and pointer-hovered row both lit up at the same time. Cause: `.option.selected` styled with the same accent fill as `.option:hover`. Fix: drop the `.option.selected` background; mark selected with font weight only.
 - **Container height wrong.** ion.rangeSlider/Selectize set their container heights via their own CSS. Without `!important`, your shorter container loses. Always pin.
