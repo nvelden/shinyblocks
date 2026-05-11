@@ -2,6 +2,39 @@
 
 ## 0.0.0.9000
 
+* New agent skill `shinyblocks-component` lands at
+  [`docs/skills/shinyblocks-component.md`](docs/skills/shinyblocks-component.md)
+  (the tracked canonical copy), with a `make skills-install` target
+  that mirrors it into `.claude/skills/shinyblocks-component/SKILL.md`
+  and `.agents/skills/shinyblocks-component/SKILL.md` so Claude Code
+  and Codex pick it up locally. End-to-end recipe for adding (or
+  refactoring) a `block_*()` component: per-gate sync rule (R + CSS
+  + showcase + tests + spec + pkgdown + NEWS), shadcn-fidelity
+  workflow against the `apps/v4/registry/new-york-v4` source, the
+  parity-harness template (including the positioning + cross-element
+  bounding-rect checks the 2026-05-11 slider POC surfaced as
+  necessary), common-pitfall list, and pre-commit checklist.
+  Triggered by user prompts like "add a component", "port shadcn X
+  to shinyblocks", or "wrap shiny::Y as a block". `docs/ROADMAP.md`
+  Current Status and the Phase 5 hand-off doc both point at the
+  skill as the canonical workflow. `make setup` now runs
+  `skills-install` automatically so a fresh checkout has the skill
+  registered after one command.
+* `tools/parity/slider-poc.mjs` grew positioning properties
+  (`position`, `top`, `marginTop`, `transform`), a
+  `getBoundingClientRect()` cross-check asserting the slider thumb
+  is vertically centred on the rail (delta ≤ 1.5px), and a dark/
+  light theme toggle that captures all three roles (rail, range,
+  thumb) in both modes. The original property-only diff had missed
+  an off-centre thumb that visibly floated above the rail; the
+  geometry assertion now catches it.
+* `block_slider()` CSS hardened to match shadcn's contract under
+  any container height: `.sb-slider .irs--shiny { height: 1.5rem
+  !important; }`, inner `.irs` wrapper expanded to fill via
+  `height: 100% !important`, and every role centred with
+  `top: 50% !important; transform: translateY(-50%) !important;`
+  so ion.rangeSlider's inline `top` rewrites cannot offset them
+  again.
 * Visual-parity harness adopted per
   [ADR 0016](docs/decisions/0016-visual-parity-harness.md). Mechanical
   computed-style + DOM diff against a pinned shadcn-react reference

@@ -1,7 +1,10 @@
 .PHONY: help setup watch-css build-css build-icons dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links spec-screenshots spec-screenshots-md gate clean deploy-showcase preview preview-pkgdown \
-	preview-shinylive quarto-setup gallery verify verify-stop
+	doc-links spec-screenshots spec-screenshots-md spec-screenshots-check \
+	spec-screenshots-seed spec-screenshots-high-risk spec-screenshots-all \
+	gate clean deploy-showcase preview preview-pkgdown \
+	preview-shinylive quarto-setup gallery verify verify-stop \
+	skills-install
 
 # Defaults you can override on the command line.
 R          ?= env -u LC_ALL Rscript
@@ -14,7 +17,8 @@ help:
 	@echo "shinyblocks make targets"
 	@echo ""
 	@echo "Inner loop (run constantly):"
-	@echo "  setup           - install npm deps and R dev deps"
+	@echo "  setup           - install npm deps, R dev deps, and agent skills"
+	@echo "  skills-install  - mirror docs/skills/*.md into .claude/skills + .agents/skills"
 	@echo "  watch-css       - Tailwind v4 in --watch mode"
 	@echo "  dev             - devtools::load_all() in an R session"
 	@echo "  showcase        - load_all() and run inst/showcase"
@@ -33,6 +37,11 @@ help:
 	@echo "  budget          - tools/budget.R (asset size report)"
 	@echo "  spec-screenshots - report missing component-spec screenshots"
 	@echo "  spec-screenshots-md - regenerate docs/component-specs/SCREENSHOT-QUEUE.md"
+	@echo "  spec-screenshots-check - fail if SCREENSHOT-QUEUE.md is stale"
+	@echo "  spec-screenshots-seed - capture seed screenshots via Safari (macOS)"
+	@echo "  spec-screenshots-high-risk - capture high-risk screenshots via Safari (macOS)"
+	@echo "  spec-screenshots-all - capture all missing screenshots via Safari (macOS)"
+	@echo "  showcase-capture - capture a local showcase section via Safari"
 	@echo "  doc-links       - tools/check-doc-links.R"
 	@echo "  gate            - run the full Quality Gate"
 	@echo ""
@@ -61,6 +70,22 @@ setup:
 	npm ci || npm install
 	$(R) -e 'install.packages(c("devtools", "lintr", "urlchecker", "pkgdown", "shinytest2", "withr", "spelling"), repos = "https://cloud.r-project.org")'
 	$(R) -e 'devtools::install_dev_deps(".")'
+	@$(MAKE) skills-install
+
+# Project-authored agent skills live under docs/skills/ (tracked).
+# This target mirrors each one into the local .claude/skills/ and
+# .agents/skills/ directories so Claude Code / Codex pick them up.
+# Re-run after editing any file under docs/skills/.
+skills-install:
+	@for skill in docs/skills/*.md; do \
+		name=$$(basename $$skill .md); \
+		if [ "$$name" = "README" ]; then continue; fi; \
+		echo "Installing skill: $$name"; \
+		mkdir -p .claude/skills/$$name .agents/skills/$$name; \
+		cp $$skill .claude/skills/$$name/SKILL.md; \
+		cp $$skill .agents/skills/$$name/SKILL.md; \
+	done
+	@echo "Local skills installed under .claude/skills/ and .agents/skills/."
 
 watch-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --watch
@@ -112,6 +137,25 @@ spec-screenshots:
 spec-screenshots-md:
 	$(R) tools/spec-screenshots.R --markdown
 
+spec-screenshots-check:
+	$(R) tools/spec-screenshots.R --check-markdown
+
+spec-screenshots-seed:
+	bash tools/capture-spec-screenshots.sh seed
+
+spec-screenshots-high-risk:
+	bash tools/capture-spec-screenshots.sh high-risk
+
+spec-screenshots-all:
+	bash tools/capture-spec-screenshots.sh all
+
+SECTION ?= field
+OUT ?= /tmp/showcase-capture.png
+THEME ?= light
+
+showcase-capture:
+	bash tools/capture-showcase-parity.sh "$(SECTION)" "$(OUT)" "$(THEME)"
+
 doc-links:
 	$(R) tools/check-doc-links.R
 
@@ -120,7 +164,7 @@ doc-links:
 # review and document tracked manually. See docs/phase-exits/TEMPLATE.md.
 # After the automated steps green, `verify` rebuilds and launches the
 # showcase + pkgdown so the maintainer eyeballs them before tagging.
-gate: build-css lint spell urls test docs check pkgdown budget doc-links verify
+gate: build-css lint spell urls test docs check pkgdown budget spec-screenshots-check doc-links verify
 	@echo ""
 	@echo "Automated gate steps green; showcase + pkgdown running."
 	@echo "Remaining manual steps for phase exit:"

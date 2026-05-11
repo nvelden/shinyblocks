@@ -54,10 +54,26 @@ passing the **Quality Gate** below before the next phase begins.
 >   Remaining fidelity work is the screenshot-backed parity review and
 >   any follow-up tuning it surfaces.
 >
-> **Hand-off plan:** the next implementer should read
-> [`docs/agent-plans/2026-05-10-screenshot-parity-handoff.md`](agent-plans/2026-05-10-screenshot-parity-handoff.md)
-> first. It is the current, slice-sized plan for the remaining
-> screenshot-backed parity work in Phase 5.
+> **Hand-off plan:** the next implementer should
+>
+> 1. **Read the `shinyblocks-component` skill** at
+>    [`docs/skills/shinyblocks-component.md`](skills/shinyblocks-component.md).
+>    It is the end-to-end recipe for adding or refactoring a
+>    `block_*()`: per-gate sync rule, shadcn-fidelity workflow, the
+>    parity-harness template (with positioning + cross-element-
+>    geometry checks baked in after the 2026-05-11 slider POC
+>    caught an off-centre-thumb bug the property-only diff missed),
+>    the common-pitfall list, and the pre-commit checklist. Run
+>    `make skills-install` once locally to register it with your
+>    agent runtime ( Claude Code / Codex / etc.) so it can be
+>    invoked via the Skill tool.
+> 2. Then read
+>    [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md)
+>    — the slice-sized plan for what to actually build, in what
+>    order, with each slice noting which skill applies.
+> 3. The 2026-05-10 screenshot-parity hand-off
+>    ([`docs/agent-plans/2026-05-10-screenshot-parity-handoff.md`](agent-plans/2026-05-10-screenshot-parity-handoff.md))
+>    is folded into slice 2 of the 2026-05-09 plan.
 >
 > Slices, in order:
 >
@@ -218,7 +234,7 @@ Non-obvious problems → postmortem under
 
 ## Continuous Tracks
 
-Three artifacts grow with every phase. Details in the
+Four artifacts grow with every phase. Details in the
 [strategy doc](agent-plans/2026-05-08-port-strategy.md#shinylive-showcase)
 and [ADR 0013](decisions/0013-component-gallery-quarto.md):
 
@@ -235,6 +251,18 @@ and [ADR 0013](decisions/0013-component-gallery-quarto.md):
   contract enforced by `test-showcase.R`. See
   [§Showcase App](#showcase-app). Hosted version exported via
   Shinylive to `site/showcase/`.
+- **Visual-parity harness** — Playwright + `getComputedStyle` + DOM
+  bounding-rect cross-checks under `tools/parity/`, against pinned
+  shadcn-react. Per [ADR 0016](decisions/0016-visual-parity-harness.md).
+  POCs cover `block_select()` and `block_slider()` today; the full
+  Vite + React reference app is slice 6 in
+  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md).
+  The `shinyblocks-component` skill at
+  [`docs/skills/shinyblocks-component.md`](skills/shinyblocks-component.md)
+  is the recipe agents use to wire new components into the harness;
+  `make skills-install` mirrors it into the local
+  `.claude/skills/` and `.agents/skills/` directories so the agent
+  runtimes pick it up.
 
 ## Components Gallery
 

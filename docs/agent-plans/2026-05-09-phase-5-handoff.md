@@ -1,28 +1,51 @@
-# Phase 5 Hand-off (2026-05-09)
+# Phase 5 Hand-off (2026-05-09, updated 2026-05-11)
 
 A consolidated, actionable hand-off plan for the next implementer
 picking up Phase 5 of `shinyblocks`. Each slice below is sized to
 land as one commit.
 
+## Use the skill
+
+> **Invoke the `shinyblocks-component` skill** before starting any
+> slice that adds, refactors, or improves the parity of a
+> `block_*()` component. The canonical content lives at
+> [`docs/skills/shinyblocks-component.md`](../skills/shinyblocks-component.md);
+> running `make skills-install` mirrors it into
+> `.claude/skills/shinyblocks-component/SKILL.md` and
+> `.agents/skills/shinyblocks-component/SKILL.md` so the agent runtimes
+> can trigger it on matching prompts. The skill is the end-to-end
+> recipe — per-gate sync rule, shadcn-fidelity workflow, parity-
+> harness template, common pitfalls, and the checklist that must
+> pass before commit. Read it first; don't reinvent the workflow.
+> Each slice below assumes the skill is loaded.
+
 ## Context
 
-Phase 5 components have landed (forms, tabs, theme runtime), but the
-shadcn-fidelity audit on 2026-05-09 surfaced three cross-cutting
-visual drifts plus a reference-screenshot gap. The decisions and
-scaffolding for follow-up are already in place:
+Phase 5 components have landed (forms, tabs, theme runtime, slider),
+but the shadcn-fidelity audit on 2026-05-09 surfaced three cross-
+cutting visual drifts plus a reference-screenshot gap. The
+2026-05-11 slider work also caught an off-centre-thumb bug the
+property-only harness missed; that lesson is now baked into the
+skill. The decisions and scaffolding for follow-up are in place:
 
 - [ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md) —
   wrap-by-default for form inputs.
 - [ADR 0015](../decisions/0015-component-specs.md) — per-component
   spec doc with reference screenshot.
+- [ADR 0016](../decisions/0016-visual-parity-harness.md) —
+  computed-style + bounding-rect diff against pinned shadcn-react.
 - [Shadcn fidelity audit](2026-05-09-shadcn-fidelity-audit.md) — the
   per-component drift findings the slices below derive from.
 - [Per-gate component-sync rule](../ROADMAP.md#per-gate-component-sync-rule) —
   showcase, pkgdown reference, gallery, spec, NEWS must stay in sync.
 
-The previous slice fixed the safe drifts (badge `rounded-full` +
+Recent slices fixed the safe drifts (badge `rounded-full` +
 `text-xs`, button link `text-primary`, button outline `shadow-xs`,
-destructive `text-white` + dark-mode dim). What's left is structural.
+destructive `text-white` + dark-mode dim) and built two
+proof-of-concept parity scripts (`tools/parity/select-poc.mjs` and
+`tools/parity/slider-poc.mjs`) that demonstrate the harness catches
+real drift. What's left is the structural cross-cuts and the
+slice-by-slice rollout.
 
 ## Slice order
 
@@ -31,6 +54,9 @@ both touch every interactive component's CSS — bundle them so the
 visual changes ship together.
 
 ### Slice 1 — Focus-visible redesign
+
+**Skill:** `shinyblocks-component` — applies the cross-cut to every
+interactive component listed in the property contract.
 
 **Why first:** the global focus-visible rule in `.sb-app *` overrides
 component-specific focus styling. shadcn applies a softer 3px ring
@@ -95,6 +121,9 @@ For controls without a border (e.g. `.sb-button-default`), the
 
 ### Slice 2 — `aria-invalid` cross-cut
 
+**Skill:** `shinyblocks-component` — adds an invalid state to every
+interactive component.
+
 **Why second:** pairs with the focus-ring change because both touch
 the same CSS bases. Ship together if possible.
 
@@ -150,6 +179,8 @@ accepts `aria-invalid`.
 
 ### Slice 3 — Tabs refactor to shadcn's data-attribute model
 
+**Skill:** `shinyblocks-component` (this is a refactor + parity slice).
+
 **Why third:** independent of slices 1–2 but the largest piece of
 work; tackle once the simpler cross-cuts are in.
 
@@ -189,6 +220,9 @@ audit doc, §Tabs.
 ---
 
 ### Slice 4 — Reference screenshots for seed specs
+
+**Skill:** `shinyblocks-component` — see "Step 4 — Spec doc" and
+"Step 7 — Document divergences" for the capture flow.
 
 **Why:** the per-gate sync rule treats the reference screenshot as
 the shadcn ground truth. Today the seed specs ([button.md](../component-specs/button.md),
@@ -244,6 +278,9 @@ ongoing parity review against those captures.
 ---
 
 ### Slice 6 — Visual-parity harness ([ADR 0016](../decisions/0016-visual-parity-harness.md))
+
+**Skill:** `shinyblocks-component` — see "Step 5 — Parity harness"
+for the POC structure to generalise from.
 
 **Why:** spec docs + reference screenshots are reviewer-anchored and
 demonstrably miss subtle drift (a 2026-05-11 audit found three
