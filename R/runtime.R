@@ -37,7 +37,8 @@ runtime_component <- function(
         `data-shinyblocks-payload` = "",
         htmltools::HTML(runtime_payload_json(payload))
       ),
-      children
+      htmltools::tags$div(`data-shinyblocks-react` = ""),
+      htmltools::tags$div(`data-shinyblocks-children` = "", children)
     )
   )
 }

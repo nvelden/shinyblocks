@@ -52,6 +52,8 @@ test_that("runtime_component() emits a scoped mount node with dependencies", {
   expect_match(html, 'data-sb-component="fixture"', fixed = TRUE)
   expect_match(html, 'data-sb-input-id="choice"', fixed = TRUE)
   expect_match(html, 'data-shinyblocks-payload=""', fixed = TRUE)
+  expect_match(html, 'data-shinyblocks-react=""', fixed = TRUE)
+  expect_match(html, 'data-shinyblocks-children=""', fixed = TRUE)
   expect_match(html, ">Child<", fixed = TRUE)
   expect_identical(deps[[1]]$name, "shinyblocks")
 })

@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run build:css && npm run build:runtime",
     "build:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --minify",
-    "build:runtime": "node tools/build-runtime.mjs",
+    "build:runtime": "vite build --config frontend/vite.config.js && node tools/build-runtime.mjs",
     "watch:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --watch",
     "build:icons": "node tools/build-icons.mjs",
     "test:runtime": "node tools/runtime-smoke.mjs",
@@ -17,8 +17,13 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "esbuild": "^0.28.0",
     "lucide-static": "^1.14.0",
     "playwright": "^1.59.1",
-    "tailwindcss": "^4.2.4"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "tailwindcss": "^4.2.4",
+    "vite": "^8.0.12"
   }
 }

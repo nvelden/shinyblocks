@@ -10,6 +10,7 @@
 * Expanded the Shiny-backed runtime browser smoke fixture to cover explicit `insertUI()` / `removeUI()` and id reuse.
 * Expanded the runtime input-update browser fixture to cover clear/reset updates, enable-after-disable, stale update rejection, and Shiny module namespacing.
 * Added browser-backed runtime collision coverage for host Bootstrap-style selectors, Selectize-style selectors, and htmlwidget children inside runtime mounts.
+* Switched the runtime JavaScript foundation from concatenated vanilla browser scripts to a Vite-built React/ReactDOM bundle, with React-owned mount slots kept separate from Shiny child slots so Shiny outputs and htmlwidgets continue to bind inside runtime components.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed

@@ -46,6 +46,11 @@ phase begins.
 >   verifies host Bootstrap-style selectors, Selectize-style selectors,
 >   and htmlwidget children inside runtime mounts are not reset by
 >   runtime CSS.
+> - **Phase 1 React bundle foundation** — runtime JavaScript now builds
+>   through Vite with React/ReactDOM `createRoot()`. Runtime mounts keep
+>   a dedicated React slot separate from `data-shinyblocks-children`
+>   so Shiny outputs and htmlwidgets remain under Shiny's binding
+>   lifecycle.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -73,8 +78,8 @@ phase begins.
 > Still owed for Phase 1 runtime foundation:
 > - Add component-specific updater contracts during the first stateful
 >   component migration, starting with `update_block_select()`.
-> - Browser-backed CSS collision fixtures for Bootstrap, bslib,
->   DT/plotly/htmlwidgets, scoped tokens, and portal content.
+> - Browser-backed CSS collision fixtures for bslib, DT/plotly,
+>   scoped tokens, and portal content.
 > - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.
 > - Do **not** migrate `block_button()`, `block_badge()`, or
 >   `block_select()` until Phase 1 proves scoped CSS, Shiny state sync,
