@@ -25,8 +25,12 @@ ui <- shiny::fluidPage(
   shiny::actionButton("set_b", "Set B"),
   shiny::actionButton("disable_choice", "Disable"),
   shiny::actionButton("toggle_dynamic", "Toggle dynamic"),
+  shiny::actionButton("insert_runtime", "Insert runtime"),
+  shiny::actionButton("remove_runtime", "Remove runtime"),
   shiny::uiOutput("dynamic_mount"),
-  shiny::verbatimTextOutput("dynamic_value")
+  shiny::verbatimTextOutput("dynamic_value"),
+  shiny::div(id = "insert_target"),
+  shiny::verbatimTextOutput("inserted_value")
 )
 
 server <- function(input, output, session) {
@@ -34,6 +38,7 @@ server <- function(input, output, session) {
   output$choice_value <- shiny::renderText(input$choice %||% "<NULL>")
   output$nested_value <- shiny::renderText(input$nested %||% "<NULL>")
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
+  output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
 
   shiny::observeEvent(input$set_b, {
     runtime$runtime_update(
@@ -75,6 +80,30 @@ server <- function(input, output, session) {
   })
 
   output$dynamic_child <- shiny::renderText("dynamic-child-ready")
+
+  shiny::observeEvent(input$insert_runtime, {
+    shiny::insertUI(
+      selector = "#insert_target",
+      where = "beforeEnd",
+      ui = shiny::div(
+        id = "inserted_host",
+        runtime$runtime_component(
+          component = "fixture",
+          input_id = "inserted",
+          state = list(value = "y"),
+          binding = list(input = TRUE),
+          mount_id = "runtime-inserted",
+          children = list(shiny::textOutput("inserted_child"))
+        )
+      )
+    )
+  })
+
+  shiny::observeEvent(input$remove_runtime, {
+    shiny::removeUI(selector = "#inserted_host", immediate = TRUE)
+  })
+
+  output$inserted_child <- shiny::renderText("inserted-child-ready")
 }
 
 shiny::runApp(
