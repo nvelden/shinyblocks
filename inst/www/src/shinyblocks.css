@@ -1052,35 +1052,6 @@
     display: inline-flex;
   }
 
-  /* shadcn badge contract (apps/v4 new-york-v4 registry):
-   *   rounded-full, text-xs, gap-1, border-transparent on base.
-   *   destructive uses text-white (not text-destructive-foreground)
-   *   so it stays light over the red surface in both modes.
-   *   See docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md. */
-  .sb-badge {
-    @apply inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap;
-  }
-
-  .sb-badge-default {
-    @apply bg-primary text-primary-foreground;
-  }
-
-  .sb-badge-secondary {
-    @apply bg-secondary text-secondary-foreground;
-  }
-
-  .sb-badge-outline {
-    @apply border-border text-foreground;
-  }
-
-  .sb-badge-destructive {
-    @apply bg-destructive text-white;
-  }
-
-  [data-theme="dark"] .sb-badge-destructive {
-    background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
-  }
-
   .sb-alert {
     @apply relative grid gap-y-0.5 rounded-lg border px-4 py-3 text-sm;
     grid-template-columns: auto minmax(0, 1fr);

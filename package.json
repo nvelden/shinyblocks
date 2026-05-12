@@ -6,9 +6,9 @@
   "packageManager": "npm@11.6.2",
   "scripts": {
     "build": "npm run build:css && npm run build:runtime",
-    "build:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --minify",
+    "build:css": "tailwindcss --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --minify",
     "build:runtime": "vite build --config frontend/vite.config.js && node tools/build-runtime.mjs",
-    "watch:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --watch",
+    "watch:css": "tailwindcss --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --watch",
     "build:icons": "node tools/build-icons.mjs",
     "test:runtime": "node tools/runtime-smoke.mjs",
     "test:runtime-shiny": "node tools/runtime-shiny-smoke.mjs",

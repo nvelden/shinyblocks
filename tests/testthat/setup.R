@@ -27,3 +27,20 @@ render_html <- function(tag) {
 tag_attr <- function(tag, name) {
   if (inherits(tag, "shiny.tag")) tag$attribs[[name]] else NULL
 }
+
+runtime_payload_from <- function(tag) {
+  html <- render_html(tag)
+  match <- regexpr(
+    '<script type="application/json" data-shinyblocks-payload="">(.*?)</script>',
+    html,
+    perl = TRUE
+  )
+  stopifnot(match > 0)
+  script <- regmatches(html, match)
+  json <- sub(
+    '^<script type="application/json" data-shinyblocks-payload="">(.*)</script>$',
+    "\\1",
+    script
+  )
+  jsonlite::fromJSON(json, simplifyVector = FALSE)
+}

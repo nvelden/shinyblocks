@@ -100,6 +100,24 @@ as_component_child <- function(value, type, builder) {
   builder(value)
 }
 
+html_fragment <- function(...) {
+  rendered <- htmltools::renderTags(htmltools::tagList(...))$html
+  paste(as.character(rendered), collapse = "")
+}
+
+named_attrs <- function(attrs, arg = "...") {
+  if (length(attrs) == 0) {
+    return(list())
+  }
+
+  names <- names(attrs)
+  if (is.null(names) || any(!nzchar(names))) {
+    stop(sprintf("All `%s` attributes must be named.", arg), call. = FALSE)
+  }
+
+  attrs
+}
+
 append_idref <- function(existing, value) {
   refs <- unique(c(strsplit(existing %||% "", "\\s+")[[1]], value))
   refs <- refs[nzchar(refs)]

@@ -176,22 +176,36 @@ block_button <- function(
     c("inline-start", "inline-end"),
     "icon_position"
   )
-  icon <- set_icon_position(icon, icon_position)
+  attrs <- named_attrs(list(...))
+  disabled <- isTRUE(attrs$disabled) || identical(attrs$disabled, NA)
+  attrs$disabled <- NULL
 
-  attach_shinyblocks_deps(
-    htmltools::tags$button(
-      class = merge_classes(
-        "sb-button",
-        paste0("sb-button-", variant),
-        paste0("sb-button-size-", size),
-        class
-      ),
-      type = "button",
-      ...,
-      if (identical(icon_position, "inline-start")) icon,
-      label,
-      if (identical(icon_position, "inline-end")) icon
-    )
+  icon_name <- NULL
+  icon_html <- NULL
+  if (!is.null(icon)) {
+    if (inherits(icon, "shiny.tag")) {
+      icon$attribs[["data-icon"]] <- icon_position
+      icon_html <- html_fragment(icon)
+    } else {
+      validate_icon_name(icon)
+      icon_name <- icon
+    }
+  }
+
+  runtime_component(
+    component = "button",
+    props = list(
+      labelHtml = html_fragment(label),
+      variant = variant,
+      size = size,
+      iconName = icon_name,
+      iconHtml = icon_html,
+      iconPosition = icon_position,
+      spriteHref = sprite_href(),
+      attrs = attrs,
+      disabled = disabled
+    ),
+    class = class
   )
 }
 
@@ -214,15 +228,13 @@ block_badge <- function(
     c("default", "secondary", "outline", "destructive")
   )
 
-  attach_shinyblocks_deps(
-    htmltools::tags$span(
-      class = merge_classes(
-        "sb-badge",
-        paste0("sb-badge-", variant),
-        class
-      ),
-      label
-    )
+  runtime_component(
+    component = "badge",
+    props = list(
+      labelHtml = html_fragment(label),
+      variant = variant
+    ),
+    class = class
   )
 }
 
