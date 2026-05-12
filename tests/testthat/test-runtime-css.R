@@ -62,6 +62,15 @@ test_that("runtime CSS does not reset all runtime children", {
   expect_no_match(css, "*::after", fixed = TRUE)
 })
 
+test_that("runtime tokens are scoped to runtime and portal roots", {
+  css <- runtime_css()
+
+  expect_match(css, "[data-shinyblocks-root]{--radius:", fixed = TRUE)
+  expect_match(css, "[data-shinyblocks-portal-root]{--radius:", fixed = TRUE)
+  expect_match(css, "--background:oklch(100% 0 0)", fixed = TRUE)
+  expect_no_match(css, ":root{--radius", fixed = TRUE)
+})
+
 test_that("runtime assets are attached and exist in the package", {
   dependency <- local_internal()$shinyblocks_dependency()
   runtime_assets <- c(

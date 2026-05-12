@@ -61,6 +61,7 @@ try {
   });
   await assertText(page, "#fixture-widget", "widget-ready");
   await assertComputedStyle(page, "#fixture-widget", "boxSizing", "content-box");
+  await page.locator("#nested_plot img").waitFor({ state: "visible" });
   await assertText(page, "#nested_table table tbody td", "table-ready");
 
   await assertComputedStyle(page, "#host-button", "borderRadius", "13px");
@@ -74,6 +75,9 @@ try {
   await assertComputedStyle(page, "#host-plotly", "position", "relative");
   await assertComputedStyle(page, "#portal-host-button", "boxSizing", "content-box");
   await assertComputedStyle(page, "#portal-host-button", "borderRadius", "17px");
+  await assertCustomProperty(page, "#host-token-probe", "--background", "rgb(7, 8, 9)");
+  await assertCustomProperty(page, "#runtime-choice", "--background", "oklch(100% 0 0)");
+  await assertCustomProperty(page, "[data-shinyblocks-portal-root]", "--background", "oklch(100% 0 0)");
 
   await page.fill("#nested", "from-browser");
   await assertText(page, "#nested_value", "from-browser");
@@ -183,6 +187,14 @@ async function assertText(page, selector, expected) {
 async function assertComputedStyle(page, selector, property, expected) {
   const actual = await page.locator(selector).evaluate((node, prop) => {
     return window.getComputedStyle(node)[prop];
+  }, property);
+
+  assert.equal(actual, expected, `${selector} ${property}`);
+}
+
+async function assertCustomProperty(page, selector, property, expected) {
+  const actual = await page.locator(selector).evaluate((node, prop) => {
+    return window.getComputedStyle(node).getPropertyValue(prop).trim();
   }, property);
 
   assert.equal(actual, expected, `${selector} ${property}`);

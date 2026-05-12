@@ -75,6 +75,10 @@ ui <- shiny::fluidPage(
     #fixture-widget.html-widget {
       box-sizing: content-box;
     }
+    #host-token-probe {
+      --background: rgb(7, 8, 9);
+      color: var(--background);
+    }
     "
   )),
   shiny::tags$button(id = "host-button", class = "btn", "Host button"),
@@ -84,6 +88,7 @@ ui <- shiny::fluidPage(
     class = "selectize-control",
     "Host selectize"
   ),
+  shiny::tags$div(id = "host-token-probe", "Host token probe"),
   bslib::card(
     id = "host-bslib-card",
     class = "host-bslib-card",
@@ -111,6 +116,7 @@ ui <- shiny::fluidPage(
     children = list(
       shiny::textOutput("child_text"),
       shiny::textInput("nested", "Nested", value = "n0"),
+      shiny::plotOutput("nested_plot", height = "120px"),
       DT::dataTableOutput("nested_table"),
       htmlwidget_fixture()
     )
@@ -133,6 +139,9 @@ ui <- shiny::fluidPage(
 
 server <- function(input, output, session) {
   output$child_text <- shiny::renderText("child-ready")
+  output$nested_plot <- shiny::renderPlot({
+    graphics::plot(1:3, 1:3, type = "b", xlab = "", ylab = "")
+  })
   output$nested_table <- DT::renderDT(
     data.frame(label = "table-ready"),
     options = list(dom = "t"),
