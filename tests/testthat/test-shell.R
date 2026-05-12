@@ -22,6 +22,7 @@ test_that("block_page renders the shell landmarks", {
   expect_match(html, 'class="sb-sidebar-mobile-trigger"', fixed = TRUE)
   expect_match(html, '<header class="sb-header">', fixed = TRUE)
   expect_match(html, '<main class="sb-body">', fixed = TRUE)
+  expect_match(html, 'data-shinyblocks-portal-root=""', fixed = TRUE)
   expect_match(head, "document.documentElement.dataset.theme", fixed = TRUE)
 })
 

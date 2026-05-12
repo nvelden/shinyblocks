@@ -2,12 +2,15 @@
   "name": "shinyblocks-build",
   "private": true,
   "type": "module",
-  "description": "Maintainer-only Tailwind v4 build pipeline for shinyblocks. End users do not need Node.",
+  "description": "Maintainer-only frontend build pipeline for shinyblocks. End users do not need Node.",
   "packageManager": "npm@11.6.2",
   "scripts": {
+    "build": "npm run build:css && npm run build:runtime",
     "build:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --minify",
+    "build:runtime": "node tools/build-runtime.mjs",
     "watch:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --watch",
     "build:icons": "node tools/build-icons.mjs",
+    "test:runtime": "node tools/runtime-smoke.mjs",
     "shadcn:info": "npx shadcn@latest info --json",
     "shadcn:docs": "npx shadcn@latest docs"
   },

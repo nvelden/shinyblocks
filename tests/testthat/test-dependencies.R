@@ -3,8 +3,14 @@ test_that("components attach the shinyblocks dependency", {
 
   expect_length(dependencies, 1)
   expect_identical(dependencies[[1]]$name, "shinyblocks")
-  expect_identical(dependencies[[1]]$stylesheet, "shinyblocks.css")
-  expect_identical(dependencies[[1]]$script, "shinyblocks.js")
+  expect_identical(
+    dependencies[[1]]$stylesheet,
+    c("shinyblocks.css", "shinyblocks-runtime.css")
+  )
+  expect_identical(
+    dependencies[[1]]$script,
+    c("shinyblocks.js", "shinyblocks-runtime.js")
+  )
   expect_identical(unname(dependencies[[1]]$attachment), "icons/sprite.svg")
 })
 

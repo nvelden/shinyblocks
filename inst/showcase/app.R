@@ -1,5 +1,5 @@
-library(shiny)
-library(shinyblocks)
+suppressWarnings(suppressPackageStartupMessages(library(shiny)))
+suppressPackageStartupMessages(library(shinyblocks))
 
 source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
