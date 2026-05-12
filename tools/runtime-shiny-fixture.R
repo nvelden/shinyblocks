@@ -8,6 +8,25 @@ runtime <- asNamespace("shinyblocks")
 
 dynamic_visible <- shiny::reactiveVal(FALSE)
 
+htmlwidget_fixture <- function() {
+  htmlwidgets::createWidget(
+    name = "runtimeFixture",
+    x = list(text = "widget-ready"),
+    width = "220px",
+    height = "40px",
+    package = "shinyblocks",
+    elementId = "fixture-widget",
+    dependencies = list(
+      htmltools::htmlDependency(
+        name = "runtime-fixture-widget",
+        version = "1.0.0",
+        src = c(file = normalizePath("tools", mustWork = TRUE)),
+        script = "runtime-fixture-widget.js"
+      )
+    )
+  )
+}
+
 module_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -26,6 +45,33 @@ module_ui <- function(id) {
 }
 
 ui <- shiny::fluidPage(
+  shiny::tags$style(shiny::HTML(
+    "
+    #host-button.btn {
+      border-radius: 13px;
+      box-sizing: content-box;
+      color: rgb(1, 2, 3);
+    }
+    #host-nav.nav-link {
+      color: rgb(4, 5, 6);
+      text-decoration-line: underline;
+    }
+    #host-selectize.selectize-control {
+      box-sizing: content-box;
+      min-height: 17px;
+    }
+    #fixture-widget.html-widget {
+      box-sizing: content-box;
+    }
+    "
+  )),
+  shiny::tags$button(id = "host-button", class = "btn", "Host button"),
+  shiny::tags$a(id = "host-nav", class = "nav-link", href = "#", "Host nav"),
+  shiny::tags$div(
+    id = "host-selectize",
+    class = "selectize-control",
+    "Host selectize"
+  ),
   runtime$runtime_component(
     component = "fixture",
     input_id = "choice",
@@ -34,7 +80,8 @@ ui <- shiny::fluidPage(
     mount_id = "runtime-choice",
     children = list(
       shiny::textOutput("child_text"),
-      shiny::textInput("nested", "Nested", value = "n0")
+      shiny::textInput("nested", "Nested", value = "n0"),
+      htmlwidget_fixture()
     )
   ),
   shiny::verbatimTextOutput("choice_value"),

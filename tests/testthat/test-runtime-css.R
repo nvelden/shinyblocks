@@ -54,6 +54,14 @@ test_that("runtime CSS does not target host framework selectors", {
   expect_identical(hits, character())
 })
 
+test_that("runtime CSS does not reset all runtime children", {
+  css <- runtime_css()
+
+  expect_no_match(css, "[data-shinyblocks-root] *", fixed = TRUE)
+  expect_no_match(css, "*::before", fixed = TRUE)
+  expect_no_match(css, "*::after", fixed = TRUE)
+})
+
 test_that("runtime assets are attached and exist in the package", {
   dependency <- local_internal()$shinyblocks_dependency()
   runtime_assets <- c(

@@ -42,6 +42,10 @@ phase begins.
 > - **Phase 1 input-update fixture** — the Shiny browser fixture now
 >   verifies clear/reset updates, enable-after-disable, stale update
 >   rejection, and Shiny module namespacing.
+> - **Phase 1 collision/widget fixture** — the Shiny browser fixture
+>   verifies host Bootstrap-style selectors, Selectize-style selectors,
+>   and htmlwidget children inside runtime mounts are not reset by
+>   runtime CSS.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -67,8 +71,6 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Still owed for Phase 1 runtime foundation:
-> - Expand Shiny child-binding fixtures to cover htmlwidgets inside
->   runtime-rendered containers.
 > - Add component-specific updater contracts during the first stateful
 >   component migration, starting with `update_block_select()`.
 > - Browser-backed CSS collision fixtures for Bootstrap, bslib,
