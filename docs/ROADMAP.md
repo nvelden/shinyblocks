@@ -54,7 +54,8 @@ phase begins.
 >   lifecycle.
 > - **Phase 1 scoped tokens** — default runtime token values are scoped
 >   to `[data-shinyblocks-root]` and `[data-shinyblocks-portal-root]`,
->   with static checks blocking accidental `:root` token writes.
+>   with static checks blocking accidental `:root` token writes and a
+>   browser fixture proving host-page tokens remain untouched.
 > - **Phase 1 runtime budgets** — ADR 0017 records measured runtime
 >   JS/CSS baselines and `tools/budget.R` now enforces Phase 1 ceilings
 >   for raw and gzipped runtime assets.
@@ -85,8 +86,6 @@ phase begins.
 > Still owed for Phase 1 runtime foundation:
 > - Add component-specific updater contracts during the first stateful
 >   component migration, starting with `update_block_select()`.
-> - Rerun the browser-backed scoped-token fixture once Playwright
->   escalation is available again.
 > - Do **not** migrate `block_button()`, `block_badge()`, or
 >   `block_select()` until Phase 1 proves scoped CSS, Shiny state sync,
 >   updater semantics, modules, dynamic UI, portals, and Shiny children.
