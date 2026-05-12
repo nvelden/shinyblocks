@@ -83,6 +83,17 @@ sections <- list(
     file = "button.R"
   ),
   list(
+    id = "select",
+    label = "Select",
+    icon = "chevron-down",
+    title = "Select",
+    lead = paste(
+      "Runtime select input with placeholder, selected value,",
+      "disabled state, width, classes, and server-side updates."
+    ),
+    file = "select.R"
+  ),
+  list(
     id = "field",
     label = "Field",
     icon = "edit",
@@ -297,6 +308,55 @@ ui <- block_page(
   ))
 )
 
-server <- function(input, output, session) {}
+server <- function(input, output, session) {
+  output$showcase_select_value <- shiny::renderText({
+    value <- input$showcase_select_reactive
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (identical(value, "")) {
+      return("<EMPTY>")
+    }
+    value
+  })
+
+  shiny::observeEvent(input$showcase_select_set_pro, {
+    update_block_select(
+      session,
+      "showcase_select_reactive",
+      selected = "pro",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$showcase_select_clear, {
+    update_block_select(
+      session,
+      "showcase_select_reactive",
+      selected = NULL,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$showcase_select_disable, {
+    update_block_select(session, "showcase_select_reactive", disabled = TRUE)
+  })
+
+  shiny::observeEvent(input$showcase_select_enable, {
+    update_block_select(session, "showcase_select_reactive", disabled = FALSE)
+  })
+
+  shiny::observeEvent(input$showcase_select_replace_choices, {
+    update_block_select(
+      session,
+      "showcase_select_reactive",
+      choices = c(Starter = "starter", Growth = "growth", Scale = "scale"),
+      selected = "growth",
+      placeholder = "Choose a package",
+      disabled = FALSE,
+      notify = TRUE
+    )
+  })
+}
 
 shinyApp(ui, server)
