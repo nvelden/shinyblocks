@@ -76,10 +76,10 @@ programmatically by the Playwright parity harness (`tools/parity/`);
 the rest still rely on spec docs plus committed screenshots until
 their registry entries land.
 
-As of 2026-05-11, the shared registry slice covers `button`,
-`checkbox`, `select`, `slider`, `switch`, and `textarea`. Remaining
-component families still need to be migrated before parity becomes the
-repo-wide primary verifier.
+As of 2026-05-12, the shared registry slice covers `alert`, `badge`,
+`button`, `checkbox`, `select`, `slider`, `switch`, and `textarea`.
+Remaining component families still need to be migrated before parity
+becomes the repo-wide primary verifier.
 
 The list below is the final pre-public sweep on top of that:
 

@@ -31,6 +31,78 @@ const BUTTON_CLASS = [
   "py-2"
 ].join(" ");
 
+const BADGE_BASE_CLASS = [
+  "inline-flex",
+  "w-fit",
+  "shrink-0",
+  "items-center",
+  "justify-center",
+  "gap-1",
+  "overflow-hidden",
+  "rounded-full",
+  "border",
+  "border-transparent",
+  "px-2",
+  "py-0.5",
+  "text-xs",
+  "font-medium",
+  "whitespace-nowrap"
+].join(" ");
+
+const BADGE_DEFAULT_CLASS = [
+  BADGE_BASE_CLASS,
+  "bg-primary",
+  "text-primary-foreground"
+].join(" ");
+
+const BADGE_SECONDARY_CLASS = [
+  BADGE_BASE_CLASS,
+  "bg-secondary",
+  "text-secondary-foreground"
+].join(" ");
+
+const BADGE_OUTLINE_CLASS = [
+  BADGE_BASE_CLASS,
+  "parity-badge-outline",
+  "border-border",
+  "text-foreground"
+].join(" ");
+
+const BADGE_DESTRUCTIVE_CLASS = [
+  BADGE_BASE_CLASS,
+  "parity-badge-destructive",
+  "bg-destructive",
+  "text-white",
+  "dark:bg-destructive/60"
+].join(" ");
+
+const ALERT_BASE_CLASS = [
+  "relative",
+  "grid",
+  "w-full",
+  "items-start",
+  "gap-y-0.5",
+  "rounded-lg",
+  "border",
+  "px-4",
+  "py-3",
+  "text-sm"
+].join(" ");
+
+const ALERT_DEFAULT_CLASS = [
+  ALERT_BASE_CLASS,
+  "parity-alert-default",
+  "bg-card",
+  "text-card-foreground"
+].join(" ");
+
+const ALERT_DESTRUCTIVE_CLASS = [
+  ALERT_BASE_CLASS,
+  "parity-alert-destructive",
+  "bg-card",
+  "text-destructive"
+].join(" ");
+
 const SELECT_TRIGGER_BASE_CLASS = [
   "flex",
   "w-[180px]",
@@ -199,6 +271,142 @@ function ButtonRoute() {
             disabled: true
           },
           "Disabled"
+        )
+      )
+    )
+  );
+}
+
+function BadgeRoute() {
+  return e(
+    Stage,
+    { component: "badge" },
+    e(
+      "div",
+      { className: "parity-stack" },
+      e(
+        "div",
+        { className: "parity-row items-center" },
+        e(
+          "span",
+          {
+            className: BADGE_DEFAULT_CLASS,
+            "data-parity-state": "default"
+          },
+          "Default"
+        ),
+        e(
+          "span",
+          {
+            className: BADGE_SECONDARY_CLASS,
+            "data-parity-state": "secondary"
+          },
+          "Secondary"
+        ),
+        e(
+          "span",
+          {
+            className: BADGE_OUTLINE_CLASS,
+            "data-parity-state": "outline"
+          },
+          "Outline"
+        ),
+        e(
+          "span",
+          {
+            className: BADGE_DESTRUCTIVE_CLASS,
+            "data-parity-state": "destructive"
+          },
+          "Destructive"
+        )
+      )
+    )
+  );
+}
+
+function AlertIcon() {
+  return e(
+    "svg",
+    {
+      "aria-hidden": "true",
+      className: "size-4 translate-y-0.5 text-current",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round"
+    },
+    e("path", { d: "M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" }),
+    e("path", { d: "M12 9v4" }),
+    e("path", { d: "M12 17h.01" })
+  );
+}
+
+function AlertRoute() {
+  return e(
+    Stage,
+    { component: "alert" },
+    e(
+      "div",
+      { className: "parity-stack max-w-xl" },
+      e(
+        "div",
+        { className: "flex flex-col gap-4" },
+        e(
+          "div",
+          {
+            className: `${ALERT_DEFAULT_CLASS} grid-cols-[0_1fr]`,
+            "data-parity-state": "default"
+          },
+          e(
+            "div",
+            { className: "col-start-2 flex min-w-0 flex-col gap-1.5" },
+            e(
+              "div",
+              {
+                className: "text-sm font-medium leading-none tracking-tight",
+                "data-parity-role": "title"
+              },
+              "Heads up"
+            ),
+            e(
+              "div",
+              {
+                className: "text-sm [&_p]:leading-relaxed",
+                "data-parity-role": "description"
+              },
+              e("p", null, "shinyblocks alerts surface important inline messages.")
+            )
+          )
+        ),
+        e(
+          "div",
+          {
+            className: `${ALERT_DESTRUCTIVE_CLASS} grid-cols-[calc(var(--spacing)*4)_1fr] gap-x-3`,
+            "data-parity-state": "destructive"
+          },
+          e(AlertIcon),
+          e(
+            "div",
+            { className: "flex min-w-0 flex-col gap-1.5" },
+            e(
+              "div",
+              {
+                className: "text-sm font-medium leading-none tracking-tight",
+                "data-parity-role": "title"
+              },
+              "Build failed"
+            ),
+            e(
+              "div",
+              {
+                className: "parity-alert-destructive-description text-sm [&_p]:leading-relaxed",
+                "data-parity-role": "description"
+              },
+              e("p", null, "Three components failed to render. Check the console for details.")
+            )
+          )
         )
       )
     )
@@ -486,6 +694,12 @@ function App() {
   setTheme();
   const component = params.get("component");
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (component === "badge" || path === "/badge") {
+    return e(BadgeRoute);
+  }
+  if (component === "alert" || path === "/alert") {
+    return e(AlertRoute);
+  }
   if (component === "button" || path === "/button") {
     return e(ButtonRoute);
   }

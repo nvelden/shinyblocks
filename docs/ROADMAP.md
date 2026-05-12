@@ -51,8 +51,9 @@ passing the **Quality Gate** below before the next phase begins.
 >   3. Tabs refactor to the shadcn data-attribute model with the
 >      line variant.
 >   Remaining fidelity work is expanding the shared parity registry
->   beyond the current `button`, `checkbox`, `select`, `slider`,
->   `switch`, and `textarea` slice, then tuning any drift it surfaces.
+>   beyond the current `alert`, `badge`, `button`, `checkbox`,
+>   `select`, `slider`, `switch`, and `textarea` slice, then tuning
+>   any drift it surfaces.
 >
 > **Hand-off plan:** the next implementer should
 >
@@ -91,10 +92,11 @@ passing the **Quality Gate** below before the next phase begins.
 >    drift the spec-doc review misses (it reduced `block_select`
 >    trigger drift from 18 to 7 properties and surfaced the
 >    double-hover bug as a 2-rows-lit assertion). The initial harness
->    slice is now landed for `button`, `checkbox`, `select`, `slider`, `switch`, and `textarea`: dev-only `parity/` reference
->    app, `tools/parity/capture-styles.mjs`, `diff-styles.mjs`,
->    `normalise.mjs`, and a committed baseline under
->    `docs/component-specs/_parity/`. The next expansion work is to
+>    slice is now landed for `alert`, `badge`, `button`, `checkbox`,
+>    `select`, `slider`, `switch`, and `textarea`: dev-only `parity/`
+>    reference app, `tools/parity/capture-styles.mjs`,
+>    `diff-styles.mjs`, `normalise.mjs`, and a committed baseline
+>    under `docs/component-specs/_parity/`. The next expansion work is to
 >    continue down the remaining high-risk components and remove any
 >    now-redundant standalone POCs once coverage is fully duplicated.
 > 4. **Gallery resumption** — blocked on the WASM track. When

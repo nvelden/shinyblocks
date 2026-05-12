@@ -1082,7 +1082,7 @@
   }
 
   .sb-alert {
-    @apply grid gap-3 rounded-lg border p-4;
+    @apply relative grid gap-y-0.5 rounded-lg border px-4 py-3 text-sm;
     grid-template-columns: auto minmax(0, 1fr);
   }
 
@@ -1104,11 +1104,20 @@
   }
 
   .sb-alert-title {
-    @apply text-sm font-medium;
+    @apply text-sm font-medium leading-none tracking-tight;
   }
 
   .sb-alert-description {
-    @apply text-sm text-muted-foreground;
+    @apply text-sm;
+    color: inherit;
+  }
+
+  .sb-alert-description p {
+    @apply leading-relaxed;
+  }
+
+  .sb-alert-destructive .sb-alert-description {
+    color: color-mix(in oklch, var(--destructive) 90%, transparent);
   }
 
   .sb-value-box {

@@ -82,6 +82,30 @@
     @apply text-sm text-muted-foreground;
   }
 
+  .parity-badge-outline {
+    border-color: var(--border) !important;
+  }
+
+  .parity-badge-destructive {
+    background-color: var(--destructive) !important;
+  }
+
+  [data-theme="dark"] .parity-badge-destructive {
+    background-color: color-mix(in oklch, var(--destructive) 60%, transparent) !important;
+  }
+
+  .parity-alert-default {
+    border-color: var(--border) !important;
+  }
+
+  .parity-alert-destructive {
+    border-color: color-mix(in oklch, var(--destructive) 40%, transparent) !important;
+  }
+
+  .parity-alert-destructive-description {
+    color: color-mix(in oklch, var(--destructive) 90%, transparent);
+  }
+
   .parity-slider-root {
     position: relative;
     width: 12rem;

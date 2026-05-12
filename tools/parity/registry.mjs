@@ -23,6 +23,58 @@ export const BUTTON_PROPS = [
   "pointerEvents"
 ];
 
+export const BADGE_PROPS = [
+  "backgroundColor",
+  "borderRadius",
+  "borderTopColor",
+  "borderTopStyle",
+  "borderTopWidth",
+  "color",
+  "display",
+  "fontSize",
+  "fontWeight",
+  "gap",
+  "height",
+  "justifyContent",
+  "lineHeight",
+  "overflowX",
+  "overflowY",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft",
+  "whiteSpace",
+  "width"
+];
+
+export const ALERT_ROOT_PROPS = [
+  "backgroundColor",
+  "borderRadius",
+  "borderTopColor",
+  "borderTopStyle",
+  "borderTopWidth",
+  "display",
+  "paddingTop",
+  "paddingRight",
+  "paddingBottom",
+  "paddingLeft",
+  "position"
+];
+
+export const ALERT_TITLE_PROPS = [
+  "color",
+  "fontSize",
+  "fontWeight",
+  "letterSpacing",
+  "lineHeight"
+];
+
+export const ALERT_DESCRIPTION_PROPS = [
+  "color",
+  "fontSize",
+  "lineHeight"
+];
+
 export const SELECT_PROPS = [
   "alignItems",
   "backgroundColor",
@@ -219,6 +271,70 @@ async function sliderExtraChecks(page, theme, state, selectors) {
 }
 
 export const REGISTRY = {
+  alert: {
+    component: "alert",
+    parityUrl: "http://127.0.0.1:5173/?component=alert",
+    showcaseUrl: "http://127.0.0.1:4321/#alert",
+    showcaseReadySelector: '[data-sb-section="alert"]:not([hidden])',
+    roles: {
+      root: {
+        props: ALERT_ROOT_PROPS,
+        referenceSelectors: {
+          default: '[data-parity-component="alert"] [data-parity-state="default"]',
+          destructive: '[data-parity-component="alert"] [data-parity-state="destructive"]'
+        },
+        showcaseSelectors: {
+          default: '[data-sb-section="alert"] .sb-parity-alert-default',
+          destructive: '[data-sb-section="alert"] .sb-parity-alert-destructive'
+        }
+      },
+      title: {
+        props: ALERT_TITLE_PROPS,
+        referenceSelectors: {
+          default: '[data-parity-component="alert"] [data-parity-state="default"] [data-parity-role="title"]',
+          destructive: '[data-parity-component="alert"] [data-parity-state="destructive"] [data-parity-role="title"]'
+        },
+        showcaseSelectors: {
+          default: '[data-sb-section="alert"] .sb-parity-alert-default .sb-alert-title',
+          destructive: '[data-sb-section="alert"] .sb-parity-alert-destructive .sb-alert-title'
+        }
+      },
+      description: {
+        props: ALERT_DESCRIPTION_PROPS,
+        referenceSelectors: {
+          default: '[data-parity-component="alert"] [data-parity-state="default"] [data-parity-role="description"]',
+          destructive: '[data-parity-component="alert"] [data-parity-state="destructive"] [data-parity-role="description"]'
+        },
+        showcaseSelectors: {
+          default: '[data-sb-section="alert"] .sb-parity-alert-default .sb-alert-description',
+          destructive: '[data-sb-section="alert"] .sb-parity-alert-destructive .sb-alert-description'
+        }
+      }
+    },
+    states: ["default", "destructive"],
+    themes: ["light", "dark"]
+  },
+  badge: {
+    component: "badge",
+    parityUrl: "http://127.0.0.1:5173/?component=badge",
+    showcaseUrl: "http://127.0.0.1:4321/#badge",
+    showcaseReadySelector: '[data-sb-section="badge"]:not([hidden])',
+    referenceSelectors: {
+      default: '[data-parity-component="badge"] [data-parity-state="default"]',
+      secondary: '[data-parity-component="badge"] [data-parity-state="secondary"]',
+      outline: '[data-parity-component="badge"] [data-parity-state="outline"]',
+      destructive: '[data-parity-component="badge"] [data-parity-state="destructive"]'
+    },
+    showcaseSelectors: {
+      default: '[data-sb-section="badge"] .sb-badge-default',
+      secondary: '[data-sb-section="badge"] .sb-badge-secondary',
+      outline: '[data-sb-section="badge"] .sb-badge-outline',
+      destructive: '[data-sb-section="badge"] .sb-badge-destructive'
+    },
+    props: BADGE_PROPS,
+    states: ["default", "secondary", "outline", "destructive"],
+    themes: ["light", "dark"]
+  },
   button: {
     component: "button",
     parityUrl: "http://127.0.0.1:5173/?component=button",
