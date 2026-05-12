@@ -55,6 +55,9 @@ phase begins.
 > - **Phase 1 scoped tokens** — default runtime token values are scoped
 >   to `[data-shinyblocks-root]` and `[data-shinyblocks-portal-root]`,
 >   with static checks blocking accidental `:root` token writes.
+> - **Phase 1 runtime budgets** — ADR 0017 records measured runtime
+>   JS/CSS baselines and `tools/budget.R` now enforces Phase 1 ceilings
+>   for raw and gzipped runtime assets.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -84,7 +87,6 @@ phase begins.
 >   component migration, starting with `update_block_select()`.
 > - Rerun the browser-backed scoped-token fixture once Playwright
 >   escalation is available again.
-> - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.
 > - Do **not** migrate `block_button()`, `block_badge()`, or
 >   `block_select()` until Phase 1 proves scoped CSS, Shiny state sync,
 >   updater semantics, modules, dynamic UI, portals, and Shiny children.

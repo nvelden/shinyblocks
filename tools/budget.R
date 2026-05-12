@@ -26,25 +26,25 @@ targets <- list(
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = NULL,
+    limit_kb = 5,
     metric = "raw",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = NULL,
+    limit_kb = 2,
     metric = "gzipped",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = NULL,
+    limit_kb = 225,
     metric = "raw",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = NULL,
+    limit_kb = 75,
     metric = "gzipped",
     group = "runtime"
   ),
