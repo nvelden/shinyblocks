@@ -11,6 +11,7 @@
     "watch:css": "@tailwindcss/cli --input inst/www/src/shinyblocks.css --output inst/www/shinyblocks.css --watch",
     "build:icons": "node tools/build-icons.mjs",
     "test:runtime": "node tools/runtime-smoke.mjs",
+    "test:runtime-shiny": "node tools/runtime-shiny-smoke.mjs",
     "shadcn:info": "npx shadcn@latest info --json",
     "shadcn:docs": "npx shadcn@latest docs"
   },

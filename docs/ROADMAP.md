@@ -33,6 +33,10 @@ phase begins.
 >   dynamic UI, Shiny child binding, and portal setup hooks.
 > - **Phase 1 browser smoke** — `npm run test:runtime` passes when
 >   Playwright can launch Chrome outside the Codex command sandbox.
+> - **Phase 1 Shiny browser fixture** — `npm run test:runtime-shiny`
+>   launches a Shiny app and verifies runtime input initialization,
+>   server updates, disabled state, dynamic `renderUI()` removal and
+>   reinsertion, and Shiny children inside runtime mounts.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -58,12 +62,10 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Still owed for Phase 1 runtime foundation:
-> - Expand browser verification beyond the initial runtime smoke into
->   Shiny-backed fixtures.
-> - Dynamic UI fixtures for `renderUI()`, `insertUI()`, `removeUI()`,
->   and id reuse.
-> - Shiny child-binding fixtures for outputs, htmlwidgets, and nested
->   inputs inside runtime-rendered containers.
+> - Expand dynamic UI fixtures to cover `insertUI()`, `removeUI()`,
+>   and id reuse outside `renderUI()`.
+> - Expand Shiny child-binding fixtures to cover htmlwidgets inside
+>   runtime-rendered containers.
 > - Browser-backed CSS collision fixtures for Bootstrap, bslib,
 >   DT/plotly/htmlwidgets, scoped tokens, and portal content.
 > - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.

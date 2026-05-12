@@ -28,7 +28,15 @@
     runtime.bindShinyChildren(root);
 
     if (payload.id && payload.binding && payload.binding.input) {
-      runtime.setInputValue(payload.id, currentValue(payload), "event");
+      const initialized = runtime.setInputValue(
+        payload.id,
+        currentValue(payload),
+        "event"
+      );
+      if (!initialized) {
+        root.dataset.sbPendingInput = "true";
+        runtime.schedulePendingInputFlush();
+      }
     }
   };
 
@@ -43,6 +51,45 @@
 
   runtime.mountAll = function mountAll(container) {
     runtimeRoots(container).forEach(runtime.mountRoot);
+  };
+
+  runtime.flushPendingInputs = function flushPendingInputs(container) {
+    runtimeRoots(container || document).forEach(function (root) {
+      if (!root.hasAttribute("data-sb-pending-input")) return;
+
+      const payload = mounted.get(root);
+      if (!payload || !payload.id || !payload.binding || !payload.binding.input) {
+        return;
+      }
+
+      const initialized = runtime.setInputValue(
+        payload.id,
+        currentValue(payload),
+        "event"
+      );
+      if (initialized) root.removeAttribute("data-sb-pending-input");
+    });
+  };
+
+  runtime.hasPendingInputs = function hasPendingInputs(container) {
+    return runtimeRoots(container || document).some(function (root) {
+      return root.hasAttribute("data-sb-pending-input");
+    });
+  };
+
+  runtime.schedulePendingInputFlush = function schedulePendingInputFlush() {
+    if (runtime.pendingInputFlushTimer) return;
+
+    let attempts = 0;
+    runtime.pendingInputFlushTimer = window.setInterval(function () {
+      runtime.flushPendingInputs(document);
+      attempts += 1;
+
+      if (!runtime.hasPendingInputs(document) || attempts >= 200) {
+        window.clearInterval(runtime.pendingInputFlushTimer);
+        runtime.pendingInputFlushTimer = null;
+      }
+    }, 50);
   };
 
   runtime.applyUpdate = function applyUpdate(message) {
