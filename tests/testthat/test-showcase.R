@@ -105,7 +105,14 @@ test_that("every exported block_*() renders into the showcase UI", {
   missing <- character()
   for (fn in components) {
     cls <- block_class_for(fn)
-    if (!grepl(sprintf('class="[^"]*\\b%s\\b', cls), rendered, perl = TRUE)) {
+    component <- sub("^block_", "", fn)
+    has_class <- grepl(sprintf('class="[^"]*\\b%s\\b', cls), rendered, perl = TRUE)
+    has_runtime <- grepl(
+      sprintf('data-sb-component="%s"', component),
+      rendered,
+      fixed = TRUE
+    )
+    if (!has_class && !has_runtime) {
       missing <- c(missing, sprintf("%s (.%s)", fn, cls))
     }
   }

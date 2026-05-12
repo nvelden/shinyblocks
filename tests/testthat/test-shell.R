@@ -136,8 +136,8 @@ test_that("sidebar collapse attrs and toggle render", {
 
 test_that("nav items and buttons decorate icons", {
   nav <- render_html(block_nav_item("Home", icon = "home"))
-  button_start <- render_html(block_button("Search", icon = "search"))
-  button_end <- render_html(
+  button_start <- runtime_payload_from(block_button("Search", icon = "search"))
+  button_end <- runtime_payload_from(
     block_button("Open", icon = "arrow-right", icon_position = "inline-end")
   )
 
@@ -147,35 +147,34 @@ test_that("nav items and buttons decorate icons", {
     'href="shinyblocks-0.0.0.9000/icons/sprite.svg#sb-icon-home"',
     fixed = TRUE
   )
-  expect_match(button_start, 'data-icon="inline-start"', fixed = TRUE)
-  expect_match(button_end, 'data-icon="inline-end"', fixed = TRUE)
+  expect_identical(button_start$props$iconName, "search")
+  expect_identical(button_start$props$iconPosition, "inline-start")
+  expect_identical(button_end$props$iconName, "arrow-right")
+  expect_identical(button_end$props$iconPosition, "inline-end")
 })
 
-test_that("button variants and sizes map to classes", {
-  destructive <- tag_attr(
-    block_button("Delete", variant = "destructive"),
-    "class"
+test_that("button variants and sizes map to runtime props", {
+  destructive <- runtime_payload_from(
+    block_button("Delete", variant = "destructive")
   )
-  link <- tag_attr(block_button("Open", variant = "link"), "class")
-  small <- tag_attr(block_button("Save", size = "sm"), "class")
-  icon <- tag_attr(block_button("", size = "icon"), "class")
+  link <- runtime_payload_from(block_button("Open", variant = "link"))
+  small <- runtime_payload_from(block_button("Save", size = "sm"))
+  icon <- runtime_payload_from(block_button("", size = "icon"))
 
-  expect_match(destructive, "sb-button-destructive", fixed = TRUE)
-  expect_match(link, "sb-button-link", fixed = TRUE)
-  expect_match(small, "sb-button-size-sm", fixed = TRUE)
-  expect_match(icon, "sb-button-size-icon", fixed = TRUE)
+  expect_identical(destructive$props$variant, "destructive")
+  expect_identical(link$props$variant, "link")
+  expect_identical(small$props$size, "sm")
+  expect_identical(icon$props$size, "icon")
 })
 
-test_that("button classes merge with user classes", {
-  classes <- tag_attr(
-    block_button("Save", variant = "outline", size = "lg", class = "custom"),
-    "class"
+test_that("button classes pass through the runtime payload", {
+  button <- runtime_payload_from(
+    block_button("Save", variant = "outline", size = "lg", class = "custom")
   )
 
-  expect_identical(
-    classes,
-    "sb-button sb-button-outline sb-button-size-lg custom"
-  )
+  expect_identical(button$className, "custom")
+  expect_identical(button$props$variant, "outline")
+  expect_identical(button$props$size, "lg")
 })
 
 test_that("dark mode toggle renders expected button attrs", {
@@ -399,9 +398,9 @@ test_that("aria-invalid reaches wrapped control types", {
 })
 
 test_that("buttons accept aria-invalid passthrough attrs", {
-  button <- render_html(block_button("Delete", `aria-invalid` = "true"))
+  button <- runtime_payload_from(block_button("Delete", `aria-invalid` = "true"))
 
-  expect_match(button, 'aria-invalid="true"', fixed = TRUE)
+  expect_identical(button$props$attrs[["aria-invalid"]], "true")
 })
 
 test_that("input groups merge user classes and render addons", {
@@ -440,21 +439,21 @@ test_that("block_select wraps a shiny select input", {
   expect_match(html, 'data-for="plan"', fixed = TRUE)
 })
 
-test_that("badge variants map to classes", {
-  destructive <- tag_attr(
-    block_badge("Blocked", variant = "destructive"),
-    "class"
+test_that("badge variants map to runtime props", {
+  destructive <- runtime_payload_from(
+    block_badge("Blocked", variant = "destructive")
   )
-  outline <- tag_attr(block_badge("Draft", variant = "outline"), "class")
+  outline <- runtime_payload_from(block_badge("Draft", variant = "outline"))
 
-  expect_match(destructive, "sb-badge-destructive", fixed = TRUE)
-  expect_match(outline, "sb-badge-outline", fixed = TRUE)
+  expect_identical(destructive$props$variant, "destructive")
+  expect_identical(outline$props$variant, "outline")
 })
 
-test_that("badge classes merge with user classes", {
-  classes <- tag_attr(block_badge("New", class = "custom"), "class")
+test_that("badge classes pass through the runtime payload", {
+  badge <- runtime_payload_from(block_badge("New", class = "custom"))
 
-  expect_identical(classes, "sb-badge sb-badge-default custom")
+  expect_identical(badge$className, "custom")
+  expect_identical(badge$props$variant, "default")
 })
 
 test_that("card flat arguments compose into card regions", {

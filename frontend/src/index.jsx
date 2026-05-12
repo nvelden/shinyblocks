@@ -78,12 +78,116 @@ function forgetRevision(id) {
 }
 
 function RuntimeMount({ payload }) {
+  if (payload.component === "button") {
+    return <Button payload={payload} />;
+  }
+
+  if (payload.component === "badge") {
+    return <Badge payload={payload} />;
+  }
+
   return (
     <span
       hidden
       data-shinyblocks-react-mounted={payload.component || "component"}
       data-shinyblocks-schema-version={payload.schemaVersion || 1}
     />
+  );
+}
+
+function classNames(...values) {
+  return values
+    .flatMap((value) => String(value || "").split(/\s+/))
+    .filter(Boolean)
+    .filter((value, index, all) => all.indexOf(value) === index)
+    .join(" ");
+}
+
+function passthroughAttrs(attrs) {
+  return Object.fromEntries(
+    Object.entries(attrs || {}).filter(([, value]) => value !== false && value !== null)
+  );
+}
+
+function HtmlSlot({ html, className, ...attrs }) {
+  if (!html) return null;
+  return (
+    <span
+      className={className}
+      dangerouslySetInnerHTML={{ __html: html }}
+      {...attrs}
+    />
+  );
+}
+
+function Icon({ payload }) {
+  const props = payload.props || {};
+  const position = props.iconPosition || "inline-start";
+
+  if (props.iconHtml) {
+    return (
+      <HtmlSlot
+        html={props.iconHtml}
+        data-icon={position}
+      />
+    );
+  }
+
+  if (!props.iconName) return null;
+
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-icon={position}
+    >
+      <use href={`${props.spriteHref}#sb-icon-${props.iconName}`} />
+    </svg>
+  );
+}
+
+function Button({ payload }) {
+  const props = payload.props || {};
+  const iconPosition = props.iconPosition || "inline-start";
+  const attrs = passthroughAttrs(props.attrs);
+
+  return (
+    <button
+      type="button"
+      data-slot="button"
+      data-variant={props.variant || "default"}
+      data-size={props.size || "default"}
+      className={classNames(
+        "sb-button",
+        `sb-button-${props.variant || "default"}`,
+        `sb-button-size-${props.size || "default"}`,
+        payload.className
+      )}
+      disabled={Boolean(props.disabled)}
+      {...attrs}
+    >
+      {iconPosition === "inline-start" && <Icon payload={payload} />}
+      <HtmlSlot html={props.labelHtml} />
+      {iconPosition === "inline-end" && <Icon payload={payload} />}
+    </button>
+  );
+}
+
+function Badge({ payload }) {
+  const props = payload.props || {};
+
+  return (
+    <span
+      data-slot="badge"
+      data-variant={props.variant || "default"}
+      className={classNames(
+        "sb-badge",
+        `sb-badge-${props.variant || "default"}`,
+        payload.className
+      )}
+    >
+      <HtmlSlot html={props.labelHtml} />
+    </span>
   );
 }
 
