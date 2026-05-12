@@ -121,12 +121,24 @@ ui <- shiny::fluidPage(
       htmlwidget_fixture()
     )
   ),
+  block_select(
+    "runtime_select",
+    choices = c(Free = "free", Pro = "pro"),
+    selected = "free",
+    placeholder = "Choose plan",
+    class = "runtime-select-fixture"
+  ),
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
+  shiny::verbatimTextOutput("runtime_select_value"),
   shiny::actionButton("set_b", "Set B"),
   shiny::actionButton("clear_choice", "Clear"),
   shiny::actionButton("disable_choice", "Disable"),
   shiny::actionButton("enable_choice", "Enable"),
+  shiny::actionButton("set_select_pro", "Set select Pro"),
+  shiny::actionButton("clear_select", "Clear select"),
+  shiny::actionButton("disable_select", "Disable select"),
+  shiny::actionButton("enable_select", "Enable select"),
   shiny::actionButton("toggle_dynamic", "Toggle dynamic"),
   shiny::actionButton("insert_runtime", "Insert runtime"),
   shiny::actionButton("remove_runtime", "Remove runtime"),
@@ -150,6 +162,16 @@ server <- function(input, output, session) {
   )
   output$choice_value <- shiny::renderText(input$choice %||% "<NULL>")
   output$nested_value <- shiny::renderText(input$nested %||% "<NULL>")
+  output$runtime_select_value <- shiny::renderText({
+    value <- input$runtime_select
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (identical(value, "")) {
+      return("<EMPTY>")
+    }
+    value
+  })
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
 
@@ -189,6 +211,40 @@ server <- function(input, output, session) {
       session = session,
       input_id = "choice",
       component = "fixture",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_select_pro, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_select",
+      selected = "pro",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$clear_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_select",
+      selected = NULL,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_select",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_select",
       disabled = FALSE
     )
   })

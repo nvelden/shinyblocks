@@ -95,6 +95,66 @@ test_that("block_select validates choices and selected value", {
   })
 })
 
+test_that("update_block_select sends runtime updates", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendCustomMessage = function(type, payload) {
+      message <<- list(type = type, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_select(
+      session,
+      "plan",
+      selected = "pro",
+      choices = c(Free = "free", Pro = "pro"),
+      placeholder = "Choose",
+      disabled = TRUE,
+      notify = TRUE
+    )
+  )
+
+  expect_identical(message$type, "sb:update")
+  expect_identical(message$payload$component, "select")
+  expect_identical(message$payload$updates$value, "pro")
+  expect_identical(message$payload$updates$choices[[2]]$label, "Pro")
+  expect_identical(message$payload$updates$placeholder, "Choose")
+  expect_identical(message$payload$updates$disabled, TRUE)
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("update_block_select maps selected NULL to the empty select value", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendCustomMessage = function(type, payload) {
+      message <<- payload
+    }
+  )
+
+  expect_invisible(update_block_select(session, "plan", selected = NULL))
+
+  expect_identical(message$updates$value, "")
+})
+
+test_that("update_block_select validates selected replacement choices", {
+  session <- list(
+    ns = identity,
+    sendCustomMessage = function(type, payload) NULL
+  )
+
+  expect_snapshot(error = TRUE, {
+    update_block_select(
+      session,
+      "plan",
+      selected = "team",
+      choices = c(Free = "free", Pro = "pro")
+    )
+  })
+})
+
 test_that("block_textarea validates rows", {
   expect_snapshot(error = TRUE, {
     block_textarea("notes", rows = 0)

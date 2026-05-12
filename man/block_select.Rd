@@ -49,6 +49,7 @@ Other forms:
 \code{\link{block_input_group_addon}()},
 \code{\link{block_slider}()},
 \code{\link{block_switch}()},
-\code{\link{block_textarea}()}
+\code{\link{block_textarea}()},
+\code{\link{update_block_select}()}
 }
 \concept{forms}
