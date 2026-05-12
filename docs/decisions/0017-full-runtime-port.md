@@ -80,6 +80,24 @@ IIFE/UMD-style asset. Dynamic imports and code splitting are deferred
 until chunk loading through `htmlDependency()` is tested from an
 installed package.
 
+### Phase 1 Runtime Budgets
+
+The Phase 1 React/ReactDOM foundation establishes the first hard runtime
+asset ceilings. These are intentionally wider than the measured baseline
+so minor build-tool output changes do not fail CI, but narrow enough to
+catch accidental dev bundles, source maps, duplicate React copies, or
+global CSS regressions.
+
+| Asset | Metric | Measured on 2026-05-12 | Phase 1 ceiling |
+| --- | --- | ---: | ---: |
+| `inst/www/shinyblocks-runtime.js` | raw | 191.3 KB | 225 KB |
+| `inst/www/shinyblocks-runtime.js` | gzip | 59.9 KB | 75 KB |
+| `inst/www/shinyblocks-runtime.css` | raw | 1.4 KB | 5 KB |
+| `inst/www/shinyblocks-runtime.css` | gzip | 0.3 KB | 2 KB |
+
+Phase 2 may raise these ceilings only with a recorded before/after size
+delta for the migrated Button, Badge, and Select runtime components.
+
 ## Shiny Runtime Rules
 
 Stateful runtime components must behave like Shiny inputs.
