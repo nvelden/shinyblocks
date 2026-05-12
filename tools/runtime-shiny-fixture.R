@@ -60,6 +60,18 @@ ui <- shiny::fluidPage(
       box-sizing: content-box;
       min-height: 17px;
     }
+    #host-bslib-card.card {
+      box-sizing: content-box;
+      border-radius: 19px;
+    }
+    #host-plotly.js-plotly-plot {
+      box-sizing: content-box;
+      position: relative;
+    }
+    #portal-host-button.btn {
+      border-radius: 17px;
+      box-sizing: content-box;
+    }
     #fixture-widget.html-widget {
       box-sizing: content-box;
     }
@@ -72,6 +84,24 @@ ui <- shiny::fluidPage(
     class = "selectize-control",
     "Host selectize"
   ),
+  bslib::card(
+    id = "host-bslib-card",
+    class = "host-bslib-card",
+    "Host bslib card"
+  ),
+  shiny::tags$div(
+    id = "host-plotly",
+    class = "js-plotly-plot plotly html-widget",
+    "Host plotly-style widget"
+  ),
+  shiny::tags$div(
+    `data-shinyblocks-portal-root` = "",
+    shiny::tags$button(
+      id = "portal-host-button",
+      class = "btn",
+      "Portal host button"
+    )
+  ),
   runtime$runtime_component(
     component = "fixture",
     input_id = "choice",
@@ -81,6 +111,7 @@ ui <- shiny::fluidPage(
     children = list(
       shiny::textOutput("child_text"),
       shiny::textInput("nested", "Nested", value = "n0"),
+      DT::dataTableOutput("nested_table"),
       htmlwidget_fixture()
     )
   ),
@@ -102,6 +133,11 @@ ui <- shiny::fluidPage(
 
 server <- function(input, output, session) {
   output$child_text <- shiny::renderText("child-ready")
+  output$nested_table <- DT::renderDT(
+    data.frame(label = "table-ready"),
+    options = list(dom = "t"),
+    rownames = FALSE
+  )
   output$choice_value <- shiny::renderText(input$choice %||% "<NULL>")
   output$nested_value <- shiny::renderText(input$nested %||% "<NULL>")
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")

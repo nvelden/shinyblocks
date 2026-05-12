@@ -61,12 +61,19 @@ try {
   });
   await assertText(page, "#fixture-widget", "widget-ready");
   await assertComputedStyle(page, "#fixture-widget", "boxSizing", "content-box");
+  await assertText(page, "#nested_table table tbody td", "table-ready");
 
   await assertComputedStyle(page, "#host-button", "borderRadius", "13px");
   await assertComputedStyle(page, "#host-button", "boxSizing", "content-box");
   await assertComputedStyle(page, "#host-button", "color", "rgb(1, 2, 3)");
   await assertComputedStyle(page, "#host-nav", "color", "rgb(4, 5, 6)");
   await assertComputedStyle(page, "#host-selectize", "boxSizing", "content-box");
+  await assertComputedStyle(page, "#host-bslib-card", "boxSizing", "content-box");
+  await assertComputedStyle(page, "#host-bslib-card", "borderRadius", "19px");
+  await assertComputedStyle(page, "#host-plotly", "boxSizing", "content-box");
+  await assertComputedStyle(page, "#host-plotly", "position", "relative");
+  await assertComputedStyle(page, "#portal-host-button", "boxSizing", "content-box");
+  await assertComputedStyle(page, "#portal-host-button", "borderRadius", "17px");
 
   await page.fill("#nested", "from-browser");
   await assertText(page, "#nested_value", "from-browser");
