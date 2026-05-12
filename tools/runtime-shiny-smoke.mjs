@@ -56,6 +56,17 @@ try {
   await page.locator("#child_text").waitFor({ state: "visible" });
   await assertText(page, "#child_text", "child-ready");
   await assertText(page, "#choice_value", "a");
+  await page.waitForFunction(() => {
+    return document.querySelector("#fixture-widget")?.dataset.runtimeFixtureReady === "true";
+  });
+  await assertText(page, "#fixture-widget", "widget-ready");
+  await assertComputedStyle(page, "#fixture-widget", "boxSizing", "content-box");
+
+  await assertComputedStyle(page, "#host-button", "borderRadius", "13px");
+  await assertComputedStyle(page, "#host-button", "boxSizing", "content-box");
+  await assertComputedStyle(page, "#host-button", "color", "rgb(1, 2, 3)");
+  await assertComputedStyle(page, "#host-nav", "color", "rgb(4, 5, 6)");
+  await assertComputedStyle(page, "#host-selectize", "boxSizing", "content-box");
 
   await page.fill("#nested", "from-browser");
   await assertText(page, "#nested_value", "from-browser");
@@ -160,4 +171,12 @@ async function assertText(page, selector, expected) {
     ([target, value]) => document.querySelector(target)?.textContent?.trim() === value,
     [selector, expected]
   );
+}
+
+async function assertComputedStyle(page, selector, property, expected) {
+  const actual = await page.locator(selector).evaluate((node, prop) => {
+    return window.getComputedStyle(node)[prop];
+  }, property);
+
+  assert.equal(actual, expected, `${selector} ${property}`);
 }

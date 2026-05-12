@@ -9,12 +9,6 @@
   box-sizing: border-box;
 }
 
-[data-shinyblocks-root] *,
-[data-shinyblocks-root] *::before,
-[data-shinyblocks-root] *::after {
-  box-sizing: inherit;
-}
-
 [data-shinyblocks-root][data-shinyblocks-runtime="true"][data-sb-mounted="true"] {
   --shinyblocks-runtime-mounted: 1;
 }
