@@ -8,6 +8,23 @@ runtime <- asNamespace("shinyblocks")
 
 dynamic_visible <- shiny::reactiveVal(FALSE)
 
+module_ui <- function(id) {
+  ns <- shiny::NS(id)
+
+  shiny::div(
+    id = ns("root"),
+    runtime$runtime_component(
+      component = "fixture",
+      input_id = ns("choice"),
+      state = list(value = "m0"),
+      binding = list(input = TRUE),
+      mount_id = ns("runtime-choice")
+    ),
+    shiny::actionButton(ns("set"), "Set module"),
+    shiny::verbatimTextOutput(ns("value"))
+  )
+}
+
 ui <- shiny::fluidPage(
   runtime$runtime_component(
     component = "fixture",
@@ -23,14 +40,17 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
   shiny::actionButton("set_b", "Set B"),
+  shiny::actionButton("clear_choice", "Clear"),
   shiny::actionButton("disable_choice", "Disable"),
+  shiny::actionButton("enable_choice", "Enable"),
   shiny::actionButton("toggle_dynamic", "Toggle dynamic"),
   shiny::actionButton("insert_runtime", "Insert runtime"),
   shiny::actionButton("remove_runtime", "Remove runtime"),
   shiny::uiOutput("dynamic_mount"),
   shiny::verbatimTextOutput("dynamic_value"),
   shiny::div(id = "insert_target"),
-  shiny::verbatimTextOutput("inserted_value")
+  shiny::verbatimTextOutput("inserted_value"),
+  module_ui("mod")
 )
 
 server <- function(input, output, session) {
@@ -51,12 +71,32 @@ server <- function(input, output, session) {
     )
   })
 
+  shiny::observeEvent(input$clear_choice, {
+    runtime$runtime_update(
+      session = session,
+      input_id = "choice",
+      component = "fixture",
+      value = NULL,
+      notify = TRUE,
+      clearable = "value"
+    )
+  })
+
   shiny::observeEvent(input$disable_choice, {
     runtime$runtime_update(
       session = session,
       input_id = "choice",
       component = "fixture",
       disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_choice, {
+    runtime$runtime_update(
+      session = session,
+      input_id = "choice",
+      component = "fixture",
+      disabled = FALSE
     )
   })
 
@@ -104,6 +144,21 @@ server <- function(input, output, session) {
   })
 
   output$inserted_child <- shiny::renderText("inserted-child-ready")
+
+  shiny::moduleServer("mod", function(input, output, session) {
+    output$value <- shiny::renderText(input$choice %||% "<NULL>")
+
+    shiny::observeEvent(input$set, {
+      runtime$runtime_update(
+        session = session,
+        input_id = "choice",
+        component = "fixture",
+        value = "m1",
+        notify = TRUE,
+        clearable = "value"
+      )
+    })
+  })
 }
 
 shiny::runApp(

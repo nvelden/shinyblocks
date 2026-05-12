@@ -39,6 +39,9 @@ phase begins.
 >   reinsertion, and Shiny children inside runtime mounts.
 > - **Phase 1 insert/remove fixture** — the Shiny browser fixture also
 >   verifies explicit `insertUI()` / `removeUI()` and id reuse.
+> - **Phase 1 input-update fixture** — the Shiny browser fixture now
+>   verifies clear/reset updates, enable-after-disable, stale update
+>   rejection, and Shiny module namespacing.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -66,6 +69,8 @@ phase begins.
 > Still owed for Phase 1 runtime foundation:
 > - Expand Shiny child-binding fixtures to cover htmlwidgets inside
 >   runtime-rendered containers.
+> - Add component-specific updater contracts during the first stateful
+>   component migration, starting with `update_block_select()`.
 > - Browser-backed CSS collision fixtures for Bootstrap, bslib,
 >   DT/plotly/htmlwidgets, scoped tokens, and portal content.
 > - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.
