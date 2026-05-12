@@ -63,9 +63,33 @@ try {
   await page.click("#set_b");
   await assertText(page, "#choice_value", "b");
 
+  await page.click("#clear_choice");
+  await assertText(page, "#choice_value", "<NULL>");
+
+  await page.click("#set_b");
+  await assertText(page, "#choice_value", "b");
+
   await page.click("#disable_choice");
   await page.waitForFunction(() => {
     return document.querySelector("#runtime-choice")?.hasAttribute("data-disabled");
+  });
+
+  await page.evaluate(() => {
+    window.shinyblocksRuntime.applyUpdate({
+      id: "choice",
+      component: "fixture",
+      updates: { disabled: false },
+      notify: false,
+      revision: 0
+    });
+  });
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime-choice")?.hasAttribute("data-disabled");
+  });
+
+  await page.click("#enable_choice");
+  await page.waitForFunction(() => {
+    return !document.querySelector("#runtime-choice")?.hasAttribute("data-disabled");
   });
 
   await page.click("#toggle_dynamic");
@@ -105,6 +129,10 @@ try {
     1,
     "page should include one portal root"
   );
+
+  await assertText(page, "#mod-value", "m0");
+  await page.click("#mod-set");
+  await assertText(page, "#mod-value", "m1");
 
   console.log("Runtime Shiny smoke test passed.");
 } catch (error) {
