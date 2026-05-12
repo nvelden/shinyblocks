@@ -3,6 +3,8 @@
 Committed computed-style baselines for the ADR 0016 visual-parity harness.
 
 Current scope:
+- `alert.json`
+- `badge.json`
 - `button.json`
 - `checkbox.json`
 - `select.json`

@@ -1,7 +1,8 @@
 htmltools::tagList(
   block_alert(
     "Heads up",
-    description = "shinyblocks alerts surface important inline messages."
+    description = "shinyblocks alerts surface important inline messages.",
+    class = "sb-parity-alert-default"
   ),
   block_alert(
     "Build failed",
@@ -10,7 +11,8 @@ htmltools::tagList(
       "Check the console for details."
     ),
     variant = "destructive",
-    icon = "alert-triangle"
+    icon = "alert-triangle",
+    class = "sb-parity-alert-destructive"
   ),
   block_alert(
     block_alert_title("Composed slots"),
