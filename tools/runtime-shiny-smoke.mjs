@@ -82,6 +82,22 @@ try {
   await page.fill("#nested", "from-browser");
   await assertText(page, "#nested_value", "from-browser");
 
+  await assertText(page, "#runtime_select_value", "free");
+  await page.selectOption("#sb-runtime-select-runtime_select select", "pro");
+  await assertText(page, "#runtime_select_value", "pro");
+  await page.click("#clear_select");
+  await assertText(page, "#runtime_select_value", "<EMPTY>");
+  await page.click("#set_select_pro");
+  await assertText(page, "#runtime_select_value", "pro");
+  await page.click("#disable_select");
+  await page.waitForFunction(() => {
+    return document.querySelector("#sb-runtime-select-runtime_select select")?.disabled === true;
+  });
+  await page.click("#enable_select");
+  await page.waitForFunction(() => {
+    return document.querySelector("#sb-runtime-select-runtime_select select")?.disabled === false;
+  });
+
   await page.click("#set_b");
   await assertText(page, "#choice_value", "b");
 

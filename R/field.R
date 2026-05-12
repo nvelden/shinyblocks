@@ -133,7 +133,7 @@ block_field_invalid <- function(field, message) {
     addAttrs(`data-invalid` = "true")$
     addClass("sb-field-invalid")
 
-  for (selector in c("input", "select", "textarea")) {
+  for (selector in c("input", "select", "textarea", ".sb-runtime-mount")) {
     selected <- tag_query$find(selector)
     selected$each(function(tag, index) {
       tag$attribs[["aria-invalid"]] <- "true"

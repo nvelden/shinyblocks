@@ -26,7 +26,7 @@ targets <- list(
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 5,
+    limit_kb = 8,
     metric = "raw",
     group = "runtime"
   ),

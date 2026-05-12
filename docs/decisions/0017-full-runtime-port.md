@@ -98,6 +98,11 @@ global CSS regressions.
 Phase 2 may raise these ceilings only with a recorded before/after size
 delta for the migrated Button, Badge, and Select runtime components.
 
+Phase 2 update (2026-05-12): Button, Badge, and Select runtime styles
+raised `inst/www/shinyblocks-runtime.css` to 6.2 KB raw / 1.3 KB gzip.
+The raw ceiling is now 8 KB; the gzip ceiling remains 2 KB. Runtime JS
+remains inside the Phase 1 ceiling at 193.8 KB raw / 60.7 KB gzip.
+
 ## Shiny Runtime Rules
 
 Stateful runtime components must behave like Shiny inputs.

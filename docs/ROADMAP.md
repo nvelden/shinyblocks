@@ -59,12 +59,18 @@ phase begins.
 > - **Phase 1 runtime budgets** — ADR 0017 records measured runtime
 >   JS/CSS baselines and `tools/budget.R` now enforces Phase 1 ceilings
 >   for raw and gzipped runtime assets.
-> - **Phase 2 presentational spike started** — `block_button()` and
->   `block_badge()` now emit runtime payloads and render in React.
+> - **Phase 2 presentational spike** — `block_button()` and
+>   `block_badge()` emit runtime payloads and render in React.
 >   Button keeps variant, size, icon, custom class, disabled, and
 >   passthrough-attribute contracts; Badge keeps variant and custom
 >   class contracts. Native Badge CSS has been removed from the legacy
 >   stylesheet.
+> - **Phase 2 stateful spike** — `block_select()` emits a runtime
+>   payload instead of Shiny/selectize markup, and
+>   `update_block_select()` covers value, choices, placeholder,
+>   disabled state, clear, and `notify` semantics. Obsolete
+>   `.sb-select` / Selectize compatibility CSS has been removed from
+>   the legacy stylesheet.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -90,10 +96,8 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Still owed for Phase 2 vertical runtime spike:
-> - Add component-specific updater contracts during the first stateful
->   component migration, starting with `update_block_select()`.
-> - Migrate `block_select()` with its showcase examples, runtime
->   browser checks, budget report, and cleanup gates in the same slice.
+> - Run the full package gate, then decide whether to tag Phase 2 or
+>   continue into the next presentational component family.
 >
 > **Hand-off plan:** the next implementer should
 >

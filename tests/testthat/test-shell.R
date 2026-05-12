@@ -416,7 +416,7 @@ test_that("input groups merge user classes and render addons", {
   expect_match(html, "sb-icon-search", fixed = TRUE)
 })
 
-test_that("block_select wraps a shiny select input", {
+test_that("block_select emits a runtime select payload", {
   select <- block_select(
     "plan",
     choices = c(Free = "free", Pro = "pro"),
@@ -424,19 +424,24 @@ test_that("block_select wraps a shiny select input", {
     class = "custom"
   )
   html <- render_html(select)
+  payload <- runtime_payload_from(select)
 
-  expect_identical(tag_attr(select, "class"), "sb-select custom")
-  expect_match(
-    html,
-    'class="form-group shiny-input-container"',
-    fixed = TRUE
+  expect_identical(tag_attr(select, "class"), "sb-runtime-mount custom")
+  expect_match(html, 'data-sb-component="select"', fixed = TRUE)
+  expect_identical(payload$id, "plan")
+  expect_identical(payload$state$value, "pro")
+  expect_identical(payload$props$choices[[1]]$value, "free")
+  expect_identical(payload$props$choices[[2]]$label, "Pro")
+})
+
+test_that("block_select defaults to first choice unless a placeholder is present", {
+  select <- runtime_payload_from(block_select("plan", choices = c("Free", "Pro")))
+  placeholder <- runtime_payload_from(
+    block_select("plan", choices = c("Free", "Pro"), placeholder = "Choose")
   )
-  expect_match(
-    html,
-    'class="shiny-input-select sb-select-control"',
-    fixed = TRUE
-  )
-  expect_match(html, 'data-for="plan"', fixed = TRUE)
+
+  expect_identical(select$state$value, "Free")
+  expect_identical(placeholder$state$value, "")
 })
 
 test_that("badge variants map to runtime props", {

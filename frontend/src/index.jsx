@@ -86,6 +86,10 @@ function RuntimeMount({ payload }) {
     return <Badge payload={payload} />;
   }
 
+  if (payload.component === "select") {
+    return <Select payload={payload} />;
+  }
+
   return (
     <span
       hidden
@@ -191,6 +195,46 @@ function Badge({ payload }) {
   );
 }
 
+function Select({ payload }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const choices = props.choices || [];
+  const disabled = Boolean(props.disabled || state.disabled);
+  const value = state.value ?? "";
+
+  return (
+    <div
+      data-slot="select"
+      className={classNames("sb-select", payload.className)}
+      style={{ width: props.width || "100%" }}
+      data-disabled={disabled ? "true" : undefined}
+    >
+      <select
+        className="sb-select-control"
+        value={value}
+        disabled={disabled}
+        aria-invalid={payload.rootAttrs?.ariaInvalid || undefined}
+        aria-describedby={payload.rootAttrs?.ariaDescribedby || undefined}
+        onChange={(event) => {
+          payload.state ||= {};
+          payload.state.value = event.target.value;
+          setInputValue(payload.id, event.target.value, "event");
+        }}
+      >
+        {props.placeholder && (
+          <option value="">{props.placeholder}</option>
+        )}
+        {choices.map((choice) => (
+          <option key={choice.value} value={choice.value}>
+            {choice.label}
+          </option>
+        ))}
+      </select>
+      <span className="sb-select-icon" aria-hidden="true" />
+    </div>
+  );
+}
+
 function renderReactMount(root, payload) {
   let target = root.querySelector("[data-shinyblocks-react]");
   if (!target) {
@@ -209,6 +253,10 @@ function mountRoot(root) {
 
   const payload = readPayload(root);
   if (!payload) return;
+  payload.rootAttrs = {
+    ariaInvalid: root.getAttribute("aria-invalid"),
+    ariaDescribedby: root.getAttribute("aria-describedby")
+  };
 
   ensurePortalRoot();
   const reactRoot = renderReactMount(root, payload);
@@ -295,8 +343,13 @@ function applyUpdate(message) {
       if (key === "disabled") {
         root.toggleAttribute("data-disabled", Boolean(value));
       }
+      if (key === "choices" || key === "placeholder" || key === "disabled") {
+        payload.props[key] = value;
+      }
       payload.state[key] = value;
     });
+
+    mountedRoot.reactRoot.render(<RuntimeMount payload={payload} />);
 
     if (message.notify && Object.prototype.hasOwnProperty.call(message.updates || {}, "value")) {
       setInputValue(message.id, message.updates.value, "event");

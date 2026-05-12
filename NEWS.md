@@ -14,6 +14,7 @@
 * Added scoped runtime token defaults on `[data-shinyblocks-root]` and `[data-shinyblocks-portal-root]`, plus static checks that the runtime asset does not write theme tokens to `:root`.
 * Added hard Phase 1 runtime asset budgets for the Vite-built runtime bundle and scoped runtime CSS, recorded in ADR 0017 and enforced by `tools/budget.R`.
 * `block_badge()` and `block_button()` now render through the package-local React runtime while preserving their R-facing variant, size, icon, custom class, disabled, and passthrough-attribute contracts. Native badge CSS was removed from the legacy stylesheet; native button CSS remains temporarily for `block_dark_mode_toggle()`.
+* `block_select()` now renders through the package-local runtime instead of Shiny/selectize, and `update_block_select()` updates value, choices, placeholder, disabled state, and optional Shiny notification. Obsolete `.sb-select` / Selectize compatibility CSS was removed from the legacy stylesheet.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed

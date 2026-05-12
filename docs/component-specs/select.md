@@ -5,16 +5,17 @@
 
 ## States
 
-- **default** — bordered trigger surface rendered through Shiny's
-  select/selectize path.
-- **open** — popover-like dropdown surface with token-driven item
-  styling.
-- **hover** — option rows use `--accent` fill and
-  `--accent-foreground`.
+- **default** — runtime-rendered native select with bordered trigger
+  surface and package-owned chevron.
+- **changed** — user selection updates `input$<id>` through the
+  runtime Shiny bridge.
+- **server-updated** — `update_block_select()` can update value,
+  choices, placeholder, and disabled state.
 - **focus-visible** — 3px `--ring` shadow on the visible trigger shell.
-- **invalid** — destructive ring when the wrapped select carries
+- **invalid** — destructive ring when the runtime select carries
   `aria-invalid="true"`.
-- **disabled** — delegated to the underlying Shiny select element.
+- **disabled** — runtime disables the rendered control and preserves
+  server updateability.
 
 ## Token contract
 
@@ -22,18 +23,20 @@
 | --- | --- |
 | Trigger surface | `--background` |
 | Trigger border | `--input` |
-| Dropdown surface | `--popover` |
-| Dropdown text | `--popover-foreground` |
-| Active option | `--accent`, `--accent-foreground` |
+| Trigger text | `--foreground` |
+| Chevron | `--muted-foreground` |
 | Focus ring | `--ring` |
 | Invalid ring | `--destructive`, `--border` |
 
 ## Deliberate divergences from shadcn
 
-- `block_select()` is a wrapper around Shiny/selectize, not a package-
-  owned select runtime, per ADR 0014.
-- Item selection and menu positioning are controlled by Selectize, with
-  shinyblocks CSS overriding the visual shell.
+- The current runtime spike uses a package-owned native `<select>`
+  rather than Radix Select content/portal primitives. This removes the
+  Shiny/selectize wrapper while keeping a small first stateful runtime
+  contract; Radix open/content behavior is deferred to the overlay phase.
+- `selected = NULL` in `update_block_select()` clears to the empty
+  placeholder value (`""`) because browser selects do not have a stable
+  JavaScript `null` value.
 
 ## Reference screenshot
 

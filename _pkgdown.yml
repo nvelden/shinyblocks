@@ -53,6 +53,7 @@ reference:
       - block_input_group
       - block_input_group_addon
       - block_select
+      - update_block_select
       - block_textarea
       - block_checkbox
       - block_switch
