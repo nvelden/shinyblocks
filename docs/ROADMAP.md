@@ -37,6 +37,8 @@ phase begins.
 >   launches a Shiny app and verifies runtime input initialization,
 >   server updates, disabled state, dynamic `renderUI()` removal and
 >   reinsertion, and Shiny children inside runtime mounts.
+> - **Phase 1 insert/remove fixture** — the Shiny browser fixture also
+>   verifies explicit `insertUI()` / `removeUI()` and id reuse.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -62,8 +64,6 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Still owed for Phase 1 runtime foundation:
-> - Expand dynamic UI fixtures to cover `insertUI()`, `removeUI()`,
->   and id reuse outside `renderUI()`.
 > - Expand Shiny child-binding fixtures to cover htmlwidgets inside
 >   runtime-rendered containers.
 > - Browser-backed CSS collision fixtures for Bootstrap, bslib,

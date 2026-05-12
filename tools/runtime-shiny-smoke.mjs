@@ -84,6 +84,22 @@ try {
   });
   await assertText(page, "#dynamic_value", "x");
 
+  await page.click("#insert_runtime");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime-inserted")?.dataset.sbMounted === "true";
+  });
+  await assertText(page, "#inserted_value", "y");
+  await assertText(page, "#inserted_child", "inserted-child-ready");
+
+  await page.click("#remove_runtime");
+  await page.waitForFunction(() => !document.querySelector("#runtime-inserted"));
+
+  await page.click("#insert_runtime");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime-inserted")?.dataset.sbMounted === "true";
+  });
+  await assertText(page, "#inserted_value", "y");
+
   assert.equal(
     await page.locator("[data-shinyblocks-portal-root]").count(),
     1,

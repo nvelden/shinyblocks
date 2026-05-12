@@ -7,6 +7,7 @@
 * Added Phase 1 runtime asset guardrails: runtime CSS isolation tests block unscoped selectors and host-framework selectors, and `tools/budget.R` now reports runtime JS/CSS raw and gzip sizes separately from legacy compatibility assets.
 * Added Phase 1 runtime lifecycle guardrails: `block_page()` now includes a package-owned portal root, runtime mounts without Shiny input ids receive unique ids, and static runtime JS tests cover the Shiny bridge, dynamic UI hooks, child binding hooks, and portal setup.
 * Added a Shiny-backed runtime browser smoke fixture that verifies runtime input initialization, server updates, disabled state, dynamic `renderUI()` removal/reinsertion, and Shiny children inside runtime mounts.
+* Expanded the Shiny-backed runtime browser smoke fixture to cover explicit `insertUI()` / `removeUI()` and id reuse.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed
