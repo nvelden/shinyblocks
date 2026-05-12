@@ -319,6 +319,11 @@ server <- function(input, output, session) {
     }
     value
   })
+  shiny::outputOptions(
+    output,
+    "showcase_select_value",
+    suspendWhenHidden = FALSE
+  )
 
   shiny::observeEvent(input$showcase_select_set_pro, {
     update_block_select(
