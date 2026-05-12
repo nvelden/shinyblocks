@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (2026-05-08)
+Superseded in part by [ADR 0017](0017-full-runtime-port.md)
+(2026-05-12). Still applies to legacy native CSS until each component
+is migrated.
 
 ## Context
 

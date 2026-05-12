@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (2026-05-09)
+Superseded by [ADR 0017](0017-full-runtime-port.md) for future
+component work (2026-05-12). Existing wrapped controls are migration
+scaffolding until the runtime implementation replaces them.
 
 ## Context
 

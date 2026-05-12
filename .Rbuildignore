@@ -23,6 +23,7 @@
 ^skills-lock\.json$
 
 # Frontend tooling for the dev-time CSS build
+^frontend$
 ^components\.json$
 ^package\.json$
 ^package-lock\.json$

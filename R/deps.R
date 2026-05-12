@@ -4,8 +4,8 @@ shinyblocks_dependency <- function() {
       name = "shinyblocks",
       version = shinyblocks_version(),
       src = c(href = "shinyblocks"),
-      stylesheet = "shinyblocks.css",
-      script = "shinyblocks.js",
+      stylesheet = c("shinyblocks.css", "shinyblocks-runtime.css"),
+      script = c("shinyblocks.js", "shinyblocks-runtime.js"),
       attachment = c(sprite = "icons/sprite.svg")
     )
   } else {
@@ -13,8 +13,8 @@ shinyblocks_dependency <- function() {
       name = "shinyblocks",
       version = shinyblocks_version(),
       src = "www",
-      stylesheet = "shinyblocks.css",
-      script = "shinyblocks.js",
+      stylesheet = c("shinyblocks.css", "shinyblocks-runtime.css"),
+      script = c("shinyblocks.js", "shinyblocks-runtime.js"),
       attachment = c(sprite = "icons/sprite.svg"),
       package = "shinyblocks"
     )

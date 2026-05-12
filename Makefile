@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-css build-icons dev showcase \
+.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
@@ -24,6 +24,8 @@ help:
 	@echo ""
 	@echo "Phase exit:"
 	@echo "  build-css       - compile inst/www/src -> inst/www"
+	@echo "  build-runtime   - compile frontend/src -> inst/www runtime assets"
+	@echo "  runtime-test    - browser smoke test for runtime mount/update behavior"
 	@echo "  build-icons     - regenerate the Lucide sprite"
 	@echo "  lint            - lintr::lint_package()"
 	@echo "  spell           - devtools::spell_check()"
@@ -93,7 +95,7 @@ dev:
 # `showcase` lives in the Local Preview section so it shares port
 # defaults with the other preview targets.
 
-check-fast: lint test build-css
+check-fast: lint test build-css build-runtime
 	@echo "check-fast OK"
 
 # ---------- Phase exit ----------
@@ -101,8 +103,14 @@ check-fast: lint test build-css
 build-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --minify
 
+build-runtime:
+	npm run build:runtime
+
 build-icons:
 	node tools/build-icons.mjs
+
+runtime-test:
+	npm run test:runtime
 
 lint:
 	$(R) -e 'lintr::lint_package()'
@@ -134,7 +142,7 @@ doc-links:
 # Quality Gate runs the same sequence as docs/ROADMAP.md. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.
 # See docs/phase-exits/TEMPLATE.md.
-gate: build-css lint spell urls test docs check pkgdown budget doc-links parity-ci
+gate: build-css build-runtime runtime-test lint spell urls test docs check pkgdown budget doc-links parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"

@@ -1,16 +1,40 @@
 # Roadmap
 
-The canonical strategy lives in
-[`agent-plans/2026-05-08-port-strategy.md`](agent-plans/2026-05-08-port-strategy.md).
-This document is the implementation sequence. Each phase ends by
-passing the **Quality Gate** below before the next phase begins.
+The canonical strategy is now [ADR 0017: Full Runtime shadcn Port](decisions/0017-full-runtime-port.md),
+implemented through
+[`agent-plans/2026-05-12-full-port-architecture.md`](agent-plans/2026-05-12-full-port-architecture.md).
+The earlier native-CSS strategy is retained as historical context only.
+Each phase ends by passing the **Quality Gate** below before the next
+phase begins.
 
 ## Current Status
 
-> **In progress: Phase 5 — tabs, forms, and theme runtime.**
+> **In progress: Phase 1 — runtime foundation.**
 >
 > Landed and verified locally:
-> - **Phase 0** — ADRs `0006`–`0016` accepted.
+> - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
+>   native component helpers, showcase scaffold, Tailwind v4 source,
+>   parity harness, and current wrapped/input components. These remain
+>   as migration scaffolding.
+> - **Phase 0 runtime pivot** — [ADR 0017](decisions/0017-full-runtime-port.md)
+>   accepted. Future implementation follows the full runtime plan in
+>   [`docs/agent-plans/2026-05-12-full-port-architecture.md`](agent-plans/2026-05-12-full-port-architecture.md).
+> - **Phase 1 foundation slice 1** — internal R runtime payload and
+>   update-message helpers, package-local `shinyblocks-runtime.css/js`,
+>   root dependency attachment, frontend source scaffold, runtime build
+>   targets, scoped mount markup, browser smoke-test scaffold, and
+>   focused runtime/dependency tests.
+> - **Phase 1 foundation slice 2** — runtime CSS static isolation
+>   tests, forbidden host-selector checks, runtime asset existence
+>   checks, and runtime JS/CSS raw+gzip reporting in `tools/budget.R`.
+> - **Phase 1 foundation slice 3** — `block_page()` emits the
+>   package-owned portal root, runtime mounts without Shiny input ids
+>   get unique ids, and static runtime JS tests cover Shiny bridge,
+>   dynamic UI, Shiny child binding, and portal setup hooks.
+> - **Phase 1 browser smoke** — `npm run test:runtime` passes when
+>   Playwright can launch Chrome outside the Codex command sandbox.
+>
+> Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
 >   CSS, dependency plumbing, showcase scaffold, and core package
 >   infrastructure.
@@ -24,7 +48,7 @@ passing the **Quality Gate** below before the next phase begins.
 >   `block_sidebar()`, page-level sidebar state, and
 >   `inst/www/shinyblocks.js` for desktop collapse, mobile open/close,
 >   backdrop click, outside click, `Escape`, and nav keyboard movement.
-> - **Phase 5 (current slice)** — `block_field_group()`, `block_field()`,
+> - **Phase 5 legacy slice** — `block_field_group()`, `block_field()`,
 >   `block_field_label()`, `block_field_description()`,
 >   `block_field_set()`, `block_field_legend()`,
 >   `block_field_invalid()`, `block_input_group()`,
@@ -33,75 +57,44 @@ passing the **Quality Gate** below before the next phase begins.
 >   `block_theme()`, `block_dark_mode_toggle()`, and
 >   `update_block_theme()`.
 >
-> Still owed in Phase 5:
-> - gallery `.qmd` pages once the WASM/gallery track resumes
-> - reference screenshots are now captured for every component spec,
->   and `test-doc-coverage.R` enforces specs for every exported
->   `block_*()` unconditionally.
-> - **shadcn fidelity audit** per
->   [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](agent-plans/2026-05-09-shadcn-fidelity-audit.md):
->   token + class drift surfaced against the canonical
->   `apps/v4/registry/new-york-v4` source. Button + badge safe
->   drifts already fixed (rounded-full + text-xs on badge,
->   `text-white` on destructive variants, `text-primary` on link,
->   `shadow-xs` on outline, dark-mode destructive dim). The structural
->   slices are now landed:
->   1. Focus-visible redesign on component-owned bases.
->   2. `aria-invalid` destructive rings on interactive controls.
->   3. Tabs refactor to the shadcn data-attribute model with the
->      line variant.
->   Remaining fidelity work is expanding the shared parity registry
->   beyond the current `alert`, `badge`, `button`, `checkbox`,
->   `select`, `slider`, `switch`, and `textarea` slice, then tuning
->   any drift it surfaces.
+> Still owed for Phase 1 runtime foundation:
+> - Expand browser verification beyond the initial runtime smoke into
+>   Shiny-backed fixtures.
+> - Dynamic UI fixtures for `renderUI()`, `insertUI()`, `removeUI()`,
+>   and id reuse.
+> - Shiny child-binding fixtures for outputs, htmlwidgets, and nested
+>   inputs inside runtime-rendered containers.
+> - Browser-backed CSS collision fixtures for Bootstrap, bslib,
+>   DT/plotly/htmlwidgets, scoped tokens, and portal content.
+> - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.
+> - Do **not** migrate `block_button()`, `block_badge()`, or
+>   `block_select()` until Phase 1 proves scoped CSS, Shiny state sync,
+>   updater semantics, modules, dynamic UI, portals, and Shiny children.
 >
 > **Hand-off plan:** the next implementer should
 >
-> 1. **Read the `shinyblocks-component` skill** at
->    [`docs/skills/shinyblocks-component.md`](skills/shinyblocks-component.md).
->    It is the end-to-end recipe for adding or refactoring a
->    `block_*()`: per-gate sync rule, shadcn-fidelity workflow, the
->    parity-harness template (with positioning + cross-element-
->    geometry checks baked in after the 2026-05-11 slider POC
->    caught an off-centre-thumb bug the property-only diff missed),
->    the common-pitfall list, and the pre-commit checklist. Run
->    `make skills-install` once locally to register it with your
->    agent runtime ( Claude Code / Codex / etc.) so it can be
->    invoked via the Skill tool.
-> 2. Then read
->    [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md)
->    — the slice-sized plan for what to actually build, in what
->    order, with each slice noting which skill applies.
-> 3. The 2026-05-10 screenshot-parity hand-off
->    ([`docs/agent-plans/2026-05-10-screenshot-parity-handoff.md`](agent-plans/2026-05-10-screenshot-parity-handoff.md))
->    is folded into slice 2 of the 2026-05-09 plan.
+> 1. Read [ADR 0017](decisions/0017-full-runtime-port.md).
+> 2. Read the runtime plan:
+>    [`docs/agent-plans/2026-05-12-full-port-architecture.md`](agent-plans/2026-05-12-full-port-architecture.md).
+> 3. Implement **Phase 1 — Runtime Foundation** only. Treat the
+>    existing native component code and parity harness as migration
+>    scaffolding until the runtime foundation passes.
 >
 > Slices, in order:
 >
-> 1. **High-risk parity pass** — `dark-mode-toggle`,
->    `badge`, `nav-item`, `sidebar`, plus any
->    follow-up CSS/spec divergence updates.
-> 2. **Remaining manual parity review** — use the committed component
->    specs + screenshots as the backstop for components not yet
->    migrated into the shared parity registry.
-> 3. **Visual-parity harness (ADR 0016)** — promote the
->    `tools/parity/select-poc.mjs` proof of concept to a real Vite +
->    React reference app under `parity/` with a Playwright capture +
->    computed-style diff. Slice 6 in the hand-off doc has the
->    detailed scope. The POC has already shown the approach catches
->    drift the spec-doc review misses (it reduced `block_select`
->    trigger drift from 18 to 7 properties and surfaced the
->    double-hover bug as a 2-rows-lit assertion). The initial harness
->    slice is now landed for `alert`, `badge`, `button`, `checkbox`,
->    `select`, `slider`, `switch`, and `textarea`: dev-only `parity/`
->    reference app, `tools/parity/capture-styles.mjs`,
->    `diff-styles.mjs`, `normalise.mjs`, and a committed baseline
->    under `docs/component-specs/_parity/`. The next expansion work is to
->    continue down the remaining high-risk components and remove any
->    now-redundant standalone POCs once coverage is fully duplicated.
-> 4. **Gallery resumption** — blocked on the WASM track. When
->    unblocked, author one `gallery/components/<name>.qmd` per
->    export and drop the `skip()` in the gallery coverage test.
+> 1. **Runtime foundation** — no user-facing component migration yet.
+> 2. **Vertical runtime spike** — `block_button()`, `block_badge()`,
+>    and `block_select()`, including showcase pages, Shiny update
+>    examples, scoped CSS, bundle-size reporting, and native cleanup.
+> 3. **Presentational components** — migrate low-risk visual
+>    components and remove their native CSS/tests.
+> 4. **Overlay/menu components** — migrate Radix portal/focus behavior.
+> 5. **Forms and controls** — migrate stateful controls and Shiny
+>    updater examples.
+> 6. **Layout, navigation, icons, theme** — finish shell decisions and
+>    remove obsolete compatibility assets.
+> 7. **Parity/spec/docs reset** — verification targets shipped runtime
+>    behavior and upstream sync drift, not native CSS translation.
 
 Update this line at every phase exit.
 
@@ -122,10 +115,10 @@ as `make gate`.
 5. **Latest-version verification.** All versioned inputs touched in
    the phase checked against authoritative sources. Recorded in the
    relevant ADR, sync log, or phase-exit file.
-6. **Tests.** `devtools::test()` clean. Every new exported function
-   has tag-shape, validation, ARIA, and `merge_classes()` tests, plus
-   a section in `inst/showcase/` enforced by `test-showcase.R` (see
-   [§Showcase App](#showcase-app)).
+6. **Tests.** `devtools::test()` clean. Every migrated component has
+   payload, validation, ARIA/state, updater/lifecycle tests where
+   applicable, plus a component page/section in `inst/showcase/`
+   enforced by `test-showcase.R` (see [§Showcase App](#showcase-app)).
 7. **Documentation.** `devtools::document()` no warnings. Generated
    `man/` committed.
 8. **Package check.** `devtools::check(remote = TRUE, manual = FALSE)`
@@ -138,10 +131,10 @@ as `make gate`.
     `reference:` section, and once WASM is unblocked, also has a
     matching gallery `.qmd` page. See
     [§Per-gate component-sync rule](#per-gate-component-sync-rule).
-11. **Visual Parity.** `make parity-ci` passes for every component
-    currently registered in `tools/parity/registry.mjs`. Until the
-    registry covers the full export surface, the remaining components
-    still require spec-and-screenshot review.
+11. **Runtime verification.** Runtime browser tests, scoped-CSS
+    collision fixtures, and any still-relevant parity/upstream-sync
+    checks pass. Native CSS parity baselines are removed as their
+    components migrate to the runtime.
 
 ### B. Verify — semi-automated
 
@@ -149,9 +142,10 @@ as `make gate`.
     `inst/showcase/app.R`, navigates every section, and
     `expect_screenshot()`s each. From Phase 1C onward, also run
     Shinylive export smoke.
-13. **Performance budget.** `tools/budget.R`: CSS ≤10 KB gzipped,
-    JS ≤15 KB raw, sprite ≤25 KB gzipped. Over budget = blocking
-    unless ADR'd.
+13. **Performance budget.** `tools/budget.R` reports runtime JS/CSS
+    raw and gzip size, compatibility CSS/JS while they remain, icon
+    assets, and per-slice deltas. Budgets are set by ADR 0017 and the
+    Phase 1/2 size baselines. Over budget = blocking unless ADR'd.
 14. **Accessibility sweep.** Manual keyboard/screen-reader smoke on
     the showcase. Findings → `docs/a11y/notes.md`.
 
@@ -223,9 +217,10 @@ Non-obvious problems → postmortem under
 
 ## Continuous Tracks
 
-Four artifacts grow with every phase. Details in the
-[strategy doc](agent-plans/2026-05-08-port-strategy.md#shinylive-showcase)
-and [ADR 0013](decisions/0013-component-gallery-quarto.md):
+Four artifacts grow with every phase. Details live in
+[ADR 0017](decisions/0017-full-runtime-port.md), the
+[runtime plan](agent-plans/2026-05-12-full-port-architecture.md), and
+[ADR 0013](decisions/0013-component-gallery-quarto.md):
 
 - **pkgdown site** — category-grouped reference. Auto-generated from
   roxygen. CI builds it; a failed build blocks the phase.
@@ -240,18 +235,11 @@ and [ADR 0013](decisions/0013-component-gallery-quarto.md):
   contract enforced by `test-showcase.R`. See
   [§Showcase App](#showcase-app). Hosted version exported via
   Shinylive to `site/showcase/`.
-- **Visual-parity harness** — Playwright + `getComputedStyle` + DOM
-  bounding-rect cross-checks under `tools/parity/`, against pinned
-  shadcn-react. Per [ADR 0016](decisions/0016-visual-parity-harness.md).
-  POCs cover `block_select()` and `block_slider()` today; the full
-  Vite + React reference app is slice 6 in
-  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](agent-plans/2026-05-09-phase-5-handoff.md).
-  The `shinyblocks-component` skill at
-  [`docs/skills/shinyblocks-component.md`](skills/shinyblocks-component.md)
-  is the recipe agents use to wire new components into the harness;
-  `make skills-install` mirrors it into the local
-  `.claude/skills/` and `.agents/skills/` directories so the agent
-  runtimes pick it up.
+- **Runtime verification** — browser tests, scoped-CSS collision
+  fixtures, Shiny state/update tests, bundle-size reports, and any
+  still-relevant upstream-sync/parity checks. ADR 0016 remains useful
+  for historical native parity and upstream drift ideas, but migrated
+  runtime components are verified against shipped runtime behavior.
 
 ## Components Gallery
 
@@ -343,9 +331,10 @@ file under `R/examples/`.
 
 When a new `block_*()` is exported, the same commit must add:
 
-1. `inst/showcase/R/examples/<component>.R` — a `htmltools::tagList`
-   showing the default plus interesting variants, evaluable in a
-   fresh environment with shinyblocks loaded.
+1. `inst/showcase/R/examples/<component>.R` — examples for the basic
+   case, every public variant/option, customization hooks, supported
+   states, and for reactive components, value reads, server updates,
+   disable/enable, reset/clear, and module namespacing where relevant.
 2. A row in the `sections` list in `inst/showcase/app.R` (id, label,
    icon, title, lead, file).
 3. Run `make showcase` and eyeball it. The new section should appear
@@ -361,15 +350,17 @@ fails the test suite. Specifically the suite asserts:
 - Every section in the `sections` list has a matching
   `data-sb-section` element and a matching `href="#..."` sidebar link
   in the rendered UI.
-- Every exported `block_*()` puts its conventional class
-  (`sb-<name>`) somewhere in the rendered showcase UI.
+- Every exported `block_*()` has a page/section marker unless it is
+  intentionally internal to another documented component family.
+- Reactive component pages include server/update examples.
 - The first section is rendered visible; all others render with the
   `hidden` attribute so the JS filter has a stable starting state.
 
 Components that are emitted transitively (e.g. `block_body` via
 `block_page`) still appear in the rendered HTML through their parent
-and need no separate section. The class-coverage test catches the
-case where they are removed entirely.
+and need no separate section. The showcase coverage test should use
+component metadata/page markers rather than `.sb-*` visual classes as
+components migrate to the runtime.
 
 ## Per-gate component-sync rule
 
@@ -379,19 +370,19 @@ same commit** that lands the API change:
 
 | Artifact | What goes in | Enforced by |
 | --- | --- | --- |
-| `inst/showcase/` | Example file + sections-list row | `test-showcase.R` |
+| `inst/showcase/` | Component page/section with basic, option, customization, state, and reactive examples where applicable | `test-showcase.R` |
 | `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
 | `gallery/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
-| `docs/component-specs/<name>.md` | Visual-parity spec per [ADR 0015](decisions/0015-component-specs.md) — shadcn link, states, token contract, divergences, reference screenshot | `test-doc-coverage.R` |
+| `docs/component-specs/<name>.md` | Runtime mapping, props/slots, Shiny state/update contract, accessibility requirements, scoped-CSS notes, and deliberate divergences | `test-doc-coverage.R` |
 | `NEWS.md` | One bullet under the dev-version heading | Quality Gate item 19 |
 
 A drifted artifact fails the Quality Gate. The first four are
 mechanically checked; `NEWS.md` is reviewer-checked at gate exit.
 
-The component spec is the anchor for Quality Gate item 15 (interaction-
-style parity) — the reviewer walks every state listed in the spec
-against the live showcase, with the spec's reference screenshot as the
-shadcn ground truth.
+The component spec is the anchor for runtime verification: the reviewer
+walks every state listed in the spec against the live showcase, and
+automated checks cover runtime behavior, scoped CSS, upstream sync drift,
+and bundle-size changes.
 
 ### Gallery exception during the WASM hold
 
@@ -412,100 +403,125 @@ Until then, the showcase is the visual verification surface.
 
 ---
 
-## Phase 0 — Decisions
+## Runtime Phase 0 — Decisions
 
-ADRs `0006`–`0012` under [`docs/decisions/`](decisions/). Done.
+Done: [ADR 0017](decisions/0017-full-runtime-port.md) adopts the full
+runtime port and supersedes the earlier native-CSS/wrap-by-default path
+where it conflicts.
 
-## Phase 1A — Asset Dependency and Static Shell
+## Runtime Phase 1 — Foundation
 
-Goal: minimal static dashboard shell, renders without JS.
+Goal: prove the runtime substrate before any user-facing component is
+migrated.
 
-- `R/deps.R`: `shinyblocks_dependency()`, `attach_shinyblocks_deps()`.
-- `R/utils.R`: `merge_classes()`, `validate_children()`.
-- `R/page.R`: `block_page()`, `block_body()`.
-- `R/header.R`: `block_header()`.
-- `R/sidebar.R`: `block_sidebar()` static layout (no collapse).
-- Tests: tag shape, semantic landmarks, single dependency attachment.
+- `frontend/` build scaffold.
+- Scoped runtime CSS without Tailwind preflight.
+- Package-local runtime JS/CSS under `inst/www/`.
+- `shinyblocks_dependency()` attaches runtime assets once.
+- Runtime mount protocol and versioned payload schema.
+- Shiny input/update bridge with `notify`, revision ids, namespacing,
+  and stale-message handling.
+- Dynamic UI lifecycle for initial UI, `renderUI()`, `insertUI()`,
+  `removeUI()`, and id reuse.
+- Portal root under `[data-shinyblocks-portal-root]`.
+- Shiny child-binding fixture for outputs, htmlwidgets, and nested
+  inputs inside runtime-rendered containers.
+- CSS collision fixtures for Bootstrap, bslib, DT/plotly/htmlwidgets,
+  scoped tokens, and portals.
+- Runtime size report for raw/gzipped JS and CSS.
 
-Exit: shell renders with JS disabled; `devtools::test()` and check pass.
+Exit: the dummy runtime input/container proves scoped CSS, value sync,
+server updates, disabled state, modules, dynamic UI, portals, and
+Shiny children. Do not migrate real components before this exits.
 
-## Phase 1B — CSS Build Pipeline
+## Runtime Phase 2 — Vertical Spike
 
-Goal: dev-time Tailwind v4 build wired up, no public R API change.
+Goal: migrate the smallest useful slice through one runtime path.
 
-- `inst/www/src/tokens.css` + `inst/www/src/shinyblocks.css` source.
-- `Makefile` `build-css` and `package.json` `build:css` targets.
-- CI drift check on committed `inst/www/shinyblocks.css`.
+- `block_button()`
+- `block_badge()`
+- `block_select()`
+- `update_block_select()`
 
-Exit: generated CSS is reproducible; no Node at install time.
+Each gets a per-component showcase page/section. `block_select()` must
+show read value, server update, choices update, disable/enable,
+invalid/error set and clear, reset to `NULL`, and module namespacing.
 
-## Phase 1C — Package Infrastructure
+Exit: native Button/Badge/Select CSS, tests, examples, and obsolete
+parity baselines are removed or rewritten.
 
-Goal: project infrastructure after the first working shell.
+## Runtime Phase 3 — Presentational Components
 
-- **pkgdown:** `_pkgdown.yml` with seven reference categories.
-- **CRAN CI:** `.github/workflows/R-CMD-check.yaml` (Ubuntu
-  devel/release/oldrel-1, macOS release, Windows release).
-- **CRAN release gate:** `.github/workflows/cran-release-check.yaml`.
-- **Showcase:** scaffold `inst/showcase/app.R` + `render_example()`.
-- **Shinylive export:** `tools/export-shinylive.R` staging flow.
-- **Makefile targets:** inner loop (`setup`, `watch-css`, `dev`,
-  `showcase`, `check-fast`) and phase exit (`gate`).
-- **Gate tools:** `tools/budget.R`, `tools/check-doc-links.R`,
-  `inst/WORDLIST`, `tests/testthat/setup.R`.
-- `Suggests:` grows only as checks are wired in.
+Goal: move low-risk visual components to the runtime and remove their
+native CSS contracts.
 
-Exit: automated gate runs on CI, pkgdown builds, showcase runs
-locally, Shinylive export succeeds.
+- `block_separator()`
+- `block_skeleton()`
+- `block_spinner()`
+- `block_alert()` and alert slots
+- `block_card()` and card slots
+- `block_empty()`
+- `block_value_box()` if retained
 
-## Phase 2 — Icons and Static Components
+Exit: migrated components render through the runtime, have showcase
+pages/sections with full customization examples, and no longer rely on
+package-owned visual CSS.
 
-- `R/icon.R`: `block_icon()` + vendored Lucide sprite (~80 icons).
-- `R/button.R`: variants and sizes per strategy doc.
-- `R/badge.R`, `R/alert.R`: variants, composition slots.
-- Tests: variant validation, ARIA, icon sprite reference.
-- Showcase: gallery sections for icon, button, badge, alert.
+## Runtime Phase 4 — Overlays and Menus
 
-## Phase 3 — Composite Components
+Goal: migrate behavior-heavy Radix components.
 
-- `R/card.R`: full composition primitives + flat-argument convenience.
-- `R/value-box.R`, `R/separator.R`, `R/skeleton.R`, `R/spinner.R`,
-  `R/empty.R`.
-- Tests: composition validation, slot composition.
-- **Third-party widget smoke test:** verify `plotOutput()`,
-  `DT::dataTableOutput()`, `plotly::plotlyOutput()`, and
-  `rhandsontable::rHandsontableOutput()` render inside
-  `block_card_content()`. Manual visual check in showcase.
-- Showcase: multi-card grid, empty state, third-party widgets section.
+- `block_dialog()`
+- `block_popover()`
+- `block_dropdown_menu()`
+- `block_sheet()`
+- `block_drawer()`
+- `block_tooltip()`
+- `block_hover_card()`
 
-## Phase 4 — Navigation and Behavior
+Exit: portal, focus, Escape, outside-click, open-state, and removal
+behavior come from the runtime and are covered by browser tests.
 
-- `R/sidebar.R`: collapse/expand, mobile sheet, keyboard nav. JS
-  module in `inst/www/shinyblocks.js`.
-- `R/nav.R`: `block_nav()`, `block_nav_item()` with selected state.
-- Showcase: convert sidebar to `block_nav()`, demonstrate collapse.
+## Runtime Phase 5 — Forms and Controls
 
-## Phase 5 — Tabs, Forms, and Theme Runtime
+Goal: remove the wrapped-Shiny-control strategy for shadcn controls.
 
-- `R/tabs.R`: wrap `shiny::tabsetPanel()`, additive decoration only.
-  Add `bslib` to `Imports` if needed. See
-  [ADR 0007](decisions/0007-tabs-and-bootstrap.md).
-- `R/field.R`, `R/input-group.R`: wrap Shiny inputs in sb-styled
-  field markup. See strategy doc
-  [§Field layout](agent-plans/2026-05-08-port-strategy.md#field-layout-shiny-input-wrapping).
-- `R/theme.R`, `R/dark-mode.R`: `block_theme()`,
-  `block_dark_mode_toggle()`, `update_block_theme()`.
-- Showcase: tabs, forms with validation states, live theme controls.
+- `block_checkbox()`
+- `block_switch()`
+- `block_radio_group()`
+- `block_textarea()`
+- `block_slider()`
+- `block_input()`
+- `block_input_group()` and addons
+- `block_field_*()`
+- `block_tabs()` and `block_tab()`
 
-## Phase 6 — Documentation Polish
+Exit: controls use runtime input bindings and updater helpers. Old
+Selectize, ion.rangeSlider, Bootstrap-tab, checkbox, switch, textarea,
+and field visual override CSS/tests are gone.
 
-- `inst/templates/starter/`: minimal starter app.
-- Vignettes finalized: `getting-started`, `theming`, `components`,
-  `coexistence`, `accessibility`.
-- `coexistence.Rmd` documents embedding third-party widgets (ggplot2,
-  DT, plotly, leaflet, rhandsontable) inside shinyblocks containers.
-- `docs/upstream/sb-sync.md` initial entry.
-- README links to pkgdown, showcase, and `run_showcase()`.
+## Runtime Phase 6 — Shell, Icons, and Theme
+
+Goal: finish package-specific shell decisions and theme runtime.
+
+- Decide which page/shell helpers remain R/htmltools-native.
+- Move Sidebar/Nav behavior to runtime where practical.
+- Decide sprite icons versus runtime icon library.
+- Ensure `block_theme()` and `update_block_theme()` affect runtime
+  components through scoped tokens.
+- Keep remaining `.sb-*` selectors as shell hooks only.
+
+Exit: no migrated component relies on package-owned visual CSS.
+
+## Runtime Phase 7 — Parity, Specs, Docs, and Release
+
+- Rewrite specs around R API, runtime mapping, props/slots, Shiny
+  state/update contract, accessibility, and deliberate divergences.
+- Convert parity checks to shipped runtime behavior, upstream sync
+  drift, theme, scoped CSS, and browser behavior.
+- Remove obsolete native parity baselines/screenshots.
+- Finish README, pkgdown, vignettes, showcase, and gallery pages.
+- Run the final package gate and tag `v0.1.0`.
 
 ## Local Preview Before Going Public
 
@@ -529,6 +545,4 @@ Only make the repo public once all four pass.
 
 ## Post-v0.1 Candidates
 
-Each requires its own ADR. See strategy doc
-[§v0.1 Scope — out of scope](agent-plans/2026-05-08-port-strategy.md#v01-scope)
-for the full list with rationale.
+Each requires its own ADR after the runtime port is stable.

@@ -1,0 +1,29 @@
+/*
+ * Scoped shinyblocks runtime CSS.
+ *
+ * This file is intentionally small in Phase 1. It proves the package-local
+ * runtime asset path without shipping Tailwind preflight or global resets.
+ */
+
+[data-shinyblocks-root] {
+  box-sizing: border-box;
+}
+
+[data-shinyblocks-root] *,
+[data-shinyblocks-root] *::before,
+[data-shinyblocks-root] *::after {
+  box-sizing: inherit;
+}
+
+[data-shinyblocks-root][data-shinyblocks-runtime="true"][data-sb-mounted="true"] {
+  --shinyblocks-runtime-mounted: 1;
+}
+
+[data-shinyblocks-root][data-shinyblocks-runtime="true"][data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-portal-root] {
+  color: var(--foreground);
+}

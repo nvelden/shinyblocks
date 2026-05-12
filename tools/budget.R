@@ -2,37 +2,62 @@
 # Asset performance budget reporter.
 #
 # Run via `make budget`. Prints sizes of shipped assets against
-# targets defined in ADR 0006 (CSS) and ADR 0008 (sprite). Exits
-# non-zero if any asset is over budget; otherwise prints a summary.
+# targets defined in the active ADRs. Runtime assets are reported
+# without hard limits until Phase 1/2 produce real baselines. Exits
+# non-zero if any asset with a limit is over budget.
 #
-# Targets (gzipped where indicated):
+# Legacy compatibility targets remain while native assets exist:
 #   inst/www/shinyblocks.css           <= 10 KB gzipped
-#   inst/www/shinyblocks.js            <= 15 KB
+#   inst/www/shinyblocks.js            <= 15 KB raw
 #   inst/www/icons/sprite.svg          <= 25 KB gzipped
 
 targets <- list(
   list(
     path = "inst/www/shinyblocks.css",
     limit_kb = 10,
-    metric = "gzipped"
+    metric = "gzipped",
+    group = "compatibility"
   ),
   list(
     path = "inst/www/shinyblocks.js",
     limit_kb = 15,
-    metric = "raw"
+    metric = "raw",
+    group = "compatibility"
+  ),
+  list(
+    path = "inst/www/shinyblocks-runtime.css",
+    limit_kb = NULL,
+    metric = "raw",
+    group = "runtime"
+  ),
+  list(
+    path = "inst/www/shinyblocks-runtime.css",
+    limit_kb = NULL,
+    metric = "gzipped",
+    group = "runtime"
+  ),
+  list(
+    path = "inst/www/shinyblocks-runtime.js",
+    limit_kb = NULL,
+    metric = "raw",
+    group = "runtime"
+  ),
+  list(
+    path = "inst/www/shinyblocks-runtime.js",
+    limit_kb = NULL,
+    metric = "gzipped",
+    group = "runtime"
   ),
   list(
     path = "inst/www/icons/sprite.svg",
     limit_kb = 25,
-    metric = "gzipped"
+    metric = "gzipped",
+    group = "icons"
   )
 )
 
 gzip_size <- function(path) {
   raw <- readBin(path, what = "raw", n = file.info(path)$size)
-  con <- gzcon(rawConnection(raw, open = "wb"))
-  writeBin(raw, con)
-  close(con)
   length(memCompress(raw, type = "gzip"))
 }
 
@@ -45,7 +70,8 @@ results <- lapply(targets, function(t) {
       status = "missing",
       size_bytes = NA_integer_,
       limit_kb = t$limit_kb,
-      metric = t$metric
+      metric = t$metric,
+      group = t$group
     ))
   }
   size_bytes <- if (identical(t$metric, "gzipped")) {
@@ -53,13 +79,20 @@ results <- lapply(targets, function(t) {
   } else {
     file.info(t$path)$size
   }
-  status <- if (size_bytes / 1024 > t$limit_kb) "OVER BUDGET" else "ok"
+  status <- if (is.null(t$limit_kb)) {
+    "reported"
+  } else if (size_bytes / 1024 > t$limit_kb) {
+    "OVER BUDGET"
+  } else {
+    "ok"
+  }
   list(
     path = t$path,
     status = status,
     size_bytes = size_bytes,
     limit_kb = t$limit_kb,
-    metric = t$metric
+    metric = t$metric,
+    group = t$group
   )
 })
 
@@ -68,17 +101,24 @@ cat(strrep("-", 60), "\n", sep = "")
 for (r in results) {
   if (identical(r$status, "missing")) {
     cat(sprintf(
-      "  %-40s %s\n",
+      "  %-40s %-13s %s\n",
       r$path,
+      sprintf("[%s]", r$group),
       "(missing — not yet built)"
     ))
     next
   }
+  limit <- if (is.null(r$limit_kb)) {
+    "baseline pending"
+  } else {
+    sprintf("%d KB", r$limit_kb)
+  }
   cat(sprintf(
-    "  %-40s %8s  /  %s  [%s, %s]\n",
+    "  %-40s %-13s %8s  /  %s  [%s, %s]\n",
     r$path,
+    sprintf("[%s]", r$group),
     format_kb(r$size_bytes),
-    sprintf("%d KB", r$limit_kb),
+    limit,
     r$metric,
     r$status
   ))

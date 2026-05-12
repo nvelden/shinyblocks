@@ -1,0 +1,6 @@
+{
+  "name": "@shinyblocks/runtime",
+  "private": true,
+  "type": "module",
+  "description": "Maintainer-owned shinyblocks runtime source. Built from the repository root."
+}
