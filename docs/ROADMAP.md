@@ -52,6 +52,9 @@ phase begins.
 >   a dedicated React slot separate from `data-shinyblocks-children`
 >   so Shiny outputs and htmlwidgets remain under Shiny's binding
 >   lifecycle.
+> - **Phase 1 scoped tokens** — default runtime token values are scoped
+>   to `[data-shinyblocks-root]` and `[data-shinyblocks-portal-root]`,
+>   with static checks blocking accidental `:root` token writes.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -79,7 +82,8 @@ phase begins.
 > Still owed for Phase 1 runtime foundation:
 > - Add component-specific updater contracts during the first stateful
 >   component migration, starting with `update_block_select()`.
-> - Browser-backed scoped-token fixtures.
+> - Rerun the browser-backed scoped-token fixture once Playwright
+>   escalation is available again.
 > - Hard runtime asset budgets after Phase 1/2 produce baseline sizes.
 > - Do **not** migrate `block_button()`, `block_badge()`, or
 >   `block_select()` until Phase 1 proves scoped CSS, Shiny state sync,
