@@ -12,6 +12,10 @@ test_that("runtime JS includes Shiny bridge hooks", {
   js <- runtime_js()
 
   expect_match(js, "Shiny.setInputValue", fixed = TRUE)
+  expect_match(js, "isShinyReady", fixed = TRUE)
+  expect_match(js, "sbPendingInput", fixed = TRUE)
+  expect_match(js, "schedulePendingInputFlush", fixed = TRUE)
+  expect_match(js, "shiny:connected", fixed = TRUE)
   expect_match(js, "Shiny.addCustomMessageHandler", fixed = TRUE)
   expect_match(js, '"sb:update"', fixed = TRUE)
 })

@@ -5,6 +5,7 @@
     runtime.mountAll(document);
     runtime.observeDynamicUi();
     runtime.registerUpdateHandler(runtime.applyUpdate);
+    runtime.flushPendingInputs(document);
   }
 
   window.shinyblocksRuntime = {
@@ -18,4 +19,9 @@
   } else {
     init();
   }
+
+  document.addEventListener("shiny:connected", function () {
+    runtime.flushPendingInputs(document);
+    runtime.schedulePendingInputFlush();
+  });
 })();
