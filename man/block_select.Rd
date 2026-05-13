@@ -11,7 +11,9 @@ block_select(
   placeholder = NULL,
   disabled = FALSE,
   width = NULL,
-  class = NULL
+  class = NULL,
+  size = c("default", "sm", "lg"),
+  invalid = FALSE
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ block_select(
 \item{width}{Optional CSS width value.}
 
 \item{class}{Additional classes.}
+
+\item{size}{Select size. One of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
+
+\item{invalid}{Whether to show the invalid/error state.}
 }
 \value{
 An \code{htmltools} tag.

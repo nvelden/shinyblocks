@@ -421,7 +421,9 @@ test_that("block_select emits a runtime select payload", {
     "plan",
     choices = c(Free = "free", Pro = "pro"),
     selected = "pro",
-    class = "custom"
+    class = "custom",
+    size = "lg",
+    invalid = TRUE
   )
   html <- render_html(select)
   payload <- runtime_payload_from(select)
@@ -432,6 +434,8 @@ test_that("block_select emits a runtime select payload", {
   expect_identical(payload$state$value, "pro")
   expect_identical(payload$props$choices[[1]]$value, "free")
   expect_identical(payload$props$choices[[2]]$label, "Pro")
+  expect_identical(payload$props$size, "lg")
+  expect_identical(payload$props$invalid, TRUE)
 })
 
 test_that("block_select defaults to first choice unless a placeholder is present", {

@@ -126,6 +126,7 @@ ui <- shiny::fluidPage(
     choices = c(Free = "free", Pro = "pro"),
     selected = "free",
     placeholder = "Choose plan",
+    size = "lg",
     class = "runtime-select-fixture"
   ),
   shiny::verbatimTextOutput("choice_value"),
