@@ -353,7 +353,18 @@ function applyUpdate(message) {
       if (key === "disabled") {
         root.toggleAttribute("data-disabled", Boolean(value));
       }
-      if (key === "choices" || key === "placeholder" || key === "disabled") {
+      if (key === "className") {
+        payload.className = value;
+        return;
+      }
+      if (
+        key === "choices" ||
+        key === "placeholder" ||
+        key === "disabled" ||
+        key === "width" ||
+        key === "size" ||
+        key === "invalid"
+      ) {
         payload.props[key] = value;
       }
       payload.state[key] = value;

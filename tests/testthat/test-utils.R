@@ -116,6 +116,10 @@ test_that("update_block_select sends runtime updates", {
       choices = c(Free = "free", Pro = "pro"),
       placeholder = "Choose",
       disabled = TRUE,
+      width = "16rem",
+      class = "custom-select",
+      size = "lg",
+      invalid = TRUE,
       notify = TRUE
     )
   )
@@ -126,10 +130,14 @@ test_that("update_block_select sends runtime updates", {
   expect_identical(message$payload$updates$choices[[2]]$label, "Pro")
   expect_identical(message$payload$updates$placeholder, "Choose")
   expect_identical(message$payload$updates$disabled, TRUE)
+  expect_identical(message$payload$updates$width, "16rem")
+  expect_identical(message$payload$updates$className, "custom-select")
+  expect_identical(message$payload$updates$size, "lg")
+  expect_identical(message$payload$updates$invalid, TRUE)
   expect_identical(message$payload$notify, TRUE)
 })
 
-test_that("update_block_select maps selected NULL to the empty select value", {
+test_that("update_block_select maps clearable NULL fields", {
   message <- NULL
   session <- list(
     ns = identity,
@@ -138,9 +146,19 @@ test_that("update_block_select maps selected NULL to the empty select value", {
     }
   )
 
-  expect_invisible(update_block_select(session, "plan", selected = NULL))
+  expect_invisible(
+    update_block_select(
+      session,
+      "plan",
+      selected = NULL,
+      placeholder = NULL,
+      class = NULL
+    )
+  )
 
   expect_identical(message$updates$value, "")
+  expect_null(message$updates$placeholder)
+  expect_null(message$updates$className)
 })
 
 test_that("update_block_select validates selected replacement choices", {
