@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 const mounted = new Map();
@@ -200,7 +200,11 @@ function Select({ payload }) {
   const state = payload.state || {};
   const choices = props.choices || [];
   const disabled = Boolean(props.disabled || state.disabled);
-  const value = state.value ?? "";
+  const [value, setValue] = useState(state.value ?? "");
+
+  useEffect(() => {
+    setValue(payload.state?.value ?? "");
+  }, [payload.state?.value]);
 
   return (
     <div
@@ -216,9 +220,11 @@ function Select({ payload }) {
         aria-invalid={payload.rootAttrs?.ariaInvalid || undefined}
         aria-describedby={payload.rootAttrs?.ariaDescribedby || undefined}
         onChange={(event) => {
+          const nextValue = event.target.value;
           payload.state ||= {};
-          payload.state.value = event.target.value;
-          setInputValue(payload.id, event.target.value, "event");
+          payload.state.value = nextValue;
+          setValue(nextValue);
+          setInputValue(payload.id, nextValue, "event");
         }}
       >
         {props.placeholder && (

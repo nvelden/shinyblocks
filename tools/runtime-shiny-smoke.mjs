@@ -84,6 +84,11 @@ try {
 
   await assertText(page, "#runtime_select_value", "free");
   await page.selectOption("#sb-runtime-select-runtime_select select", "pro");
+  assert.equal(
+    await page.locator("#sb-runtime-select-runtime_select select").inputValue(),
+    "pro",
+    "runtime select should keep the browser-selected value"
+  );
   await assertText(page, "#runtime_select_value", "pro");
   await page.click("#clear_select");
   await assertText(page, "#runtime_select_value", "<EMPTY>");
