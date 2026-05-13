@@ -26,6 +26,46 @@ arg_row <- function(argument, default, value, description) {
   )
 }
 
+code_block <- function(code) {
+  htmltools::tags$pre(
+    style = paste(
+      "margin: 0;",
+      "padding: 0.75rem 1rem;",
+      "overflow-x: auto;",
+      "background: var(--muted);",
+      "color: var(--foreground);",
+      "border-radius: 0.5rem;",
+      "font-size: 0.8125rem;",
+      "line-height: 1.5;"
+    ),
+    htmltools::HTML(paste0(
+      "<code>",
+      htmltools::htmlEscape(code),
+      "</code>"
+    ))
+  )
+}
+
+input_value_block <- function(output_id, input_name) {
+  htmltools::tags$pre(
+    style = paste(
+      "margin: 0;",
+      "padding: 0.75rem 1rem;",
+      "overflow-x: auto;",
+      "background: var(--muted);",
+      "color: var(--foreground);",
+      "border-radius: 0.5rem;",
+      "font-size: 0.8125rem;",
+      "line-height: 1.5;",
+      "display: grid;",
+      "grid-template-columns: max-content minmax(0, 1fr);",
+      "column-gap: 0.5rem;"
+    ),
+    htmltools::tags$code(paste0("input$", input_name, " =")),
+    htmltools::tags$code(shiny::textOutput(output_id, inline = TRUE))
+  )
+}
+
 htmltools::tagList(
   htmltools::tags$style(htmltools::HTML(
     "
@@ -74,20 +114,23 @@ htmltools::tagList(
           "Change the values in the argument table below to update this select."
         )
       ),
-      htmltools::tags$pre(
-        style = paste(
-          "margin: 0;",
-          "padding: 0.75rem 1rem;",
-          "overflow-x: auto;",
-          "background: var(--muted);",
-          "color: var(--foreground);",
-          "border-radius: 0.5rem;",
-          "font-size: 0.8125rem;",
-          "line-height: 1.5;"
-        ),
-        "input$showcase_select_preview = ",
-        shiny::textOutput("showcase_select_preview_value", inline = TRUE)
-      )
+      input_value_block(
+        "showcase_select_preview_value",
+        "showcase_select_preview"
+      ),
+      code_block(paste0(
+        "block_select(\n",
+        "  input_id = \"showcase_select_preview\",\n",
+        "  choices = c(Free = \"free\", Pro = \"pro\", Team = \"team\"),\n",
+        "  selected = NULL,\n",
+        "  placeholder = NULL,\n",
+        "  disabled = FALSE,\n",
+        "  width = NULL,\n",
+        "  class = NULL,\n",
+        "  size = \"default\",\n",
+        "  invalid = FALSE\n",
+        ")"
+      ))
     )
   ),
   htmltools::tags$table(
@@ -189,7 +232,7 @@ htmltools::tagList(
   ),
   htmltools::tags$hr(style = "border-top: 1px solid var(--border);"),
   block_field_set(
-    block_field_legend("Reactive update helpers"),
+    block_field_legend("Reactivity"),
     block_field_group(
       block_field(
         block_field_label("Plan", `for` = "showcase_select_reactive"),
@@ -211,20 +254,27 @@ htmltools::tagList(
         control_button("showcase_select_enable", "Enable"),
         control_button("showcase_select_replace_choices", "Replace choices")
       ),
-      htmltools::tags$pre(
-        style = paste(
-          "margin: 0;",
-          "padding: 0.75rem 1rem;",
-          "overflow-x: auto;",
-          "background: var(--muted);",
-          "color: var(--foreground);",
-          "border-radius: 0.5rem;",
-          "font-size: 0.8125rem;",
-          "line-height: 1.5;"
-        ),
-        "input$showcase_select_reactive = ",
-        shiny::textOutput("showcase_select_value", inline = TRUE)
-      )
+      input_value_block(
+        "showcase_select_value",
+        "showcase_select_reactive"
+      ),
+      code_block(paste0(
+        "observeEvent(input$set_plan, {\n",
+        "  update_block_select(\n",
+        "    session = session,\n",
+        "    input_id = \"showcase_select_reactive\",\n",
+        "    selected = \"pro\",\n",
+        "    choices = c(Free = \"free\", Pro = \"pro\", Team = \"team\"),\n",
+        "    placeholder = \"Choose a plan\",\n",
+        "    disabled = FALSE,\n",
+        "    width = NULL,\n",
+        "    class = NULL,\n",
+        "    size = \"default\",\n",
+        "    invalid = FALSE,\n",
+        "    notify = TRUE\n",
+        "  )\n",
+        "})"
+      ))
     )
   )
 )

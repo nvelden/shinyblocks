@@ -87,10 +87,7 @@ sections <- list(
     label = "Select",
     icon = "chevron-down",
     title = "Select",
-    lead = paste(
-      "Runtime select input with placeholder, selected value,",
-      "disabled state, width, classes, and server-side updates."
-    ),
+    lead = NULL,
     file = "select.R"
   ),
   list(
@@ -214,32 +211,6 @@ ui <- block_page(
       class = "sb-dark-mode-toggle",
       `data-sb-theme-toggle` = "true",
       `aria-label` = "Toggle theme"
-    )
-  ),
-  htmltools::div(
-    style = paste(
-      "display: flex;",
-      "flex-direction: column;",
-      "gap: 0.5rem;",
-      "margin-bottom: 0.5rem;"
-    ),
-    htmltools::tags$h1(
-      style = paste(
-        "font-size: 1.5rem;",
-        "font-weight: 600;",
-        "letter-spacing: -0.025em;",
-        "margin: 0;"
-      ),
-      "Component gallery"
-    ),
-    htmltools::tags$p(
-      style = "color: var(--muted-foreground); margin: 0;",
-      paste(
-        "Live demos of every exported shinyblocks component.",
-        "The gallery's own UI uses block_page(), block_sidebar(),",
-        "block_header(), and block_body() — what you see is the",
-        "package documenting itself."
-      )
     )
   ),
   lapply(seq_along(sections), function(i) {
