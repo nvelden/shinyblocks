@@ -93,6 +93,10 @@ test_that("block_select validates choices and selected value", {
   expect_snapshot(error = TRUE, {
     block_select("plan", choices = c("Free", "Pro"), selected = "Team")
   })
+
+  expect_snapshot(error = TRUE, {
+    block_select("plan", choices = c("Free", "Pro"), size = "xl")
+  })
 })
 
 test_that("update_block_select sends runtime updates", {

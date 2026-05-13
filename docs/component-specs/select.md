@@ -16,6 +16,8 @@
   `aria-invalid="true"`.
 - **disabled** — runtime disables the rendered control and preserves
   server updateability.
+- **sizes** — `sm`, `default`, and `lg` adjust the trigger height and
+  horizontal padding while keeping typography aligned with shadcn.
 
 ## Token contract
 
@@ -27,6 +29,20 @@
 | Chevron | `--muted-foreground` |
 | Focus ring | `--ring` |
 | Invalid ring | `--destructive`, `--border` |
+
+## Exposed shinyblocks options
+
+| Argument | Purpose |
+| --- | --- |
+| `input_id` | Shiny input id used for `input$<id>` and update messages. |
+| `choices` | Character vector or named vector of labels/values. |
+| `selected` | Initial selected value. |
+| `placeholder` | Empty-value prompt shown before selection. |
+| `disabled` | Disables browser interaction while keeping server updates possible. |
+| `width` | CSS width for the runtime select wrapper. |
+| `class` | Additional class merged onto the runtime select wrapper. |
+| `size` | One of `default`, `sm`, or `lg`. |
+| `invalid` | Applies `aria-invalid` and destructive border/ring styling. |
 
 ## Deliberate divergences from shadcn
 

@@ -200,6 +200,8 @@ function Select({ payload }) {
   const state = payload.state || {};
   const choices = props.choices || [];
   const disabled = Boolean(props.disabled || state.disabled);
+  const invalid = Boolean(props.invalid);
+  const size = props.size || "default";
   const [value, setValue] = useState(state.value ?? "");
 
   useEffect(() => {
@@ -209,15 +211,17 @@ function Select({ payload }) {
   return (
     <div
       data-slot="select"
-      className={classNames("sb-select", payload.className)}
+      data-size={size}
+      className={classNames("sb-select", `sb-select-size-${size}`, payload.className)}
       style={{ width: props.width || "100%" }}
       data-disabled={disabled ? "true" : undefined}
+      data-invalid={invalid ? "true" : undefined}
     >
       <select
         className="sb-select-control"
         value={value}
         disabled={disabled}
-        aria-invalid={payload.rootAttrs?.ariaInvalid || undefined}
+        aria-invalid={invalid || payload.rootAttrs?.ariaInvalid || undefined}
         aria-describedby={payload.rootAttrs?.ariaDescribedby || undefined}
         onChange={(event) => {
           const nextValue = event.target.value;

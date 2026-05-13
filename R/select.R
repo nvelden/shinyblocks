@@ -7,6 +7,8 @@
 #' @param disabled Whether the control is disabled.
 #' @param width Optional CSS width value.
 #' @param class Additional classes.
+#' @param size Select size. One of `"default"`, `"sm"`, or `"lg"`.
+#' @param invalid Whether to show the invalid/error state.
 #'
 #' @return An `htmltools` tag.
 #' @family forms
@@ -18,8 +20,11 @@ block_select <- function(
   placeholder = NULL,
   disabled = FALSE,
   width = NULL,
-  class = NULL
+  class = NULL,
+  size = c("default", "sm", "lg"),
+  invalid = FALSE
 ) {
+  size <- match_arg(size, c("default", "sm", "lg"))
   choices_df <- normalize_choices(choices)
   choice_values <- choices_df$value
 
@@ -34,7 +39,9 @@ block_select <- function(
       choices = runtime_choice_records(choices_df),
       placeholder = placeholder,
       disabled = isTRUE(disabled),
-      width = width %||% "100%"
+      width = width %||% "100%",
+      size = size,
+      invalid = isTRUE(invalid)
     ),
     input_id = input_id,
     state = list(value = selected_value),

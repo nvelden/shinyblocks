@@ -102,6 +102,14 @@
       Error:
       ! `selected` must match one of `choices`.
 
+---
+
+    Code
+      block_select("plan", choices = c("Free", "Pro"), size = "xl")
+    Condition
+      Error:
+      ! `size` must be one of "default", "sm", "lg".
+
 # update_block_select validates selected replacement choices
 
     Code

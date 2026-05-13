@@ -83,6 +83,12 @@ try {
   await assertText(page, "#nested_value", "from-browser");
 
   await assertText(page, "#runtime_select_value", "free");
+  await assertComputedStyle(
+    page,
+    "#sb-runtime-select-runtime_select select",
+    "height",
+    "25px"
+  );
   await page.selectOption("#sb-runtime-select-runtime_select select", "pro");
   assert.equal(
     await page.locator("#sb-runtime-select-runtime_select select").inputValue(),
