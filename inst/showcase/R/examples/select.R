@@ -47,18 +47,17 @@ code_block <- function(code) {
 }
 
 input_value_block <- function(output_id, input_name) {
-  htmltools::tags$pre(
+  htmltools::tags$div(
     style = paste(
       "margin: 0;",
-      "padding: 0.75rem 1rem;",
-      "overflow-x: auto;",
+      "padding: 0.5rem 0.75rem;",
       "background: var(--muted);",
       "color: var(--foreground);",
       "border-radius: 0.5rem;",
       "font-size: 0.8125rem;",
-      "line-height: 1.5;",
-      "display: grid;",
-      "grid-template-columns: max-content minmax(0, 1fr);",
+      "line-height: 1.25rem;",
+      "display: inline-flex;",
+      "align-items: baseline;",
       "column-gap: 0.5rem;"
     ),
     htmltools::tags$code(paste0("input$", input_name, " =")),
