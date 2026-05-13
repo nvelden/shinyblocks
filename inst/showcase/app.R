@@ -309,6 +309,78 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
+  select_doc_choices <- function(key) {
+    switch(
+      key %||% "plans",
+      channels = c(Alpha = "alpha", Beta = "beta", Stable = "stable"),
+      sizes = c(Small = "sm", Medium = "md", Large = "lg"),
+      c(Free = "free", Pro = "pro", Team = "team")
+    )
+  }
+
+  output$showcase_select_preview_value <- shiny::renderText({
+    value <- input$showcase_select_preview
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (identical(value, "")) {
+      return("<EMPTY>")
+    }
+    value
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_select_preview_value",
+    suspendWhenHidden = FALSE
+  )
+
+  shiny::observeEvent(input$showcase_select_doc_choices, {
+    choices <- select_doc_choices(input$showcase_select_doc_choices)
+    update_block_select(
+      session,
+      "showcase_select_doc_selected",
+      choices = choices,
+      selected = unname(choices[[1]]),
+      notify = TRUE
+    )
+  }, ignoreInit = TRUE)
+
+  shiny::observe({
+    choices <- select_doc_choices(input$showcase_select_doc_choices)
+    selected <- input$showcase_select_doc_selected
+    if (is.null(selected) || !selected %in% unname(choices)) {
+      selected <- unname(choices[[1]])
+    }
+
+    placeholder <- input$showcase_select_doc_placeholder %||% ""
+    if (!nzchar(placeholder)) {
+      placeholder <- NULL
+    }
+
+    width <- input$showcase_select_doc_width %||% "100%"
+    if (!nzchar(width)) {
+      width <- "100%"
+    }
+
+    update_block_select(
+      session,
+      "showcase_select_preview",
+      choices = choices,
+      selected = selected,
+      placeholder = placeholder,
+      disabled = isTRUE(input$showcase_select_doc_disabled),
+      width = width,
+      class = if (isTRUE(input$showcase_select_doc_class)) {
+        "showcase-select-preview-custom"
+      } else {
+        NULL
+      },
+      size = input$showcase_select_doc_size %||% "default",
+      invalid = isTRUE(input$showcase_select_doc_invalid),
+      notify = TRUE
+    )
+  })
+
   output$showcase_select_value <- shiny::renderText({
     value <- input$showcase_select_reactive
     if (is.null(value)) {

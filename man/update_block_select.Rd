@@ -11,6 +11,10 @@ update_block_select(
   choices,
   placeholder,
   disabled,
+  width,
+  class,
+  size,
+  invalid,
   notify = FALSE
 )
 }
@@ -26,6 +30,14 @@ update_block_select(
 \item{placeholder}{Optional replacement placeholder.}
 
 \item{disabled}{Optional disabled state.}
+
+\item{width}{Optional replacement CSS width value.}
+
+\item{class}{Optional replacement classes.}
+
+\item{size}{Optional replacement size. One of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
+
+\item{invalid}{Optional invalid/error state.}
 
 \item{notify}{Whether Shiny should receive an input event for \code{selected}.}
 }

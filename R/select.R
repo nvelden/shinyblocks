@@ -58,6 +58,10 @@ block_select <- function(
 #' @param choices Optional replacement choices.
 #' @param placeholder Optional replacement placeholder.
 #' @param disabled Optional disabled state.
+#' @param width Optional replacement CSS width value.
+#' @param class Optional replacement classes.
+#' @param size Optional replacement size. One of `"default"`, `"sm"`, or `"lg"`.
+#' @param invalid Optional invalid/error state.
 #' @param notify Whether Shiny should receive an input event for `selected`.
 #'
 #' @return Invisibly returns `NULL`.
@@ -70,6 +74,10 @@ update_block_select <- function(
   choices,
   placeholder,
   disabled,
+  width,
+  class,
+  size,
+  invalid,
   notify = FALSE
 ) {
   updates <- list()
@@ -95,6 +103,18 @@ update_block_select <- function(
   if (!missing(disabled)) {
     updates$disabled <- isTRUE(disabled)
   }
+  if (!missing(width)) {
+    updates$width <- width %||% "100%"
+  }
+  if (!missing(class)) {
+    updates$className <- class
+  }
+  if (!missing(size)) {
+    updates$size <- match_arg(size, c("default", "sm", "lg"))
+  }
+  if (!missing(invalid)) {
+    updates$invalid <- isTRUE(invalid)
+  }
 
   do.call(
     runtime_update,
@@ -107,7 +127,7 @@ update_block_select <- function(
       updates,
       list(
         notify = notify,
-        clearable = "value"
+        clearable = c("value", "placeholder", "className")
       )
     )
   )

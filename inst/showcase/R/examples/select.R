@@ -10,158 +10,186 @@ control_button <- function(input_id, label) {
   )
 }
 
-option_row <- function(name, signature, example, description) {
+arg_control <- function(...) {
   htmltools::div(
-    style = paste(
-      "display: grid;",
-      "grid-template-columns: minmax(9rem, 12rem) minmax(14rem, 1fr);",
-      "gap: 1rem;",
-      "align-items: start;"
-    ),
-    htmltools::div(
-      htmltools::tags$div(
-        style = "font-weight: 600;",
-        name
-      ),
-      htmltools::tags$code(
-        style = paste(
-          "display: inline-block;",
-          "margin-top: 0.25rem;",
-          "color: var(--muted-foreground);"
-        ),
-        signature
-      )
-    ),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 0.5rem;",
-      example,
-      block_field_description(description)
-    )
+    style = "min-width: 14rem;",
+    ...
+  )
+}
+
+arg_row <- function(argument, default, value, description) {
+  htmltools::tags$tr(
+    htmltools::tags$td(htmltools::tags$code(argument)),
+    htmltools::tags$td(htmltools::tags$code(default)),
+    htmltools::tags$td(value),
+    htmltools::tags$td(description)
   )
 }
 
 htmltools::tagList(
-  block_field_group(
-    option_row(
-      "choices",
-      "choices = c(Free = \"free\", ...)",
-      block_select(
-        "showcase_select_choices",
-        choices = c(Free = "free", Pro = "pro", Team = "team"),
-        selected = "pro"
-      ),
-      paste(
-        "Named vectors use names as labels and values as Shiny input values.",
-        "Unnamed vectors use the same string for label and value."
-      )
-    ),
-    block_field(
-      block_field_label("Basic", `for` = "showcase_select_basic"),
-      block_select(
-        "showcase_select_basic",
-        choices = c(Free = "free", Pro = "pro", Team = "team"),
-        selected = "pro"
-      ),
-      block_field_description("Named choices with an initial selected value.")
-    ),
-    option_row(
-      "placeholder",
-      "placeholder = \"Choose ...\"",
-      block_select(
-        "showcase_select_placeholder",
-        choices = c(Alpha = "alpha", Beta = "beta", Stable = "stable"),
-        placeholder = "Choose a release channel"
-      ),
-      "Placeholder keeps the initial browser and Shiny value empty."
-    ),
-    option_row(
-      "selected",
-      "selected = \"team\"",
-      block_select(
-        "showcase_select_selected",
-        choices = c(Free = "free", Pro = "pro", Team = "team"),
-        selected = "team"
-      ),
-      "Selected sets the initial value rendered in the browser and sent to Shiny."
-    ),
-    option_row(
-      "width",
-      "width = \"16rem\"",
-      block_select(
-        "showcase_select_width",
-        choices = c(Small = "sm", Medium = "md", Large = "lg"),
-        selected = "md",
-        width = "16rem",
-        class = "showcase-select-width"
-      ),
-      "Width sets the select wrapper width while preserving the token styling."
-    ),
-    option_row(
-      "class",
-      "class = \"showcase-select-width\"",
-      block_select(
-        "showcase_select_class",
-        choices = c(Default = "default", Custom = "custom"),
-        selected = "custom",
-        width = "16rem",
-        class = "showcase-select-width"
-      ),
-      "Class is merged onto the runtime select wrapper for app-level layout hooks."
-    ),
-    option_row(
-      "disabled",
-      "disabled = TRUE",
-      block_select(
-        "showcase_select_disabled",
-        choices = c(Manual = "manual", Automatic = "automatic"),
-        selected = "automatic",
-        disabled = TRUE
-      ),
-      "Disabled blocks user changes but still allows server-side updates."
-    ),
-    option_row(
-      "size",
-      "size = \"sm\" / \"default\" / \"lg\"",
-      htmltools::div(
-        style = "display: flex; flex-direction: column; gap: 0.5rem;",
+  htmltools::tags$style(htmltools::HTML(
+    "
+    .showcase-select-doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .showcase-select-doc-table th,
+    .showcase-select-doc-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .showcase-select-doc-table th {
+      color: var(--muted-foreground);
+      font-weight: 600;
+    }
+    .showcase-select-doc-table td:nth-child(1),
+    .showcase-select-doc-table td:nth-child(2) {
+      white-space: nowrap;
+      width: 1%;
+    }
+    .showcase-select-doc-table .form-group {
+      margin-bottom: 0;
+    }
+    .showcase-select-preview-custom .sb-select-control {
+      border-style: dashed !important;
+    }
+    "
+  )),
+  block_field_set(
+    block_field_legend("Configured preview"),
+    block_field_group(
+      block_field(
+        block_field_label("Preview", `for` = "showcase_select_preview"),
         block_select(
-          "showcase_select_size_sm",
-          choices = c(Small = "sm", Medium = "md"),
-          selected = "sm",
-          width = "14rem",
-          size = "sm"
+          "showcase_select_preview",
+          choices = c(Free = "free", Pro = "pro", Team = "team"),
+          selected = "pro",
+          placeholder = "Choose a plan",
+          width = "100%"
         ),
-        block_select(
-          "showcase_select_size_default",
-          choices = c(Default = "default", Medium = "md"),
-          selected = "default",
-          width = "14rem"
-        ),
-        block_select(
-          "showcase_select_size_lg",
-          choices = c(Large = "lg", Medium = "md"),
-          selected = "lg",
-          width = "14rem",
-          size = "lg"
+        block_field_description(
+          "Change the values in the argument table below to update this select."
         )
       ),
-      "Size adjusts control height and horizontal padding."
+      htmltools::tags$pre(
+        style = paste(
+          "margin: 0;",
+          "padding: 0.75rem 1rem;",
+          "overflow-x: auto;",
+          "background: var(--muted);",
+          "color: var(--foreground);",
+          "border-radius: 0.5rem;",
+          "font-size: 0.8125rem;",
+          "line-height: 1.5;"
+        ),
+        "input$showcase_select_preview = ",
+        shiny::textOutput("showcase_select_preview_value", inline = TRUE)
+      )
+    )
+  ),
+  htmltools::tags$table(
+    class = "showcase-select-doc-table",
+    htmltools::tags$thead(
+      htmltools::tags$tr(
+        htmltools::tags$th("Argument"),
+        htmltools::tags$th("Default"),
+        htmltools::tags$th("Value"),
+        htmltools::tags$th("Description")
+      )
     ),
-    option_row(
-      "invalid",
-      "invalid = TRUE",
-      block_select(
-        "showcase_select_invalid",
-        choices = c(Valid = "valid", Invalid = "invalid"),
-        selected = "invalid",
-        invalid = TRUE
+    htmltools::tags$tbody(
+      arg_row(
+        "choices",
+        "required",
+        arg_control(block_select(
+          "showcase_select_doc_choices",
+          choices = c(
+            "Plans" = "plans",
+            "Release channels" = "channels",
+            "Sizes" = "sizes"
+          ),
+          selected = "plans"
+        )),
+        "The labels and values available in the select."
       ),
-      "Invalid applies aria-invalid and the destructive border/ring styling."
+      arg_row(
+        "selected",
+        "NULL",
+        arg_control(block_select(
+          "showcase_select_doc_selected",
+          choices = c(Free = "free", Pro = "pro", Team = "team"),
+          selected = "pro"
+        )),
+        "Initial selected value. It must match one of the current choices."
+      ),
+      arg_row(
+        "placeholder",
+        "NULL",
+        arg_control(block_textarea(
+          "showcase_select_doc_placeholder",
+          value = "Choose a plan",
+          rows = 1
+        )),
+        "Optional empty-value prompt."
+      ),
+      arg_row(
+        "disabled",
+        "FALSE",
+        arg_control(block_checkbox(
+          "showcase_select_doc_disabled",
+          "TRUE",
+          value = FALSE
+        )),
+        "Disables browser interaction while server updates remain possible."
+      ),
+      arg_row(
+        "width",
+        "NULL",
+        arg_control(block_textarea(
+          "showcase_select_doc_width",
+          value = "100%",
+          rows = 1
+        )),
+        "CSS width applied to the runtime select wrapper."
+      ),
+      arg_row(
+        "class",
+        "NULL",
+        arg_control(block_checkbox(
+          "showcase_select_doc_class",
+          "Use custom dashed-border class",
+          value = FALSE
+        )),
+        "Additional class merged onto the runtime select wrapper."
+      ),
+      arg_row(
+        "size",
+        "default",
+        arg_control(block_select(
+          "showcase_select_doc_size",
+          choices = c("default", "sm", "lg"),
+          selected = "default"
+        )),
+        "Control size. One of default, sm, or lg."
+      ),
+      arg_row(
+        "invalid",
+        "FALSE",
+        arg_control(block_checkbox(
+          "showcase_select_doc_invalid",
+          "TRUE",
+          value = FALSE
+        )),
+        "Applies aria-invalid and destructive border/ring styling."
+      )
     )
   ),
   htmltools::tags$hr(style = "border-top: 1px solid var(--border);"),
   block_field_set(
-    block_field_legend("Reactive select"),
+    block_field_legend("Reactive update helpers"),
     block_field_group(
       block_field(
         block_field_label("Plan", `for` = "showcase_select_reactive"),
