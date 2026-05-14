@@ -432,12 +432,12 @@ block_skeleton <- function(class = NULL, ...) {
 #' @family content
 #' @export
 block_spinner <- function(label = "Loading", class = NULL) {
-  attach_shinyblocks_deps(
-    htmltools::tags$span(
-      class = merge_classes("sb-spinner", class),
-      role = "status",
-      `aria-label` = label
-    )
+  runtime_component(
+    component = "spinner",
+    props = list(
+      label = label
+    ),
+    class = class
   )
 }
 

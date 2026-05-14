@@ -16,6 +16,7 @@
 * `block_badge()` and `block_button()` now render through the package-local React runtime while preserving their R-facing variant, size, icon, custom class, disabled, and passthrough-attribute contracts. Native badge CSS was removed from the legacy stylesheet; native button CSS remains temporarily for `block_dark_mode_toggle()`.
 * `block_select()` now renders a package-local shadcn-style overlay backed by a hidden native `<select>` and a component-specific Shiny input binding. `update_block_select()` now routes through `sendInputMessage()` and can update value, choices, placeholder, disabled state, styling metadata, and optional Shiny notification.
 * `block_separator()` now renders through the package-local runtime while preserving horizontal/vertical orientation and decorative/semantic ARIA behavior.
+* `block_spinner()` now renders through the package-local runtime while preserving the `role="status"` and accessible label contract.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed

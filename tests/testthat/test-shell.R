@@ -638,13 +638,14 @@ test_that("separators expose orientation and aria correctly", {
 
 test_that("skeletons and spinners expose expected attributes", {
   skeleton <- block_skeleton(class = "custom")
-  spinner <- block_spinner(label = "Loading table", class = "custom")
+  spinner <- runtime_payload_from(block_spinner(label = "Loading table", class = "custom"))
+  spinner_html <- render_html(block_spinner(label = "Loading table", class = "custom"))
 
   expect_identical(tag_attr(skeleton, "class"), "sb-skeleton custom")
   expect_identical(tag_attr(skeleton, "aria-hidden"), "true")
-  expect_identical(tag_attr(spinner, "class"), "sb-spinner custom")
-  expect_identical(tag_attr(spinner, "role"), "status")
-  expect_identical(tag_attr(spinner, "aria-label"), "Loading table")
+  expect_identical(spinner$props$label, "Loading table")
+  expect_identical(spinner$className, "custom")
+  expect_match(spinner_html, 'data-sb-component="spinner"', fixed = TRUE)
 })
 
 test_that("empty states render icon, description, and action", {

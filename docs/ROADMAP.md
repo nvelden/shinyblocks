@@ -74,6 +74,9 @@ phase begins.
 > - **Phase 3 presentational slice 1** — `block_separator()` now
 >   renders through the package-local runtime with scoped separator
 >   styles and updated shell/runtime smoke coverage.
+> - **Phase 3 presentational slice 2** — `block_spinner()` now renders
+>   through the package-local runtime with scoped spinner animation and
+>   updated shell/runtime smoke coverage.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

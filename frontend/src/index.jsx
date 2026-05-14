@@ -261,6 +261,10 @@ function RuntimeMount({ payload, root }) {
     return <Separator payload={payload} />;
   }
 
+  if (payload.component === "spinner") {
+    return <Spinner payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -398,6 +402,19 @@ function Separator({ payload }) {
       role={decorative ? undefined : "separator"}
       aria-orientation={decorative ? undefined : orientation}
       aria-hidden={decorative ? "true" : undefined}
+    />
+  );
+}
+
+function Spinner({ payload }) {
+  const props = payload.props || {};
+
+  return (
+    <span
+      data-slot="spinner"
+      className={classNames("sb-spinner", payload.className)}
+      role="status"
+      aria-label={props.label || "Loading"}
     />
   );
 }
