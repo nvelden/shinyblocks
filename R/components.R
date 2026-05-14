@@ -324,18 +324,23 @@ block_alert <- function(
   )
 }
 
-#' Create a dialog (Phase 4.1 skeleton)
+#' Create a dialog (Phase 4.2 — Shiny-bound modal)
 #'
-#' A modal dialog rendered into the runtime portal root. The 4.1
-#' skeleton supports an initial open state and a static close button
-#' that toggles local visibility only. Shiny input binding, trigger
-#' wiring, escape/outside-click, focus management, and the
-#' `update_block_dialog()` updater land in subsequent sub-phases.
+#' A modal dialog rendered into the runtime portal root. Reports its
+#' open/closed state to `input$<id>` and accepts server-driven
+#' updates through `update_block_dialog()`. A.11y behaviors (escape,
+#' outside-click, focus trap, focus return, scroll lock) land in 4.3.
 #'
+#' @param id Required input id. `input$<id>` is `TRUE` when open,
+#'   `FALSE` when closed.
 #' @param title Required dialog title. Used as the accessible name.
-#' @param ... Body content. Serialized to HTML in 4.1; arbitrary Shiny
-#'   children become Shiny-bound in 4.2+.
+#' @param ... Body content. Serialized to HTML in 4.1/4.2; arbitrary
+#'   Shiny children become Shiny-bound in a later sub-phase.
 #' @param description Optional description below the title.
+#' @param trigger Optional label string. Renders a default-variant
+#'   `block_button()` next to the mount node that opens the dialog
+#'   when clicked. Pass `NULL` (default) to drive open state purely
+#'   from the server with `update_block_dialog()`.
 #' @param open Initial open state. Defaults to `FALSE`.
 #' @param class Additional classes for the dialog content container.
 #'
@@ -343,18 +348,27 @@ block_alert <- function(
 #' @family content
 #' @export
 block_dialog <- function(
+  id,
   title,
   ...,
   description = NULL,
+  trigger = NULL,
   open = FALSE,
   class = NULL
 ) {
+  if (missing(id) || is.null(id)) {
+    stop("`id` is required.", call. = FALSE)
+  }
   if (missing(title) || is.null(title)) {
     stop("`title` is required.", call. = FALSE)
+  }
+  if (!is.null(trigger) && (!is.character(trigger) || length(trigger) != 1)) {
+    stop("`trigger` must be a single string label or NULL.", call. = FALSE)
   }
 
   runtime_component(
     component = "dialog",
+    input_id = id,
     props = list(
       titleHtml = html_fragment(title),
       descriptionHtml = if (!is.null(description)) {
@@ -362,11 +376,68 @@ block_dialog <- function(
       } else {
         NULL
       },
-      bodyHtml = html_fragment(...)
+      bodyHtml = html_fragment(...),
+      triggerLabel = trigger
     ),
-    state = list(open = isTRUE(open)),
+    state = list(value = isTRUE(open), open = isTRUE(open)),
+    binding = list(input = TRUE),
     class = class
   )
+}
+
+#' Update a runtime dialog
+#'
+#' Send a server-driven update to a `block_dialog()`.
+#'
+#' @param session Shiny session. Defaults to the current reactive
+#'   session.
+#' @param input_id Dialog input id (unnamespaced; updaters namespace
+#'   via `session$ns()`).
+#' @param open Optional boolean. `TRUE` opens, `FALSE` closes.
+#' @param title Optional replacement title.
+#' @param description Optional replacement description.
+#' @param notify Whether Shiny receives an input event when `open`
+#'   changes. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family content
+#' @export
+update_block_dialog <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  open,
+  title,
+  description,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(open)) {
+    payload$open <- isTRUE(open)
+  }
+  if (!missing(title)) {
+    payload$titleHtml <- if (is.null(title)) NULL else html_fragment(title)
+  }
+  if (!missing(description)) {
+    payload$descriptionHtml <- if (is.null(description)) NULL else html_fragment(description)
+  }
+
+  payload$notify <- isTRUE(notify) && "open" %in% names(payload)
+  message_target <- runtime_mount_id("dialog", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
 }
 
 #' Create a value box

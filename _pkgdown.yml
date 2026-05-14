@@ -42,6 +42,7 @@ reference:
       - block_spinner
       - block_empty
       - block_dialog
+      - update_block_dialog
   - title: Forms
     contents:
       - block_field_group

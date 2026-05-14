@@ -5,6 +5,7 @@ source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
 source(file.path("R", "server_button.R"), local = TRUE)
 source(file.path("R", "server_select.R"), local = TRUE)
+source(file.path("R", "server_dialog.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -299,6 +300,7 @@ ui <- block_page(
 server <- function(input, output, session) {
   register_button_showcase(input, output, session)
   register_select_showcase(input, output, session)
+  register_dialog_showcase(input, output, session)
 }
 
 shinyApp(ui, server)

@@ -82,6 +82,10 @@ function isSelectPayload(payload) {
   return payload && payload.component === "select";
 }
 
+function isDialogPayload(payload) {
+  return payload && payload.component === "dialog";
+}
+
 function nativeSelect(root) {
   return root ? root.querySelector(".sb-select-native") : null;
 }
@@ -248,6 +252,85 @@ function unbindSelectRoot(root) {
   window.Shiny.unbindAll(root);
 }
 
+function registerDialogBinding() {
+  if (
+    window.shinyblocksDialogBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksDialogBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector = "[data-shinyblocks-runtime='true'][data-sb-component='dialog']";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches;
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      return Boolean(el.__sbDialogValue);
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbDialogReceive === "function") {
+        el.__sbDialogReceive({ open: Boolean(value), notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(false);
+      el.addEventListener("sb:dialog-change", handler);
+      el.__sbDialogChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbDialogChangeHandler) return;
+      el.removeEventListener("sb:dialog-change", el.__sbDialogChangeHandler);
+      delete el.__sbDialogChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbDialogReceive === "function") {
+        el.__sbDialogReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksDialogBinding(),
+    "shinyblocks.dialog"
+  );
+  window.shinyblocksDialogBindingRegistered = true;
+}
+
+function bindDialogRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindDialogRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
 function RuntimeMount({ payload, root }) {
   if (payload.component === "button") {
     return <Button payload={payload} />;
@@ -286,7 +369,7 @@ function RuntimeMount({ payload, root }) {
   }
 
   if (payload.component === "dialog") {
-    return <Dialog payload={payload} />;
+    return <Dialog payload={payload} root={root} />;
   }
 
   if (payload.component === "select") {
@@ -570,56 +653,116 @@ function Alert({ payload }) {
   );
 }
 
-function Dialog({ payload }) {
+function Dialog({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
-  const [open, setOpen] = useState(Boolean(state.open));
+  const [open, setOpenState] = useState(Boolean(state.open));
+  const [titleHtml, setTitleHtml] = useState(props.titleHtml || "");
+  const [descriptionHtml, setDescriptionHtml] = useState(
+    props.descriptionHtml || ""
+  );
+  const openRef = useRef(open);
 
-  if (!open) return null;
+  useEffect(() => {
+    openRef.current = open;
+    if (root) {
+      root.__sbDialogValue = open;
+      root.dataset.sbDialogOpen = open ? "true" : "false";
+    }
+  }, [open, root]);
+
+  function notifyChange() {
+    if (!root) return;
+    root.dispatchEvent(new CustomEvent("sb:dialog-change"));
+  }
+
+  function setOpen(next, notify) {
+    setOpenState(Boolean(next));
+    if (notify !== false) {
+      requestAnimationFrame(notifyChange);
+    }
+  }
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    root.__sbDialogReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "titleHtml")) {
+        setTitleHtml(nextData.titleHtml || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "descriptionHtml")) {
+        setDescriptionHtml(nextData.descriptionHtml || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "open")) {
+        setOpen(Boolean(nextData.open), Boolean(nextData.notify));
+      }
+    };
+
+    return () => {
+      delete root.__sbDialogReceive;
+    };
+  }, [root]);
 
   const portal = ensurePortalRoot();
 
-  return createPortal(
-    <div data-slot="dialog" data-sb-dialog-open="true">
-      <div
-        className="sb-dialog-overlay"
-        data-slot="dialog-overlay"
-        onClick={() => setOpen(false)}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        className={classNames("sb-dialog-content", payload.className)}
-        data-slot="dialog-content"
-      >
-        <div className="sb-dialog-header" data-slot="dialog-header">
-          <HtmlSlot html={props.titleHtml} className="sb-dialog-title" />
-          {props.descriptionHtml && (
-            <HtmlSlot
-              html={props.descriptionHtml}
-              className="sb-dialog-description"
-            />
-          )}
-        </div>
-        {props.bodyHtml && (
-          <div
-            className="sb-dialog-body"
-            data-slot="dialog-body"
-            dangerouslySetInnerHTML={{ __html: props.bodyHtml }}
-          />
-        )}
+  return (
+    <>
+      {props.triggerLabel && (
         <button
           type="button"
-          className="sb-dialog-close"
-          data-slot="dialog-close"
-          aria-label="Close"
-          onClick={() => setOpen(false)}
+          className="sb-button sb-button-default sb-button-size-default"
+          data-slot="dialog-trigger"
+          onClick={() => setOpen(true)}
         >
-          ×
+          {props.triggerLabel}
         </button>
-      </div>
-    </div>,
-    portal
+      )}
+      {open &&
+        createPortal(
+          <div data-slot="dialog" data-sb-dialog-open="true">
+            <div
+              className="sb-dialog-overlay"
+              data-slot="dialog-overlay"
+              onClick={() => setOpen(false)}
+            />
+            <div
+              role="dialog"
+              aria-modal="true"
+              className={classNames("sb-dialog-content", payload.className)}
+              data-slot="dialog-content"
+            >
+              <div className="sb-dialog-header" data-slot="dialog-header">
+                <HtmlSlot html={titleHtml} className="sb-dialog-title" />
+                {descriptionHtml && (
+                  <HtmlSlot
+                    html={descriptionHtml}
+                    className="sb-dialog-description"
+                  />
+                )}
+              </div>
+              {props.bodyHtml && (
+                <div
+                  className="sb-dialog-body"
+                  data-slot="dialog-body"
+                  dangerouslySetInnerHTML={{ __html: props.bodyHtml }}
+                />
+              )}
+              <button
+                type="button"
+                className="sb-dialog-close"
+                data-slot="dialog-close"
+                aria-label="Close"
+                onClick={() => setOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+          </div>,
+          portal
+        )}
+    </>
   );
 }
 
@@ -988,6 +1131,7 @@ function mountRoot(root) {
   const payload = readPayload(root);
   if (!payload) return;
   registerSelectBinding();
+  registerDialogBinding();
   payload.rootAttrs = {
     ariaInvalid: root.getAttribute("aria-invalid"),
     ariaDescribedby: root.getAttribute("aria-describedby")
@@ -1002,11 +1146,19 @@ function mountRoot(root) {
   mounted.set(root, { payload, reactRoot });
   if (isSelectPayload(payload)) {
     bindSelectRoot(root);
+  } else if (isDialogPayload(payload)) {
+    bindDialogRoot(root);
   } else {
     bindShinyChildren(root);
   }
 
-  if (payload.id && payload.binding && payload.binding.input && !isSelectPayload(payload)) {
+  if (
+    payload.id &&
+    payload.binding &&
+    payload.binding.input &&
+    !isSelectPayload(payload) &&
+    !isDialogPayload(payload)
+  ) {
     const initialized = setInputValue(payload.id, currentValue(payload), "event");
     if (!initialized) {
       root.dataset.sbPendingInput = "true";
@@ -1021,6 +1173,8 @@ function unmountRoot(root) {
 
   if (isSelectPayload(mountedRoot.payload)) {
     unbindSelectRoot(root);
+  } else if (isDialogPayload(mountedRoot.payload)) {
+    unbindDialogRoot(root);
   } else {
     unbindShinyChildren(root);
   }
