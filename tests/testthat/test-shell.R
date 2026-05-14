@@ -668,18 +668,33 @@ test_that("skeletons and spinners expose expected attributes", {
 })
 
 test_that("empty states render icon, description, and action", {
-  empty <- render_html(
+  empty <- runtime_payload_from(
     block_empty(
       "No results",
       description = "Try broadening your search.",
+      htmltools::tags$p("Extra detail"),
+      icon = "folder",
+      action = block_button("Clear filters")
+    )
+  )
+  empty_html <- render_html(
+    block_empty(
+      "No results",
+      description = "Try broadening your search.",
+      htmltools::tags$p("Extra detail"),
       icon = "folder",
       action = block_button("Clear filters")
     )
   )
 
-  expect_match(empty, 'class="sb-empty"', fixed = TRUE)
-  expect_match(empty, 'class="sb-empty-title"', fixed = TRUE)
-  expect_match(empty, 'class="sb-empty-description"', fixed = TRUE)
-  expect_match(empty, 'class="sb-empty-action"', fixed = TRUE)
-  expect_match(empty, 'data-icon="inline-start"', fixed = TRUE)
+  expect_match(empty$props$titleHtml, "No results", fixed = TRUE)
+  expect_match(
+    empty$props$descriptionHtml,
+    "Try broadening your search.",
+    fixed = TRUE
+  )
+  expect_match(empty$props$contentHtml, "Extra detail", fixed = TRUE)
+  expect_match(empty$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
+  expect_match(empty$props$actionHtml, 'data-sb-component="button"', fixed = TRUE)
+  expect_match(empty_html, 'data-sb-component="empty"', fixed = TRUE)
 })

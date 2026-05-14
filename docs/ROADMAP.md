@@ -80,6 +80,9 @@ phase begins.
 > - **Phase 3 presentational slice 3** — `block_skeleton()` now renders
 >   through the package-local runtime while preserving passthrough
 >   attributes and scoped skeleton animation.
+> - **Phase 3 presentational slice 4** — `block_empty()` now renders
+>   through the package-local runtime while preserving icon/content/
+>   action composition and scoped empty-state styles.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

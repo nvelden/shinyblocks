@@ -47,7 +47,6 @@ test_that("runtime CSS does not target host framework selectors", {
     ".irs-",
     ".dataTables_",
     ".html-widget",
-    "body{",
     ":root"
   )
 
@@ -58,6 +57,10 @@ test_that("runtime CSS does not target host framework selectors", {
   )]
 
   expect_identical(hits, character())
+  expect_false(
+    grepl("(^|[},])body\\{", css, perl = TRUE),
+    info = "runtime CSS must not emit a global body selector"
+  )
 })
 
 test_that("runtime CSS does not reset all runtime children", {
