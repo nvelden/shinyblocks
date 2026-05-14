@@ -1,0 +1,71 @@
+---
+title: "Textarea"
+description: "Displays a form textarea or a component that looks like a textarea."
+---
+
+```{r, include = FALSE}
+library(shiny)
+library(shinyblocks)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Textarea
+
+Displays a multi-line text input field.
+
+## Usage
+
+```r
+library(shinyblocks)
+
+block_textarea("textarea_id", placeholder = "Type your message here.")
+```
+
+## Examples
+
+### Basic
+
+A standard textarea with a placeholder.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_textarea(
+  "textarea_demo",
+  placeholder = "Type your message here.",
+  rows = 4
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_textarea(
+  "textarea_demo",
+  placeholder = "Type your message here.",
+  rows = 4
+)
+```
+
+### With Label
+
+Textareas can be wrapped in a field for labels and descriptions.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_field(
+  block_field_label("Bio", `for` = "bio"),
+  block_textarea("bio", placeholder = "Tell us a little bit about yourself", rows = 4),
+  block_field_description("You can @mention other users and organizations.")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_field(
+  block_field_label("Bio", `for` = "bio"),
+  block_textarea("bio", placeholder = "Tell us a little bit about yourself", rows = 4),
+  block_field_description("You can @mention other users and organizations.")
+)
+```

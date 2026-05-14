@@ -8,6 +8,7 @@ Current scope:
 - `button.json`
 - `checkbox.json`
 - `select.json`
+- `separator.json`
 - `slider.json`
 - `switch.json`
 - `textarea.json`

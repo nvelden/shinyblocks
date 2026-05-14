@@ -1,0 +1,41 @@
+{
+  "component": "separator",
+  "source": "http://127.0.0.1:5173/?component=separator",
+  "captured_at": "2026-05-12T13:00:06.564Z",
+  "props": [
+    "background-color",
+    "display",
+    "height",
+    "min-height"
+  ],
+  "themes": {
+    "light": {
+      "horizontal": {
+        "backgroundColor": "rgba(229, 229, 229, 1)",
+        "display": "block",
+        "height": "1px",
+        "minHeight": "auto"
+      },
+      "vertical": {
+        "backgroundColor": "rgba(229, 229, 229, 1)",
+        "display": "block",
+        "height": "32px",
+        "minHeight": "24px"
+      }
+    },
+    "dark": {
+      "horizontal": {
+        "backgroundColor": "rgba(38, 38, 38, 1)",
+        "display": "block",
+        "height": "1px",
+        "minHeight": "auto"
+      },
+      "vertical": {
+        "backgroundColor": "rgba(38, 38, 38, 1)",
+        "display": "block",
+        "height": "32px",
+        "minHeight": "24px"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+---
+title: "Body"
+description: "Documentation for body component."
+---
+
+Placeholder for body component article.
+

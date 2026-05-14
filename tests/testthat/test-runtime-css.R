@@ -19,7 +19,12 @@ test_that("runtime CSS selectors are scoped to shinyblocks roots", {
   selectors <- css_selectors(runtime_css())
 
   allowed <- grepl(
-    "^\\[data-shinyblocks-root\\]|^\\[data-shinyblocks-portal-root\\]",
+    paste0(
+      "^\\[data-shinyblocks-root\\]|",
+      "^\\[data-shinyblocks-portal-root\\]|",
+      "^\\[data-theme=\"dark\"\\] \\[data-shinyblocks-root\\]|",
+      "^\\[data-theme=\"dark\"\\] \\[data-shinyblocks-portal-root\\]"
+    ),
     selectors
   )
 
@@ -65,10 +70,34 @@ test_that("runtime CSS does not reset all runtime children", {
 test_that("runtime tokens are scoped to runtime and portal roots", {
   css <- runtime_css()
 
-  expect_match(css, "[data-shinyblocks-root]{--radius:", fixed = TRUE)
-  expect_match(css, "[data-shinyblocks-portal-root]{--radius:", fixed = TRUE)
+  expect_match(
+    css,
+    "[data-shinyblocks-root],[data-shinyblocks-portal-root]{--radius:",
+    fixed = TRUE
+  )
   expect_match(css, "--background:oklch(100% 0 0)", fixed = TRUE)
+  expect_match(
+    css,
+    '[data-theme="dark"] [data-shinyblocks-root],[data-theme="dark"] [data-shinyblocks-portal-root]{--background:oklch(14.5% 0 0)',
+    fixed = TRUE
+  )
   expect_no_match(css, ":root{--radius", fixed = TRUE)
+})
+
+test_that("runtime CSS exposes custom select selectors", {
+  css <- runtime_css()
+
+  expect_match(css, ".sb-select-native", fixed = TRUE)
+  expect_match(css, ".sb-select-trigger", fixed = TRUE)
+  expect_match(css, ".sb-select-content", fixed = TRUE)
+  expect_match(css, ".sb-select-item", fixed = TRUE)
+})
+
+test_that("runtime CSS omits legacy native select selectors", {
+  css <- runtime_css()
+
+  expect_no_match(css, ".sb-select-control", fixed = TRUE)
+  expect_no_match(css, ".sb-select-icon", fixed = TRUE)
 })
 
 test_that("runtime assets are attached and exist in the package", {

@@ -8,6 +8,16 @@ runtime_js <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+app_js <- function() {
+  path <- system.file(
+    "www",
+    "shinyblocks.js",
+    package = "shinyblocks",
+    mustWork = TRUE
+  )
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 test_that("runtime JS includes Shiny bridge hooks", {
   js <- runtime_js()
 
@@ -52,4 +62,17 @@ test_that("runtime JS creates scoped portal roots", {
 
   expect_match(js, "data-shinyblocks-portal-root", fixed = TRUE)
   expect_no_match(js, "document.body.innerHTML", fixed = TRUE)
+})
+
+test_that("app JS delegates dark-mode toggle clicks", {
+  js <- app_js()
+
+  expect_match(js, "currentThemeMode", fixed = TRUE)
+  expect_match(js, "syncThemeToggles", fixed = TRUE)
+  expect_match(js, "window.shinyblocksTheme.apply", fixed = TRUE)
+  expect_match(js, "window.shinyblocksThemeToggleWired", fixed = TRUE)
+  expect_match(js, "document.addEventListener(\"click\"", fixed = TRUE)
+  expect_match(js, "target.closest(\"[data-sb-theme-toggle]\")", fixed = TRUE)
+  expect_match(js, "applyTheme(currentThemeMode())", fixed = TRUE)
+  expect_no_match(js, "querySelectorAll(\"[data-sb-theme-toggle]\")\n    ).forEach(function (button) {\n      button.addEventListener(\"click\"", fixed = TRUE)
 })

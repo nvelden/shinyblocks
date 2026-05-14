@@ -129,6 +129,82 @@ append_idref <- function(existing, value) {
   paste(refs, collapse = " ")
 }
 
+normalize_runtime_style <- function(style) {
+  if (is.null(style)) {
+    return(NULL)
+  }
+  if (is.list(style)) {
+    names <- names(style)
+    if (
+      length(style) > 0 &&
+        (is.null(names) || any(is.na(names) | !nzchar(names)))
+    ) {
+      stop("`style` lists must be fully named.", call. = FALSE)
+    }
+    return(style)
+  }
+  if (!is.character(style) || length(style) != 1 || is.na(style)) {
+    stop("`style` must be a single CSS declaration string.", call. = FALSE)
+  }
+
+  declarations <- strsplit(style, ";", fixed = TRUE)[[1]]
+  if (length(declarations) == 0) {
+    stop("`style` must include at least one CSS declaration.", call. = FALSE)
+  }
+
+  style_out <- list()
+  for (declaration in declarations) {
+    declaration <- trimws(declaration)
+    if (!nzchar(declaration)) {
+      next
+    }
+
+    idx <- regexpr(":", declaration, fixed = TRUE)[1]
+    if (idx < 2) {
+      stop(
+        "`style` declarations must use `property: value` syntax.",
+        call. = FALSE
+      )
+    }
+
+    raw_property <- trimws(substr(declaration, 1, idx - 1))
+    raw_value <- trimws(substr(declaration, idx + 1, nchar(declaration)))
+    if (!nzchar(raw_property) || !nzchar(raw_value)) {
+      stop(
+        "`style` declarations must include non-empty properties and values.",
+        call. = FALSE
+      )
+    }
+
+    raw_value <- trimws(sub("\\s*!important\\s*$", "", raw_value, perl = TRUE))
+    if (!nzchar(raw_value)) {
+      stop(
+        "`style` declarations must include non-empty values.",
+        call. = FALSE
+      )
+    }
+
+    property <- if (startsWith(raw_property, "--")) {
+      raw_property
+    } else {
+      gsub(
+        "-([a-z])",
+        "\\U\\1",
+        raw_property,
+        perl = TRUE
+      )
+    }
+
+    style_out[[property]] <- raw_value
+  }
+
+  if (length(style_out) == 0) {
+    stop("`style` must include at least one CSS declaration.", call. = FALSE)
+  } else {
+    style_out
+  }
+}
+
 normalize_choices <- function(choices) {
   values <- unlist(choices, recursive = TRUE, use.names = TRUE)
 
@@ -149,4 +225,26 @@ normalize_choices <- function(choices) {
     label = as.character(labels),
     stringsAsFactors = FALSE
   )
+}
+
+validate_select_choice_values <- function(values) {
+  if (any(!nzchar(values))) {
+    stop(
+      "`choices` values must be non-empty. `\"\"` is reserved as the placeholder sentinel.",
+      call. = FALSE
+    )
+  }
+
+  duplicates <- unique(values[duplicated(values)])
+  if (length(duplicates) > 0) {
+    stop(
+      sprintf(
+        "`choices` values must be unique. Duplicates: %s.",
+        paste(sprintf('"%s"', duplicates), collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(values)
 }

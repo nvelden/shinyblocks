@@ -10,6 +10,7 @@ runtime_component <- function(
   state = list(),
   binding = list(),
   class = NULL,
+  style = NULL,
   mount_id = NULL
 ) {
   payload <- runtime_payload(
@@ -28,6 +29,7 @@ runtime_component <- function(
     htmltools::tags$div(
       id = mount_id,
       class = merge_classes("sb-runtime-mount", class),
+      style = style,
       `data-shinyblocks-root` = "",
       `data-shinyblocks-runtime` = "true",
       `data-sb-component` = component,

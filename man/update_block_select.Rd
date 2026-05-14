@@ -7,15 +7,15 @@
 update_block_select(
   session = shiny::getDefaultReactiveDomain(),
   input_id,
-  selected,
   choices,
+  selected,
   placeholder,
   disabled,
   width,
   class,
   size,
   invalid,
-  notify = FALSE
+  notify = TRUE
 )
 }
 \arguments{
@@ -23,9 +23,9 @@ update_block_select(
 
 \item{input_id}{Input id passed to \code{block_select()}.}
 
-\item{selected}{Optional selected value. \code{NULL} clears the value.}
-
 \item{choices}{Optional replacement choices.}
+
+\item{selected}{Optional selected value. \code{NULL} clears the value.}
 
 \item{placeholder}{Optional replacement placeholder.}
 
@@ -39,7 +39,8 @@ update_block_select(
 
 \item{invalid}{Optional invalid/error state.}
 
-\item{notify}{Whether Shiny should receive an input event for \code{selected}.}
+\item{notify}{Whether Shiny should receive an input event when \code{selected}
+is updated. Cosmetic-only updates never notify.}
 }
 \value{
 Invisibly returns \code{NULL}.

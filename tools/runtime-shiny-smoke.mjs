@@ -85,15 +85,16 @@ try {
   await assertText(page, "#runtime_select_value", "free");
   await assertComputedStyle(
     page,
-    "#sb-runtime-select-runtime_select select",
+    "#runtime_select-trigger",
     "height",
     "25px"
   );
-  await page.selectOption("#sb-runtime-select-runtime_select select", "pro");
+  await page.click("#runtime_select-trigger");
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='select-item']").filter({ hasText: "Pro" }).click();
   assert.equal(
-    await page.locator("#sb-runtime-select-runtime_select select").inputValue(),
+    await page.locator("#runtime_select").inputValue(),
     "pro",
-    "runtime select should keep the browser-selected value"
+    "runtime select should keep the hidden native value"
   );
   await assertText(page, "#runtime_select_value", "pro");
   await page.click("#clear_select");
@@ -102,11 +103,13 @@ try {
   await assertText(page, "#runtime_select_value", "pro");
   await page.click("#disable_select");
   await page.waitForFunction(() => {
-    return document.querySelector("#sb-runtime-select-runtime_select select")?.disabled === true;
+    return document.querySelector("#runtime_select")?.disabled === true &&
+      document.querySelector("#runtime_select-trigger")?.disabled === true;
   });
   await page.click("#enable_select");
   await page.waitForFunction(() => {
-    return document.querySelector("#sb-runtime-select-runtime_select select")?.disabled === false;
+    return document.querySelector("#runtime_select")?.disabled === false &&
+      document.querySelector("#runtime_select-trigger")?.disabled === false;
   });
 
   await page.click("#set_b");

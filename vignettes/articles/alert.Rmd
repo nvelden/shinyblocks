@@ -1,0 +1,76 @@
+---
+title: "Alert"
+description: "Displays a callout for user attention."
+---
+
+```{r, include = FALSE}
+library(shiny)
+library(shinyblocks)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Alert
+
+Displays a callout for user attention.
+
+## Usage
+
+```r
+library(shinyblocks)
+
+block_alert(
+  block_alert_title("Heads up!"),
+  block_alert_description("You can add components to your app using the cli.")
+)
+```
+
+## Examples
+
+### Basic
+
+A standard alert with an icon and description.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_alert(
+  block_icon("terminal", class = "h-4 w-4"),
+  block_alert_title("Heads up!"),
+  block_alert_description("You can add components to your app using the cli.")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_alert(
+  block_icon("terminal", class = "h-4 w-4"),
+  block_alert_title("Heads up!"),
+  block_alert_description("You can add components to your app using the cli.")
+)
+```
+
+### Variants
+
+Use the `variant` prop to change the visual style of the alert.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_alert(
+  variant = "destructive",
+  block_icon("alert-circle", class = "h-4 w-4"),
+  block_alert_title("Error"),
+  block_alert_description("Your session has expired. Please log in again.")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_alert(
+  variant = "destructive",
+  block_icon("alert-circle", class = "h-4 w-4"),
+  block_alert_title("Error"),
+  block_alert_description("Your session has expired. Please log in again.")
+)
+```

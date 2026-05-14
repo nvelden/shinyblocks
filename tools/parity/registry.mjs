@@ -75,6 +75,13 @@ export const ALERT_DESCRIPTION_PROPS = [
   "lineHeight"
 ];
 
+export const SEPARATOR_PROPS = [
+  "backgroundColor",
+  "display",
+  "height",
+  "minHeight"
+];
+
 export const SELECT_PROPS = [
   "alignItems",
   "backgroundColor",
@@ -312,6 +319,23 @@ export const REGISTRY = {
       }
     },
     states: ["default", "destructive"],
+    themes: ["light", "dark"]
+  },
+  separator: {
+    component: "separator",
+    parityUrl: "http://127.0.0.1:5173/?component=separator",
+    showcaseUrl: "http://127.0.0.1:4321/#separator",
+    showcaseReadySelector: '[data-sb-section="separator"]:not([hidden])',
+    referenceSelectors: {
+      horizontal: '[data-parity-component="separator"] [data-parity-state="horizontal"]',
+      vertical: '[data-parity-component="separator"] [data-parity-state="vertical"]'
+    },
+    showcaseSelectors: {
+      horizontal: '[data-sb-section="separator"] .sb-parity-separator-horizontal',
+      vertical: '[data-sb-section="separator"] .sb-parity-separator-vertical'
+    },
+    props: SEPARATOR_PROPS,
+    states: ["horizontal", "vertical"],
     themes: ["light", "dark"]
   },
   badge: {

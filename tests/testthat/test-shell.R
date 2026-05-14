@@ -24,6 +24,8 @@ test_that("block_page renders the shell landmarks", {
   expect_match(html, '<main class="sb-body">', fixed = TRUE)
   expect_match(html, 'data-shinyblocks-portal-root=""', fixed = TRUE)
   expect_match(head, "document.documentElement.dataset.theme", fixed = TRUE)
+  expect_match(head, "window.shinyblocksTheme.apply", fixed = TRUE)
+  expect_match(head, "data-sb-theme-toggle", fixed = TRUE)
 })
 
 test_that("block_page includes optional theme overrides in head", {
@@ -175,6 +177,37 @@ test_that("button classes pass through the runtime payload", {
   expect_identical(button$className, "custom")
   expect_identical(button$props$variant, "outline")
   expect_identical(button$props$size, "lg")
+})
+
+test_that("button inline style is normalized for runtime rendering", {
+  button <- runtime_payload_from(
+    block_button(
+      "Save",
+      style = "color: red; min-width: 10rem; --custom-accent: #f00 !important;"
+    )
+  )
+
+  expect_identical(button$props$attrs$style$color, "red")
+  expect_identical(button$props$attrs$style$minWidth, "10rem")
+  expect_identical(button$props$attrs$style$`--custom-accent`, "#f00")
+})
+
+test_that("runtime inline style fails hard for malformed input", {
+  expect_error(
+    block_button("Save", style = "color red"),
+    "`style` declarations must use `property: value` syntax.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_button("Save", style = c("color: red;", "background: black;")),
+    "`style` must be a single CSS declaration string.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_button("Save", style = list(color = "red", "10rem")),
+    "`style` lists must be fully named.",
+    fixed = TRUE
+  )
 })
 
 test_that("dark mode toggle renders expected button attrs", {
@@ -421,8 +454,10 @@ test_that("block_select emits a runtime select payload", {
     "plan",
     choices = c(Free = "free", Pro = "pro"),
     selected = "pro",
+    width = "16rem",
     class = "custom",
     size = "lg",
+    style = "margin-top: 1rem;",
     invalid = TRUE
   )
   html <- render_html(select)
@@ -430,12 +465,19 @@ test_that("block_select emits a runtime select payload", {
 
   expect_identical(tag_attr(select, "class"), "sb-runtime-mount custom")
   expect_match(html, 'data-sb-component="select"', fixed = TRUE)
+  expect_match(html, '<select id="plan" class="sb-select-native"', fixed = TRUE)
+  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(html, '<option value="pro" selected', fixed = TRUE)
+  expect_no_match(html, "sb-select-control", fixed = TRUE)
   expect_identical(payload$id, "plan")
   expect_identical(payload$state$value, "pro")
   expect_identical(payload$props$choices[[1]]$value, "free")
   expect_identical(payload$props$choices[[2]]$label, "Pro")
+  expect_identical(payload$props$width, "16rem")
+  expect_identical(payload$props$style$marginTop, "1rem")
   expect_identical(payload$props$size, "lg")
   expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$binding$type, "shinyblocks.select")
 })
 
 test_that("block_select defaults to first choice unless a placeholder is present", {

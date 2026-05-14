@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test dev showcase \
+.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
@@ -27,6 +27,7 @@ help:
 	@echo "  build-runtime   - compile frontend/src -> inst/www runtime assets"
 	@echo "  runtime-test    - browser smoke test for runtime mount/update behavior"
 	@echo "  runtime-shiny-test - Shiny-backed browser smoke for runtime bindings"
+	@echo "  showcase-test   - Shiny showcase smoke for documented interactive controls"
 	@echo "  build-icons     - regenerate the Lucide sprite"
 	@echo "  lint            - lintr::lint_package()"
 	@echo "  spell           - devtools::spell_check()"
@@ -115,6 +116,9 @@ runtime-test:
 
 runtime-shiny-test:
 	npm run test:runtime-shiny
+
+showcase-test:
+	npm run test:showcase
 
 lint:
 	$(R) -e 'lintr::lint_package()'
