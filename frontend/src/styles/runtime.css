@@ -256,6 +256,22 @@
   min-height: 1.5rem;
 }
 
+[data-shinyblocks-root] .sb-spinner {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+  border-top-color: var(--foreground);
+  border-radius: 9999px;
+  animation: shinyblocks-spin 1s linear infinite;
+}
+
+@keyframes shinyblocks-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 [data-shinyblocks-root] .sb-select {
   position: relative;
   display: inline-block;
