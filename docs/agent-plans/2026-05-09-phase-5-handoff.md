@@ -289,8 +289,8 @@ radius 4px vs 10px, a leftover Selectize arrow, and a "double hover"
 in the dropdown). [ADR 0016](../decisions/0016-visual-parity-harness.md)
 adopts a mechanical computed-style + DOM diff harness against a
 pinned shadcn-react reference. A proof of concept is already in the
-repo at [`tools/parity/select-poc.mjs`](../../tools/parity/select-poc.mjs)
-and demonstrated the approach (reduced select trigger drift from 18
+repo at `tools/parity/select-poc.mjs` (since removed in commit
+`dd24ce8`) and demonstrated the approach (reduced select trigger drift from 18
 to 7 properties and fixed the double-hover).
 
 **Scope:** Promote the POC to a real harness:
@@ -370,7 +370,7 @@ Add a GitHub Actions job that:
   harness into CI once those known high-risk components are covered.
 
 **POC artifacts to learn from before reimplementing:**
-- [`tools/parity/select-poc.mjs`](../../tools/parity/select-poc.mjs) —
+- `tools/parity/select-poc.mjs` (removed in commit `dd24ce8`) —
   see how `.evaluate()` captures computed styles, how Selectize
   pseudo-elements are queried, how the dropdown open-state and
   hover are triggered.
