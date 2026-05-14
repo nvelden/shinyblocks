@@ -272,6 +272,59 @@
   animation: shinyblocks-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+[data-shinyblocks-root] .sb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.4);
+  background-color: var(--card);
+  color: var(--card-foreground);
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+[data-shinyblocks-root] .sb-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.75rem;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 28rem;
+}
+
+[data-shinyblocks-root] .sb-empty-title {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+[data-shinyblocks-root] .sb-empty-description {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-empty-content {
+  width: 100%;
+}
+
+[data-shinyblocks-root] .sb-empty-action {
+  padding-top: 0.5rem;
+}
+
 @keyframes shinyblocks-spin {
   to {
     transform: rotate(360deg);

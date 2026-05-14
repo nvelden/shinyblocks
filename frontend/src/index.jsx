@@ -269,6 +269,10 @@ function RuntimeMount({ payload, root }) {
     return <Skeleton payload={payload} />;
   }
 
+  if (payload.component === "empty") {
+    return <Empty payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -435,6 +439,46 @@ function Skeleton({ payload }) {
       aria-hidden="true"
       {...attrs}
     />
+  );
+}
+
+function Empty({ payload }) {
+  const props = payload.props || {};
+
+  return (
+    <section
+      data-slot="empty"
+      className={classNames("sb-empty", payload.className)}
+    >
+      {props.iconHtml && (
+        <div className="sb-empty-icon">
+          <HtmlSlot html={props.iconHtml} />
+        </div>
+      )}
+      <div className="sb-empty-body">
+        <h3
+          className="sb-empty-title"
+          dangerouslySetInnerHTML={{ __html: props.titleHtml || "" }}
+        />
+        {props.descriptionHtml && (
+          <p
+            className="sb-empty-description"
+            dangerouslySetInnerHTML={{ __html: props.descriptionHtml }}
+          />
+        )}
+        {props.contentHtml && (
+          <div
+            className="sb-empty-content"
+            dangerouslySetInnerHTML={{ __html: props.contentHtml }}
+          />
+        )}
+        {props.actionHtml && (
+          <div className="sb-empty-action">
+            <HtmlSlot html={props.actionHtml} />
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

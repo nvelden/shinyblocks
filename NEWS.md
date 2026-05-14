@@ -18,6 +18,7 @@
 * `block_separator()` now renders through the package-local runtime while preserving horizontal/vertical orientation and decorative/semantic ARIA behavior.
 * `block_spinner()` now renders through the package-local runtime while preserving the `role="status"` and accessible label contract.
 * `block_skeleton()` now renders through the package-local runtime while preserving passthrough attributes and normalized runtime inline-style handling.
+* `block_empty()` now renders through the package-local runtime while preserving icon, description, extra content, and action composition.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed

@@ -475,23 +475,15 @@ block_empty <- function(
 ) {
   icon_tag <- set_icon_position(icon, "inline-start")
 
-  attach_shinyblocks_deps(
-    htmltools::tags$section(
-      class = merge_classes("sb-empty", class),
-      if (!is.null(icon_tag)) {
-        htmltools::tags$div(class = "sb-empty-icon", icon_tag)
-      },
-      htmltools::tags$div(
-        class = "sb-empty-body",
-        htmltools::tags$h3(class = "sb-empty-title", title),
-        if (!is.null(description)) {
-          htmltools::tags$p(class = "sb-empty-description", description)
-        },
-        ...,
-        if (!is.null(action)) {
-          htmltools::tags$div(class = "sb-empty-action", action)
-        }
-      )
-    )
+  runtime_component(
+    component = "empty",
+    props = list(
+      titleHtml = html_fragment(title),
+      descriptionHtml = if (!is.null(description)) html_fragment(description) else NULL,
+      contentHtml = html_fragment(...),
+      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
+      actionHtml = if (!is.null(action)) html_fragment(action) else NULL
+    ),
+    class = class
   )
 }
