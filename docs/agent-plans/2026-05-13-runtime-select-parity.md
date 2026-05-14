@@ -134,6 +134,8 @@ mobile-picker compatibility.
 |  - React mounts overlay into data-shinyblocks-react.   |
 |  - ShinyblocksSelectBinding extends Shiny.InputBinding |
 |    and is registered as "shinyblocks.select".          |
+|  - getType(el) returns null for the plain string value;|
+|    the registry name is not the serialized value type. |
 |  - getValue(el) = el.querySelector(".sb-select-native")|
 |                     .value                             |
 |  - subscribe(el, cb): listen "change.shinyblocks.select|
@@ -149,7 +151,7 @@ mobile-picker compatibility.
 +--------------------------------------------------------+
 |  R: update_block_select(session, "x", choices = ...,   |
 |                         selected = "pro")              |
-|     -> session$sendInputMessage(session$ns("x"),       |
+|     -> session$sendInputMessage("sb-runtime-select-x", |
 |                                 flat_payload)          |
 |     -> Shiny routes to receiveMessage of the           |
 |        registered binding.                             |
@@ -261,7 +263,11 @@ class ShinyblocksSelectBinding extends Shiny.InputBinding {
     return el.dataset.sbInputId;
   }
   getType() {
-    return "shinyblocks.select";
+    // Plain string input value. The binding registration name is
+    // "shinyblocks.select"; returning it here would make Shiny send
+    // the value as id:shinyblocks.select and require a custom R
+    // input handler.
+    return null;
   }
   getValue(el) {
     const native = el.querySelector(".sb-select-native");
@@ -395,7 +401,10 @@ update_block_select <- function(
 
   payload$notify <- isTRUE(notify) && "selected" %in% names(payload)
 
-  session$sendInputMessage(session$ns(input_id), payload)
+  session$sendInputMessage(
+    runtime_mount_id("select", session$ns(input_id)),
+    payload
+  )
   invisible(NULL)
 }
 ```
@@ -1053,8 +1062,9 @@ Add cases under the existing runtime-shiny harness. Required
 assertions:
 
 - `window.Shiny.inputBindings.bindings` includes
-  `{ binding: anything, priority: anything }` whose binding instance
-  reports `binding.getType() === "shinyblocks.select"`.
+  `{ binding: anything, priority: anything }` registered under the
+  name `shinyblocks.select`; the binding instance reports
+  `binding.getType() === null` for the plain string value.
 - The binding's `find(root)` returns `root` when `root` is the
   Select runtime mount, not only when an ancestor scope is passed.
 - After `Shiny.bindAll(document)`, `getValue(root)` returns the

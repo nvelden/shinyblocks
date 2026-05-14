@@ -1,0 +1,7 @@
+---
+title: "Separator"
+description: "Documentation for separator component."
+---
+
+Placeholder for separator component article.
+

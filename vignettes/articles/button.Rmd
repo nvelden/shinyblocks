@@ -1,0 +1,114 @@
+---
+title: "Button"
+description: "Displays a button or a component that looks like a button."
+---
+
+```{r, include = FALSE}
+library(shiny)
+library(shinyblocks)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Button
+
+Displays a button or a component that looks like a button.
+
+## Installation
+
+Add `shinyblocks` to your project dependencies:
+
+```r
+# If not already installed
+# remotes::install_github("nvelden/shinyblocks")
+```
+
+## Usage
+
+```r
+library(shinyblocks)
+
+block_button("Button", variant = "default")
+```
+
+## Examples
+
+### Basic
+
+A basic button with default styling.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_button("Button")))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_button("Button")
+```
+
+### Variants
+
+Use the `variant` prop to change the visual style of the button.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(htmltools::tagList(
+  block_button("Default"),
+  block_button("Secondary", variant = "secondary"),
+  block_button("Outline", variant = "outline"),
+  block_button("Ghost", variant = "ghost"),
+  block_button("Destructive", variant = "destructive"),
+  block_button("Link", variant = "link")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_button("Default")
+block_button("Secondary", variant = "secondary")
+block_button("Outline", variant = "outline")
+block_button("Ghost", variant = "ghost")
+block_button("Destructive", variant = "destructive")
+block_button("Link", variant = "link")
+```
+
+### Sizes
+
+Use the `size` prop to change the size of the button.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(htmltools::tagList(
+  block_button("Small", size = "sm"),
+  block_button("Default"),
+  block_button("Large", size = "lg")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_button("Small", size = "sm")
+block_button("Default", size = "default")
+block_button("Large", size = "lg")
+```
+
+### With Icons
+
+You can add icons to the button and control their position.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(htmltools::tagList(
+  block_button("Search", icon = "search"),
+  block_button("Next", icon = "arrow-right", icon_position = "inline-end")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_button("Search", icon = "search")
+block_button("Next", icon = "arrow-right", icon_position = "inline-end")
+```

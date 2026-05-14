@@ -179,6 +179,9 @@ block_button <- function(
   attrs <- named_attrs(list(...))
   disabled <- isTRUE(attrs$disabled) || identical(attrs$disabled, NA)
   attrs$disabled <- NULL
+  if (!is.null(attrs$style)) {
+    attrs$style <- normalize_runtime_style(attrs$style)
+  }
 
   icon_name <- NULL
   icon_html <- NULL

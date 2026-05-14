@@ -89,6 +89,86 @@ the page, ensure the dependency is still present after the swap.
 Also check that `session = shiny::getDefaultReactiveDomain()` is the
 right session in non-trivial app architectures.
 
+## A showcase runtime component preview is blank or stale
+
+The local showcase uses hash navigation and hides inactive sections
+client-side. Shiny may suspend `renderUI()` outputs while a section is
+hidden, so an argument/code block can update while the actual preview
+mount remains blank or stale.
+
+For interactive showcase previews that live inside hidden sections,
+set output suspension off for every related output:
+
+```r
+output$showcase_button_preview_ui <- shiny::renderUI({
+  block_button("Continue")
+})
+shiny::outputOptions(
+  output,
+  "showcase_button_preview_ui",
+  suspendWhenHidden = FALSE
+)
+```
+
+Do the same for paired code, value, action, or API-table outputs if
+they are expected to stay reactive after section switches.
+
+## Runtime component style changes do not show in the showcase
+
+First separate three possible failures:
+
+1. The R payload is wrong.
+2. The browser runtime cannot apply the payload.
+3. The running Shiny app/browser tab is stale.
+
+Check the R payload first. Inline styles for runtime React components
+must be serialized as a JSON object, not a raw CSS string:
+
+```bash
+Rscript -e "devtools::load_all('.', quiet=TRUE); rt <- htmltools::renderTags(block_button('Continue', style='color: red;', id='preview')); html <- paste(rt$html, collapse=''); json <- sub('.*data-shinyblocks-payload=\"\">', '', html); json <- sub('</script>.*', '', json); cat(json)"
+```
+
+Expected shape:
+
+```json
+"attrs":{"style":{"color":"red"},"id":"preview"}
+```
+
+If the payload still contains `"style":"color: red;"`, normalize the
+style before it reaches React. `block_button()` does this through
+`normalize_runtime_style()`. The browser runtime intentionally expects a
+style object and fails hard if a raw style string reaches React; keep the
+string-to-object conversion in R so component behavior is tested before
+the bundle runs.
+
+Then verify the live browser behavior:
+
+```bash
+node -e "const { chromium } = require('playwright'); (async () => { const browser = await chromium.launch({headless:true}); const page = await browser.newPage(); await page.goto('http://127.0.0.1:4321/#button', {waitUntil:'domcontentloaded'}); await page.waitForSelector('#showcase_button_doc_style'); await page.fill('#showcase_button_doc_style','color: red;'); await page.waitForTimeout(500); const out = await page.evaluate(() => { const btn = document.querySelector('#showcase_button_preview'); if (!btn) return {exists:false}; const cs = getComputedStyle(btn); return {exists:true, text: btn.textContent.trim(), style: btn.getAttribute('style'), color: cs.color, display: cs.display}; }); console.log(JSON.stringify(out)); await browser.close(); })();"
+```
+
+Expected result includes:
+
+```json
+{"exists":true,"style":"color: red;","color":"rgb(255, 0, 0)","display":"inline-flex"}
+```
+
+If R and browser checks pass but the visible tab still looks wrong,
+restart the local showcase process and hard refresh the browser:
+
+```bash
+make showcase
+```
+
+When port `4321` is already occupied, find and stop the stale server
+before restarting:
+
+```bash
+lsof -nP -iTCP:4321 -sTCP:LISTEN
+kill <PID>
+make showcase
+```
+
 ## Components from bslib / shinydashboard / bs4Dash look broken
 
 shinyblocks does not officially support coexistence with other

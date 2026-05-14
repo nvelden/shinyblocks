@@ -103,6 +103,10 @@ const ALERT_DESTRUCTIVE_CLASS = [
   "text-destructive"
 ].join(" ");
 
+const SEPARATOR_BASE_CLASS = "shrink-0 bg-border";
+const SEPARATOR_HORIZONTAL_CLASS = `${SEPARATOR_BASE_CLASS} h-px w-full`;
+const SEPARATOR_VERTICAL_CLASS = `${SEPARATOR_BASE_CLASS} h-full min-h-6 w-px self-stretch`;
+
 const SELECT_TRIGGER_BASE_CLASS = [
   "flex",
   "w-[180px]",
@@ -413,6 +417,40 @@ function AlertRoute() {
   );
 }
 
+function SeparatorRoute() {
+  return e(
+    Stage,
+    { component: "separator" },
+    e(
+      "div",
+      { className: "parity-stack max-w-xl" },
+      e(
+        "div",
+        { className: "flex flex-col gap-3" },
+        e("p", { className: "text-sm" }, "Section one"),
+        e("div", {
+          className: SEPARATOR_HORIZONTAL_CLASS,
+          "data-parity-state": "horizontal"
+        }),
+        e("p", { className: "text-sm" }, "Section two")
+      ),
+      e(
+        "div",
+        {
+          className: "flex h-8 items-center gap-4"
+        },
+        e("span", { className: "text-sm" }, "Filters"),
+        e("div", {
+          className: SEPARATOR_VERTICAL_CLASS,
+          "data-parity-state": "vertical"
+        }),
+        e("span", { className: "text-sm" }, "Sort"),
+        e("span", { className: "text-sm" }, "Export")
+      )
+    )
+  );
+}
+
 function SelectRoute() {
   return e(
     Stage,
@@ -699,6 +737,9 @@ function App() {
   }
   if (component === "alert" || path === "/alert") {
     return e(AlertRoute);
+  }
+  if (component === "separator" || path === "/separator") {
+    return e(SeparatorRoute);
   }
   if (component === "button" || path === "/button") {
     return e(ButtonRoute);

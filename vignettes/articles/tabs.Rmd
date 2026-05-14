@@ -1,0 +1,7 @@
+---
+title: "Tabs"
+description: "Documentation for tabs component."
+---
+
+Placeholder for tabs component article.
+

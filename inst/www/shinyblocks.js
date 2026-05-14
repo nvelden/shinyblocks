@@ -1,7 +1,10 @@
 (function () {
   function currentThemeMode() {
     try {
-      return localStorage.getItem("sb-theme") || "system";
+      var mode = localStorage.getItem("sb-theme") || "system";
+      return mode === "light" || mode === "dark" || mode === "system"
+        ? mode
+        : "system";
     } catch (e) {
       return "system";
     }
@@ -16,16 +19,7 @@
     return mode;
   }
 
-  function applyTheme(mode) {
-    var resolved = resolvedTheme(mode);
-
-    try {
-      localStorage.setItem("sb-theme", mode);
-    } catch (e) {}
-
-    document.documentElement.dataset.theme = resolved;
-    document.documentElement.dataset.themeMode = mode;
-
+  function syncThemeToggles(resolved) {
     Array.prototype.slice.call(
       document.querySelectorAll("[data-sb-theme-toggle]")
     ).forEach(function (button) {
@@ -38,16 +32,36 @@
     });
   }
 
-  function wireThemeToggles() {
-    Array.prototype.slice.call(
-      document.querySelectorAll("[data-sb-theme-toggle]")
-    ).forEach(function (button) {
-      button.addEventListener("click", function () {
-        var next = document.documentElement.dataset.theme === "dark"
-          ? "light"
-          : "dark";
-        applyTheme(next);
-      });
+  function applyTheme(mode) {
+    var resolved = resolvedTheme(mode);
+
+    try {
+      localStorage.setItem("sb-theme", mode);
+    } catch (e) {}
+
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.dataset.themeMode = mode;
+    syncThemeToggles(resolved);
+    window.shinyblocksTheme = window.shinyblocksTheme || {};
+    window.shinyblocksTheme.apply = applyTheme;
+  }
+
+  function wireThemeToggleEvents() {
+    if (window.shinyblocksThemeToggleWired) return;
+    window.shinyblocksThemeToggleWired = true;
+
+    document.addEventListener("click", function (event) {
+      var target = event.target;
+      var button = target && target.closest
+        ? target.closest("[data-sb-theme-toggle]")
+        : null;
+      if (!button) return;
+
+      event.preventDefault();
+      var next = document.documentElement.dataset.theme === "dark"
+        ? "light"
+        : "dark";
+      applyTheme(next);
     });
   }
 
@@ -245,7 +259,8 @@
   }
 
   function init() {
-    wireThemeToggles();
+    applyTheme(currentThemeMode());
+    wireThemeToggleEvents();
     tabs().forEach(wireTabs);
     sidebarPages().forEach(wirePage);
   }

@@ -1,0 +1,7 @@
+---
+title: "Nav Item"
+description: "Documentation for nav-item component."
+---
+
+Placeholder for nav-item component article.
+

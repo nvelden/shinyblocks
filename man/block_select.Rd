@@ -13,6 +13,7 @@ block_select(
   width = NULL,
   class = NULL,
   size = c("default", "sm", "lg"),
+  style = NULL,
   invalid = FALSE
 )
 }
@@ -33,13 +34,17 @@ block_select(
 
 \item{size}{Select size. One of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
 
+\item{style}{Inline CSS styles.}
+
 \item{invalid}{Whether to show the invalid/error state.}
 }
 \value{
 An \code{htmltools} tag.
 }
 \description{
-Create a styled select input
+\code{block_select()} renders a hidden native \verb{<select>} as the Shiny input
+value source, plus a package runtime overlay for the visible
+shadcn-style trigger and popup.
 }
 \seealso{
 Other forms: 

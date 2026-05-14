@@ -97,14 +97,36 @@ test_that("block_select validates choices and selected value", {
   expect_snapshot(error = TRUE, {
     block_select("plan", choices = c("Free", "Pro"), size = "xl")
   })
+
+  expect_error(
+    block_select("plan", choices = c(None = "", Free = "free")),
+    "placeholder sentinel"
+  )
+
+  expect_error(
+    block_select("plan", choices = c(Free = "free", AlsoFree = "free")),
+    "must be unique"
+  )
 })
 
-test_that("update_block_select sends runtime updates", {
+test_that("validate_select_choice_values rejects invalid values", {
+  expect_error(
+    validate_select_choice_values(c("free", "")),
+    "placeholder sentinel"
+  )
+  expect_error(
+    validate_select_choice_values(c("free", "pro", "free")),
+    "must be unique"
+  )
+  expect_invisible(validate_select_choice_values(c("free", "pro")))
+})
+
+test_that("update_block_select sends input binding messages", {
   message <- NULL
   session <- list(
     ns = identity,
-    sendCustomMessage = function(type, payload) {
-      message <<- list(type = type, payload = payload)
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
     }
   )
 
@@ -124,16 +146,15 @@ test_that("update_block_select sends runtime updates", {
     )
   )
 
-  expect_identical(message$type, "sb:update")
-  expect_identical(message$payload$component, "select")
-  expect_identical(message$payload$updates$value, "pro")
-  expect_identical(message$payload$updates$choices[[2]]$label, "Pro")
-  expect_identical(message$payload$updates$placeholder, "Choose")
-  expect_identical(message$payload$updates$disabled, TRUE)
-  expect_identical(message$payload$updates$width, "16rem")
-  expect_identical(message$payload$updates$className, "custom-select")
-  expect_identical(message$payload$updates$size, "lg")
-  expect_identical(message$payload$updates$invalid, TRUE)
+  expect_identical(message$input_id, "sb-runtime-select-plan")
+  expect_identical(message$payload$selected, "pro")
+  expect_identical(message$payload$choices[[2]]$label, "Pro")
+  expect_identical(message$payload$placeholder, "Choose")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$width, "16rem")
+  expect_identical(message$payload$class, "custom-select")
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$invalid, TRUE)
   expect_identical(message$payload$notify, TRUE)
 })
 
@@ -141,7 +162,7 @@ test_that("update_block_select maps clearable NULL fields", {
   message <- NULL
   session <- list(
     ns = identity,
-    sendCustomMessage = function(type, payload) {
+    sendInputMessage = function(input_id, payload) {
       message <<- payload
     }
   )
@@ -156,15 +177,32 @@ test_that("update_block_select maps clearable NULL fields", {
     )
   )
 
-  expect_identical(message$updates$value, "")
-  expect_null(message$updates$placeholder)
-  expect_null(message$updates$className)
+  expect_identical(message$selected, "")
+  expect_null(message$placeholder)
+  expect_null(message$class)
+  expect_identical(message$notify, TRUE)
+})
+
+test_that("cosmetic update_block_select messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = function(id) paste0("module-", id),
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  update_block_select(session, "plan", width = "12rem")
+
+  expect_identical(message$input_id, "sb-runtime-select-module-plan")
+  expect_identical(message$payload$width, "12rem")
+  expect_identical(message$payload$notify, FALSE)
 })
 
 test_that("update_block_select validates selected replacement choices", {
   session <- list(
     ns = identity,
-    sendCustomMessage = function(type, payload) NULL
+    sendInputMessage = function(input_id, payload) NULL
   )
 
   expect_snapshot(error = TRUE, {

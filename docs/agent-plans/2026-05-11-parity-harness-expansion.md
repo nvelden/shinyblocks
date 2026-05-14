@@ -16,8 +16,8 @@ not over-claim its coverage.
   - `make parity-ci` now iterates over the shared registry instead of
     hardcoding `button`.
   - The shared registry + committed baselines now cover `alert`,
-    `badge`, `button`, `checkbox`, `select`, `slider`, `switch`,
-    and `textarea`.
+    `badge`, `button`, `checkbox`, `select`, `separator`, `slider`,
+    `switch`, and `textarea`.
   - The shared capture/diff path supports role-mapped components and
     state-specific selectors for wrapper controls.
 - Remaining scope:
@@ -80,6 +80,7 @@ not over-claim its coverage.
 - `make parity COMPONENT=alert`
 - `make parity COMPONENT=badge`
 - `make parity COMPONENT=select`
+- `make parity COMPONENT=separator`
 - `make parity COMPONENT=slider`
 - `make parity COMPONENT=checkbox`
 - `make parity COMPONENT=switch`

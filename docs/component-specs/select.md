@@ -5,10 +5,10 @@
 
 ## States
 
-- **default** — runtime-rendered native select with bordered trigger
-  surface and package-owned chevron.
+- **default** — custom runtime trigger and portal popup backed by a
+  hidden native `<select>` that carries the Shiny value.
 - **changed** — user selection updates `input$<id>` through the
-  runtime Shiny bridge.
+  component-specific Shiny input binding.
 - **server-updated** — `update_block_select()` can update value,
   choices, placeholder, and disabled state.
 - **focus-visible** — 3px `--ring` shadow on the visible trigger shell.
@@ -35,7 +35,7 @@
 | Argument | Purpose |
 | --- | --- |
 | `input_id` | Shiny input id used for `input$<id>` and update messages. |
-| `choices` | Character vector or named vector of labels/values. |
+| `choices` | Character vector or named vector of labels/values. Values must be unique and non-empty; `""` is reserved as the placeholder sentinel. |
 | `selected` | Initial selected value. |
 | `placeholder` | Empty-value prompt shown before selection. |
 | `disabled` | Disables browser interaction while keeping server updates possible. |
@@ -44,15 +44,34 @@
 | `size` | One of `default`, `sm`, or `lg`. |
 | `invalid` | Applies `aria-invalid` and destructive border/ring styling. |
 
-## Deliberate divergences from shadcn
+## Runtime DOM Contract
 
-- The current runtime spike uses a package-owned native `<select>`
-  rather than Radix Select content/portal primitives. This removes the
-  Shiny/selectize wrapper while keeping a small first stateful runtime
-  contract; Radix open/content behavior is deferred to the overlay phase.
+- The visible UI is a package runtime overlay with shadcn-aligned
+  trigger, content, viewport, item, and selected indicator parts.
+- A hidden `<select id="{input_id}" class="sb-select-native">` remains
+  in the runtime mount as the canonical Shiny value source.
+- `ShinyblocksSelectBinding` is registered as `shinyblocks.select`.
+  It reads and updates the hidden native control while routing server
+  messages through `receiveMessage()`.
 - `selected = NULL` in `update_block_select()` clears to the empty
   placeholder value (`""`) because browser selects do not have a stable
   JavaScript `null` value.
+
+## Stable Styling Hooks
+
+Use the `sb-*` hooks for package theming and downstream overrides:
+
+- `.sb-select`
+- `.sb-select-native`
+- `.sb-select-trigger`
+- `.sb-select-trigger-icon`
+- `.sb-select-content`
+- `.sb-select-viewport`
+- `.sb-select-item`
+- `.sb-select-item-indicator`
+
+The runtime also mirrors shadcn `data-slot` attributes for parity
+tooling, but those are not the primary public styling hooks.
 
 ## Reference screenshot
 

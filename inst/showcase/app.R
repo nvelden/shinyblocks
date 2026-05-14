@@ -3,6 +3,8 @@ suppressPackageStartupMessages(library(shinyblocks))
 
 source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
+source(file.path("R", "server_button.R"), local = TRUE)
+source(file.path("R", "server_select.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -187,6 +189,9 @@ sections <- list(
 
 ui <- block_page(
   title = "shinyblocks — component gallery",
+  htmltools::tags$head(
+    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css")
+  ),
   sidebar = block_sidebar(
     title = "shinyblocks",
     collapsible = TRUE,
@@ -280,131 +285,8 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
-  select_doc_choices <- function(key) {
-    switch(
-      key %||% "plans",
-      channels = c(Alpha = "alpha", Beta = "beta", Stable = "stable"),
-      sizes = c(Small = "sm", Medium = "md", Large = "lg"),
-      c(Free = "free", Pro = "pro", Team = "team")
-    )
-  }
-
-  output$showcase_select_preview_value <- shiny::renderText({
-    value <- input$showcase_select_preview
-    if (is.null(value)) {
-      return("<NULL>")
-    }
-    if (identical(value, "")) {
-      return("<EMPTY>")
-    }
-    value
-  })
-  shiny::outputOptions(
-    output,
-    "showcase_select_preview_value",
-    suspendWhenHidden = FALSE
-  )
-
-  shiny::observeEvent(input$showcase_select_doc_choices, {
-    choices <- select_doc_choices(input$showcase_select_doc_choices)
-    update_block_select(
-      session,
-      "showcase_select_doc_selected",
-      choices = choices,
-      selected = unname(choices[[1]]),
-      notify = TRUE
-    )
-  }, ignoreInit = TRUE)
-
-  shiny::observe({
-    choices <- select_doc_choices(input$showcase_select_doc_choices)
-    selected <- input$showcase_select_doc_selected
-    if (is.null(selected) || !selected %in% unname(choices)) {
-      selected <- unname(choices[[1]])
-    }
-
-    placeholder <- input$showcase_select_doc_placeholder %||% ""
-    if (!nzchar(placeholder)) {
-      placeholder <- NULL
-    }
-
-    width <- input$showcase_select_doc_width %||% "100%"
-    if (!nzchar(width)) {
-      width <- "100%"
-    }
-
-    update_block_select(
-      session,
-      "showcase_select_preview",
-      choices = choices,
-      selected = selected,
-      placeholder = placeholder,
-      disabled = isTRUE(input$showcase_select_doc_disabled),
-      width = width,
-      class = if (isTRUE(input$showcase_select_doc_class)) {
-        "showcase-select-preview-custom"
-      } else {
-        NULL
-      },
-      size = input$showcase_select_doc_size %||% "default",
-      invalid = isTRUE(input$showcase_select_doc_invalid),
-      notify = TRUE
-    )
-  })
-
-  output$showcase_select_value <- shiny::renderText({
-    value <- input$showcase_select_reactive
-    if (is.null(value)) {
-      return("<NULL>")
-    }
-    if (identical(value, "")) {
-      return("<EMPTY>")
-    }
-    value
-  })
-  shiny::outputOptions(
-    output,
-    "showcase_select_value",
-    suspendWhenHidden = FALSE
-  )
-
-  shiny::observeEvent(input$showcase_select_set_pro, {
-    update_block_select(
-      session,
-      "showcase_select_reactive",
-      selected = "pro",
-      notify = TRUE
-    )
-  })
-
-  shiny::observeEvent(input$showcase_select_clear, {
-    update_block_select(
-      session,
-      "showcase_select_reactive",
-      selected = NULL,
-      notify = TRUE
-    )
-  })
-
-  shiny::observeEvent(input$showcase_select_disable, {
-    update_block_select(session, "showcase_select_reactive", disabled = TRUE)
-  })
-
-  shiny::observeEvent(input$showcase_select_enable, {
-    update_block_select(session, "showcase_select_reactive", disabled = FALSE)
-  })
-
-  shiny::observeEvent(input$showcase_select_replace_choices, {
-    update_block_select(
-      session,
-      "showcase_select_reactive",
-      choices = c(Starter = "starter", Growth = "growth", Scale = "scale"),
-      selected = "growth",
-      placeholder = "Choose a package",
-      disabled = FALSE,
-      notify = TRUE
-    )
-  })
+  register_button_showcase(input, output, session)
+  register_select_showcase(input, output, session)
 }
 
 shinyApp(ui, server)

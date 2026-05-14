@@ -1,0 +1,7 @@
+---
+title: "Skeleton"
+description: "Documentation for skeleton component."
+---
+
+Placeholder for skeleton component article.
+

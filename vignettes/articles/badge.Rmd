@@ -1,0 +1,63 @@
+---
+title: "Badge"
+description: "Displays a badge or a component that looks like a badge."
+---
+
+```{r, include = FALSE}
+library(shiny)
+pkgload::load_all("..")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Badge
+
+Displays a badge or a component that looks like a badge.
+
+## Usage
+
+```r
+pkgload::load_all("..")
+
+block_badge("Badge")
+```
+
+## Examples
+
+### Basic
+
+A standard badge with default styling.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(block_badge("Badge")))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_badge("Badge")
+```
+
+### Variants
+
+Use the `variant` prop to change the visual style of the badge.
+
+<div class="sb-component-preview">
+```{r, echo=FALSE, results="asis"}
+cat(as.character(htmltools::tagList(
+  block_badge("Default"),
+  block_badge("Secondary", variant = "secondary"),
+  block_badge("Outline", variant = "outline"),
+  block_badge("Destructive", variant = "destructive")
+)))
+```
+</div>
+<div class="sb-component-code-title">Code</div>
+```r
+block_badge("Default")
+block_badge("Secondary", variant = "secondary")
+block_badge("Outline", variant = "outline")
+block_badge("Destructive", variant = "destructive")
+```

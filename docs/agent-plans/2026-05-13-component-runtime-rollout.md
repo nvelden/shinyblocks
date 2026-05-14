@@ -92,6 +92,11 @@ review can verify Shiny reactivity without reading code.
 - Showcase smoke coverage must confirm the page has the playground
   structure: preview, UI source, server source/comment, controls, and
   API table.
+- Always restart the local Shiny showcase from the workspace with
+  `devtools::load_all(); shiny::runApp("inst/showcase", ...)` and
+  hard-refresh the browser before browser-based checks or manual review
+  so stale installed-package JS/CSS is not mistaken for a component
+  bug.
 - Manual browser approval at `http://127.0.0.1:4321/#<component>`.
 
 # Rollout Steps
@@ -103,7 +108,9 @@ review can verify Shiny reactivity without reading code.
 5. Remove compatibility fallback code that only hides payload defects.
 6. Add focused regression coverage for the behavior that changed.
 7. Run the targeted checks and rebuild generated assets.
-8. Start the showcase and pause for manual approval.
+8. Restart the showcase on `http://127.0.0.1:4321/` through
+   `devtools::load_all(); shiny::runApp("inst/showcase", ...)`,
+   hard-refresh the browser tab, and pause for manual approval.
 
 # Open Questions
 

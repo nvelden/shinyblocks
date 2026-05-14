@@ -1,0 +1,7 @@
+---
+title: "Sidebar"
+description: "Documentation for sidebar component."
+---
+
+Placeholder for sidebar component article.
+

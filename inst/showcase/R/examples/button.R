@@ -1,24 +1,81 @@
 htmltools::tagList(
-  htmltools::div(
-    style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-    block_button("Default"),
-    block_button("Secondary", variant = "secondary"),
-    block_button("Outline", variant = "outline"),
-    block_button("Ghost", variant = "ghost"),
-    block_button("Destructive", variant = "destructive"),
-    block_button("Link", variant = "link")
+  block_field_set(
+    block_field_legend("Interactive Playground"),
+    htmltools::div(
+      style = "display: flex; flex-direction: column; gap: 1.5rem;",
+      htmltools::div(
+        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
+        htmltools::div(
+          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
+          block_field(
+            block_field_label("Preview", `for` = "showcase_button_preview"),
+            shiny::uiOutput("showcase_button_preview_ui")
+          ),
+          htmltools::tags$div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$div(
+              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
+              shiny::verbatimTextOutput("showcase_button_preview_code")
+            ),
+            htmltools::tags$div(
+              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "Server Action"),
+              shiny::verbatimTextOutput("showcase_button_reactive_code")
+            )
+          )
+        ),
+        htmltools::div(
+          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
+          # Data controls
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Data"),
+            block_field(
+              block_field_label("label", `for` = "showcase_button_doc_label"),
+              block_textarea("showcase_button_doc_label", value = "Continue", rows = 1)
+            ),
+            block_field(
+              block_field_label("variant", `for` = "showcase_button_doc_variant"),
+              block_select("showcase_button_doc_variant", choices = c("default", "secondary", "outline", "ghost", "destructive", "link"), selected = "default")
+            ),
+            block_field(
+              block_field_label("icon", `for` = "showcase_button_doc_icon"),
+              block_select("showcase_button_doc_icon", choices = c("<None>" = "none", search = "search", `arrow-right` = "arrow-right", check = "check"), selected = "none")
+            ),
+            block_field(
+              block_field_label("icon_position", `for` = "showcase_button_doc_icon_position"),
+              block_select("showcase_button_doc_icon_position", choices = c("inline-start", "inline-end"), selected = "inline-start")
+            )
+          ),
+          # State controls
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
+            block_field(
+              block_field_label("disabled", `for` = "showcase_button_doc_disabled"),
+              block_checkbox("showcase_button_doc_disabled", "Disabled", value = FALSE)
+            )
+          ),
+          # Styling controls
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
+            block_field(
+              block_field_label("size", `for` = "showcase_button_doc_size"),
+              block_select("showcase_button_doc_size", choices = c("default", "sm", "lg", "icon"), selected = "default")
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_button_doc_style"),
+              block_textarea("showcase_button_doc_style", value = "", rows = 1, placeholder = "e.g., min-width: 10rem;")
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_button_doc_class"),
+              block_checkbox("showcase_button_doc_class", "Use custom dashed-border class", value = FALSE)
+            )
+          )
+        )
+      )
+    )
   ),
-  htmltools::div(
-    style = "display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;",
-    block_button("Default size"),
-    block_button("Small", size = "sm"),
-    block_button("Large", size = "lg"),
-    block_button("", size = "icon", icon = "search")
-  ),
-  htmltools::div(
-    style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-    block_button("Search", icon = "search"),
-    block_button("Open", icon = "arrow-right", icon_position = "inline-end"),
-    block_button("Disabled", disabled = NA)
-  )
+  htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
+  shiny::tableOutput("showcase_button_api_table")
 )

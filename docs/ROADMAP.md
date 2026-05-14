@@ -96,17 +96,27 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Still owed for Phase 2 vertical runtime spike:
-> - Run the full package gate, then decide whether to tag Phase 2 or
->   continue into the next presentational component family.
+> - Finish the button/select cleanup gate, including targeted R tests,
+>   runtime smoke, showcase smoke, and a manual browser approval pass.
+> - Run the full package gate before tagging Phase 2 or moving into the
+>   next component family.
 >
-> **Hand-off plan:** the next implementer should
+> **Component-by-component hand-off:** after button and select are
+> accepted, proceed one component at a time. Each slice should
 >
 > 1. Read [ADR 0017](decisions/0017-full-runtime-port.md).
 > 2. Read the runtime plan:
 >    [`docs/agent-plans/2026-05-12-full-port-architecture.md`](agent-plans/2026-05-12-full-port-architecture.md).
-> 3. Implement **Phase 1 — Runtime Foundation** only. Treat the
->    existing native component code and parity harness as migration
->    scaffolding until the runtime foundation passes.
+> 3. Choose exactly one component and keep the write set vertical:
+>    R API/runtime payload, CSS/runtime source if needed, showcase
+>    documentation, component spec/docs, NEWS/pkgdown reference when
+>    public behavior changes, and focused tests.
+> 4. Prefer direct failures over compatibility fallbacks. Normalize data
+>    at the R boundary, keep runtime payload shapes strict, and avoid
+>    duplicate parsing in JavaScript unless the component genuinely needs
+>    browser-only state.
+> 5. Run the targeted checks for that component, start the local showcase,
+>    and stop for manual approval before beginning the next component.
 >
 > Slices, in order:
 >
