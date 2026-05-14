@@ -273,6 +273,10 @@ function RuntimeMount({ payload, root }) {
     return <Empty payload={payload} />;
   }
 
+  if (payload.component === "value-box") {
+    return <ValueBox payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -476,6 +480,45 @@ function Empty({ payload }) {
           <div className="sb-empty-action">
             <HtmlSlot html={props.actionHtml} />
           </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ValueBox({ payload }) {
+  const props = payload.props || {};
+
+  return (
+    <section
+      data-slot="value-box"
+      className={classNames("sb-value-box", payload.className)}
+    >
+      {props.iconHtml && (
+        <div className="sb-value-box-icon">
+          <HtmlSlot html={props.iconHtml} />
+        </div>
+      )}
+      <div className="sb-value-box-body">
+        <p
+          className="sb-value-box-title"
+          dangerouslySetInnerHTML={{ __html: props.titleHtml || "" }}
+        />
+        <div
+          className="sb-value-box-value"
+          dangerouslySetInnerHTML={{ __html: props.valueHtml || "" }}
+        />
+        {props.descriptionHtml && (
+          <p
+            className="sb-value-box-description"
+            dangerouslySetInnerHTML={{ __html: props.descriptionHtml }}
+          />
+        )}
+        {props.contentHtml && (
+          <div
+            className="sb-value-box-content"
+            dangerouslySetInnerHTML={{ __html: props.contentHtml }}
+          />
         )}
       </div>
     </section>

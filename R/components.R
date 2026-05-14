@@ -353,25 +353,16 @@ block_value_box <- function(
 ) {
   icon_tag <- set_icon_position(icon, "inline-start")
 
-  attach_shinyblocks_deps(
-    htmltools::tags$section(
-      class = merge_classes("sb-value-box", class),
-      if (!is.null(icon_tag)) {
-        htmltools::tags$div(class = "sb-value-box-icon", icon_tag)
-      },
-      htmltools::tags$div(
-        class = "sb-value-box-body",
-        htmltools::tags$p(class = "sb-value-box-title", title),
-        htmltools::tags$div(class = "sb-value-box-value", value),
-        if (!is.null(description)) {
-          htmltools::tags$p(
-            class = "sb-value-box-description",
-            description
-          )
-        },
-        ...
-      )
-    )
+  runtime_component(
+    component = "value-box",
+    props = list(
+      titleHtml = html_fragment(title),
+      valueHtml = html_fragment(value),
+      descriptionHtml = if (!is.null(description)) html_fragment(description) else NULL,
+      contentHtml = html_fragment(...),
+      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
+    ),
+    class = class
   )
 }
 

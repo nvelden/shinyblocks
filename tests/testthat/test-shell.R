@@ -590,29 +590,36 @@ test_that("alerts accept composed title and description tags", {
 })
 
 test_that("value boxes render expected regions", {
-  box <- render_html(
+  box <- runtime_payload_from(
     block_value_box(
       "Revenue",
       "$42k",
+      block_badge("Healthy", variant = "secondary"),
+      description = "Up 12% month over month.",
+      icon = "trending-up"
+    )
+  )
+  box_html <- render_html(
+    block_value_box(
+      "Revenue",
+      "$42k",
+      block_badge("Healthy", variant = "secondary"),
       description = "Up 12% month over month.",
       icon = "trending-up"
     )
   )
 
-  expect_match(box, 'class="sb-value-box"', fixed = TRUE)
-  expect_match(box, 'class="sb-value-box-title"', fixed = TRUE)
-  expect_match(box, 'class="sb-value-box-value"', fixed = TRUE)
-  expect_match(box, 'class="sb-value-box-description"', fixed = TRUE)
-  expect_match(box, 'data-icon="inline-start"', fixed = TRUE)
+  expect_match(box$props$titleHtml, "Revenue", fixed = TRUE)
+  expect_match(box$props$valueHtml, "$42k", fixed = TRUE)
+  expect_match(box$props$descriptionHtml, "Up 12% month over month.", fixed = TRUE)
+  expect_match(box$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
+  expect_match(box$props$contentHtml, 'data-sb-component="badge"', fixed = TRUE)
+  expect_match(box_html, 'data-sb-component="value-box"', fixed = TRUE)
 })
 
 test_that("value boxes merge user classes", {
-  classes <- tag_attr(
-    block_value_box("Revenue", "$42k", class = "custom"),
-    "class"
-  )
-
-  expect_identical(classes, "sb-value-box custom")
+  payload <- runtime_payload_from(block_value_box("Revenue", "$42k", class = "custom"))
+  expect_identical(payload$className, "custom")
 })
 
 test_that("separators expose orientation and aria correctly", {
