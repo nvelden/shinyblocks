@@ -266,9 +266,21 @@
   animation: shinyblocks-spin 1s linear infinite;
 }
 
+[data-shinyblocks-root] .sb-skeleton {
+  border-radius: calc(var(--radius) * 0.8);
+  background-color: var(--muted);
+  animation: shinyblocks-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes shinyblocks-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes shinyblocks-pulse {
+  50% {
+    opacity: 0.5;
   }
 }
 

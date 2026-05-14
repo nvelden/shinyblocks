@@ -265,6 +265,10 @@ function RuntimeMount({ payload, root }) {
     return <Spinner payload={payload} />;
   }
 
+  if (payload.component === "skeleton") {
+    return <Skeleton payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -415,6 +419,21 @@ function Spinner({ payload }) {
       className={classNames("sb-spinner", payload.className)}
       role="status"
       aria-label={props.label || "Loading"}
+    />
+  );
+}
+
+function Skeleton({ payload }) {
+  const props = payload.props || {};
+  const attrs = passthroughAttrs(props.attrs);
+  delete attrs["aria-hidden"];
+
+  return (
+    <div
+      data-slot="skeleton"
+      className={classNames("sb-skeleton", payload.className)}
+      aria-hidden="true"
+      {...attrs}
     />
   );
 }

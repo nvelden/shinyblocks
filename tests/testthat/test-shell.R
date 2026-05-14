@@ -637,12 +637,31 @@ test_that("separators expose orientation and aria correctly", {
 })
 
 test_that("skeletons and spinners expose expected attributes", {
-  skeleton <- block_skeleton(class = "custom")
+  skeleton <- runtime_payload_from(
+    block_skeleton(
+      class = "custom",
+      id = "loading-skeleton",
+      `data-testid` = "skeleton",
+      style = "width: 4rem; height: 1rem;"
+    )
+  )
+  skeleton_html <- render_html(
+    block_skeleton(
+      class = "custom",
+      id = "loading-skeleton",
+      `data-testid` = "skeleton",
+      style = "width: 4rem; height: 1rem;"
+    )
+  )
   spinner <- runtime_payload_from(block_spinner(label = "Loading table", class = "custom"))
   spinner_html <- render_html(block_spinner(label = "Loading table", class = "custom"))
 
-  expect_identical(tag_attr(skeleton, "class"), "sb-skeleton custom")
-  expect_identical(tag_attr(skeleton, "aria-hidden"), "true")
+  expect_identical(skeleton$className, "custom")
+  expect_identical(skeleton$props$attrs$id, "loading-skeleton")
+  expect_identical(skeleton$props$attrs$`data-testid`, "skeleton")
+  expect_identical(skeleton$props$attrs$style$width, "4rem")
+  expect_identical(skeleton$props$attrs$style$height, "1rem")
+  expect_match(skeleton_html, 'data-sb-component="skeleton"', fixed = TRUE)
   expect_identical(spinner$props$label, "Loading table")
   expect_identical(spinner$className, "custom")
   expect_match(spinner_html, 'data-sb-component="spinner"', fixed = TRUE)

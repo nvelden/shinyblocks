@@ -77,6 +77,9 @@ phase begins.
 > - **Phase 3 presentational slice 2** — `block_spinner()` now renders
 >   through the package-local runtime with scoped spinner animation and
 >   updated shell/runtime smoke coverage.
+> - **Phase 3 presentational slice 3** — `block_skeleton()` now renders
+>   through the package-local runtime while preserving passthrough
+>   attributes and scoped skeleton animation.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
