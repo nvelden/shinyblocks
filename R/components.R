@@ -342,6 +342,9 @@ block_alert <- function(
 #'   when clicked. Pass `NULL` (default) to drive open state purely
 #'   from the server with `update_block_dialog()`.
 #' @param open Initial open state. Defaults to `FALSE`.
+#' @param hide_title Whether to visually hide the title while keeping
+#'   it available to assistive technology as the dialog's accessible
+#'   name. Defaults to `FALSE`.
 #' @param class Additional classes for the dialog content container.
 #'
 #' @return An `htmltools` tag.
@@ -354,6 +357,7 @@ block_dialog <- function(
   description = NULL,
   trigger = NULL,
   open = FALSE,
+  hide_title = FALSE,
   class = NULL
 ) {
   if (missing(id) || is.null(id)) {
@@ -377,7 +381,8 @@ block_dialog <- function(
         NULL
       },
       bodyHtml = html_fragment(...),
-      triggerLabel = trigger
+      triggerLabel = trigger,
+      hideTitle = isTRUE(hide_title)
     ),
     state = list(value = isTRUE(open), open = isTRUE(open)),
     binding = list(input = TRUE),

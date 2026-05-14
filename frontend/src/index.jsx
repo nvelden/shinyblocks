@@ -653,18 +653,39 @@ function Alert({ payload }) {
   );
 }
 
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  "input:not([disabled]):not([type='hidden'])",
+  "select:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])"
+].join(",");
+
+function focusableChildren(container) {
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+    (el) => !el.hasAttribute("aria-hidden") && el.offsetParent !== null
+  );
+}
+
 function Dialog({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
+  const inputId = payload.id || "dialog";
   const [open, setOpenState] = useState(Boolean(state.open));
   const [titleHtml, setTitleHtml] = useState(props.titleHtml || "");
   const [descriptionHtml, setDescriptionHtml] = useState(
     props.descriptionHtml || ""
   );
-  const openRef = useRef(open);
+  const hideTitle = Boolean(props.hideTitle);
+  const titleId = `${inputId}-title`;
+  const descriptionId = `${inputId}-description`;
+
+  const contentRef = useRef(null);
+  const returnFocusRef = useRef(null);
 
   useEffect(() => {
-    openRef.current = open;
     if (root) {
       root.__sbDialogValue = open;
       root.dataset.sbDialogOpen = open ? "true" : "false";
@@ -677,7 +698,11 @@ function Dialog({ payload, root }) {
   }
 
   function setOpen(next, notify) {
-    setOpenState(Boolean(next));
+    const nextOpen = Boolean(next);
+    if (nextOpen && !open) {
+      returnFocusRef.current = document.activeElement;
+    }
+    setOpenState(nextOpen);
     if (notify !== false) {
       requestAnimationFrame(notifyChange);
     }
@@ -705,6 +730,65 @@ function Dialog({ payload, root }) {
     };
   }, [root]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const focusables = focusableChildren(contentRef.current);
+    const initial = focusables[0] || contentRef.current;
+    initial && initial.focus({ preventScroll: true });
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const items = focusableChildren(contentRef.current);
+      if (items.length === 0) {
+        event.preventDefault();
+        contentRef.current && contentRef.current.focus();
+        return;
+      }
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+
+      const target = returnFocusRef.current;
+      returnFocusRef.current = null;
+      if (target && typeof target.focus === "function") {
+        requestAnimationFrame(() => target.focus({ preventScroll: true }));
+      }
+    };
+  }, [open]);
+
   const portal = ensurePortalRoot();
 
   return (
@@ -714,6 +798,8 @@ function Dialog({ payload, root }) {
           type="button"
           className="sb-button sb-button-default sb-button-size-default"
           data-slot="dialog-trigger"
+          aria-haspopup="dialog"
+          aria-expanded={open ? "true" : "false"}
           onClick={() => setOpen(true)}
         >
           {props.triggerLabel}
@@ -730,14 +816,26 @@ function Dialog({ payload, root }) {
             <div
               role="dialog"
               aria-modal="true"
+              aria-labelledby={titleId}
+              aria-describedby={descriptionHtml ? descriptionId : undefined}
+              tabIndex={-1}
+              ref={contentRef}
               className={classNames("sb-dialog-content", payload.className)}
               data-slot="dialog-content"
             >
               <div className="sb-dialog-header" data-slot="dialog-header">
-                <HtmlSlot html={titleHtml} className="sb-dialog-title" />
+                <HtmlSlot
+                  html={titleHtml}
+                  id={titleId}
+                  className={classNames(
+                    "sb-dialog-title",
+                    hideTitle && "sb-visually-hidden"
+                  )}
+                />
                 {descriptionHtml && (
                   <HtmlSlot
                     html={descriptionHtml}
+                    id={descriptionId}
                     className="sb-dialog-description"
                   />
                 )}

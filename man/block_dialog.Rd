@@ -11,6 +11,7 @@ block_dialog(
   description = NULL,
   trigger = NULL,
   open = FALSE,
+  hide_title = FALSE,
   class = NULL
 )
 }
@@ -31,6 +32,10 @@ when clicked. Pass \code{NULL} (default) to drive open state purely
 from the server with \code{update_block_dialog()}.}
 
 \item{open}{Initial open state. Defaults to \code{FALSE}.}
+
+\item{hide_title}{Whether to visually hide the title while keeping
+it available to assistive technology as the dialog's accessible
+name. Defaults to \code{FALSE}.}
 
 \item{class}{Additional classes for the dialog content container.}
 }
