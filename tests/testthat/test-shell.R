@@ -616,16 +616,24 @@ test_that("value boxes merge user classes", {
 })
 
 test_that("separators expose orientation and aria correctly", {
-  vertical <- block_separator(orientation = "vertical", decorative = FALSE)
-  decorative <- block_separator()
+  vertical <- runtime_payload_from(
+    block_separator(orientation = "vertical", decorative = FALSE)
+  )
+  decorative <- runtime_payload_from(block_separator())
+  decorative_html <- render_html(block_separator())
 
   expect_identical(
-    tag_attr(vertical, "class"),
-    "sb-separator sb-separator-vertical"
+    vertical$props$orientation,
+    "vertical"
   )
-  expect_identical(tag_attr(vertical, "role"), "separator")
-  expect_identical(tag_attr(vertical, "aria-orientation"), "vertical")
-  expect_identical(tag_attr(decorative, "aria-hidden"), "true")
+  expect_identical(vertical$props$decorative, FALSE)
+  expect_identical(decorative$props$orientation, "horizontal")
+  expect_identical(decorative$props$decorative, TRUE)
+  expect_match(
+    decorative_html,
+    'data-sb-component="separator"',
+    fixed = TRUE
+  )
 })
 
 test_that("skeletons and spinners expose expected attributes", {

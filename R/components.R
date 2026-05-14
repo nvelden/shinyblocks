@@ -395,17 +395,13 @@ block_separator <- function(
     "orientation"
   )
 
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes(
-        "sb-separator",
-        paste0("sb-separator-", orientation),
-        class
-      ),
-      role = if (isTRUE(decorative)) NULL else "separator",
-      `aria-orientation` = if (isTRUE(decorative)) NULL else orientation,
-      `aria-hidden` = if (isTRUE(decorative)) "true" else NULL
-    )
+  runtime_component(
+    component = "separator",
+    props = list(
+      orientation = orientation,
+      decorative = isTRUE(decorative)
+    ),
+    class = class
   )
 }
 

@@ -71,6 +71,9 @@ phase begins.
 >   disabled state, clear, and `notify` semantics. Obsolete
 >   `.sb-select` / Selectize compatibility CSS has been removed from
 >   the legacy stylesheet.
+> - **Phase 3 presentational slice 1** — `block_separator()` now
+>   renders through the package-local runtime with scoped separator
+>   styles and updated shell/runtime smoke coverage.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

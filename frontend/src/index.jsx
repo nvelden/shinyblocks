@@ -257,6 +257,10 @@ function RuntimeMount({ payload, root }) {
     return <Badge payload={payload} />;
   }
 
+  if (payload.component === "separator") {
+    return <Separator payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -374,6 +378,27 @@ function Badge({ payload }) {
     >
       <HtmlSlot html={props.labelHtml} />
     </span>
+  );
+}
+
+function Separator({ payload }) {
+  const props = payload.props || {};
+  const orientation = props.orientation || "horizontal";
+  const decorative = Boolean(props.decorative);
+
+  return (
+    <div
+      data-slot="separator"
+      data-orientation={orientation}
+      className={classNames(
+        "sb-separator",
+        `sb-separator-${orientation}`,
+        payload.className
+      )}
+      role={decorative ? undefined : "separator"}
+      aria-orientation={decorative ? undefined : orientation}
+      aria-hidden={decorative ? "true" : undefined}
+    />
   );
 }
 
