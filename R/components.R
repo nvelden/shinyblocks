@@ -310,24 +310,20 @@ block_alert <- function(
   )
   icon_tag <- set_icon_position(icon, "inline-start")
 
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes(
-        "sb-alert",
-        paste0("sb-alert-", variant),
-        class
-      ),
-      role = "alert",
-      if (!is.null(icon_tag)) {
-        htmltools::tags$div(class = "sb-alert-icon", icon_tag)
+  runtime_component(
+    component = "alert",
+    props = list(
+      variant = variant,
+      titleHtml = html_fragment(title_tag),
+      descriptionHtml = if (!is.null(description_tag)) {
+        html_fragment(description_tag)
+      } else {
+        NULL
       },
-      htmltools::tags$div(
-        class = "sb-alert-content",
-        title_tag,
-        description_tag,
-        ...
-      )
-    )
+      contentHtml = html_fragment(...),
+      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
+    ),
+    class = class
   )
 }
 

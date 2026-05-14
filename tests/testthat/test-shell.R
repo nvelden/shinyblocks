@@ -557,7 +557,15 @@ test_that("card helper classes merge with user classes", {
 })
 
 test_that("alerts render role, variants, and icon markup", {
-  alert <- render_html(
+  alert <- runtime_payload_from(
+    block_alert(
+      "Heads up",
+      description = "Action needed.",
+      variant = "destructive",
+      icon = "alert-triangle"
+    )
+  )
+  alert_html <- render_html(
     block_alert(
       "Heads up",
       description = "Action needed.",
@@ -566,27 +574,38 @@ test_that("alerts render role, variants, and icon markup", {
     )
   )
 
-  expect_match(alert, 'role="alert"', fixed = TRUE)
-  expect_match(alert, 'class="sb-alert sb-alert-destructive"', fixed = TRUE)
-  expect_match(alert, 'class="sb-alert-title"', fixed = TRUE)
-  expect_match(alert, 'class="sb-alert-description"', fixed = TRUE)
-  expect_match(alert, 'data-icon="inline-start"', fixed = TRUE)
+  expect_identical(alert$props$variant, "destructive")
+  expect_match(alert$props$titleHtml, "Heads up", fixed = TRUE)
+  expect_match(alert$props$titleHtml, 'class="sb-alert-title"', fixed = TRUE)
+  expect_match(alert$props$descriptionHtml, "Action needed.", fixed = TRUE)
+  expect_match(
+    alert$props$descriptionHtml,
+    'class="sb-alert-description"',
+    fixed = TRUE
+  )
+  expect_match(alert$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
+  expect_match(alert_html, 'data-sb-component="alert"', fixed = TRUE)
 })
 
 test_that("alerts accept composed title and description tags", {
   title <- block_alert_title("Maintenance")
   description <- block_alert_description("Scheduled tonight.")
-  alert <- block_alert(title, description = description, icon = NULL)
+  payload <- runtime_payload_from(
+    block_alert(title, description = description, icon = NULL)
+  )
 
   expect_identical(tag_attr(title, "data-sb-child"), "alert-title")
   expect_identical(
     tag_attr(description, "data-sb-child"),
     "alert-description"
   )
-  expect_identical(
-    tag_attr(alert, "class"),
-    "sb-alert sb-alert-default"
+  expect_match(payload$props$titleHtml, "Maintenance", fixed = TRUE)
+  expect_match(
+    payload$props$descriptionHtml,
+    "Scheduled tonight.",
+    fixed = TRUE
   )
+  expect_null(payload$props$iconHtml)
 })
 
 test_that("value boxes render expected regions", {

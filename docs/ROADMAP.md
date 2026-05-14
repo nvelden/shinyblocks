@@ -86,6 +86,9 @@ phase begins.
 > - **Phase 3 presentational slice 5** — `block_value_box()` now renders
 >   through the package-local runtime while preserving title/value/
 >   description/icon/content composition and scoped metric-tile styles.
+> - **Phase 3 presentational slice 6** — `block_alert()` now renders
+>   through the package-local runtime while preserving role/variant/
+>   icon/title/description/content composition and scoped alert styles.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

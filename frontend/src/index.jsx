@@ -277,6 +277,10 @@ function RuntimeMount({ payload, root }) {
     return <ValueBox payload={payload} />;
   }
 
+  if (payload.component === "alert") {
+    return <Alert payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -522,6 +526,39 @@ function ValueBox({ payload }) {
         )}
       </div>
     </section>
+  );
+}
+
+function Alert({ payload }) {
+  const props = payload.props || {};
+  const variant = props.variant || "default";
+
+  return (
+    <div
+      data-slot="alert"
+      data-variant={variant}
+      role="alert"
+      className={classNames(
+        "sb-alert",
+        `sb-alert-${variant}`,
+        payload.className
+      )}
+    >
+      {props.iconHtml && (
+        <div className="sb-alert-icon">
+          <HtmlSlot html={props.iconHtml} />
+        </div>
+      )}
+      <div
+        className="sb-alert-content"
+        dangerouslySetInnerHTML={{
+          __html:
+            (props.titleHtml || "") +
+            (props.descriptionHtml || "") +
+            (props.contentHtml || "")
+        }}
+      />
+    </div>
   );
 }
 
