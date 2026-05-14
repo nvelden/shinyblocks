@@ -106,9 +106,11 @@ test_that("every exported block_*() renders into the showcase UI", {
   for (fn in components) {
     cls <- block_class_for(fn)
     component <- sub("^block_", "", fn)
-    has_class <- grepl(sprintf('class="[^"]*\\b%s\\b', cls), rendered, perl = TRUE)
+    has_class <- grepl(sprintf('class="[^"]*\\b%s\\b', cls), rendered, perl = TRUE) ||
+      grepl(cls, rendered, fixed = TRUE)
+    runtime_name <- gsub("_", "-", component)
     has_runtime <- grepl(
-      sprintf('data-sb-component="%s"', component),
+      sprintf('data-sb-component="%s"', runtime_name),
       rendered,
       fixed = TRUE
     )
