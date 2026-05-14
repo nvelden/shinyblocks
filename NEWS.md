@@ -107,9 +107,9 @@
 * Visual-parity harness adopted per
   [ADR 0016](docs/decisions/0016-visual-parity-harness.md). Mechanical
   computed-style + DOM diff against a pinned shadcn-react reference
-  replaces reviewer-only parity for the bulk of drift. A proof of
-  concept at [`tools/parity/select-poc.mjs`](tools/parity/select-poc.mjs)
-  validated the approach against `block_select()` — caught
+  replaces reviewer-only parity for the bulk of drift. An initial
+  proof of concept validated the approach against `block_select()` —
+  caught
   18 trigger drifts and a double-hover dropdown bug that the
   spec-doc review missed. A follow-up CSS fix on the same select
   reduced trigger drift from 18 to 7 properties (the remaining ones
