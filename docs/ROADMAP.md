@@ -89,6 +89,11 @@ phase begins.
 > - **Phase 3 presentational slice 6** — `block_alert()` now renders
 >   through the package-local runtime while preserving role/variant/
 >   icon/title/description/content composition and scoped alert styles.
+> - **Phase 3 presentational slice 7** — `block_card()` now renders
+>   through the package-local runtime. Card body flows through
+>   `[data-shinyblocks-children]`, preserving Shiny binding lifecycles
+>   for nested outputs/widgets/inputs. Legacy `.sb-card*` Tailwind rules
+>   removed; runtime CSS owns card styling under `[data-shinyblocks-root]`.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

@@ -538,7 +538,10 @@ test_that("card composition helpers render expected child markers", {
   expect_identical(tag_attr(header, "data-sb-child"), "card-header")
   expect_identical(tag_attr(content, "data-sb-child"), "card-content")
   expect_identical(tag_attr(footer, "data-sb-child"), "card-footer")
-  expect_identical(tag_attr(card, "class"), "sb-card custom")
+
+  card_html <- render_html(card)
+  expect_match(card_html, 'data-sb-component="card"', fixed = TRUE)
+  expect_match(card_html, 'class="sb-runtime-mount sb-card custom"', fixed = TRUE)
 })
 
 test_that("card helper classes merge with user classes", {
