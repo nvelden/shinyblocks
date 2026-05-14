@@ -236,6 +236,13 @@ test_that("block_dialog requires id and title", {
   expect_error(block_dialog(id = "x"), "`title` is required", fixed = TRUE)
 })
 
+test_that("block_dialog forwards hide_title to props", {
+  payload <- runtime_payload_from(
+    block_dialog(id = "x", title = "Hidden", hide_title = TRUE)
+  )
+  expect_identical(payload$props$hideTitle, TRUE)
+})
+
 test_that("update_block_select maps clearable NULL fields", {
   message <- NULL
   session <- list(

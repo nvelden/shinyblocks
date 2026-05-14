@@ -2,9 +2,33 @@
 
 > Shinyblocks function: `block_dialog()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/dialog>
-> Status: **Phase 4.2 — Shiny-bound modal**. A.11y behaviors, variants,
-> and parity arrive in 4.3–4.5. See GitHub issue #1 for the full
-> sub-phase breakdown.
+> Status: **Phase 4.3 — accessibility hardening**. Variants and parity
+> arrive in 4.4–4.5. See GitHub issue #1 for the full sub-phase
+> breakdown.
+
+## Phase 4.3 accessibility contract
+
+- `Escape` closes the dialog (notifies the binding) and re-stops
+  propagation so host hash listeners do not also fire.
+- Focus is moved to the first focusable element inside the dialog
+  on open; if none exist, the content container itself receives
+  focus.
+- `Tab` and `Shift+Tab` cycle within the dialog's focusable
+  children, never escaping the modal.
+- Closing the dialog returns focus to whichever element held it
+  before open (typically the trigger button), preserving keyboard
+  context.
+- `document.body` overflow is locked while open and the previously
+  used `padding-right` value is restored on close; scrollbar-width
+  padding is applied to prevent layout shift.
+- ARIA wiring: `role="dialog"`, `aria-modal="true"`,
+  `aria-labelledby="<id>-title"`, and `aria-describedby="<id>-description"`
+  when a description is present.
+- `hide_title = TRUE` keeps the title in the DOM (and as the
+  accessible name) but renders it inside `.sb-visually-hidden` so it
+  is announced by screen readers without occupying visible space.
+- Trigger button advertises `aria-haspopup="dialog"` and
+  `aria-expanded` that tracks the current open state.
 
 ## Phase 4.2 contract
 

@@ -505,6 +505,22 @@
   color: color-mix(in oklch, var(--destructive) 90%, transparent);
 }
 
+[data-shinyblocks-portal-root] .sb-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-content:focus {
+  outline: none;
+}
+
 [data-shinyblocks-portal-root] .sb-dialog-overlay {
   position: fixed;
   inset: 0;

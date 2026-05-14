@@ -102,7 +102,15 @@ phase begins.
 >   input binding. New `update_block_dialog()` updater changes open state,
 >   title, and description from the server with explicit `notify`
 >   semantics. A trigger button label argument auto-renders a default
->   `sb-button` that opens the dialog locally. A.11y behaviors arrive in 4.3.
+>   `sb-button` that opens the dialog locally.
+> - **Phase 4.3 dialog accessibility** — `block_dialog()` now traps focus
+>   inside the modal, closes on Escape, returns focus to the previously
+>   active element on close, locks body scroll with scrollbar-width
+>   compensation, and exposes proper ARIA wiring
+>   (`role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`).
+>   New `hide_title = TRUE` hides the title visually while keeping it as
+>   the accessible name; the trigger advertises `aria-haspopup` and
+>   `aria-expanded`.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
