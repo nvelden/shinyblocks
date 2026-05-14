@@ -103,6 +103,14 @@ raised `inst/www/shinyblocks-runtime.css` to 6.2 KB raw / 1.3 KB gzip.
 The raw ceiling is now 8 KB; the gzip ceiling remains 2 KB. Runtime JS
 remains inside the Phase 1 ceiling at 193.8 KB raw / 60.7 KB gzip.
 
+Phase 3 update (2026-05-14): Presentational slices 1–6 (separator,
+spinner, skeleton, empty, value-box, alert) plus the full custom
+runtime Select trigger/content/item styles raised
+`inst/www/shinyblocks-runtime.css` to 11.6 KB raw / 2.2 KB gzip. The
+raw ceiling moves to 16 KB; the gzip ceiling moves to 3 KB. Runtime JS
+remains inside the Phase 1 ceiling at 204.3 KB raw / 63.5 KB gzip, so
+the JS limits are unchanged.
+
 ## Shiny Runtime Rules
 
 Stateful runtime components must behave like Shiny inputs.

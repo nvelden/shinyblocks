@@ -26,13 +26,13 @@ targets <- list(
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 8,
+    limit_kb = 16,
     metric = "raw",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 2,
+    limit_kb = 3,
     metric = "gzipped",
     group = "runtime"
   ),
