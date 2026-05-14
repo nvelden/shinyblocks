@@ -2,20 +2,32 @@
 
 > Shinyblocks function: `block_dialog()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/dialog>
-> Status: **Phase 4.1 skeleton** — see GitHub issue #1 for the
-> sub-phase breakdown (Shiny binding, trigger, a11y behaviors,
-> variants/slots, and parity arrive in 4.2–4.5).
+> Status: **Phase 4.2 — Shiny-bound modal**. A.11y behaviors, variants,
+> and parity arrive in 4.3–4.5. See GitHub issue #1 for the full
+> sub-phase breakdown.
 
-## Phase 4.1 contract
+## Phase 4.2 contract
 
 - Modal dialog rendered into the runtime portal root
   (`[data-shinyblocks-portal-root]`).
-- Initial open state only — controlled by the `open` argument.
-- Required `title`. Optional `description` and body (`...`).
-- Static close button (`×`) and overlay click both toggle local
-  visibility; there is no `input$<id>` binding yet.
-- No focus management, no escape/outside-click outside of the local
-  close handlers, no scroll lock.
+- Required `id`. `input$<id>` is `TRUE` when open, `FALSE` when closed.
+- Required `title`. Optional `description`, body (`...`), and
+  `trigger` label.
+- Trigger label renders an `sb-button` next to the mount node that
+  opens the dialog locally. Pass `NULL` (default) to drive open
+  state purely from the server.
+- Close button (`×`) and overlay click set `open = FALSE` and notify
+  the binding.
+- Server can call `update_block_dialog(session, id, open, title,
+  description, notify)` to drive open state, update slot content, or
+  silently apply cosmetic changes (`notify` defaults to `TRUE` only
+  when `open` is included).
+- Message routing follows the `block_select()` pattern:
+  `sendInputMessage(mount_id, payload)` with the dialog binding's
+  `receiveMessage` forwarding to a component-installed
+  `el.__sbDialogReceive`.
+- No focus management, scroll lock, escape key, or focus trap yet
+  (arrives in 4.3).
 
 ## Token contract
 

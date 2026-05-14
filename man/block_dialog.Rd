@@ -2,17 +2,33 @@
 % Please edit documentation in R/components.R
 \name{block_dialog}
 \alias{block_dialog}
-\title{Create a dialog (Phase 4.1 skeleton)}
+\title{Create a dialog (Phase 4.2 — Shiny-bound modal)}
 \usage{
-block_dialog(title, ..., description = NULL, open = FALSE, class = NULL)
+block_dialog(
+  id,
+  title,
+  ...,
+  description = NULL,
+  trigger = NULL,
+  open = FALSE,
+  class = NULL
+)
 }
 \arguments{
+\item{id}{Required input id. \verb{input$<id>} is \code{TRUE} when open,
+\code{FALSE} when closed.}
+
 \item{title}{Required dialog title. Used as the accessible name.}
 
-\item{...}{Body content. Serialized to HTML in 4.1; arbitrary Shiny
-children become Shiny-bound in 4.2+.}
+\item{...}{Body content. Serialized to HTML in 4.1/4.2; arbitrary
+Shiny children become Shiny-bound in a later sub-phase.}
 
 \item{description}{Optional description below the title.}
+
+\item{trigger}{Optional label string. Renders a default-variant
+\code{block_button()} next to the mount node that opens the dialog
+when clicked. Pass \code{NULL} (default) to drive open state purely
+from the server with \code{update_block_dialog()}.}
 
 \item{open}{Initial open state. Defaults to \code{FALSE}.}
 
@@ -22,11 +38,10 @@ children become Shiny-bound in 4.2+.}
 An \code{htmltools} tag.
 }
 \description{
-A modal dialog rendered into the runtime portal root. The 4.1
-skeleton supports an initial open state and a static close button
-that toggles local visibility only. Shiny input binding, trigger
-wiring, escape/outside-click, focus management, and the
-\code{update_block_dialog()} updater land in subsequent sub-phases.
+A modal dialog rendered into the runtime portal root. Reports its
+open/closed state to \verb{input$<id>} and accepts server-driven
+updates through \code{update_block_dialog()}. A.11y behaviors (escape,
+outside-click, focus trap, focus return, scroll lock) land in 4.3.
 }
 \seealso{
 Other content: 
@@ -44,6 +59,7 @@ Other content:
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
-\code{\link{block_value_box}()}
+\code{\link{block_value_box}()},
+\code{\link{update_block_dialog}()}
 }
 \concept{content}

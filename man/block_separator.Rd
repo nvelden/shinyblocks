@@ -39,6 +39,7 @@ Other content:
 \code{\link{block_empty}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
-\code{\link{block_value_box}()}
+\code{\link{block_value_box}()},
+\code{\link{update_block_dialog}()}
 }
 \concept{content}

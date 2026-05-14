@@ -96,9 +96,13 @@ phase begins.
 >   removed; runtime CSS owns card styling under `[data-shinyblocks-root]`.
 > - **Phase 4.1 dialog skeleton** — `block_dialog()` lands as a modal
 >   portal-rendered through `[data-shinyblocks-portal-root]`, with title,
->   description, and a serialized body. Initial open state only;
->   Shiny binding, trigger, escape/outside-click, focus trap, and
->   `update_block_dialog()` arrive in sub-phases 4.2–4.5.
+>   description, and a serialized body. Initial open state only.
+> - **Phase 4.2 dialog Shiny integration** — `block_dialog()` reports its
+>   open/closed state to `input$<id>` through the `shinyblocks.dialog`
+>   input binding. New `update_block_dialog()` updater changes open state,
+>   title, and description from the server with explicit `notify`
+>   semantics. A trigger button label argument auto-renders a default
+>   `sb-button` that opens the dialog locally. A.11y behaviors arrive in 4.3.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

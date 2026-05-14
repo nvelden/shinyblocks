@@ -1,13 +1,33 @@
-block_dialog(
-  title = "Phase 4.1 skeleton",
-  description = paste(
-    "Initial open state only — Shiny binding, trigger button,",
-    "escape and outside-click close, focus trap, and update_block_dialog()",
-    "land in sub-phases 4.2 through 4.5."
+htmltools::tagList(
+  block_dialog(
+    id = "dialog_demo",
+    title = "Confirm action",
+    description = paste(
+      "Phase 4.2 — input$dialog_demo reflects open/closed state.",
+      "Use the trigger to open, or send a server update."
+    ),
+    htmltools::tags$p(
+      "The trigger button opens the dialog locally.",
+      "The server controls below call update_block_dialog()."
+    ),
+    trigger = "Open dialog"
   ),
-  htmltools::tags$p(
-    "Click the overlay or the X button to close locally.",
-    "This dialog is forced open via open = TRUE so it renders on load."
+  htmltools::tags$div(
+    style = "display: flex; gap: 0.5rem; margin-top: 1rem;",
+    shiny::actionButton(
+      "showcase_dialog_open",
+      "Open from server",
+      class = "sb-button sb-button-secondary sb-button-size-default"
+    ),
+    shiny::actionButton(
+      "showcase_dialog_close",
+      "Close from server",
+      class = "sb-button sb-button-outline sb-button-size-default"
+    )
   ),
-  open = TRUE
+  htmltools::tags$div(
+    style = "margin-top: 1rem; font-size: 0.875rem;",
+    "Current input$dialog_demo: ",
+    shiny::textOutput("showcase_dialog_state", inline = TRUE)
+  )
 )

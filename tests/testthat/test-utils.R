@@ -158,6 +158,84 @@ test_that("update_block_select sends input binding messages", {
   expect_identical(message$payload$notify, TRUE)
 })
 
+test_that("update_block_dialog sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_dialog(
+      session,
+      "confirm",
+      open = TRUE,
+      title = "New title",
+      description = "Updated copy.",
+      notify = TRUE
+    )
+  )
+
+  expect_identical(message$input_id, "sb-runtime-dialog-confirm")
+  expect_identical(message$payload$open, TRUE)
+  expect_match(message$payload$titleHtml, "New title", fixed = TRUE)
+  expect_match(message$payload$descriptionHtml, "Updated copy.", fixed = TRUE)
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_dialog messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_dialog(session, "confirm", title = "Renamed")
+  expect_identical(message$notify, FALSE)
+  expect_match(message$titleHtml, "Renamed", fixed = TRUE)
+  expect_null(message$open)
+})
+
+test_that("update_block_dialog requires a session with the right hooks", {
+  expect_error(update_block_dialog(NULL, "confirm"), "session")
+  expect_error(
+    update_block_dialog(list(), "confirm"),
+    "ns"
+  )
+})
+
+test_that("block_dialog emits a runtime payload with input id and open state", {
+  payload <- runtime_payload_from(
+    block_dialog(
+      id = "confirm",
+      title = "Are you sure?",
+      description = "This cannot be undone.",
+      "Body content.",
+      trigger = "Delete account",
+      open = FALSE
+    )
+  )
+
+  expect_identical(payload$component, "dialog")
+  expect_identical(payload$id, "confirm")
+  expect_identical(payload$state$value, FALSE)
+  expect_identical(payload$state$open, FALSE)
+  expect_identical(payload$binding$input, TRUE)
+  expect_match(payload$props$titleHtml, "Are you sure?", fixed = TRUE)
+  expect_match(payload$props$descriptionHtml, "cannot be undone", fixed = TRUE)
+  expect_match(payload$props$bodyHtml, "Body content.", fixed = TRUE)
+  expect_identical(payload$props$triggerLabel, "Delete account")
+})
+
+test_that("block_dialog requires id and title", {
+  expect_error(block_dialog(title = "X"), "`id` is required", fixed = TRUE)
+  expect_error(block_dialog(id = "x"), "`title` is required", fixed = TRUE)
+})
+
 test_that("update_block_select maps clearable NULL fields", {
   message <- NULL
   session <- list(
