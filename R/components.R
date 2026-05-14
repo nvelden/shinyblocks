@@ -414,12 +414,24 @@ block_separator <- function(
 #' @family content
 #' @export
 block_skeleton <- function(class = NULL, ...) {
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes("sb-skeleton", class),
-      `aria-hidden` = "true",
-      ...
-    )
+  attrs <- named_attrs(list(...))
+  if (!is.null(attrs$style)) {
+    attrs$style <- normalize_runtime_style(attrs$style)
+  }
+  extra_class <- attrs[["class"]]
+  class <- if (is.null(class) && is.null(extra_class)) {
+    NULL
+  } else {
+    merge_classes(class, extra_class)
+  }
+  attrs[["class"]] <- NULL
+
+  runtime_component(
+    component = "skeleton",
+    props = list(
+      attrs = attrs
+    ),
+    class = class
   )
 }
 
