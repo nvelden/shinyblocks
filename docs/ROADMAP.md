@@ -83,6 +83,9 @@ phase begins.
 > - **Phase 3 presentational slice 4** — `block_empty()` now renders
 >   through the package-local runtime while preserving icon/content/
 >   action composition and scoped empty-state styles.
+> - **Phase 3 presentational slice 5** — `block_value_box()` now renders
+>   through the package-local runtime while preserving title/value/
+>   description/icon/content composition and scoped metric-tile styles.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
