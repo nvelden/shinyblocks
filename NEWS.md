@@ -21,6 +21,7 @@
 * `block_empty()` now renders through the package-local runtime while preserving icon, description, extra content, and action composition.
 * `block_value_box()` now renders through the package-local runtime while preserving title, value, description, icon, and extra-content composition.
 * `block_alert()` now renders through the package-local runtime while preserving role, variant, icon, title, description, and extra-content composition.
+* `block_card()` now renders through the package-local runtime. Card body flows through `[data-shinyblocks-children]` so nested Shiny outputs, htmlwidgets, and inputs bind without a serialized HTML slot. Legacy `.sb-card*` Tailwind rules have been removed from `inst/www/src/shinyblocks.css`; runtime CSS now owns card styling under `[data-shinyblocks-root]`.
 * Added the initial ADR 0016 visual-parity harness scaffold: a
   dev-only `parity/` React reference app, shared Playwright
   capture/diff scripts, parity make targets, and the first committed

@@ -37,13 +37,10 @@ block_card <- function(
     ...
   )
 
-  attach_shinyblocks_deps(
-    htmltools::tags$article(
-      class = merge_classes("sb-card", class),
-      header_tag,
-      content_tag,
-      footer_tag
-    )
+  runtime_component(
+    component = "card",
+    children = list(header_tag, content_tag, footer_tag),
+    class = merge_classes("sb-card", class)
   )
 }
 

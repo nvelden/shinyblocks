@@ -281,6 +281,10 @@ function RuntimeMount({ payload, root }) {
     return <Alert payload={payload} />;
   }
 
+  if (payload.component === "card") {
+    return null;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }

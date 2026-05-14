@@ -918,41 +918,6 @@
     @apply pt-2;
   }
 
-  /* Card — flat-argument convenience styling. Phase 3 will add the full
-   * composition primitives (sb-card-header, sb-card-content, sb-card-footer)
-   * alongside this minimal shape. */
-  .sb-card {
-    @apply flex flex-col gap-4 rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm;
-  }
-
-  .sb-card-header {
-    @apply flex flex-col gap-1.5;
-  }
-
-  .sb-card-title {
-    @apply text-base font-semibold leading-none tracking-tight;
-  }
-
-  .sb-card-description {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .sb-card-value {
-    @apply text-2xl font-semibold tracking-tight;
-  }
-
-  .sb-card-content {
-    @apply flex flex-col gap-4;
-  }
-
-  .sb-card-body {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .sb-card-footer {
-    @apply flex items-center;
-  }
-
   .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] {
     grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
   }
