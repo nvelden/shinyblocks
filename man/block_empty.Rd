@@ -44,6 +44,7 @@ Other content:
 \code{\link{block_card_footer}()},
 \code{\link{block_card_header}()},
 \code{\link{block_card_title}()},
+\code{\link{block_dialog}()},
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},

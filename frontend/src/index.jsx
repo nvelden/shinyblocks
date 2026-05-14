@@ -285,6 +285,10 @@ function RuntimeMount({ payload, root }) {
     return null;
   }
 
+  if (payload.component === "dialog") {
+    return <Dialog payload={payload} />;
+  }
+
   if (payload.component === "select") {
     return <Select payload={payload} root={root} />;
   }
@@ -563,6 +567,59 @@ function Alert({ payload }) {
         }}
       />
     </div>
+  );
+}
+
+function Dialog({ payload }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const [open, setOpen] = useState(Boolean(state.open));
+
+  if (!open) return null;
+
+  const portal = ensurePortalRoot();
+
+  return createPortal(
+    <div data-slot="dialog" data-sb-dialog-open="true">
+      <div
+        className="sb-dialog-overlay"
+        data-slot="dialog-overlay"
+        onClick={() => setOpen(false)}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        className={classNames("sb-dialog-content", payload.className)}
+        data-slot="dialog-content"
+      >
+        <div className="sb-dialog-header" data-slot="dialog-header">
+          <HtmlSlot html={props.titleHtml} className="sb-dialog-title" />
+          {props.descriptionHtml && (
+            <HtmlSlot
+              html={props.descriptionHtml}
+              className="sb-dialog-description"
+            />
+          )}
+        </div>
+        {props.bodyHtml && (
+          <div
+            className="sb-dialog-body"
+            data-slot="dialog-body"
+            dangerouslySetInnerHTML={{ __html: props.bodyHtml }}
+          />
+        )}
+        <button
+          type="button"
+          className="sb-dialog-close"
+          data-slot="dialog-close"
+          aria-label="Close"
+          onClick={() => setOpen(false)}
+        >
+          ×
+        </button>
+      </div>
+    </div>,
+    portal
   );
 }
 

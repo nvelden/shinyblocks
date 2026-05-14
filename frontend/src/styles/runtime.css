@@ -505,6 +505,83 @@
   color: color-mix(in oklch, var(--destructive) 90%, transparent);
 }
 
+[data-shinyblocks-portal-root] .sb-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.5);
+  z-index: 50;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: calc(100% - 2rem);
+  max-width: 32rem;
+  max-height: calc(100vh - 4rem);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.4);
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 1.5rem;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-description {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-body {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: calc(var(--radius) * 0.6);
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-close:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
 @keyframes shinyblocks-spin {
   to {
     transform: rotate(360deg);

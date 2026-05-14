@@ -324,6 +324,51 @@ block_alert <- function(
   )
 }
 
+#' Create a dialog (Phase 4.1 skeleton)
+#'
+#' A modal dialog rendered into the runtime portal root. The 4.1
+#' skeleton supports an initial open state and a static close button
+#' that toggles local visibility only. Shiny input binding, trigger
+#' wiring, escape/outside-click, focus management, and the
+#' `update_block_dialog()` updater land in subsequent sub-phases.
+#'
+#' @param title Required dialog title. Used as the accessible name.
+#' @param ... Body content. Serialized to HTML in 4.1; arbitrary Shiny
+#'   children become Shiny-bound in 4.2+.
+#' @param description Optional description below the title.
+#' @param open Initial open state. Defaults to `FALSE`.
+#' @param class Additional classes for the dialog content container.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_dialog <- function(
+  title,
+  ...,
+  description = NULL,
+  open = FALSE,
+  class = NULL
+) {
+  if (missing(title) || is.null(title)) {
+    stop("`title` is required.", call. = FALSE)
+  }
+
+  runtime_component(
+    component = "dialog",
+    props = list(
+      titleHtml = html_fragment(title),
+      descriptionHtml = if (!is.null(description)) {
+        html_fragment(description)
+      } else {
+        NULL
+      },
+      bodyHtml = html_fragment(...)
+    ),
+    state = list(open = isTRUE(open)),
+    class = class
+  )
+}
+
 #' Create a value box
 #'
 #' @param title Value box title.
