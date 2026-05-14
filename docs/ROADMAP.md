@@ -94,6 +94,11 @@ phase begins.
 >   `[data-shinyblocks-children]`, preserving Shiny binding lifecycles
 >   for nested outputs/widgets/inputs. Legacy `.sb-card*` Tailwind rules
 >   removed; runtime CSS owns card styling under `[data-shinyblocks-root]`.
+> - **Phase 4.1 dialog skeleton** — `block_dialog()` lands as a modal
+>   portal-rendered through `[data-shinyblocks-portal-root]`, with title,
+>   description, and a serialized body. Initial open state only;
+>   Shiny binding, trigger, escape/outside-click, focus trap, and
+>   `update_block_dialog()` arrive in sub-phases 4.2–4.5.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

@@ -184,6 +184,18 @@ sections <- list(
       "instead of custom centered divs."
     ),
     file = "empty.R"
+  ),
+  list(
+    id = "dialog",
+    label = "Dialog",
+    icon = "message-circle",
+    title = "Dialogs",
+    lead = paste(
+      "Phase 4.1 skeleton — portal-rendered modal with overlay and",
+      "close button. Shiny binding, trigger, escape/outside-click,",
+      "and update_block_dialog() arrive in later sub-phases."
+    ),
+    file = "dialog.R"
   )
 )
 
