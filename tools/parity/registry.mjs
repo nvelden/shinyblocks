@@ -291,8 +291,8 @@ export const REGISTRY = {
           destructive: '[data-parity-component="alert"] [data-parity-state="destructive"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="alert"] .sb-parity-alert-default',
-          destructive: '[data-sb-section="alert"] .sb-parity-alert-destructive'
+          default: '[data-sb-section="alert"] .sb-parity-alert-default[data-slot="alert"]',
+          destructive: '[data-sb-section="alert"] .sb-parity-alert-destructive[data-slot="alert"]'
         }
       },
       title: {
