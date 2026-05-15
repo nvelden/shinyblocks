@@ -551,6 +551,29 @@
     0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
+[data-shinyblocks-portal-root] .sb-dialog-content-size-sm {
+  max-width: 24rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-content-size-default {
+  max-width: 32rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-content-size-lg {
+  max-width: 48rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-content-size-xl {
+  max-width: 64rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 [data-shinyblocks-portal-root] .sb-dialog-header {
   display: flex;
   flex-direction: column;
@@ -596,6 +619,222 @@
 [data-shinyblocks-portal-root] .sb-dialog-close:hover {
   background-color: var(--accent);
   color: var(--accent-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-popover-content {
+  z-index: 60;
+  min-width: 12rem;
+  max-width: 20rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+[data-shinyblocks-root] .sb-checkbox {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+[data-shinyblocks-root] .sb-checkbox-native {
+  display: none;
+}
+
+[data-shinyblocks-root] .sb-checkbox-button {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  background-color: var(--background);
+  color: var(--primary-foreground);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+
+[data-shinyblocks-root] .sb-checkbox-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-root] .sb-checkbox-indicator {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-content: center;
+  color: currentColor;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+
+[data-shinyblocks-root] .sb-checkbox-indicator::after {
+  content: none;
+}
+
+[data-shinyblocks-root] .sb-checkbox-indicator svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+[data-shinyblocks-root] .sb-checkbox-button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+[data-shinyblocks-root] .sb-checkbox-button[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-checkbox-button {
+  background-color: color-mix(in oklch, var(--input) 30%, transparent);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-checkbox-button[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
+}
+
+[data-shinyblocks-root] .sb-checkbox-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+[data-shinyblocks-root] .sb-checkbox-button[data-state="checked"] .sb-checkbox-indicator svg {
+  opacity: 1;
+}
+
+[data-shinyblocks-root] .sb-checkbox-text {
+  min-height: 1rem;
+  line-height: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  min-width: 0;
+}
+
+[data-shinyblocks-root] .sb-checkbox[data-disabled="true"] .sb-checkbox-text {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-root] .sb-switch {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-shinyblocks-root] .sb-switch-native {
+  display: none;
+}
+
+[data-shinyblocks-root] .sb-switch-button {
+  display: inline-flex;
+  width: 2rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background-color: var(--input);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+[data-shinyblocks-root] .sb-switch-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-root] .sb-switch-button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+[data-shinyblocks-root] .sb-switch-button[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+[data-shinyblocks-root] .sb-switch-button[data-state="checked"] {
+  background-color: var(--primary);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-switch-button[data-state="unchecked"] {
+  background-color: color-mix(in oklch, var(--input) 80%, transparent);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-switch-button[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
+}
+
+[data-shinyblocks-root] .sb-switch-thumb {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background-color: var(--background);
+  pointer-events: none;
+  transform: translateX(0);
+  transition: transform 0.15s;
+}
+
+[data-shinyblocks-root] .sb-switch-button[data-state="checked"] .sb-switch-thumb {
+  transform: translateX(calc(100% - 2px));
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] .sb-switch-thumb {
+  background-color: var(--primary-foreground);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-switch-button[data-state="unchecked"] .sb-switch-thumb {
+  background-color: var(--foreground);
+}
+
+[data-shinyblocks-root] .sb-switch-text {
+  min-height: 1rem;
+  line-height: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  min-width: 0;
+}
+
+[data-shinyblocks-root] .sb-switch[data-disabled="true"] .sb-switch-text {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 @keyframes shinyblocks-spin {

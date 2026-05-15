@@ -43,6 +43,7 @@ reference:
       - block_empty
       - block_dialog
       - update_block_dialog
+      - block_popover
   - title: Forms
     contents:
       - block_field_group

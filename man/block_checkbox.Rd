@@ -4,7 +4,14 @@
 \alias{block_checkbox}
 \title{Create a styled checkbox input}
 \usage{
-block_checkbox(input_id, label, value = FALSE, disabled = FALSE, class = NULL)
+block_checkbox(
+  input_id,
+  label,
+  value = FALSE,
+  disabled = FALSE,
+  style = NULL,
+  class = NULL
+)
 }
 \arguments{
 \item{input_id}{Input id.}
@@ -14,6 +21,8 @@ block_checkbox(input_id, label, value = FALSE, disabled = FALSE, class = NULL)
 \item{value}{Whether the checkbox starts checked.}
 
 \item{disabled}{Whether the control is disabled.}
+
+\item{style}{Inline CSS styles.}
 
 \item{class}{Additional classes.}
 }
@@ -38,6 +47,8 @@ Other forms:
 \code{\link{block_slider}()},
 \code{\link{block_switch}()},
 \code{\link{block_textarea}()},
-\code{\link{update_block_select}()}
+\code{\link{update_block_checkbox}()},
+\code{\link{update_block_select}()},
+\code{\link{update_block_switch}()}
 }
 \concept{forms}

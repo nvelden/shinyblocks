@@ -2,15 +2,17 @@
 % Please edit documentation in R/components.R
 \name{block_dialog}
 \alias{block_dialog}
-\title{Create a dialog (Phase 4.2 — Shiny-bound modal)}
+\title{Create a dialog (Phase 4.4 — Shiny-bound modal with size + footer)}
 \usage{
 block_dialog(
   id,
   title,
   ...,
   description = NULL,
+  footer = NULL,
   trigger = NULL,
   open = FALSE,
+  size = c("default", "sm", "lg", "xl"),
   hide_title = FALSE,
   class = NULL
 )
@@ -26,12 +28,18 @@ Shiny children become Shiny-bound in a later sub-phase.}
 
 \item{description}{Optional description below the title.}
 
+\item{footer}{Optional footer content (typically action buttons).
+Renders below the body in a right-aligned flex row.}
+
 \item{trigger}{Optional label string. Renders a default-variant
 \code{block_button()} next to the mount node that opens the dialog
 when clicked. Pass \code{NULL} (default) to drive open state purely
 from the server with \code{update_block_dialog()}.}
 
 \item{open}{Initial open state. Defaults to \code{FALSE}.}
+
+\item{size}{Content max-width preset. One of \code{"sm"}, \code{"default"},
+\code{"lg"}, \code{"xl"}. Defaults to \code{"default"} (32rem).}
 
 \item{hide_title}{Whether to visually hide the title while keeping
 it available to assistive technology as the dialog's accessible
@@ -45,7 +53,7 @@ An \code{htmltools} tag.
 \description{
 A modal dialog rendered into the runtime portal root. Reports its
 open/closed state to \verb{input$<id>} and accepts server-driven
-updates through \code{update_block_dialog()}. A.11y behaviors (escape,
+updates through \code{update_block_dialog()}. A11y behaviors (escape,
 outside-click, focus trap, focus return, scroll lock) land in 4.3.
 }
 \seealso{
@@ -61,10 +69,12 @@ Other content:
 \code{\link{block_card_header}()},
 \code{\link{block_card_title}()},
 \code{\link{block_empty}()},
+\code{\link{block_popover}()},
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
 \code{\link{block_value_box}()},
-\code{\link{update_block_dialog}()}
+\code{\link{update_block_dialog}()},
+\code{\link{update_block_popover}()}
 }
 \concept{content}

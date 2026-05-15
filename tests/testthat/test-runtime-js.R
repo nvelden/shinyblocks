@@ -28,6 +28,12 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "shiny:connected", fixed = TRUE)
   expect_match(js, "Shiny.addCustomMessageHandler", fixed = TRUE)
   expect_match(js, '"sb:update"', fixed = TRUE)
+  expect_match(js, "shinyblocks.popover", fixed = TRUE)
+  expect_match(js, "sb:popover-change", fixed = TRUE)
+  expect_match(js, "shinyblocks.checkbox", fixed = TRUE)
+  expect_match(js, "sb:checkbox-change", fixed = TRUE)
+  expect_match(js, "shinyblocks.switch", fixed = TRUE)
+  expect_match(js, "sb:switch-change", fixed = TRUE)
 })
 
 test_that("runtime JS includes dynamic UI lifecycle hooks", {

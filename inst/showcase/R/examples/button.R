@@ -25,10 +25,10 @@ htmltools::tagList(
         ),
         htmltools::div(
           style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
-          # Data controls
+          # Content controls
           htmltools::div(
             style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Data"),
+            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
             block_field(
               block_field_label("label", `for` = "showcase_button_doc_label"),
               block_textarea("showcase_button_doc_label", value = "Continue", rows = 1)

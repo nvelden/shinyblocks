@@ -314,11 +314,12 @@ test_that("block_slider validates its arguments", {
   )
 })
 
-test_that("checkbox and switch preserve Shiny input bindings", {
+test_that("checkbox and switch emit runtime payloads", {
   checkbox <- block_checkbox(
     "marketing",
     "Email me updates",
     value = TRUE,
+    style = "padding: 0.5rem;",
     class = "custom"
   )
   switch <- block_switch(
@@ -329,31 +330,43 @@ test_that("checkbox and switch preserve Shiny input bindings", {
   )
   checkbox_html <- render_html(checkbox)
   switch_html <- render_html(switch)
+  checkbox_payload <- runtime_payload_from(checkbox)
+  switch_payload <- runtime_payload_from(switch)
 
   expect_identical(
     tag_attr(checkbox, "class"),
-    "form-group shiny-input-container sb-checkbox custom"
+    "sb-runtime-mount sb-checkbox custom"
   )
-  expect_identical(
-    tag_attr(switch, "class"),
-    "form-group shiny-input-container sb-switch custom"
-  )
+  expect_match(checkbox_html, 'data-sb-component="checkbox"', fixed = TRUE)
   expect_match(
     checkbox_html,
-    'class="shiny-input-checkbox sb-checkbox-control"',
+    '<input id="marketing" type="checkbox" class="sb-checkbox-native"',
     fixed = TRUE
   )
-  expect_match(checkbox_html, 'checked="checked"', fixed = TRUE)
-  expect_match(checkbox_html, 'class="sb-checkbox-indicator"', fixed = TRUE)
+  expect_match(checkbox_html, 'data-shiny-no-bind-input', fixed = TRUE)
   expect_match(checkbox_html, "Email me updates", fixed = TRUE)
+  expect_identical(checkbox_payload$id, "marketing")
+  expect_identical(checkbox_payload$state$value, TRUE)
+  expect_identical(checkbox_payload$props$labelHtml, "Email me updates")
+  expect_identical(checkbox_payload$props$style$padding, "0.5rem")
+  expect_identical(checkbox_payload$binding$type, "shinyblocks.checkbox")
+
+  expect_identical(
+    tag_attr(switch, "class"),
+    "sb-runtime-mount sb-switch custom"
+  )
+  expect_match(switch_html, 'data-sb-component="switch"', fixed = TRUE)
   expect_match(
     switch_html,
-    'class="shiny-input-checkbox sb-checkbox-control sb-switch-control"',
+    '<input id="alerts" type="checkbox" class="sb-switch-native"',
     fixed = TRUE
   )
-  expect_match(switch_html, 'role="switch"', fixed = TRUE)
-  expect_match(switch_html, 'class="sb-switch-track"', fixed = TRUE)
+  expect_match(switch_html, 'data-shiny-no-bind-input', fixed = TRUE)
   expect_match(switch_html, "Send incident alerts", fixed = TRUE)
+  expect_identical(switch_payload$id, "alerts")
+  expect_identical(switch_payload$state$value, TRUE)
+  expect_identical(switch_payload$props$labelHtml, "Send incident alerts")
+  expect_identical(switch_payload$binding$type, "shinyblocks.switch")
 })
 
 test_that("field labels and descriptions expose expected attributes", {
@@ -426,8 +439,10 @@ test_that("aria-invalid reaches wrapped control types", {
   expect_match(select, 'aria-invalid="true"', fixed = TRUE)
   expect_match(checkbox, 'aria-invalid="true"', fixed = TRUE)
   expect_match(switch, 'aria-invalid="true"', fixed = TRUE)
-  expect_match(checkbox, 'class="sb-checkbox-indicator"', fixed = TRUE)
-  expect_match(switch, 'class="sb-switch-track"', fixed = TRUE)
+  expect_match(checkbox, 'data-sb-component="checkbox"', fixed = TRUE)
+  expect_match(checkbox, 'class="sb-checkbox-native"', fixed = TRUE)
+  expect_match(switch, 'data-sb-component="switch"', fixed = TRUE)
+  expect_match(switch, 'class="sb-switch-native"', fixed = TRUE)
 })
 
 test_that("buttons accept aria-invalid passthrough attrs", {

@@ -31,9 +31,11 @@ Other content:
 \code{\link{block_card_title}()},
 \code{\link{block_dialog}()},
 \code{\link{block_empty}()},
+\code{\link{block_popover}()},
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_value_box}()},
-\code{\link{update_block_dialog}()}
+\code{\link{update_block_dialog}()},
+\code{\link{update_block_popover}()}
 }
 \concept{content}

@@ -158,6 +158,92 @@ test_that("update_block_select sends input binding messages", {
   expect_identical(message$payload$notify, TRUE)
 })
 
+test_that("update_block_checkbox sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_checkbox(
+      session,
+      "agree",
+      checked = TRUE,
+      disabled = TRUE,
+      style = "border: 2px dashed red;",
+      class = "custom-checkbox",
+      notify = TRUE
+    )
+  )
+
+  expect_identical(message$input_id, "sb-runtime-checkbox-agree")
+  expect_identical(message$payload$checked, TRUE)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$style$border, "2px dashed red")
+  expect_identical(message$payload$class, "custom-checkbox")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_checkbox messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_checkbox(session, "agree", class = "renamed")
+  expect_identical(message$notify, FALSE)
+  expect_null(message$checked)
+})
+
+test_that("update_block_switch sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_switch(
+      session,
+      "alerts",
+      checked = TRUE,
+      disabled = TRUE,
+      style = "border: 2px dashed red;",
+      class = "custom-switch",
+      notify = TRUE
+    )
+  )
+
+  expect_identical(message$input_id, "sb-runtime-switch-alerts")
+  expect_identical(message$payload$checked, TRUE)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$style$border, "2px dashed red")
+  expect_identical(message$payload$class, "custom-switch")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_switch messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_switch(session, "alerts", class = "renamed")
+  expect_identical(message$notify, FALSE)
+  expect_null(message$checked)
+})
+
 test_that("update_block_dialog sends input binding messages", {
   message <- NULL
   session <- list(
@@ -236,11 +322,207 @@ test_that("block_dialog requires id and title", {
   expect_error(block_dialog(id = "x"), "`title` is required", fixed = TRUE)
 })
 
+test_that("block_popover emits a runtime payload with trigger and body", {
+  payload <- runtime_payload_from(
+    block_popover(
+      id = "details",
+      trigger = "Show details",
+      htmltools::tags$p("Hello"),
+      side = "top",
+      align = "end",
+      open = TRUE
+    )
+  )
+
+  expect_identical(payload$component, "popover")
+  expect_identical(payload$props$triggerLabel, "Show details")
+  expect_match(payload$props$bodyHtml, "Hello", fixed = TRUE)
+  expect_identical(payload$props$side, "top")
+  expect_identical(payload$props$align, "end")
+  expect_identical(payload$state$open, TRUE)
+  expect_identical(payload$binding$input, TRUE)
+  expect_identical(payload$binding$type, "shinyblocks.popover")
+})
+
+test_that("block_popover requires a string trigger", {
+  expect_error(block_popover(trigger = NULL), "`trigger`", fixed = TRUE)
+  expect_error(block_popover(trigger = c("a", "b")), "single string", fixed = TRUE)
+})
+
+test_that("block_popover rejects invalid side and align", {
+  expect_error(block_popover(trigger = "x", side = "diagonal"), "should be one of")
+  expect_error(block_popover(trigger = "x", align = "weird"), "should be one of")
+})
+
+test_that("block_popover without id is client-only", {
+  payload <- runtime_payload_from(block_popover(trigger = "Open"))
+
+  expect_identical(payload$binding$input, FALSE)
+  expect_false("type" %in% names(payload$binding))
+})
+
+test_that("update_block_popover sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  update_block_popover(
+    session,
+    "details",
+    open = TRUE,
+    trigger = "Updated label",
+    body = htmltools::tags$p("Updated body"),
+    side = "left",
+    align = "start",
+    style = "max-width: 18rem;",
+    class = "custom-popover"
+  )
+
+  expect_identical(message$input_id, "sb-runtime-popover-details")
+  expect_identical(message$payload$open, TRUE)
+  expect_identical(message$payload$triggerLabel, "Updated label")
+  expect_match(message$payload$bodyHtml, "Updated body", fixed = TRUE)
+  expect_identical(message$payload$side, "left")
+  expect_identical(message$payload$align, "start")
+  expect_identical(message$payload$contentStyle$maxWidth, "18rem")
+  expect_identical(message$payload$contentClass, "custom-popover")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_popover messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = function(id) paste0("module-", id),
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  update_block_popover(session, "details", class = "custom")
+
+  expect_identical(message$input_id, "sb-runtime-popover-module-details")
+  expect_identical(message$payload$class, NULL)
+  expect_identical(message$payload$contentClass, "custom")
+  expect_identical(message$payload$notify, FALSE)
+})
+
+test_that("update_block_popover clears clearable fields", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_popover(
+    session,
+    "details",
+    body = NULL,
+    style = NULL,
+    class = NULL
+  )
+
+  expect_true("bodyHtml" %in% names(message))
+  expect_true("contentStyle" %in% names(message))
+  expect_true("contentClass" %in% names(message))
+  expect_null(message$bodyHtml)
+  expect_null(message$contentStyle)
+  expect_null(message$contentClass)
+})
+
+test_that("update_block_popover validates session and enums", {
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) NULL
+  )
+
+  expect_error(update_block_popover(NULL, "details"), "session")
+  expect_error(update_block_popover(session, "details", side = "diagonal"), "one of")
+  expect_error(update_block_popover(session, "details", align = "weird"), "one of")
+})
+
 test_that("block_dialog forwards hide_title to props", {
   payload <- runtime_payload_from(
     block_dialog(id = "x", title = "Hidden", hide_title = TRUE)
   )
   expect_identical(payload$props$hideTitle, TRUE)
+})
+
+test_that("block_dialog defaults to size = 'default' and forwards size + footer", {
+  default_payload <- runtime_payload_from(
+    block_dialog(id = "x", title = "T")
+  )
+  expect_identical(default_payload$props$size, "default")
+  expect_null(default_payload$props$footerHtml)
+
+  sized_payload <- runtime_payload_from(
+    block_dialog(
+      id = "x",
+      title = "T",
+      size = "lg",
+      footer = htmltools::tags$span("Action")
+    )
+  )
+  expect_identical(sized_payload$props$size, "lg")
+  expect_match(sized_payload$props$footerHtml, "Action", fixed = TRUE)
+})
+
+test_that("block_dialog rejects unknown size values", {
+  expect_error(
+    block_dialog(id = "x", title = "T", size = "huge"),
+    "should be one of"
+  )
+})
+
+test_that("update_block_dialog forwards size and footer", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_dialog(
+    session,
+    "confirm",
+    size = "xl",
+    footer = htmltools::tags$button("OK")
+  )
+
+  expect_identical(message$size, "xl")
+  expect_match(message$footerHtml, "OK", fixed = TRUE)
+  expect_identical(message$notify, FALSE)
+})
+
+test_that("update_block_dialog clears footer when passed NULL", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_dialog(session, "confirm", footer = NULL)
+  expect_true("footerHtml" %in% names(message))
+  expect_null(message$footerHtml)
+})
+
+test_that("update_block_dialog rejects invalid size values", {
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) NULL
+  )
+  expect_error(
+    update_block_dialog(session, "confirm", size = "huge"),
+    "size"
+  )
 })
 
 test_that("update_block_select maps clearable NULL fields", {

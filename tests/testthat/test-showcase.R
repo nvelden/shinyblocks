@@ -186,3 +186,58 @@ test_that("theme showcase overrides are scoped to the preview wrapper", {
     rendered
   ))
 })
+
+test_that("interactive sections use the full playground layout", {
+  env <- source_showcase()
+  section_map <- stats::setNames(env$sections, vapply(env$sections, `[[`, "", "id"))
+  interactive_contract <- list(
+    button = list(require_actions = FALSE),
+    select = list(require_actions = TRUE),
+    dialog = list(require_actions = TRUE),
+    popover = list(require_actions = TRUE),
+    checkbox = list(require_actions = TRUE)
+  )
+
+  required_labels <- c(
+    "Interactive Playground",
+    "UI Definition",
+    "Server Action",
+    "Content",
+    "State",
+    "Styling",
+    "API Reference"
+  )
+
+  for (id in names(interactive_contract)) {
+    section <- section_map[[id]]
+    expect_false(is.null(section), label = sprintf("missing section id: %s", id))
+
+    example_path <- file.path(
+      system.file("showcase", package = "shinyblocks", mustWork = TRUE),
+      "R",
+      "examples",
+      section$file
+    )
+    code <- readLines(example_path, warn = FALSE)
+    example_tag <- eval(parse(text = code), envir = new.env(parent = globalenv()))
+    html <- paste(htmltools::renderTags(example_tag)$html, collapse = "\n")
+
+    for (label in required_labels) {
+      expect_match(
+        html,
+        label,
+        fixed = TRUE,
+        label = sprintf("section '%s' missing playground label '%s'", id, label)
+      )
+    }
+
+    if (isTRUE(interactive_contract[[id]]$require_actions)) {
+      expect_match(
+        html,
+        "Actions (Server Update)",
+        fixed = TRUE,
+        label = sprintf("section '%s' missing playground label 'Actions (Server Update)'", id)
+      )
+    }
+  }
+})

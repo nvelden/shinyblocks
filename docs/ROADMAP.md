@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: Phase 2 — vertical runtime spike.**
+> **In progress: Phase 4/5 — overlay + controls runtime migration (status as of 2026-05-15).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -111,6 +111,38 @@ phase begins.
 >   New `hide_title = TRUE` hides the title visually while keeping it as
 >   the accessible name; the trigger advertises `aria-haspopup` and
 >   `aria-expanded`.
+> - **Phase 4.4 dialog variants + slots** — `block_dialog()` gains a `size`
+>   argument (`"sm"` / `"default"` / `"lg"` / `"xl"`) mapping to content
+>   max-width presets and a `footer` slot rendering action buttons in a
+>   right-aligned wrapping flex row. `update_block_dialog()` learns
+>   matching `size` and `footer` arguments (with `footer = NULL` clearing
+>   an existing footer). The dialog showcase is rewritten as the canonical
+>   interactive playground (preview + UI Definition + Server Action
+>   panels + Content/State/Styling/Actions controls + API Reference).
+> - **Phase 5.2 popover binding + updater** — `block_popover()` now
+>   supports optional Shiny input binding when `id` is supplied, and
+>   `update_block_popover()` can update `open`, `trigger`, `body`,
+>   `side`, `align`, `style`, and `class` via runtime input messages.
+>   The showcase and runtime Shiny fixture both exercise server-driven
+>   popover updates.
+> - **Phase 5.3 popover interactions** — popover now closes on Escape
+>   and pointer-down outside, returns focus to the trigger on close, and
+>   is covered by runtime Shiny smoke checks for dismiss and server
+>   update flows.
+> - **Phase 5.4 checkbox runtime migration** — `block_checkbox()` now
+>   renders through the package runtime with a hidden native checkbox,
+>   a dedicated `shinyblocks.checkbox` input binding, and runtime Shiny
+>   smoke coverage for value toggling and native-input sync.
+> - **Phase 5.4 checkbox parity hardening** — checkbox runtime structure
+>   and scoped CSS now align with current shadcn visual contract (single
+>   control box, compact indicator, checked/focus/invalid states, and
+>   label click behavior) without leaking legacy checkbox pseudo-element
+>   styling into runtime mounts.
+> - **Phase 5.5 switch runtime migration** — `block_switch()` now
+>   renders through the package runtime with a hidden native checkbox,
+>   a dedicated `shinyblocks.switch` input binding, and
+>   `update_block_switch()` for checked/disabled/style/class updates
+>   with optional Shiny notify semantics.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -135,11 +167,13 @@ phase begins.
 >   `block_theme()`, `block_dark_mode_toggle()`, and
 >   `update_block_theme()`.
 >
-> Still owed for Phase 2 vertical runtime spike:
-> - Finish the button/select cleanup gate, including targeted R tests,
->   runtime smoke, showcase smoke, and a manual browser approval pass.
-> - Run the full package gate before tagging Phase 2 or moving into the
->   next component family.
+> Current blocking gate item:
+> - `make parity-ci` still fails on **17 badge parity drifts**:
+>   `borderRadius` (`3.35544e+07px` vs `9999px`), `display`
+>   (`flex` vs `inline-flex`), and dark destructive background tint
+>   (`dark:bg-destructive/60` vs solid `--destructive`).
+> - Remaining post-popover controls work is tracked as normal phase
+>   work, but parity remains the hard blocker before any phase-exit tag.
 >
 > **Component-by-component hand-off:** after button and select are
 > accepted, proceed one component at a time. Each slice should
@@ -259,6 +293,13 @@ as `make gate`.
 Run this any time you want to *see* the work — not just at phase exit.
 After every component slice is a good cadence; before opening a PR is
 the minimum.
+Always fully restart the showcase app after editing runtime JS/CSS,
+showcase server wiring, or component update handlers; do not rely on a
+previous in-memory Shiny process to pick up those changes correctly.
+During active development, prefer `make showcase` (which uses
+`devtools::load_all(".")`) so the app reflects the current checkout.
+`shinyblocks::run_showcase()` launches the installed package copy and
+requires reinstalling to pick up local file edits.
 
 | Command | Serves | Port | When to run |
 | --- | --- | --- | --- |
@@ -409,15 +450,41 @@ file under `R/examples/`.
 
 When a new `block_*()` is exported, the same commit must add:
 
-1. `inst/showcase/R/examples/<component>.R` — examples for the basic
-   case, every public variant/option, customization hooks, supported
-   states, and for reactive components, value reads, server updates,
-   disable/enable, reset/clear, and module namespacing where relevant.
-2. A row in the `sections` list in `inst/showcase/app.R` (id, label,
-   icon, title, lead, file).
-3. Run `make showcase` and eyeball it. The new section should appear
+1. `inst/showcase/R/examples/<component>.R` — an **interactive
+   playground** following the standard layout (preview at top;
+   two-column split below with `input$` value + UI Definition + Server
+   Action code blocks on the left and Content / State / Actions /
+   Styling controls on the right; API Reference table at the bottom).
+   See `select.R` and `dialog.R` as canonical references, and the
+   `shinyblocks-component` skill's "Showcase playground layout" step
+   for the full template. This full layout is mandatory for every
+   component section; do not ship minimal/static demos.
+2. `inst/showcase/R/server_<component>.R` — a
+   `register_<component>_showcase(input, output, session)` function
+   wiring the five standard outputs (`*_preview_ui`, `*_preview_value`,
+   `*_preview_code`, `*_reactive_code`, `*_api_table`) plus an
+   observer per action button that drives the visible preview, calls
+   `update_block_<name>()`, and updates the `reactive_code`
+   `reactiveVal`. Source it and call the register function from
+   `inst/showcase/app.R`. Every section must expose the same control
+   families: Content, State, Actions (Server Update), and Styling
+   (`style` and `class`). Controls must cover the component's full
+   public constructor surface (all user-facing args). If an
+   `update_block_*()` helper exists, the Actions panel is mandatory and
+   should demonstrate the updater contract (for example set/clear,
+   disable/enable, plus one structural/content mutation where relevant).
+3. A row in the `sections` list in `inst/showcase/app.R` (id, label,
+   icon, title, lead, file). The `lead` is a one-sentence current-state
+   description — no phase numbers, no "skeleton — to be expanded
+   later" placeholders.
+4. Update `inst/showcase/www/showcase.css`: add
+   `#showcase_<component>_api_table` to the three rule blocks that
+   style the API tables (monospace first three columns, muted header,
+   border-bottom rows), and add any `.showcase-<component>-preview-custom`
+   demo class referenced by the playground's `class` checkbox.
+5. Run `make showcase` and eyeball it. The new section should appear
    in the sidebar, render correctly when selected, and deep-link via
-   `#<id>`.
+   `#<id>`. The API table should match the other components visually.
 
 `tests/testthat/test-showcase.R` enforces this contract end-to-end —
 exporting a new `block_*()` without referencing it from the showcase
@@ -448,7 +515,7 @@ same commit** that lands the API change:
 
 | Artifact | What goes in | Enforced by |
 | --- | --- | --- |
-| `inst/showcase/` | Component page/section with basic, option, customization, state, and reactive examples where applicable | `test-showcase.R` |
+| `inst/showcase/` | Full interactive playground per component: preview, input value, UI Definition, Server Action, Content/State/Actions/Styling controls, API Reference | `test-showcase.R` |
 | `_pkgdown.yml` `reference:` | Function under the matching category | `test-doc-coverage.R` |
 | `gallery/components/*.qmd` | Page following the [§Components Gallery](#components-gallery) template | `test-doc-coverage.R` (currently `skip()`'d — see below) |
 | `docs/component-specs/<name>.md` | Runtime mapping, props/slots, Shiny state/update contract, accessibility requirements, scoped-CSS notes, and deliberate divergences | `test-doc-coverage.R` |

@@ -86,8 +86,48 @@ function isDialogPayload(payload) {
   return payload && payload.component === "dialog";
 }
 
+function isPopoverPayload(payload) {
+  return payload && payload.component === "popover";
+}
+
+function isCheckboxPayload(payload) {
+  return payload && payload.component === "checkbox";
+}
+
+function isSwitchPayload(payload) {
+  return payload && payload.component === "switch";
+}
+
 function nativeSelect(root) {
   return root ? root.querySelector(".sb-select-native") : null;
+}
+
+function nativeCheckbox(root) {
+  return root ? root.querySelector(".sb-checkbox-native") : null;
+}
+
+function nativeSwitch(root) {
+  return root ? root.querySelector(".sb-switch-native") : null;
+}
+
+function setNativeCheckboxValue(root, checked, notify) {
+  const native = nativeCheckbox(root);
+  if (!native) return;
+
+  native.checked = Boolean(checked);
+  if (notify) {
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
+function setNativeSwitchValue(root, checked, notify) {
+  const native = nativeSwitch(root);
+  if (!native) return;
+
+  native.checked = Boolean(checked);
+  if (notify) {
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 }
 
 function cssEscape(value) {
@@ -331,6 +371,246 @@ function unbindDialogRoot(root) {
   window.Shiny.unbindAll(root);
 }
 
+function registerPopoverBinding() {
+  if (
+    window.shinyblocksPopoverBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksPopoverBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='popover'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      return Boolean(el.__sbPopoverValue);
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbPopoverReceive === "function") {
+        el.__sbPopoverReceive({ open: Boolean(value), notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(false);
+      el.addEventListener("sb:popover-change", handler);
+      el.__sbPopoverChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbPopoverChangeHandler) return;
+      el.removeEventListener("sb:popover-change", el.__sbPopoverChangeHandler);
+      delete el.__sbPopoverChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbPopoverReceive === "function") {
+        el.__sbPopoverReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksPopoverBinding(),
+    "shinyblocks.popover"
+  );
+  window.shinyblocksPopoverBindingRegistered = true;
+}
+
+function bindPopoverRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindPopoverRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
+function registerCheckboxBinding() {
+  if (
+    window.shinyblocksCheckboxBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksCheckboxBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='checkbox'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      return Boolean(el.__sbCheckboxValue);
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbCheckboxReceive === "function") {
+        el.__sbCheckboxReceive({ checked: Boolean(value), notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(false);
+      el.addEventListener("sb:checkbox-change", handler);
+      el.__sbCheckboxChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbCheckboxChangeHandler) return;
+      el.removeEventListener("sb:checkbox-change", el.__sbCheckboxChangeHandler);
+      delete el.__sbCheckboxChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbCheckboxReceive === "function") {
+        el.__sbCheckboxReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksCheckboxBinding(),
+    "shinyblocks.checkbox"
+  );
+  window.shinyblocksCheckboxBindingRegistered = true;
+}
+
+function bindCheckboxRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindCheckboxRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
+function registerSwitchBinding() {
+  if (
+    window.shinyblocksSwitchBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksSwitchBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='switch'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      return Boolean(el.__sbSwitchValue);
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbSwitchReceive === "function") {
+        el.__sbSwitchReceive({ checked: Boolean(value), notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(false);
+      el.addEventListener("sb:switch-change", handler);
+      el.__sbSwitchChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbSwitchChangeHandler) return;
+      el.removeEventListener("sb:switch-change", el.__sbSwitchChangeHandler);
+      delete el.__sbSwitchChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbSwitchReceive === "function") {
+        el.__sbSwitchReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksSwitchBinding(),
+    "shinyblocks.switch"
+  );
+  window.shinyblocksSwitchBindingRegistered = true;
+}
+
+function bindSwitchRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindSwitchRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
 function RuntimeMount({ payload, root }) {
   if (payload.component === "button") {
     return <Button payload={payload} />;
@@ -370,6 +650,18 @@ function RuntimeMount({ payload, root }) {
 
   if (payload.component === "dialog") {
     return <Dialog payload={payload} root={root} />;
+  }
+
+  if (payload.component === "popover") {
+    return <Popover payload={payload} root={root} />;
+  }
+
+  if (payload.component === "checkbox") {
+    return <Checkbox payload={payload} root={root} />;
+  }
+
+  if (payload.component === "switch") {
+    return <Switch payload={payload} root={root} />;
   }
 
   if (payload.component === "select") {
@@ -678,6 +970,8 @@ function Dialog({ payload, root }) {
   const [descriptionHtml, setDescriptionHtml] = useState(
     props.descriptionHtml || ""
   );
+  const [footerHtml, setFooterHtml] = useState(props.footerHtml || "");
+  const [size, setSize] = useState(props.size || "default");
   const hideTitle = Boolean(props.hideTitle);
   const titleId = `${inputId}-title`;
   const descriptionId = `${inputId}-description`;
@@ -719,6 +1013,12 @@ function Dialog({ payload, root }) {
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "descriptionHtml")) {
         setDescriptionHtml(nextData.descriptionHtml || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "footerHtml")) {
+        setFooterHtml(nextData.footerHtml || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
+        setSize(nextData.size || "default");
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "open")) {
         setOpen(Boolean(nextData.open), Boolean(nextData.notify));
@@ -820,8 +1120,13 @@ function Dialog({ payload, root }) {
               aria-describedby={descriptionHtml ? descriptionId : undefined}
               tabIndex={-1}
               ref={contentRef}
-              className={classNames("sb-dialog-content", payload.className)}
+              className={classNames(
+                "sb-dialog-content",
+                `sb-dialog-content-size-${size}`,
+                payload.className
+              )}
               data-slot="dialog-content"
+              data-size={size}
             >
               <div className="sb-dialog-header" data-slot="dialog-header">
                 <HtmlSlot
@@ -847,6 +1152,13 @@ function Dialog({ payload, root }) {
                   dangerouslySetInnerHTML={{ __html: props.bodyHtml }}
                 />
               )}
+              {footerHtml && (
+                <div
+                  className="sb-dialog-footer"
+                  data-slot="dialog-footer"
+                  dangerouslySetInnerHTML={{ __html: footerHtml }}
+                />
+              )}
               <button
                 type="button"
                 className="sb-dialog-close"
@@ -862,6 +1174,487 @@ function Dialog({ payload, root }) {
         )}
     </>
   );
+}
+
+function Popover({ payload, root }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const [open, setOpenState] = useState(Boolean(state.open));
+  const [position, setPosition] = useState(null);
+  const [triggerLabel, setTriggerLabel] = useState(props.triggerLabel || "");
+  const [bodyHtml, setBodyHtml] = useState(props.bodyHtml || "");
+  const [side, setSide] = useState(props.side || "bottom");
+  const [align, setAlign] = useState(props.align || "center");
+  const [contentStyle, setContentStyle] = useState(props.contentStyle || null);
+  const [contentClass, setContentClass] = useState(props.contentClass || null);
+  const triggerRef = useRef(null);
+  const contentRef = useRef(null);
+  const returnFocusRef = useRef(null);
+  const contentId = `${payload.id || "popover"}-content`;
+
+  useEffect(() => {
+    if (root) {
+      root.__sbPopoverValue = open;
+      root.dataset.sbPopoverOpen = open ? "true" : "false";
+    }
+  }, [open, root]);
+
+  function notifyChange() {
+    if (!root) return;
+    root.dispatchEvent(new CustomEvent("sb:popover-change"));
+  }
+
+  function setOpen(next, notify) {
+    const nextOpen = Boolean(next);
+    if (nextOpen && !open) {
+      returnFocusRef.current = document.activeElement;
+    }
+    setOpenState(nextOpen);
+    if (notify !== false) {
+      requestAnimationFrame(notifyChange);
+    }
+  }
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    root.__sbPopoverReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "triggerLabel")) {
+        setTriggerLabel(nextData.triggerLabel || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "bodyHtml")) {
+        setBodyHtml(nextData.bodyHtml || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "side")) {
+        setSide(nextData.side || "bottom");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "align")) {
+        setAlign(nextData.align || "center");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "contentStyle")) {
+        setContentStyle(nextData.contentStyle || null);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "contentClass")) {
+        setContentClass(nextData.contentClass || null);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "open")) {
+        setOpen(Boolean(nextData.open), Boolean(nextData.notify));
+      }
+    };
+
+    return () => {
+      delete root.__sbPopoverReceive;
+    };
+  }, [root]);
+
+  useEffect(() => {
+    if (!open || !triggerRef.current) return undefined;
+
+    function updatePosition() {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const offset = 8;
+      let top = 0;
+      let left = 0;
+      if (side === "bottom") {
+        top = rect.bottom + offset;
+      } else if (side === "top") {
+        top = rect.top - offset;
+      } else if (side === "left") {
+        left = rect.left - offset;
+        top = rect.top;
+      } else if (side === "right") {
+        left = rect.right + offset;
+        top = rect.top;
+      }
+      if (side === "top" || side === "bottom") {
+        if (align === "center") {
+          left = rect.left + rect.width / 2;
+        } else if (align === "start") {
+          left = rect.left;
+        } else {
+          left = rect.right;
+        }
+      } else if (align === "center") {
+        top = rect.top + rect.height / 2;
+      } else if (align === "end") {
+        top = rect.bottom;
+      }
+      setPosition({ top, left });
+    }
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open, side, align]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const focusFrame = requestAnimationFrame(() => {
+      const focusables = focusableChildren(contentRef.current);
+      const initial = focusables[0] || contentRef.current;
+      if (initial && typeof initial.focus === "function") {
+        initial.focus({ preventScroll: true });
+      }
+    });
+
+    function onDocumentPointerDown(event) {
+      const target = event.target;
+      if (triggerRef.current?.contains(target)) return;
+      if (contentRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+
+    function onDocumentKeyDown(event) {
+      if (event.key !== "Escape") return;
+      event.stopPropagation();
+      setOpen(false);
+    }
+
+    document.addEventListener("pointerdown", onDocumentPointerDown);
+    document.addEventListener("keydown", onDocumentKeyDown);
+
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.removeEventListener("pointerdown", onDocumentPointerDown);
+      document.removeEventListener("keydown", onDocumentKeyDown);
+
+      const target = returnFocusRef.current;
+      returnFocusRef.current = null;
+      if (target && typeof target.focus === "function") {
+        requestAnimationFrame(() => target.focus({ preventScroll: true }));
+      }
+    };
+  }, [open]);
+
+  const portal = ensurePortalRoot();
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="sb-button sb-button-default sb-button-size-default"
+        data-slot="popover-trigger"
+        aria-haspopup="dialog"
+        aria-expanded={open ? "true" : "false"}
+        aria-controls={open ? contentId : undefined}
+        onClick={() => setOpen(!open)}
+      >
+        {triggerLabel}
+      </button>
+      {open && position &&
+        createPortal(
+          <div
+            id={contentId}
+            ref={contentRef}
+            className={classNames("sb-popover-content", contentClass)}
+            data-slot="popover-content"
+            data-side={side}
+            data-align={align}
+            role="dialog"
+            tabIndex={-1}
+            style={{
+              position: "fixed",
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              transform: popoverTransform(side, align),
+              ...(contentStyle || {})
+            }}
+            dangerouslySetInnerHTML={{ __html: bodyHtml || "" }}
+          />,
+          portal
+        )}
+    </>
+  );
+}
+
+function Checkbox({ payload, root }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const inputId = payload.id;
+  const [checked, setCheckedState] = useState(Boolean(state.value));
+  const [disabled, setDisabled] = useState(Boolean(props.disabled));
+  const [style, setStyle] = useState(props.style || {});
+  const [className, setClassName] = useState(payload.className || "");
+  const [labelledBy, setLabelledBy] = useState(null);
+  const controlRef = useRef(null);
+  const invalid = root?.getAttribute("aria-invalid") === "true";
+  const describedBy = root?.getAttribute("aria-describedby") || undefined;
+  const inlineLabelId = inputId ? `${inputId}__label` : undefined;
+
+  useEffect(() => {
+    if (root) {
+      root.__sbCheckboxValue = checked;
+      root.dataset.sbCheckboxChecked = checked ? "true" : "false";
+    }
+  }, [checked, root]);
+
+  useEffect(() => {
+    if (!root) return;
+    setNativeCheckboxValue(root, checked, false);
+  }, [checked, root]);
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    setLabelledBy(labelIdForInput(inputId));
+
+    root.__sbCheckboxReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "checked")) {
+        const nextChecked = Boolean(nextData.checked);
+        setCheckedState(nextChecked);
+        setNativeCheckboxValue(root, nextChecked, Boolean(nextData.notify));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
+        const nextDisabled = Boolean(nextData.disabled);
+        setDisabled(nextDisabled);
+        root.toggleAttribute("data-disabled", nextDisabled);
+        const native = nativeCheckbox(root);
+        if (native) native.disabled = nextDisabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setClassName(nextData.class || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setStyle(nextData.style || {});
+      }
+    };
+
+    return () => {
+      delete root.__sbCheckboxReceive;
+    };
+  }, [inputId, root]);
+
+  useEffect(() => {
+    if (!root) return;
+    root.toggleAttribute("data-disabled", disabled);
+    const native = nativeCheckbox(root);
+    if (native) native.disabled = disabled;
+  }, [disabled, root]);
+
+  function notifyChange(nextChecked) {
+    if (!root) return;
+    root.__sbCheckboxValue = nextChecked;
+    root.dataset.sbCheckboxChecked = nextChecked ? "true" : "false";
+    setNativeCheckboxValue(root, nextChecked, true);
+    root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
+  }
+
+  function setChecked(nextChecked, notify = false) {
+    const next = Boolean(nextChecked);
+    setCheckedState(next);
+    if (notify) {
+      requestAnimationFrame(() => notifyChange(next));
+    }
+  }
+
+  function toggle() {
+    if (disabled) return;
+    setChecked(!checked, true);
+  }
+
+  return (
+    <div
+      data-slot="checkbox"
+      className={classNames("sb-checkbox", className)}
+      data-state={checked ? "checked" : "unchecked"}
+      data-disabled={disabled ? "true" : undefined}
+    >
+      <button
+        ref={controlRef}
+        type="button"
+        className="sb-checkbox-button"
+        data-slot="checkbox-control"
+        data-state={checked ? "checked" : "unchecked"}
+        role="checkbox"
+        aria-checked={checked ? "true" : "false"}
+        aria-labelledby={labelledBy || inlineLabelId || undefined}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
+        disabled={disabled}
+        style={style}
+        onClick={toggle}
+        onKeyDown={(event) => {
+          if (event.key === " " || event.key === "Enter") {
+            event.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <span className="sb-checkbox-indicator" aria-hidden="true">
+          <svg viewBox="0 0 15 15" aria-hidden="true" focusable="false">
+            <path
+              d="M11.4669 3.72684C11.7598 3.43395 12.2347 3.43395 12.5276 3.72684C12.8205 4.01974 12.8205 4.49461 12.5276 4.7875L6.86095 10.4542C6.56806 10.7471 6.09318 10.7471 5.80029 10.4542L3.46696 8.12084C3.17407 7.82795 3.17407 7.35308 3.46696 7.06018C3.75986 6.76729 4.23473 6.76729 4.52762 7.06018L6.33062 8.86317L11.4669 3.72684Z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      </button>
+      <HtmlSlot
+        id={inlineLabelId}
+        html={props.labelHtml}
+        className="sb-checkbox-text"
+        onClick={() => {
+          if (disabled) return;
+          controlRef.current?.focus();
+          toggle();
+        }}
+      />
+    </div>
+  );
+}
+
+function Switch({ payload, root }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const inputId = payload.id;
+  const [checked, setCheckedState] = useState(Boolean(state.value));
+  const [disabled, setDisabled] = useState(Boolean(props.disabled));
+  const [style, setStyle] = useState(props.style || {});
+  const [className, setClassName] = useState(payload.className || "");
+  const [labelledBy, setLabelledBy] = useState(null);
+  const controlRef = useRef(null);
+  const invalid = root?.getAttribute("aria-invalid") === "true";
+  const describedBy = root?.getAttribute("aria-describedby") || undefined;
+  const inlineLabelId = inputId ? `${inputId}__label` : undefined;
+
+  useEffect(() => {
+    if (root) {
+      root.__sbSwitchValue = checked;
+      root.dataset.sbSwitchChecked = checked ? "true" : "false";
+    }
+  }, [checked, root]);
+
+  useEffect(() => {
+    if (!root) return;
+    setNativeSwitchValue(root, checked, false);
+  }, [checked, root]);
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    setLabelledBy(labelIdForInput(inputId));
+
+    root.__sbSwitchReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "checked")) {
+        const nextChecked = Boolean(nextData.checked);
+        setCheckedState(nextChecked);
+        setNativeSwitchValue(root, nextChecked, Boolean(nextData.notify));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
+        const nextDisabled = Boolean(nextData.disabled);
+        setDisabled(nextDisabled);
+        root.toggleAttribute("data-disabled", nextDisabled);
+        const native = nativeSwitch(root);
+        if (native) native.disabled = nextDisabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setClassName(nextData.class || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setStyle(nextData.style || {});
+      }
+    };
+
+    return () => {
+      delete root.__sbSwitchReceive;
+    };
+  }, [inputId, root]);
+
+  useEffect(() => {
+    if (!root) return;
+    root.toggleAttribute("data-disabled", disabled);
+    const native = nativeSwitch(root);
+    if (native) native.disabled = disabled;
+  }, [disabled, root]);
+
+  function notifyChange(nextChecked) {
+    if (!root) return;
+    root.__sbSwitchValue = nextChecked;
+    root.dataset.sbSwitchChecked = nextChecked ? "true" : "false";
+    setNativeSwitchValue(root, nextChecked, true);
+    root.dispatchEvent(new CustomEvent("sb:switch-change"));
+  }
+
+  function setChecked(nextChecked, notify = false) {
+    const next = Boolean(nextChecked);
+    setCheckedState(next);
+    if (notify) {
+      requestAnimationFrame(() => notifyChange(next));
+    }
+  }
+
+  function toggle() {
+    if (disabled) return;
+    setChecked(!checked, true);
+  }
+
+  return (
+    <div
+      data-slot="switch"
+      className={classNames("sb-switch", className)}
+      data-state={checked ? "checked" : "unchecked"}
+      data-disabled={disabled ? "true" : undefined}
+    >
+      <button
+        ref={controlRef}
+        type="button"
+        className="sb-switch-button"
+        data-slot="switch-control"
+        data-state={checked ? "checked" : "unchecked"}
+        role="switch"
+        aria-checked={checked ? "true" : "false"}
+        aria-labelledby={labelledBy || inlineLabelId || undefined}
+        aria-describedby={describedBy}
+        aria-invalid={invalid || undefined}
+        disabled={disabled}
+        style={style}
+        onClick={toggle}
+        onKeyDown={(event) => {
+          if (event.key === " " || event.key === "Enter") {
+            event.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <span className="sb-switch-thumb" aria-hidden="true" />
+      </button>
+      <HtmlSlot
+        id={inlineLabelId}
+        html={props.labelHtml}
+        className="sb-switch-text"
+        onClick={() => {
+          if (disabled) return;
+          controlRef.current?.focus();
+          toggle();
+        }}
+      />
+    </div>
+  );
+}
+
+function popoverTransform(side, align) {
+  if (side === "top" || side === "bottom") {
+    const y = side === "top" ? "-100%" : "0";
+    if (align === "center") return `translate(-50%, ${y})`;
+    if (align === "start") return `translate(0, ${y})`;
+    return `translate(-100%, ${y})`;
+  }
+  const x = side === "left" ? "-100%" : "0";
+  if (align === "center") return `translate(${x}, -50%)`;
+  if (align === "end") return `translate(${x}, -100%)`;
+  return `translate(${x}, 0)`;
 }
 
 function Select({ payload, root }) {
@@ -1230,6 +2023,9 @@ function mountRoot(root) {
   if (!payload) return;
   registerSelectBinding();
   registerDialogBinding();
+  registerPopoverBinding();
+  registerCheckboxBinding();
+  registerSwitchBinding();
   payload.rootAttrs = {
     ariaInvalid: root.getAttribute("aria-invalid"),
     ariaDescribedby: root.getAttribute("aria-describedby")
@@ -1246,6 +2042,12 @@ function mountRoot(root) {
     bindSelectRoot(root);
   } else if (isDialogPayload(payload)) {
     bindDialogRoot(root);
+  } else if (isPopoverPayload(payload)) {
+    bindPopoverRoot(root);
+  } else if (isCheckboxPayload(payload)) {
+    bindCheckboxRoot(root);
+  } else if (isSwitchPayload(payload)) {
+    bindSwitchRoot(root);
   } else {
     bindShinyChildren(root);
   }
@@ -1255,7 +2057,10 @@ function mountRoot(root) {
     payload.binding &&
     payload.binding.input &&
     !isSelectPayload(payload) &&
-    !isDialogPayload(payload)
+    !isDialogPayload(payload) &&
+    !isPopoverPayload(payload) &&
+    !isCheckboxPayload(payload) &&
+    !isSwitchPayload(payload)
   ) {
     const initialized = setInputValue(payload.id, currentValue(payload), "event");
     if (!initialized) {
@@ -1273,6 +2078,12 @@ function unmountRoot(root) {
     unbindSelectRoot(root);
   } else if (isDialogPayload(mountedRoot.payload)) {
     unbindDialogRoot(root);
+  } else if (isPopoverPayload(mountedRoot.payload)) {
+    unbindPopoverRoot(root);
+  } else if (isCheckboxPayload(mountedRoot.payload)) {
+    unbindCheckboxRoot(root);
+  } else if (isSwitchPayload(mountedRoot.payload)) {
+    unbindSwitchRoot(root);
   } else {
     unbindShinyChildren(root);
   }
@@ -1294,6 +2105,8 @@ function flushPendingInputs(container) {
     if (
       !payload ||
       isSelectPayload(payload) ||
+      isCheckboxPayload(payload) ||
+      isSwitchPayload(payload) ||
       !payload.id ||
       !payload.binding ||
       !payload.binding.input
@@ -1409,6 +2222,10 @@ function observeDynamicUi() {
 
 function init() {
   registerSelectBinding();
+  registerDialogBinding();
+  registerPopoverBinding();
+  registerCheckboxBinding();
+  registerSwitchBinding();
   mountAll(document);
   observeDynamicUi();
   registerUpdateHandler();
@@ -1429,6 +2246,10 @@ if (document.readyState === "loading") {
 
 document.addEventListener("shiny:connected", function connected() {
   registerSelectBinding();
+  registerDialogBinding();
+  registerPopoverBinding();
+  registerCheckboxBinding();
+  registerSwitchBinding();
   flushPendingInputs(document);
   schedulePendingInputFlush();
 });
