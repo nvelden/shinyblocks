@@ -2,7 +2,7 @@
 
 > Shinyblocks function: `block_checkbox()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/checkbox>
-> Status: **Phase 5.4 - runtime checkbox migration**.
+> Status: **Phase 5.6 — popover/checkbox/switch parity + cleanup**.
 
 ## States
 

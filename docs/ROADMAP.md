@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: Phase 4/5 — overlay + controls runtime migration (status as of 2026-05-15).**
+> **In progress: Phase 5 — controls runtime migration (status as of 2026-05-15).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -143,6 +143,12 @@ phase begins.
 >   a dedicated `shinyblocks.switch` input binding, and
 >   `update_block_switch()` for checked/disabled/style/class updates
 >   with optional Shiny notify semantics.
+> - **Phase 5.6 popover/checkbox/switch cleanup** — removed the dead
+>   pre-runtime `boolean_control_input()` helper and the legacy
+>   `.sb-checkbox-*`/`.sb-switch-*` rules from
+>   `inst/www/src/shinyblocks.css` now that all three controls render
+>   through scoped runtime CSS under `[data-shinyblocks-root]`.
+>   Component specs aligned to a common status header.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

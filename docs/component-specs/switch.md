@@ -2,7 +2,7 @@
 
 > Shinyblocks function: `block_switch()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/switch>
-> Status: **Phase 5.5 - runtime switch migration**.
+> Status: **Phase 5.6 — popover/checkbox/switch parity + cleanup**.
 
 ## States
 

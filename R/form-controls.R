@@ -334,18 +334,3 @@ block_slider <- function(
   )
 }
 
-boolean_control_input <- function(input_id, value, disabled) {
-  checkbox_tag <- shiny::checkboxInput(input_id, NULL, value = value)
-  query <- htmltools::tagQuery(checkbox_tag)
-  input_tag <- query$find("input")$selectedTags()[[1]]
-  input_tag$attribs[["class"]] <- merge_classes(
-    input_tag$attribs[["class"]],
-    "sb-checkbox-control"
-  )
-
-  if (disabled) {
-    input_tag$attribs[["disabled"]] <- NA
-  }
-
-  input_tag
-}
