@@ -28,6 +28,7 @@ Other forms:
 \code{\link{block_field_invalid}()},
 \code{\link{block_field_legend}()},
 \code{\link{block_field_set}()},
+\code{\link{block_input}()},
 \code{\link{block_input_group}()},
 \code{\link{block_input_group_addon}()},
 \code{\link{block_select}()},
@@ -35,6 +36,7 @@ Other forms:
 \code{\link{block_switch}()},
 \code{\link{block_textarea}()},
 \code{\link{update_block_checkbox}()},
+\code{\link{update_block_input}()},
 \code{\link{update_block_select}()},
 \code{\link{update_block_switch}()},
 \code{\link{update_block_textarea}()}

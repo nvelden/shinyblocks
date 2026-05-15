@@ -59,6 +59,8 @@ reference:
       - update_block_select
       - block_textarea
       - update_block_textarea
+      - block_input
+      - update_block_input
       - block_checkbox
       - block_switch
       - block_slider

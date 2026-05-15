@@ -157,6 +157,12 @@ phase begins.
 >   invalid/style/class updates with optional Shiny notify semantics.
 >   Legacy `.sb-textarea` rules removed from
 >   `inst/www/src/shinyblocks.css`.
+> - **Phase 5.8 text input** — introduced `block_input()` and
+>   `update_block_input()`. Single-line runtime input with hidden
+>   native `<input>`, `shinyblocks.input` binding (debounced 250 ms),
+>   `type` (text/password/email/url/tel/search/number), `invalid`
+>   flag, and full server updater for
+>   value/placeholder/type/disabled/invalid/style/class.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
