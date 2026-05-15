@@ -322,15 +322,6 @@
     @apply flex flex-col gap-4 rounded-lg border border-border p-4;
   }
 
-  .sb-textarea {
-    @apply w-full;
-  }
-
-  .sb-textarea textarea.sb-textarea-control {
-    min-height: 4rem;
-    height: auto;
-    resize: vertical;
-  }
 
   /* shadcn Slider contract (apps/v4 new-york-v4 registry):
    *   Track  = relative grow overflow-hidden rounded-full bg-muted h-1.5

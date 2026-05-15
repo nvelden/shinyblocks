@@ -149,6 +149,14 @@ phase begins.
 >   `inst/www/src/shinyblocks.css` now that all three controls render
 >   through scoped runtime CSS under `[data-shinyblocks-root]`.
 >   Component specs aligned to a common status header.
+> - **Phase 5.7 textarea runtime migration** — `block_textarea()` now
+>   renders through the package runtime with a hidden native
+>   `<textarea>`, a dedicated `shinyblocks.textarea` input binding
+>   (debounced 250 ms), a new `invalid` argument, and
+>   `update_block_textarea()` for value/placeholder/rows/disabled/
+>   invalid/style/class updates with optional Shiny notify semantics.
+>   Legacy `.sb-textarea` rules removed from
+>   `inst/www/src/shinyblocks.css`.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled

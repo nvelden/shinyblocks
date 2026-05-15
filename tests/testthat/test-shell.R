@@ -242,20 +242,37 @@ test_that("field wrappers expose expected classes and child markers", {
   expect_identical(tag_attr(group, "data-sb-child"), "field-group")
 })
 
-test_that("textarea wraps Shiny markup and supports placeholder", {
+test_that("textarea emits a runtime payload and hidden native textarea", {
   textarea <- block_textarea(
     "notes",
     value = "hello",
     placeholder = "Write a note",
     rows = 5,
+    invalid = TRUE,
+    style = "color: red;",
     class = "custom"
   )
   html <- render_html(textarea)
+  payload <- runtime_payload_from(textarea)
 
-  expect_identical(tag_attr(textarea, "class"), "sb-textarea custom")
-  expect_match(html, "sb-textarea-control", fixed = TRUE)
-  expect_match(html, 'placeholder="Write a note"', fixed = TRUE)
-  expect_match(html, 'rows="5"', fixed = TRUE)
+  expect_identical(
+    tag_attr(textarea, "class"),
+    "sb-runtime-mount sb-textarea custom"
+  )
+  expect_match(html, 'data-sb-component="textarea"', fixed = TRUE)
+  expect_match(
+    html,
+    '<textarea id="notes" class="sb-textarea-native"',
+    fixed = TRUE
+  )
+  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_identical(payload$id, "notes")
+  expect_identical(payload$state$value, "hello")
+  expect_identical(payload$props$placeholder, "Write a note")
+  expect_identical(payload$props$rows, 5L)
+  expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$props$style$color, "red")
+  expect_identical(payload$binding$type, "shinyblocks.textarea")
 })
 
 test_that("slider wraps Shiny markup and exposes the data-disabled flag", {
