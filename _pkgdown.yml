@@ -61,6 +61,8 @@ reference:
       - update_block_textarea
       - block_input
       - update_block_input
+      - block_radio_group
+      - update_block_radio_group
       - block_checkbox
       - block_switch
       - block_slider
