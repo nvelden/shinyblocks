@@ -135,6 +135,140 @@ update_block_textarea <- function(
   invisible(NULL)
 }
 
+#' Create a styled single-line text input
+#'
+#' @param input_id Input id.
+#' @param value Initial value.
+#' @param placeholder Optional placeholder text.
+#' @param type Input type. One of `"text"`, `"password"`, `"email"`,
+#'   `"url"`, `"tel"`, `"search"`, or `"number"`. Defaults to `"text"`.
+#' @param width Optional CSS width value (applied to the wrapper).
+#' @param disabled Whether the control is disabled.
+#' @param invalid Whether the control should show invalid styling
+#'   (sets `aria-invalid="true"`).
+#' @param style Inline CSS styles for the input element.
+#' @param class Additional classes for the wrapper.
+#'
+#' @return An `htmltools` tag.
+#' @family forms
+#' @export
+block_input <- function(
+  input_id,
+  value = "",
+  placeholder = NULL,
+  type = c("text", "password", "email", "url", "tel", "search", "number"),
+  width = NULL,
+  disabled = FALSE,
+  invalid = FALSE,
+  style = NULL,
+  class = NULL
+) {
+  validate_input_id(input_id)
+  type <- match.arg(type)
+
+  hidden_native <- htmltools::tags$input(
+    id = input_id,
+    type = type,
+    class = "sb-input-native",
+    tabindex = "-1",
+    `aria-hidden` = "true",
+    `data-shiny-no-bind-input` = "",
+    style = "display:none",
+    value = if (is.null(value)) "" else as.character(value)
+  )
+
+  wrapper_class <- merge_classes("sb-input", class)
+  wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
+
+  runtime_component(
+    component = "input",
+    props = list(
+      placeholder = placeholder,
+      type = type,
+      disabled = isTRUE(disabled),
+      invalid = isTRUE(invalid),
+      style = normalize_runtime_style(style)
+    ),
+    input_id = input_id,
+    state = list(value = if (is.null(value)) "" else as.character(value)),
+    binding = list(input = TRUE, type = "shinyblocks.input"),
+    class = wrapper_class,
+    style = wrapper_style,
+    children = list(hidden_native)
+  )
+}
+
+#' Update a runtime text input
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_input()`.
+#' @param value Optional replacement value.
+#' @param placeholder Optional replacement placeholder text.
+#' @param type Optional input type.
+#' @param disabled Optional disabled state.
+#' @param invalid Optional invalid flag.
+#' @param style Optional replacement inline CSS styles for the input.
+#' @param class Optional replacement classes for the wrapper.
+#' @param notify Whether Shiny should receive an input event when `value`
+#'   changes. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family forms
+#' @export
+update_block_input <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  value,
+  placeholder,
+  type,
+  disabled,
+  invalid,
+  style,
+  class,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(value)) {
+    payload$value <- if (is.null(value)) "" else as.character(value)
+  }
+  if (!missing(placeholder)) {
+    payload["placeholder"] <- list(placeholder)
+  }
+  if (!missing(type)) {
+    payload$type <- match.arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+  }
+  if (!missing(disabled)) {
+    payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(invalid)) {
+    payload$invalid <- isTRUE(invalid)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["class"] <- list(class)
+  }
+
+  payload$notify <- isTRUE(notify) && "value" %in% names(payload)
+  message_target <- runtime_mount_id("input", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
+}
+
 #' Create a styled checkbox input
 #'
 #' @param input_id Input id.

@@ -242,6 +242,39 @@ test_that("field wrappers expose expected classes and child markers", {
   expect_identical(tag_attr(group, "data-sb-child"), "field-group")
 })
 
+test_that("block_input emits a runtime payload and hidden native input", {
+  input <- block_input(
+    "email",
+    value = "n@example.com",
+    placeholder = "you@example.com",
+    type = "email",
+    invalid = TRUE,
+    style = "color: red;",
+    class = "custom"
+  )
+  html <- render_html(input)
+  payload <- runtime_payload_from(input)
+
+  expect_identical(
+    tag_attr(input, "class"),
+    "sb-runtime-mount sb-input custom"
+  )
+  expect_match(html, 'data-sb-component="input"', fixed = TRUE)
+  expect_match(
+    html,
+    '<input id="email" type="email" class="sb-input-native"',
+    fixed = TRUE
+  )
+  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_identical(payload$id, "email")
+  expect_identical(payload$state$value, "n@example.com")
+  expect_identical(payload$props$placeholder, "you@example.com")
+  expect_identical(payload$props$type, "email")
+  expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$props$style$color, "red")
+  expect_identical(payload$binding$type, "shinyblocks.input")
+})
+
 test_that("textarea emits a runtime payload and hidden native textarea", {
   textarea <- block_textarea(
     "notes",

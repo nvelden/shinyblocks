@@ -9,6 +9,7 @@ source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
 source(file.path("R", "server_popover.R"), local = TRUE)
 source(file.path("R", "server_textarea.R"), local = TRUE)
+source(file.path("R", "server_input.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -117,6 +118,17 @@ sections <- list(
       "placeholder/rows/disabled/invalid state, and update_block_textarea() server updates."
     ),
     file = "textarea.R"
+  ),
+  list(
+    id = "input",
+    label = "Input",
+    icon = "edit",
+    title = "Text input",
+    lead = paste(
+      "Runtime-rendered single-line input with text/password/email/url/tel/search/number types,",
+      "placeholder, disabled/invalid state, and update_block_input() server updates."
+    ),
+    file = "input.R"
   ),
   list(
     id = "field",
@@ -338,6 +350,7 @@ server <- function(input, output, session) {
   register_select_showcase(input, output, session)
   register_checkbox_showcase(input, output, session)
   register_textarea_showcase(input, output, session)
+  register_input_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
 }
