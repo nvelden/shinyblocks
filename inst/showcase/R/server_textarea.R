@@ -125,12 +125,18 @@ register_textarea_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_textarea_clear, {
-    update_block_textarea(session, "showcase_textarea_preview", value = "")
+    update_block_textarea(
+      session,
+      "showcase_textarea_preview",
+      value = "",
+      rows = 3
+    )
     reactive_code(paste0(
       "update_block_textarea(\n",
       "  session = session,\n",
       "  input_id = \"showcase_textarea_preview\",\n",
-      "  value = \"\"\n",
+      "  value = \"\",\n",
+      "  rows = 3\n",
       ")"
     ))
   })
