@@ -8,9 +8,11 @@ block_textarea(
   input_id,
   value = "",
   placeholder = NULL,
-  rows = 2,
+  rows = 3,
   width = NULL,
   disabled = FALSE,
+  invalid = FALSE,
+  style = NULL,
   class = NULL
 )
 }
@@ -23,11 +25,16 @@ block_textarea(
 
 \item{rows}{Number of visible rows.}
 
-\item{width}{Optional CSS width value.}
+\item{width}{Optional CSS width value (applied to the wrapper).}
 
 \item{disabled}{Whether the control is disabled.}
 
-\item{class}{Additional classes.}
+\item{invalid}{Whether the control should show invalid styling
+(sets \code{aria-invalid="true"}).}
+
+\item{style}{Inline CSS styles for the textarea element.}
+
+\item{class}{Additional classes for the wrapper.}
 }
 \value{
 An \code{htmltools} tag.
@@ -52,6 +59,7 @@ Other forms:
 \code{\link{block_switch}()},
 \code{\link{update_block_checkbox}()},
 \code{\link{update_block_select}()},
-\code{\link{update_block_switch}()}
+\code{\link{update_block_switch}()},
+\code{\link{update_block_textarea}()}
 }
 \concept{forms}

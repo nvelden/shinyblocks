@@ -3,7 +3,8 @@
 #showcase_button_api_table table,
 #showcase_dialog_api_table table,
 #showcase_popover_api_table table,
-#showcase_checkbox_api_table table {
+#showcase_checkbox_api_table table,
+#showcase_textarea_api_table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
@@ -17,7 +18,9 @@
 #showcase_popover_api_table th,
 #showcase_popover_api_table td,
 #showcase_checkbox_api_table th,
-#showcase_checkbox_api_table td {
+#showcase_checkbox_api_table td,
+#showcase_textarea_api_table th,
+#showcase_textarea_api_table td {
   border-bottom: 1px solid var(--border);
   padding: 0.75rem;
   text-align: left;
@@ -27,7 +30,8 @@
 #showcase_button_api_table th,
 #showcase_dialog_api_table th,
 #showcase_popover_api_table th,
-#showcase_checkbox_api_table th {
+#showcase_checkbox_api_table th,
+#showcase_textarea_api_table th {
   color: var(--muted-foreground);
   font-weight: 600;
 }
@@ -45,7 +49,10 @@
 #showcase_popover_api_table td:nth-child(3),
 #showcase_checkbox_api_table td:nth-child(1),
 #showcase_checkbox_api_table td:nth-child(2),
-#showcase_checkbox_api_table td:nth-child(3) {
+#showcase_checkbox_api_table td:nth-child(3),
+#showcase_textarea_api_table td:nth-child(1),
+#showcase_textarea_api_table td:nth-child(2),
+#showcase_textarea_api_table td:nth-child(3) {
   white-space: nowrap;
   width: 1%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -72,6 +79,11 @@
 }
 
 .showcase-checkbox-preview-custom .sb-checkbox-indicator {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.showcase-textarea-preview-custom .sb-textarea-control {
   border-style: dashed !important;
   border-width: 2px !important;
 }

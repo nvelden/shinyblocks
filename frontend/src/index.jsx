@@ -98,12 +98,32 @@ function isSwitchPayload(payload) {
   return payload && payload.component === "switch";
 }
 
+function isTextareaPayload(payload) {
+  return payload && payload.component === "textarea";
+}
+
 function nativeSelect(root) {
   return root ? root.querySelector(".sb-select-native") : null;
 }
 
 function nativeCheckbox(root) {
   return root ? root.querySelector(".sb-checkbox-native") : null;
+}
+
+function nativeTextarea(root) {
+  return root.querySelector("textarea.sb-textarea-native");
+}
+
+function setNativeTextareaValue(root, value, notify) {
+  const native = nativeTextarea(root);
+  if (!native) return;
+  const next = value == null ? "" : String(value);
+  if (native.value === next) return;
+  native.value = next;
+  if (notify) {
+    native.dispatchEvent(new Event("input", { bubbles: true }));
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 }
 
 function nativeSwitch(root) {
@@ -611,6 +631,86 @@ function unbindSwitchRoot(root) {
   window.Shiny.unbindAll(root);
 }
 
+function registerTextareaBinding() {
+  if (
+    window.shinyblocksTextareaBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksTextareaBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='textarea'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      return typeof el.__sbTextareaValue === "string" ? el.__sbTextareaValue : "";
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbTextareaReceive === "function") {
+        el.__sbTextareaReceive({ value: value == null ? "" : String(value), notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(true);
+      el.addEventListener("sb:textarea-change", handler);
+      el.__sbTextareaChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbTextareaChangeHandler) return;
+      el.removeEventListener("sb:textarea-change", el.__sbTextareaChangeHandler);
+      delete el.__sbTextareaChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbTextareaReceive === "function") {
+        el.__sbTextareaReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return { policy: "debounce", delay: 250 };
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksTextareaBinding(),
+    "shinyblocks.textarea"
+  );
+  window.shinyblocksTextareaBindingRegistered = true;
+}
+
+function bindTextareaRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindTextareaRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
 function RuntimeMount({ payload, root }) {
   if (payload.component === "button") {
     return <Button payload={payload} />;
@@ -662,6 +762,10 @@ function RuntimeMount({ payload, root }) {
 
   if (payload.component === "switch") {
     return <Switch payload={payload} root={root} />;
+  }
+
+  if (payload.component === "textarea") {
+    return <Textarea payload={payload} root={root} />;
   }
 
   if (payload.component === "select") {
@@ -1644,6 +1748,109 @@ function Switch({ payload, root }) {
   );
 }
 
+function Textarea({ payload, root }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const inputId = payload.id;
+  const initialValue = typeof state.value === "string" ? state.value : "";
+  const [value, setValueState] = useState(initialValue);
+  const [placeholder, setPlaceholder] = useState(props.placeholder || "");
+  const [rows, setRows] = useState(Number(props.rows || 3));
+  const [disabled, setDisabled] = useState(Boolean(props.disabled));
+  const [invalid, setInvalid] = useState(Boolean(props.invalid));
+  const [style, setStyle] = useState(props.style || {});
+  const [className, setClassName] = useState(payload.className || "");
+  const labelledBy = inputId ? labelIdForInput(inputId) : null;
+  const describedBy = root?.getAttribute("aria-describedby") || undefined;
+  const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
+  const isInvalid = invalid || wrapperInvalid;
+
+  useEffect(() => {
+    if (root) {
+      root.__sbTextareaValue = value;
+      root.dataset.sbTextareaValue = value;
+    }
+  }, [value, root]);
+
+  useEffect(() => {
+    if (!root) return;
+    setNativeTextareaValue(root, value, false);
+  }, [value, root]);
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    root.__sbTextareaReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "value")) {
+        const nextValue = nextData.value == null ? "" : String(nextData.value);
+        setValueState(nextValue);
+        setNativeTextareaValue(root, nextValue, Boolean(nextData.notify));
+        if (nextData.notify) {
+          requestAnimationFrame(() => {
+            root.__sbTextareaValue = nextValue;
+            root.dispatchEvent(new CustomEvent("sb:textarea-change"));
+          });
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "placeholder")) {
+        setPlaceholder(nextData.placeholder == null ? "" : String(nextData.placeholder));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "rows")) {
+        const nextRows = Number(nextData.rows);
+        if (Number.isFinite(nextRows) && nextRows >= 1) setRows(nextRows);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
+        const nextDisabled = Boolean(nextData.disabled);
+        setDisabled(nextDisabled);
+        root.toggleAttribute("data-disabled", nextDisabled);
+        const native = nativeTextarea(root);
+        if (native) native.disabled = nextDisabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "invalid")) {
+        setInvalid(Boolean(nextData.invalid));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setClassName(nextData.class || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setStyle(nextData.style || {});
+      }
+    };
+
+    return () => {
+      delete root.__sbTextareaReceive;
+    };
+  }, [inputId, root]);
+
+  function handleChange(event) {
+    const next = event.target.value;
+    setValueState(next);
+    if (root) {
+      root.__sbTextareaValue = next;
+      setNativeTextareaValue(root, next, true);
+      root.dispatchEvent(new CustomEvent("sb:textarea-change"));
+    }
+  }
+
+  return (
+    <textarea
+      className={classNames("sb-textarea-control", className)}
+      data-slot="textarea-control"
+      value={value}
+      placeholder={placeholder || undefined}
+      rows={rows}
+      disabled={disabled}
+      aria-invalid={isInvalid || undefined}
+      aria-labelledby={labelledBy || undefined}
+      aria-describedby={describedBy}
+      style={style}
+      onChange={handleChange}
+    />
+  );
+}
+
 function popoverTransform(side, align) {
   if (side === "top" || side === "bottom") {
     const y = side === "top" ? "-100%" : "0";
@@ -2048,6 +2255,8 @@ function mountRoot(root) {
     bindCheckboxRoot(root);
   } else if (isSwitchPayload(payload)) {
     bindSwitchRoot(root);
+  } else if (isTextareaPayload(payload)) {
+    bindTextareaRoot(root);
   } else {
     bindShinyChildren(root);
   }
@@ -2060,7 +2269,8 @@ function mountRoot(root) {
     !isDialogPayload(payload) &&
     !isPopoverPayload(payload) &&
     !isCheckboxPayload(payload) &&
-    !isSwitchPayload(payload)
+    !isSwitchPayload(payload) &&
+    !isTextareaPayload(payload)
   ) {
     const initialized = setInputValue(payload.id, currentValue(payload), "event");
     if (!initialized) {
@@ -2084,6 +2294,8 @@ function unmountRoot(root) {
     unbindCheckboxRoot(root);
   } else if (isSwitchPayload(mountedRoot.payload)) {
     unbindSwitchRoot(root);
+  } else if (isTextareaPayload(mountedRoot.payload)) {
+    unbindTextareaRoot(root);
   } else {
     unbindShinyChildren(root);
   }
@@ -2226,6 +2438,7 @@ function init() {
   registerPopoverBinding();
   registerCheckboxBinding();
   registerSwitchBinding();
+  registerTextareaBinding();
   mountAll(document);
   observeDynamicUi();
   registerUpdateHandler();
@@ -2250,6 +2463,7 @@ document.addEventListener("shiny:connected", function connected() {
   registerPopoverBinding();
   registerCheckboxBinding();
   registerSwitchBinding();
+  registerTextareaBinding();
   flushPendingInputs(document);
   schedulePendingInputFlush();
 });
