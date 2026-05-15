@@ -940,6 +940,95 @@
   opacity: 0.5;
 }
 
+[data-shinyblocks-root] .sb-radio-group {
+  display: block;
+  width: 100%;
+}
+
+[data-shinyblocks-root] .sb-radio-group-native {
+  display: none;
+}
+
+[data-shinyblocks-root] .sb-radio-group-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+[data-shinyblocks-root] .sb-radio-group-control[data-orientation="horizontal"] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+[data-shinyblocks-root] .sb-radio-group-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+[data-shinyblocks-root] .sb-radio-group-item[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-root] .sb-radio-group-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  border: 1px solid var(--input);
+  border-radius: 9999px;
+  background-color: transparent;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background-color 0.15s;
+}
+
+[data-shinyblocks-root] .sb-radio-group-button:disabled {
+  cursor: not-allowed;
+}
+
+[data-shinyblocks-root] .sb-radio-group-button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+[data-shinyblocks-root] .sb-radio-group-control[aria-invalid="true"] .sb-radio-group-button {
+  border-color: var(--destructive);
+}
+
+[data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] {
+  border-color: var(--primary);
+}
+
+[data-shinyblocks-root] .sb-radio-group-indicator {
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: transparent;
+  transition: background-color 0.15s;
+}
+
+[data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] .sb-radio-group-indicator {
+  background-color: var(--primary);
+}
+
+[data-shinyblocks-root] .sb-radio-group-text {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--foreground);
+  user-select: none;
+}
+
 @keyframes shinyblocks-spin {
   to {
     transform: rotate(360deg);

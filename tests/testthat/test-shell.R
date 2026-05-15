@@ -242,6 +242,45 @@ test_that("field wrappers expose expected classes and child markers", {
   expect_identical(tag_attr(group, "data-sb-child"), "field-group")
 })
 
+test_that("block_radio_group emits a runtime payload with choice records", {
+  rg <- block_radio_group(
+    "channel",
+    choices = c(All = "all", Mentions = "mentions", None = "none"),
+    selected = "mentions",
+    orientation = "horizontal",
+    invalid = TRUE,
+    class = "custom"
+  )
+  html <- render_html(rg)
+  payload <- runtime_payload_from(rg)
+
+  expect_identical(
+    tag_attr(rg, "class"),
+    "sb-runtime-mount sb-radio-group custom"
+  )
+  expect_match(html, 'data-sb-component="radio-group"', fixed = TRUE)
+  expect_match(
+    html,
+    '<input id="channel" type="hidden" class="sb-radio-group-native"',
+    fixed = TRUE
+  )
+  expect_identical(payload$id, "channel")
+  expect_identical(payload$state$value, "mentions")
+  expect_identical(payload$props$orientation, "horizontal")
+  expect_identical(payload$props$invalid, TRUE)
+  expect_identical(length(payload$props$choices), 3L)
+  expect_identical(payload$props$choices[[1]]$value, "all")
+  expect_identical(payload$props$choices[[1]]$label, "All")
+  expect_identical(payload$binding$type, "shinyblocks.radio-group")
+})
+
+test_that("block_radio_group rejects an unknown selected value", {
+  expect_error(
+    block_radio_group("c", choices = c(A = "a", B = "b"), selected = "z"),
+    "must match one of"
+  )
+})
+
 test_that("block_input emits a runtime payload and hidden native input", {
   input <- block_input(
     "email",

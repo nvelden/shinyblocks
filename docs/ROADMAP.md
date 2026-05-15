@@ -163,6 +163,12 @@ phase begins.
 >   `type` (text/password/email/url/tel/search/number), `invalid`
 >   flag, and full server updater for
 >   value/placeholder/type/disabled/invalid/style/class.
+> - **Phase 5.9 radio group** — introduced `block_radio_group()` and
+>   `update_block_radio_group()`. Runtime radio group with hidden
+>   native `<input type="hidden">`, `shinyblocks.radio-group`
+>   binding, arrow-key navigation, `orientation` (vertical/
+>   horizontal), `invalid` flag, and a server updater covering
+>   selected/choices/disabled/invalid/orientation/style/class.
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
