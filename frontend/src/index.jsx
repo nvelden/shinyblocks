@@ -1764,6 +1764,7 @@ function Textarea({ payload, root }) {
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
   const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
   const isInvalid = invalid || wrapperInvalid;
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     if (root) {
@@ -1799,7 +1800,10 @@ function Textarea({ payload, root }) {
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "rows")) {
         const nextRows = Number(nextData.rows);
-        if (Number.isFinite(nextRows) && nextRows >= 1) setRows(nextRows);
+        if (Number.isFinite(nextRows) && nextRows >= 1) {
+          setRows(nextRows);
+          if (textareaRef.current) textareaRef.current.style.height = "";
+        }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
         const nextDisabled = Boolean(nextData.disabled);
@@ -1836,6 +1840,7 @@ function Textarea({ payload, root }) {
 
   return (
     <textarea
+      ref={textareaRef}
       className={classNames("sb-textarea-control", className)}
       data-slot="textarea-control"
       value={value}
