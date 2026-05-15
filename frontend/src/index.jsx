@@ -1788,6 +1788,7 @@ function Textarea({ payload, root }) {
         const nextValue = nextData.value == null ? "" : String(nextData.value);
         setValueState(nextValue);
         setNativeTextareaValue(root, nextValue, Boolean(nextData.notify));
+        if (textareaRef.current) textareaRef.current.style.height = "";
         if (nextData.notify) {
           requestAnimationFrame(() => {
             root.__sbTextareaValue = nextValue;
