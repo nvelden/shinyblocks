@@ -324,11 +324,11 @@ block_alert <- function(
   )
 }
 
-#' Create a dialog (Phase 4.2 — Shiny-bound modal)
+#' Create a dialog (Phase 4.4 — Shiny-bound modal with size + footer)
 #'
 #' A modal dialog rendered into the runtime portal root. Reports its
 #' open/closed state to `input$<id>` and accepts server-driven
-#' updates through `update_block_dialog()`. A.11y behaviors (escape,
+#' updates through `update_block_dialog()`. A11y behaviors (escape,
 #' outside-click, focus trap, focus return, scroll lock) land in 4.3.
 #'
 #' @param id Required input id. `input$<id>` is `TRUE` when open,
@@ -337,11 +337,15 @@ block_alert <- function(
 #' @param ... Body content. Serialized to HTML in 4.1/4.2; arbitrary
 #'   Shiny children become Shiny-bound in a later sub-phase.
 #' @param description Optional description below the title.
+#' @param footer Optional footer content (typically action buttons).
+#'   Renders below the body in a right-aligned flex row.
 #' @param trigger Optional label string. Renders a default-variant
 #'   `block_button()` next to the mount node that opens the dialog
 #'   when clicked. Pass `NULL` (default) to drive open state purely
 #'   from the server with `update_block_dialog()`.
 #' @param open Initial open state. Defaults to `FALSE`.
+#' @param size Content max-width preset. One of `"sm"`, `"default"`,
+#'   `"lg"`, `"xl"`. Defaults to `"default"` (32rem).
 #' @param hide_title Whether to visually hide the title while keeping
 #'   it available to assistive technology as the dialog's accessible
 #'   name. Defaults to `FALSE`.
@@ -355,8 +359,10 @@ block_dialog <- function(
   title,
   ...,
   description = NULL,
+  footer = NULL,
   trigger = NULL,
   open = FALSE,
+  size = c("default", "sm", "lg", "xl"),
   hide_title = FALSE,
   class = NULL
 ) {
@@ -369,6 +375,7 @@ block_dialog <- function(
   if (!is.null(trigger) && (!is.character(trigger) || length(trigger) != 1)) {
     stop("`trigger` must be a single string label or NULL.", call. = FALSE)
   }
+  size <- match.arg(size)
 
   runtime_component(
     component = "dialog",
@@ -381,7 +388,9 @@ block_dialog <- function(
         NULL
       },
       bodyHtml = html_fragment(...),
+      footerHtml = if (!is.null(footer)) html_fragment(footer) else NULL,
       triggerLabel = trigger,
+      size = size,
       hideTitle = isTRUE(hide_title)
     ),
     state = list(value = isTRUE(open), open = isTRUE(open)),
@@ -401,6 +410,9 @@ block_dialog <- function(
 #' @param open Optional boolean. `TRUE` opens, `FALSE` closes.
 #' @param title Optional replacement title.
 #' @param description Optional replacement description.
+#' @param footer Optional replacement footer content. Pass `NULL` to
+#'   remove an existing footer.
+#' @param size Optional content size: `"sm"`, `"default"`, `"lg"`, `"xl"`.
 #' @param notify Whether Shiny receives an input event when `open`
 #'   changes. Cosmetic-only updates never notify.
 #'
@@ -413,6 +425,8 @@ update_block_dialog <- function(
   open,
   title,
   description,
+  footer,
+  size,
   notify = TRUE
 ) {
   if (is.null(session)) {
@@ -437,9 +451,170 @@ update_block_dialog <- function(
   if (!missing(description)) {
     payload$descriptionHtml <- if (is.null(description)) NULL else html_fragment(description)
   }
+  if (!missing(footer)) {
+    payload["footerHtml"] <- list(if (is.null(footer)) NULL else html_fragment(footer))
+  }
+  if (!missing(size)) {
+    allowed <- c("default", "sm", "lg", "xl")
+    if (!is.character(size) || length(size) != 1 || !(size %in% allowed)) {
+      stop(
+        sprintf(
+          "`size` must be one of %s.",
+          paste(shQuote(allowed), collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+    payload$size <- size
+  }
 
   payload$notify <- isTRUE(notify) && "open" %in% names(payload)
   message_target <- runtime_mount_id("dialog", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
+}
+
+#' Create a runtime popover
+#'
+#' A non-modal, portal-rendered popover anchored to a trigger button.
+#' Popovers with an `id` report their open/closed state to `input$<id>`
+#' and accept server-driven updates through `update_block_popover()`.
+#' Popovers without an `id` stay client-only.
+#'
+#' @param trigger Required label string. Renders a default-variant
+#'   `block_button()` that toggles the popover when clicked.
+#' @param ... Popover body content. Serialized to HTML.
+#' @param id Optional input id. When supplied, `input$<id>` is `TRUE`
+#'   when open and `FALSE` when closed.
+#' @param side Side of the trigger to anchor on. One of `"bottom"`,
+#'   `"top"`, `"left"`, `"right"`. Defaults to `"bottom"`.
+#' @param align Alignment along the anchored side. One of `"center"`,
+#'   `"start"`, `"end"`. Defaults to `"center"`.
+#' @param open Initial open state. Defaults to `FALSE`.
+#' @param style Optional inline CSS applied to the popover content
+#'   container (string or named list).
+#' @param class Additional classes for the popover content container.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_popover <- function(
+  trigger,
+  ...,
+  id = NULL,
+  side = c("bottom", "top", "left", "right"),
+  align = c("center", "start", "end"),
+  open = FALSE,
+  style = NULL,
+  class = NULL
+) {
+  if (missing(trigger) || is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
+    stop("`trigger` must be a single string label.", call. = FALSE)
+  }
+  if (!is.null(id)) {
+    validate_input_id(id)
+  }
+  side <- match.arg(side)
+  align <- match.arg(align)
+
+  content_style <- if (!is.null(style)) normalize_runtime_style(style) else NULL
+
+  runtime_component(
+    component = "popover",
+    input_id = id,
+    props = list(
+      triggerLabel = trigger,
+      bodyHtml = html_fragment(...),
+      side = side,
+      align = align,
+      contentStyle = content_style,
+      contentClass = class
+    ),
+    state = list(value = isTRUE(open), open = isTRUE(open)),
+    binding = if (is.null(id)) {
+      list(input = FALSE)
+    } else {
+      list(input = TRUE, type = "shinyblocks.popover")
+    }
+  )
+}
+
+#' Update a runtime popover
+#'
+#' Send a server-driven update to a `block_popover()`.
+#'
+#' @param session Shiny session. Defaults to the current reactive
+#'   session.
+#' @param input_id Popover input id (unnamespaced; updaters namespace
+#'   via `session$ns()`).
+#' @param open Optional boolean. `TRUE` opens, `FALSE` closes.
+#' @param trigger Optional replacement trigger label.
+#' @param body Optional replacement body content. Pass `NULL` to clear.
+#' @param side Optional side: `"bottom"`, `"top"`, `"left"`, `"right"`.
+#' @param align Optional alignment: `"center"`, `"start"`, `"end"`.
+#' @param style Optional replacement content style (CSS string or named
+#'   list). Pass `NULL` to clear.
+#' @param class Optional replacement content classes. Pass `NULL` to
+#'   clear.
+#' @param notify Whether Shiny receives an input event when `open`
+#'   changes. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family content
+#' @export
+update_block_popover <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  open,
+  trigger,
+  body,
+  side,
+  align,
+  style,
+  class,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(open)) {
+    payload$open <- isTRUE(open)
+  }
+  if (!missing(trigger)) {
+    if (is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
+      stop("`trigger` must be a single string label.", call. = FALSE)
+    }
+    payload$triggerLabel <- trigger
+  }
+  if (!missing(body)) {
+    payload["bodyHtml"] <- list(if (is.null(body)) NULL else html_fragment(body))
+  }
+  if (!missing(side)) {
+    payload$side <- match.arg(side, c("bottom", "top", "left", "right"))
+  }
+  if (!missing(align)) {
+    payload$align <- match.arg(align, c("center", "start", "end"))
+  }
+  if (!missing(style)) {
+    payload["contentStyle"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["contentClass"] <- list(class)
+  }
+
+  payload$notify <- isTRUE(notify) && "open" %in% names(payload)
+  message_target <- runtime_mount_id("popover", session$ns(input_id))
 
   session$sendInputMessage(message_target, payload)
   invisible(NULL)

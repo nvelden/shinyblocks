@@ -1,6 +1,10 @@
 render_example <- function(path) {
-  code <- readLines(path, warn = FALSE)
-  rendered <- eval(parse(text = code), envir = new.env(parent = globalenv()))
+  code <- readLines(path, warn = FALSE, encoding = "UTF-8")
+  Encoding(code) <- "UTF-8"
+  rendered <- eval(
+    parse(text = code, encoding = "UTF-8"),
+    envir = new.env(parent = globalenv())
+  )
   list(rendered = rendered, code = paste(code, collapse = "\n"))
 }
 

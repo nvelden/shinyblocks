@@ -59,6 +59,8 @@ Other forms:
 \code{\link{block_select}()},
 \code{\link{block_switch}()},
 \code{\link{block_textarea}()},
-\code{\link{update_block_select}()}
+\code{\link{update_block_checkbox}()},
+\code{\link{update_block_select}()},
+\code{\link{update_block_switch}()}
 }
 \concept{forms}

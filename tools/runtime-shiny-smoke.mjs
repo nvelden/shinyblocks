@@ -112,6 +112,102 @@ try {
       document.querySelector("#runtime_select-trigger")?.disabled === false;
   });
 
+  await assertText(page, "#runtime_checkbox_value", "FALSE");
+  await page.locator("[data-sb-component='checkbox'] [data-slot='checkbox-control']").evaluate((node) => {
+    node.click();
+  });
+  await assertText(page, "#runtime_checkbox_value", "TRUE");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_checkbox")?.checked),
+    true,
+    "runtime checkbox should keep the hidden native value"
+  );
+  await page.locator("[data-sb-component='checkbox'] [data-slot='checkbox-control']").evaluate((node) => {
+    node.click();
+  });
+  await assertText(page, "#runtime_checkbox_value", "FALSE");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_checkbox")?.checked),
+    false,
+    "runtime checkbox should toggle hidden native value back to false"
+  );
+
+  await assertText(page, "#runtime_switch_value", "FALSE");
+  await page.locator("[data-sb-component='switch'] [data-slot='switch-control']").evaluate((node) => {
+    node.click();
+  });
+  await assertText(page, "#runtime_switch_value", "TRUE");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_switch")?.checked),
+    true,
+    "runtime switch should keep the hidden native value"
+  );
+  await page.click("#set_switch_off");
+  await assertText(page, "#runtime_switch_value", "FALSE");
+  await page.click("#set_switch_on");
+  await assertText(page, "#runtime_switch_value", "TRUE");
+  await page.click("#disable_switch");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_switch")?.disabled === true &&
+      document.querySelector("[data-sb-component='switch'] [data-slot='switch-control']")?.disabled === true;
+  });
+  await page.click("#enable_switch");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_switch")?.disabled === false &&
+      document.querySelector("[data-sb-component='switch'] [data-slot='switch-control']")?.disabled === false;
+  });
+
+  await assertText(page, "#runtime_popover_value", "FALSE");
+  await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({
+    state: "visible"
+  });
+  await assertText(page, "#runtime_popover_value", "TRUE");
+  await page.click("#runtime_popover_inner");
+  assert.equal(
+    await page.evaluate(() => document.activeElement?.id),
+    "runtime_popover_inner",
+    "inner popover control should be focusable when open"
+  );
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='popover-content']");
+  });
+  await assertText(page, "#runtime_popover_value", "FALSE");
+  assert.equal(
+    await page.evaluate(() => document.activeElement?.getAttribute("data-slot")),
+    "popover-trigger",
+    "closing popover should return focus to the trigger"
+  );
+
+  await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({
+    state: "visible"
+  });
+  await page.click("#host-button");
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='popover-content']");
+  });
+  await assertText(page, "#runtime_popover_value", "FALSE");
+
+  await page.click("#open_popover");
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({
+    state: "visible"
+  });
+  await assertText(page, "#runtime_popover_value", "TRUE");
+  await page.click("#update_popover_body");
+  await page.waitForFunction(() => {
+    const content = document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='popover-content']"
+    );
+    return content && content.textContent && content.textContent.includes("Updated from server");
+  });
+  await page.click("#close_popover");
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='popover-content']");
+  });
+  await assertText(page, "#runtime_popover_value", "FALSE");
+
   await page.click("#set_b");
   await assertText(page, "#choice_value", "b");
 

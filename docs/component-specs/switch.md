@@ -2,6 +2,7 @@
 
 > Shinyblocks function: `block_switch()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/switch>
+> Status: **Phase 5.5 - runtime switch migration**.
 
 ## States
 
@@ -28,9 +29,14 @@
 
 ## Deliberate divergences from shadcn
 
-- `block_switch()` wraps `shiny::checkboxInput()` rather than emitting
-  a bespoke switch runtime. Checked state still comes from the native
-  checkbox input.
+- React runtime is package-local (`component = "switch"`); we do not
+  ship Radix switch primitives.
+- A hidden native `<input type="checkbox">` remains in the mount so the
+  Shiny-side value source stays native while the visible shell matches
+  shadcn styling.
+- Shiny input wiring is handled by a component-specific
+  `ShinyblocksSwitchBinding` (`shinyblocks.switch`) instead of relying on
+  Shiny's default checkbox binding.
 
 ## Reference screenshot
 

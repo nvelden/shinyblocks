@@ -129,9 +129,36 @@ ui <- shiny::fluidPage(
     size = "lg",
     class = "runtime-select-fixture"
   ),
+  block_checkbox(
+    "runtime_checkbox",
+    "Runtime checkbox",
+    value = FALSE,
+    class = "runtime-checkbox-fixture"
+  ),
+  block_switch(
+    "runtime_switch",
+    "Runtime switch",
+    value = FALSE,
+    class = "runtime-switch-fixture"
+  ),
+  block_popover(
+    id = "runtime_popover",
+    trigger = "Open popover",
+    side = "bottom",
+    align = "center",
+    htmltools::tags$p("Popover body"),
+    htmltools::tags$button(
+      id = "runtime_popover_inner",
+      type = "button",
+      "Inner action"
+    )
+  ),
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
   shiny::verbatimTextOutput("runtime_select_value"),
+  shiny::verbatimTextOutput("runtime_checkbox_value"),
+  shiny::verbatimTextOutput("runtime_switch_value"),
+  shiny::verbatimTextOutput("runtime_popover_value"),
   shiny::actionButton("set_b", "Set B"),
   shiny::actionButton("clear_choice", "Clear"),
   shiny::actionButton("disable_choice", "Disable"),
@@ -140,6 +167,13 @@ ui <- shiny::fluidPage(
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
   shiny::actionButton("enable_select", "Enable select"),
+  shiny::actionButton("set_switch_on", "Set switch on"),
+  shiny::actionButton("set_switch_off", "Set switch off"),
+  shiny::actionButton("disable_switch", "Disable switch"),
+  shiny::actionButton("enable_switch", "Enable switch"),
+  shiny::actionButton("open_popover", "Open popover"),
+  shiny::actionButton("close_popover", "Close popover"),
+  shiny::actionButton("update_popover_body", "Update popover body"),
   shiny::actionButton("toggle_dynamic", "Toggle dynamic"),
   shiny::actionButton("insert_runtime", "Insert runtime"),
   shiny::actionButton("remove_runtime", "Remove runtime"),
@@ -172,6 +206,36 @@ server <- function(input, output, session) {
       return("<EMPTY>")
     }
     value
+  })
+  output$runtime_checkbox_value <- shiny::renderText({
+    value <- input$runtime_checkbox
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (isTRUE(value)) {
+      return("TRUE")
+    }
+    "FALSE"
+  })
+  output$runtime_switch_value <- shiny::renderText({
+    value <- input$runtime_switch
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (isTRUE(value)) {
+      return("TRUE")
+    }
+    "FALSE"
+  })
+  output$runtime_popover_value <- shiny::renderText({
+    value <- input$runtime_popover
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (isTRUE(value)) {
+      return("TRUE")
+    }
+    "FALSE"
   })
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
@@ -247,6 +311,65 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_select",
       disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_switch_on, {
+    update_block_switch(
+      session = session,
+      input_id = "runtime_switch",
+      checked = TRUE,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$set_switch_off, {
+    update_block_switch(
+      session = session,
+      input_id = "runtime_switch",
+      checked = FALSE,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_switch, {
+    update_block_switch(
+      session = session,
+      input_id = "runtime_switch",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_switch, {
+    update_block_switch(
+      session = session,
+      input_id = "runtime_switch",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$open_popover, {
+    update_block_popover(
+      session = session,
+      input_id = "runtime_popover",
+      open = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$close_popover, {
+    update_block_popover(
+      session = session,
+      input_id = "runtime_popover",
+      open = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$update_popover_body, {
+    update_block_popover(
+      session = session,
+      input_id = "runtime_popover",
+      open = TRUE,
+      body = htmltools::tags$p("Updated from server")
     )
   })
 

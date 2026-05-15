@@ -2,9 +2,28 @@
 
 > Shinyblocks function: `block_dialog()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/dialog>
-> Status: **Phase 4.3 — accessibility hardening**. Variants and parity
-> arrive in 4.4–4.5. See GitHub issue #1 for the full sub-phase
+> Status: **Phase 4.4 — size + footer slot**. Parity entry and final
+> cleanup arrive in 4.5. See GitHub issue #1 for the full sub-phase
 > breakdown.
+
+## Phase 4.4 variants + slots
+
+- New `size` argument: `"sm"` (24rem), `"default"` (32rem), `"lg"`
+  (48rem), `"xl"` (64rem). Emits an `sb-dialog-content-size-<size>`
+  class and a `data-size` attribute on the content container.
+  `update_block_dialog(size = ...)` resizes from the server. Invalid
+  values raise informative errors at both the R API and the updater.
+- New `footer` slot: optional `htmltools` content rendered below the
+  body in `.sb-dialog-footer`. Layout is a right-aligned, wrapping
+  flex row with `gap: 0.5rem`, so a single action button or a chain
+  of three buttons both render correctly without media queries. `update_block_dialog(footer = ...)` swaps the
+  footer content. Passing `footer = NULL` to the updater clears it.
+- Composed helpers (`block_dialog_header()`, `block_dialog_title()`,
+  `block_dialog_description()`, `block_dialog_footer()`) are
+  intentionally deferred — flat `title` / `description` / `footer`
+  arguments cover the Shiny composition story without requiring a
+  per-helper sync bundle. Revisit if user feedback demands richer
+  composition.
 
 ## Phase 4.3 accessibility contract
 

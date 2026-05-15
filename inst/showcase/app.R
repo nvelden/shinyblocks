@@ -5,7 +5,9 @@ source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
 source(file.path("R", "server_button.R"), local = TRUE)
 source(file.path("R", "server_select.R"), local = TRUE)
+source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
+source(file.path("R", "server_popover.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -92,6 +94,17 @@ sections <- list(
     title = "Select",
     lead = NULL,
     file = "select.R"
+  ),
+  list(
+    id = "checkbox",
+    label = "Checkbox",
+    icon = "check",
+    title = "Checkbox",
+    lead = paste(
+      "Runtime-rendered checkbox with native Shiny value binding,",
+      "checked/disabled/invalid states, and token-driven styling."
+    ),
+    file = "checkbox.R"
   ),
   list(
     id = "field",
@@ -192,11 +205,22 @@ sections <- list(
     icon = "message-circle",
     title = "Dialogs",
     lead = paste(
-      "Phase 4.1 skeleton — portal-rendered modal with overlay and",
-      "close button. Shiny binding, trigger, escape/outside-click,",
-      "and update_block_dialog() arrive in later sub-phases."
+      "Portal-rendered modal with overlay, close button, focus trap,",
+      "and full Shiny input binding. Variants, server-side updates,",
+      "and accessibility behaviors covered below."
     ),
     file = "dialog.R"
+  ),
+  list(
+    id = "popover",
+    label = "Popover",
+    icon = "panel-right",
+    title = "Popovers",
+    lead = paste(
+      "Portal-rendered non-modal overlays with trigger, positioning,",
+      "and Shiny open-state/update wiring."
+    ),
+    file = "popover.R"
   )
 )
 
@@ -300,7 +324,9 @@ ui <- block_page(
 server <- function(input, output, session) {
   register_button_showcase(input, output, session)
   register_select_showcase(input, output, session)
+  register_checkbox_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
+  register_popover_showcase(input, output, session)
 }
 
 shinyApp(ui, server)

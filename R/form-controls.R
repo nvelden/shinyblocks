@@ -57,6 +57,7 @@ block_textarea <- function(
 #' @param label Checkbox label.
 #' @param value Whether the checkbox starts checked.
 #' @param disabled Whether the control is disabled.
+#' @param style Inline CSS styles.
 #' @param class Additional classes.
 #'
 #' @return An `htmltools` tag.
@@ -67,32 +68,91 @@ block_checkbox <- function(
   label,
   value = FALSE,
   disabled = FALSE,
+  style = NULL,
   class = NULL
 ) {
-  control <- boolean_control_input(input_id, value, disabled)
+  validate_input_id(input_id)
 
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes(
-        "form-group",
-        "shiny-input-container",
-        "sb-checkbox",
-        class
-      ),
-      htmltools::tags$div(
-        class = "sb-checkbox-shell",
-        htmltools::tags$label(
-          class = "sb-checkbox-label",
-          control,
-          htmltools::tags$span(
-            class = "sb-checkbox-indicator",
-            `aria-hidden` = "true"
-          ),
-          htmltools::tags$span(class = "sb-checkbox-text", label)
-        )
-      )
-    )
+  hidden_native <- htmltools::tags$input(
+    id = input_id,
+    type = "checkbox",
+    class = "sb-checkbox-native",
+    tabindex = "-1",
+    `aria-hidden` = "true",
+    `data-shiny-no-bind-input` = "",
+    checked = if (isTRUE(value)) NA else NULL,
+    disabled = if (isTRUE(disabled)) NA else NULL
   )
+
+  runtime_component(
+    component = "checkbox",
+    props = list(
+      labelHtml = html_fragment(label),
+      disabled = isTRUE(disabled),
+      style = normalize_runtime_style(style)
+    ),
+    input_id = input_id,
+    state = list(value = isTRUE(value)),
+    binding = list(input = TRUE, type = "shinyblocks.checkbox"),
+    class = merge_classes("sb-checkbox", class),
+    children = list(hidden_native)
+  )
+}
+
+#' Update a runtime checkbox input
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_checkbox()`.
+#' @param checked Optional checked state.
+#' @param disabled Optional disabled state.
+#' @param style Optional replacement inline CSS styles.
+#' @param class Optional replacement classes.
+#' @param notify Whether Shiny should receive an input event when `checked`
+#'   is updated. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family forms
+#' @export
+update_block_checkbox <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  checked,
+  disabled,
+  style,
+  class,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(checked)) {
+    payload$checked <- isTRUE(checked)
+  }
+  if (!missing(disabled)) {
+    payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["class"] <- list(class)
+  }
+
+  payload$notify <- isTRUE(notify) && "checked" %in% names(payload)
+  message_target <- runtime_mount_id("checkbox", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
 }
 
 #' Create a styled switch input
@@ -101,6 +161,7 @@ block_checkbox <- function(
 #' @param label Switch label.
 #' @param value Whether the switch starts on.
 #' @param disabled Whether the control is disabled.
+#' @param style Inline CSS styles.
 #' @param class Additional classes.
 #'
 #' @return An `htmltools` tag.
@@ -111,37 +172,91 @@ block_switch <- function(
   label,
   value = FALSE,
   disabled = FALSE,
+  style = NULL,
   class = NULL
 ) {
-  control <- boolean_control_input(input_id, value, disabled)
-  control$attribs[["class"]] <- merge_classes(
-    control$attribs[["class"]],
-    "sb-switch-control"
-  )
-  control$attribs[["role"]] <- "switch"
+  validate_input_id(input_id)
 
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes(
-        "form-group",
-        "shiny-input-container",
-        "sb-switch",
-        class
-      ),
-      htmltools::tags$div(
-        class = "sb-switch-shell",
-        htmltools::tags$label(
-          class = "sb-switch-label",
-          control,
-          htmltools::tags$span(
-            class = "sb-switch-track",
-            `aria-hidden` = "true"
-          ),
-          htmltools::tags$span(class = "sb-switch-text", label)
-        )
-      )
-    )
+  hidden_native <- htmltools::tags$input(
+    id = input_id,
+    type = "checkbox",
+    class = "sb-switch-native",
+    tabindex = "-1",
+    `aria-hidden` = "true",
+    `data-shiny-no-bind-input` = "",
+    checked = if (isTRUE(value)) NA else NULL,
+    disabled = if (isTRUE(disabled)) NA else NULL
   )
+
+  runtime_component(
+    component = "switch",
+    props = list(
+      labelHtml = html_fragment(label),
+      disabled = isTRUE(disabled),
+      style = normalize_runtime_style(style)
+    ),
+    input_id = input_id,
+    state = list(value = isTRUE(value)),
+    binding = list(input = TRUE, type = "shinyblocks.switch"),
+    class = merge_classes("sb-switch", class),
+    children = list(hidden_native)
+  )
+}
+
+#' Update a runtime switch input
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_switch()`.
+#' @param checked Optional checked state.
+#' @param disabled Optional disabled state.
+#' @param style Optional replacement inline CSS styles.
+#' @param class Optional replacement classes.
+#' @param notify Whether Shiny should receive an input event when `checked`
+#'   is updated. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family forms
+#' @export
+update_block_switch <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  checked,
+  disabled,
+  style,
+  class,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(checked)) {
+    payload$checked <- isTRUE(checked)
+  }
+  if (!missing(disabled)) {
+    payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["class"] <- list(class)
+  }
+
+  payload$notify <- isTRUE(notify) && "checked" %in% names(payload)
+  message_target <- runtime_mount_id("switch", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
 }
 
 #' Create a styled slider input

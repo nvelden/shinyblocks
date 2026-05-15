@@ -2,6 +2,7 @@
 
 > Shinyblocks function: `block_checkbox()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/checkbox>
+> Status: **Phase 5.4 - runtime checkbox migration**.
 
 ## States
 
@@ -28,9 +29,14 @@
 
 ## Deliberate divergences from shadcn
 
-- `block_checkbox()` wraps `shiny::checkboxInput()` and preserves the
-  native checkbox input for Shiny bindings instead of using Radix state
-  attributes.
+- React runtime is package-local (`component = "checkbox"`); we do not
+  ship Radix checkbox primitives.
+- A hidden native `<input type="checkbox">` remains in the mount so the
+  Shiny-side value source stays native while the visible shell matches
+  shadcn styling.
+- Shiny input wiring is handled by a component-specific
+  `ShinyblocksCheckboxBinding` (`shinyblocks.checkbox`) instead of
+  relying on Shiny's default checkbox binding.
 
 ## Reference screenshot
 

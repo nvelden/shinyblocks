@@ -1,6 +1,9 @@
 /* Custom styles for the API Reference table */
 #showcase_select_api_table table,
-#showcase_button_api_table table {
+#showcase_button_api_table table,
+#showcase_dialog_api_table table,
+#showcase_popover_api_table table,
+#showcase_checkbox_api_table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
@@ -8,14 +11,23 @@
 #showcase_select_api_table th,
 #showcase_select_api_table td,
 #showcase_button_api_table th,
-#showcase_button_api_table td {
+#showcase_button_api_table td,
+#showcase_dialog_api_table th,
+#showcase_dialog_api_table td,
+#showcase_popover_api_table th,
+#showcase_popover_api_table td,
+#showcase_checkbox_api_table th,
+#showcase_checkbox_api_table td {
   border-bottom: 1px solid var(--border);
   padding: 0.75rem;
   text-align: left;
   vertical-align: top;
 }
 #showcase_select_api_table th,
-#showcase_button_api_table th {
+#showcase_button_api_table th,
+#showcase_dialog_api_table th,
+#showcase_popover_api_table th,
+#showcase_checkbox_api_table th {
   color: var(--muted-foreground);
   font-weight: 600;
 }
@@ -24,7 +36,16 @@
 #showcase_select_api_table td:nth-child(3),
 #showcase_button_api_table td:nth-child(1),
 #showcase_button_api_table td:nth-child(2),
-#showcase_button_api_table td:nth-child(3) {
+#showcase_button_api_table td:nth-child(3),
+#showcase_dialog_api_table td:nth-child(1),
+#showcase_dialog_api_table td:nth-child(2),
+#showcase_dialog_api_table td:nth-child(3),
+#showcase_popover_api_table td:nth-child(1),
+#showcase_popover_api_table td:nth-child(2),
+#showcase_popover_api_table td:nth-child(3),
+#showcase_checkbox_api_table td:nth-child(1),
+#showcase_checkbox_api_table td:nth-child(2),
+#showcase_checkbox_api_table td:nth-child(3) {
   white-space: nowrap;
   width: 1%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -40,11 +61,28 @@
   border-style: dashed !important;
 }
 
+.showcase-dialog-preview-custom {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.showcase-popover-preview-custom {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.showcase-checkbox-preview-custom .sb-checkbox-indicator {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
 /* Styles for native shiny::verbatimTextOutput blocks */
 pre.shiny-text-output {
   margin: 0;
   padding: 0.75rem 1rem;
-  overflow-x: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
   background: var(--muted);
   color: var(--foreground);
   border-radius: 0.5rem;

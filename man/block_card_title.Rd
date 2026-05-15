@@ -30,10 +30,12 @@ Other content:
 \code{\link{block_card_header}()},
 \code{\link{block_dialog}()},
 \code{\link{block_empty}()},
+\code{\link{block_popover}()},
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
 \code{\link{block_value_box}()},
-\code{\link{update_block_dialog}()}
+\code{\link{update_block_dialog}()},
+\code{\link{update_block_popover}()}
 }
 \concept{content}

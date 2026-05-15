@@ -47,6 +47,13 @@ specific artifact is ready to become part of the public workflow.
 - Stateful components follow Shiny input/update semantics, including
   module namespacing and dynamic UI cleanup.
 - Accessibility is part of the component contract, not an afterthought.
+- Every showcase component page uses the same full interactive playground
+  contract: preview, `input$` value, UI Definition, Server Action,
+  Content controls, State controls, Actions (Server Update), Styling
+  controls (`style` + `class`), and API Reference. For each component,
+  the playground controls must cover all supported public constructor
+  arguments; when an `update_block_*()` helper exists, include Actions
+  buttons that exercise that updater contract.
 - Every exported component has a **gallery page** with an embedded
   Shinylive demo and visible source, modelled on
   <https://shiny.posit.co/r/components/>. See
