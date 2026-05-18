@@ -30,6 +30,26 @@
 - `block_badge()` is a plain content primitive; if a consumer wants a
   clickable badge, they compose that outside the helper.
 
+## Parity normalisation notes
+
+The runtime CSS and the Tailwind v4 reference page produce visually
+identical badges but differ in two computed-style idioms. Both are
+normalised in `tools/parity/normalise.mjs`:
+
+- **`border-radius`** — Tailwind v4 emits `rounded-full` as
+  `calc(infinity * 1px)`, which Chromium computes to ~`3.35544e+07px`.
+  The runtime uses an explicit `9999px`. Any `border-radius >= 9999px`
+  collapses to the sentinel `"pill"` for diffing.
+- **`display`** — Tailwind v4 emits `inline-flex` using the two-value
+  syntax `display: inline flex`, which Chromium's `getComputedStyle`
+  reports as `flex`. The runtime uses single-keyword `inline-flex`.
+  Both yield an inline-level flex container; the normaliser collapses
+  `flex`, `inline-flex`, and `inline flex` to canonical `inline-flex`.
+
+The dark-mode destructive tint (`color-mix(... 60%, transparent)`) is
+implemented in `frontend/src/styles/runtime.css` to match
+`dark:bg-destructive/60` upstream.
+
 ## Reference screenshot
 
 ![Badge](_screenshots/badge.png)

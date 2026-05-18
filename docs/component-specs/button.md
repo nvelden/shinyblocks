@@ -44,6 +44,22 @@
 | Invalid ring | `--destructive`, `--border` |
 | Radius | `--radius-md` |
 
+## Shiny state and update contract
+
+- Pass `id = "..."` (via `...`) to `block_button()` to make the button
+  addressable from the server via `update_block_button()`. Without an
+  id, the button is purely presentational and emits no runtime input
+  binding.
+- The runtime registers a `shinyblocks.button` input binding that is
+  receive-only — it never reports a value to `input$<id>`. Use
+  `shiny::actionButton()` if you need click counts; use `block_button()`
+  when you want shadcn fidelity plus server-driven updates to label,
+  variant, size, icon, icon position, disabled state, inline style, or
+  wrapper class.
+- `update_block_button()` accepts the same set of fields. Omitted
+  arguments are preserved on the client. Pass `icon = NULL` or
+  `style = NULL` to clear those props explicitly.
+
 ## Deliberate divergences from shadcn
 
 - Always emits `type="button"` so the control never accidentally

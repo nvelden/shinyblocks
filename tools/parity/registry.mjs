@@ -196,7 +196,7 @@ async function prepareFocusState(page, state, selector) {
 
 async function prepareSelectOpenState(page, _state, selector) {
   await page.locator(selector).first().click();
-  await page.waitForSelector('[data-sb-section="field"] .sb-select .selectize-dropdown', {
+  await page.waitForSelector('[data-slot="select-content"][data-state="open"]', {
     state: "visible",
     timeout: 10000
   });
@@ -331,8 +331,8 @@ export const REGISTRY = {
       vertical: '[data-parity-component="separator"] [data-parity-state="vertical"]'
     },
     showcaseSelectors: {
-      horizontal: '[data-sb-section="separator"] .sb-parity-separator-horizontal',
-      vertical: '[data-sb-section="separator"] .sb-parity-separator-vertical'
+      horizontal: '[data-sb-section="separator"] .sb-parity-separator-horizontal[data-slot="separator"]',
+      vertical: '[data-sb-section="separator"] .sb-parity-separator-vertical[data-slot="separator"]'
     },
     props: SEPARATOR_PROPS,
     states: ["horizontal", "vertical"],
@@ -369,8 +369,8 @@ export const REGISTRY = {
       disabled: '[data-parity-component="button"] [data-parity-state="disabled"]'
     },
     showcaseSelectors: {
-      default: '[data-sb-section="button"] .sb-button:not([disabled])',
-      disabled: '[data-sb-section="button"] .sb-button[disabled]'
+      default: '[data-sb-section="button"] button.sb-parity-button-default[data-slot="button"]',
+      disabled: '[data-sb-section="button"] button.sb-parity-button-disabled[data-slot="button"]'
     },
     props: BUTTON_PROPS,
     states: ["default", "hover", "disabled"],
@@ -387,8 +387,8 @@ export const REGISTRY = {
     },
     showcaseSelectors: {
       default:
-        '[data-sb-section="field"] .sb-select .selectize-control.single .selectize-input',
-      open: '[data-sb-section="field"] .sb-select .selectize-control.single .selectize-input'
+        '[data-sb-section="field"] .sb-parity-select-default button[data-slot="select-trigger"]',
+      open: '[data-sb-section="field"] .sb-parity-select-default button[data-slot="select-trigger"]'
     },
     props: SELECT_PROPS,
     states: ["default", "open"],
@@ -501,11 +501,11 @@ export const REGISTRY = {
         },
         showcaseSelectors: {
           default:
-            '[data-sb-section="field"] .sb-parity-checkbox-default .sb-checkbox-indicator',
+            '[data-sb-section="field"] .sb-parity-checkbox-default button[data-slot="checkbox-control"]',
           checked:
-            '[data-sb-section="field"] .sb-parity-checkbox-checked .sb-checkbox-indicator',
+            '[data-sb-section="field"] .sb-parity-checkbox-checked button[data-slot="checkbox-control"]',
           disabled:
-            '[data-sb-section="field"] .sb-parity-checkbox-disabled .sb-checkbox-indicator'
+            '[data-sb-section="field"] .sb-parity-checkbox-disabled button[data-slot="checkbox-control"]'
         }
       }
     },
@@ -541,9 +541,9 @@ export const REGISTRY = {
             '[data-parity-component="switch"] [data-parity-state="disabled"] [data-parity-role="track"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="field"] .sb-parity-switch-default .sb-switch-track',
-          checked: '[data-sb-section="field"] .sb-parity-switch-checked .sb-switch-track',
-          disabled: '[data-sb-section="field"] .sb-parity-switch-disabled .sb-switch-track'
+          default: '[data-sb-section="field"] .sb-parity-switch-default button[data-slot="switch-control"]',
+          checked: '[data-sb-section="field"] .sb-parity-switch-checked button[data-slot="switch-control"]',
+          disabled: '[data-sb-section="field"] .sb-parity-switch-disabled button[data-slot="switch-control"]'
         }
       }
     },

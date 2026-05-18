@@ -415,6 +415,64 @@ function registerDialogBinding() {
   window.shinyblocksDialogBindingRegistered = true;
 }
 
+function registerButtonBinding() {
+  if (
+    window.shinyblocksButtonBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksButtonBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='button'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue() {
+      return null;
+    }
+
+    setValue() {}
+
+    subscribe() {}
+
+    unsubscribe() {}
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbButtonReceive === "function") {
+        el.__sbButtonReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksButtonBinding(),
+    "shinyblocks.button"
+  );
+  window.shinyblocksButtonBindingRegistered = true;
+}
+
 function bindDialogRoot(root) {
   if (!window.Shiny || !window.Shiny.bindAll) return;
   window.Shiny.bindAll(root);
@@ -696,7 +754,11 @@ function registerTextareaBinding() {
     }
 
     getValue(el) {
-      return typeof el.__sbTextareaValue === "string" ? el.__sbTextareaValue : "";
+      if (typeof el.__sbTextareaValue === "string") return el.__sbTextareaValue;
+      // React mounts asynchronously; Shiny reports initial input values before
+      // the first effect runs, so fall back to the payload's state.value.
+      const initial = currentValue(readPayload(el));
+      return typeof initial === "string" ? initial : "";
     }
 
     setValue(el, value) {
@@ -776,7 +838,9 @@ function registerInputBinding() {
     }
 
     getValue(el) {
-      return typeof el.__sbInputValue === "string" ? el.__sbInputValue : "";
+      if (typeof el.__sbInputValue === "string") return el.__sbInputValue;
+      const initial = currentValue(readPayload(el));
+      return typeof initial === "string" ? initial : "";
     }
 
     setValue(el, value) {
@@ -907,7 +971,7 @@ function unbindRadioGroupRoot(root) {
 
 function RuntimeMount({ payload, root }) {
   if (payload.component === "button") {
-    return <Button payload={payload} />;
+    return <Button payload={payload} root={root} />;
   }
 
   if (payload.component === "badge") {
@@ -1045,29 +1109,87 @@ function Icon({ payload }) {
   );
 }
 
-function Button({ payload }) {
-  const props = payload.props || {};
-  const iconPosition = props.iconPosition || "inline-start";
-  const attrs = passthroughAttrs(props.attrs);
+function Button({ payload, root }) {
+  const initialProps = payload.props || {};
+  const attrs = passthroughAttrs(initialProps.attrs);
+
+  const [labelHtml, setLabelHtml] = useState(initialProps.labelHtml || "");
+  const [variant, setVariant] = useState(initialProps.variant || "default");
+  const [size, setSize] = useState(initialProps.size || "default");
+  const [iconName, setIconName] = useState(initialProps.iconName || null);
+  const [iconHtml, setIconHtml] = useState(initialProps.iconHtml || null);
+  const [iconPosition, setIconPosition] = useState(initialProps.iconPosition || "inline-start");
+  const [spriteHref, setSpriteHref] = useState(initialProps.spriteHref || "");
+  const [disabled, setDisabled] = useState(Boolean(initialProps.disabled));
+  const [style, setStyle] = useState(initialProps.style || {});
+  const [className, setClassName] = useState(payload.className || "");
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    root.__sbButtonReceive = (data) => {
+      const nextData = data || {};
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "labelHtml")) {
+        setLabelHtml(nextData.labelHtml == null ? "" : String(nextData.labelHtml));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "variant")) {
+        setVariant(nextData.variant || "default");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
+        setSize(nextData.size || "default");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "iconPosition")) {
+        setIconPosition(nextData.iconPosition || "inline-start");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "iconName")) {
+        setIconName(nextData.iconName == null ? null : String(nextData.iconName));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "iconHtml")) {
+        setIconHtml(nextData.iconHtml == null ? null : String(nextData.iconHtml));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "spriteHref")) {
+        setSpriteHref(nextData.spriteHref || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
+        setDisabled(Boolean(nextData.disabled));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setStyle(nextData.style == null ? {} : nextData.style);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setClassName(nextData.class == null ? "" : String(nextData.class));
+      }
+    };
+
+    return () => {
+      delete root.__sbButtonReceive;
+    };
+  }, [root]);
+
+  const iconPayload = {
+    props: { iconName, iconHtml, spriteHref, iconPosition }
+  };
 
   return (
     <button
       type="button"
       data-slot="button"
-      data-variant={props.variant || "default"}
-      data-size={props.size || "default"}
+      data-variant={variant}
+      data-size={size}
       className={classNames(
         "sb-button",
-        `sb-button-${props.variant || "default"}`,
-        `sb-button-size-${props.size || "default"}`,
-        payload.className
+        `sb-button-${variant}`,
+        `sb-button-size-${size}`,
+        className
       )}
-      disabled={Boolean(props.disabled)}
+      disabled={disabled}
+      style={style}
       {...attrs}
     >
-      {iconPosition === "inline-start" && <Icon payload={payload} />}
-      <HtmlSlot html={props.labelHtml} />
-      {iconPosition === "inline-end" && <Icon payload={payload} />}
+      {iconPosition === "inline-start" && <Icon payload={iconPayload} />}
+      <HtmlSlot html={labelHtml} />
+      {iconPosition === "inline-end" && <Icon payload={iconPayload} />}
     </button>
   );
 }
@@ -2694,6 +2816,7 @@ function mountRoot(root) {
   const payload = readPayload(root);
   if (!payload) return;
   registerSelectBinding();
+  registerButtonBinding();
   registerDialogBinding();
   registerPopoverBinding();
   registerCheckboxBinding();
@@ -2908,6 +3031,7 @@ function observeDynamicUi() {
 }
 
 function init() {
+  registerButtonBinding();
   registerSelectBinding();
   registerDialogBinding();
   registerPopoverBinding();
@@ -2934,6 +3058,7 @@ if (document.readyState === "loading") {
   init();
 }
 
+  registerButtonBinding();
 document.addEventListener("shiny:connected", function connected() {
   registerSelectBinding();
   registerDialogBinding();

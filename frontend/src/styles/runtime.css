@@ -303,6 +303,10 @@
   color: white;
 }
 
+[data-theme="dark"] [data-shinyblocks-root] .sb-badge-destructive {
+  background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
+}
+
 [data-shinyblocks-root] .sb-badge-outline {
   border-color: var(--border);
   color: var(--foreground);
@@ -323,6 +327,11 @@
   width: 1px;
   height: 100%;
   min-height: 1.5rem;
+}
+
+.sb-runtime-mount[data-sb-component="separator"]:has(.sb-separator-vertical) {
+  align-self: stretch;
+  display: flex;
 }
 
 [data-shinyblocks-root] .sb-spinner {
@@ -1059,9 +1068,10 @@
   gap: 0.5rem;
   border: 1px solid var(--input);
   border-radius: calc(var(--radius) * 0.8);
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--foreground);
-  padding-inline: 0.75rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  min-height: auto;
   font-size: 0.875rem;
   line-height: 1.25rem;
   outline: none;
@@ -1077,10 +1087,16 @@
   color: var(--muted-foreground);
 }
 
+[data-theme="dark"] [data-shinyblocks-root] .sb-select-trigger {
+  background-color: color-mix(in oklch, var(--input) 30%, transparent);
+}
+
 [data-shinyblocks-root] .sb-select-trigger:focus-visible,
 [data-shinyblocks-root] .sb-select-trigger[data-state="open"] {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow:
+    0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
+    0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 [data-shinyblocks-root] .sb-select-trigger[data-invalid="true"] {
@@ -1099,12 +1115,12 @@
 
 [data-shinyblocks-root] .sb-select-size-sm {
   height: 2rem;
-  padding-inline: 0.625rem 0.5rem;
+  padding: 0.25rem 0.625rem;
 }
 
 [data-shinyblocks-root] .sb-select-size-lg {
   height: 2.5rem;
-  padding-inline: 1rem 0.5rem;
+  padding: 0.5rem 1rem;
 }
 
 [data-shinyblocks-root] .sb-select-trigger-value {

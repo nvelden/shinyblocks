@@ -96,6 +96,7 @@ async function setShowcaseTheme(page, theme) {
 }
 
 async function captureShowcaseState(page, config, theme, state) {
+  await page.goto("about:blank");
   await page.goto(config.showcaseUrl, { waitUntil: "networkidle" });
   await page.waitForSelector(config.showcaseReadySelector, {
     state: "attached",
@@ -113,6 +114,11 @@ async function captureShowcaseState(page, config, theme, state) {
     await page.waitForSelector(selectors, { state: "visible", timeout: 10000 });
   }
   await page.mouse.move(1270, 10);
+  await page.evaluate(() => {
+    if (document.activeElement && document.activeElement !== document.body) {
+      document.activeElement.blur();
+    }
+  });
   await page.waitForTimeout(100);
   if (config.prepareShowcaseState) {
     await config.prepareShowcaseState(page, state, selectors);
@@ -157,10 +163,18 @@ async function main() {
   for (const theme of config.themes) {
     for (const state of config.states) {
       const { captured: live, selectors } = await captureShowcaseState(page, config, theme, state);
-      const expected = baseline.themes?.[theme]?.[state];
-      if (!expected) {
+      const rawExpected = baseline.themes?.[theme]?.[state];
+      if (!rawExpected) {
         throw new Error(`Missing baseline for ${config.component} ${theme}/${state}.`);
       }
+      const expected = config.roles
+        ? Object.fromEntries(
+            Object.entries(rawExpected).map(([roleName, roleStyles]) => [
+              roleName,
+              normaliseStyles(roleStyles)
+            ])
+          )
+        : normaliseStyles(rawExpected);
 
       if (config.roles) {
         for (const [roleName, roleConfig] of Object.entries(config.roles)) {

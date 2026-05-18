@@ -108,29 +108,26 @@ const SEPARATOR_HORIZONTAL_CLASS = `${SEPARATOR_BASE_CLASS} h-px w-full`;
 const SEPARATOR_VERTICAL_CLASS = `${SEPARATOR_BASE_CLASS} h-full min-h-6 w-px self-stretch`;
 
 const SELECT_TRIGGER_BASE_CLASS = [
-  "flex",
+  "inline-flex",
   "w-[180px]",
   "items-center",
   "justify-between",
   "gap-2",
   "whitespace-nowrap",
-  "rounded-lg",
+  "rounded-md",
   "border",
-  "px-2.5",
-  "py-0",
-  "pr-8",
+  "px-3",
+  "py-2",
   "text-sm",
   "text-foreground",
   "outline-none",
   "transition-[color,box-shadow]",
-  "h-8",
-  "min-h-8",
-  "leading-5",
-  "relative"
+  "h-9"
 ].join(" ");
 
 const SELECT_TRIGGER_DEFAULT_CLASS = [
   SELECT_TRIGGER_BASE_CLASS,
+  "parity-select-trigger",
   "border-input",
   "bg-transparent",
   "shadow-xs"
@@ -138,7 +135,8 @@ const SELECT_TRIGGER_DEFAULT_CLASS = [
 
 const SELECT_TRIGGER_OPEN_CLASS = [
   SELECT_TRIGGER_BASE_CLASS,
-  "bg-background",
+  "parity-select-trigger",
+  "bg-transparent",
   "border-ring",
   "shadow-xs",
   "ring-[3px]",

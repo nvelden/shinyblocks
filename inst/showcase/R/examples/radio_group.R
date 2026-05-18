@@ -8,20 +8,6 @@ radio_group_action_button <- function(input_id, label) {
 
 htmltools::tagList(
   block_field_set(
-    block_field_legend("Static reference"),
-    block_field(
-      block_field_label("Notification preference", `for` = "showcase_radio_group_static"),
-      block_radio_group(
-        "showcase_radio_group_static",
-        choices = c(All = "all", Mentions = "mentions", None = "none"),
-        selected = "all"
-      ),
-      block_field_description(
-        "Static example of block_radio_group() rendered directly in the showcase markup."
-      )
-    )
-  ),
-  block_field_set(
     block_field_legend("Interactive Playground"),
     htmltools::div(
       style = "display: flex; flex-direction: column; gap: 1.5rem;",
@@ -78,10 +64,11 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
               block_field(
                 block_field_label("orientation", `for` = "showcase_radio_group_doc_orientation"),
-                block_select(
+                block_radio_group(
                   "showcase_radio_group_doc_orientation",
-                  choices = c("vertical", "horizontal"),
-                  selected = "vertical"
+                  choices = c(Vertical = "vertical", Horizontal = "horizontal"),
+                  selected = "vertical",
+                  orientation = "horizontal"
                 )
               ),
               block_field(

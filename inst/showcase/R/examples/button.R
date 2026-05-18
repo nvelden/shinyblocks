@@ -1,3 +1,11 @@
+button_action_button <- function(input_id, label) {
+  shiny::actionButton(
+    input_id,
+    label,
+    class = "sb-button sb-button-outline sb-button-size-sm action-button"
+  )
+}
+
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -46,13 +54,30 @@ htmltools::tagList(
               block_select("showcase_button_doc_icon_position", choices = c("inline-start", "inline-end"), selected = "inline-start")
             )
           ),
-          # State controls
           htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
-            block_field(
-              block_field_label("disabled", `for` = "showcase_button_doc_disabled"),
-              block_checkbox("showcase_button_doc_disabled", "Disabled", value = FALSE)
+            style = "display: flex; flex-direction: column; gap: 2rem;",
+            # State controls
+            htmltools::div(
+              style = "display: flex; flex-direction: column; gap: 1rem;",
+              htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
+              block_field(
+                block_field_label("disabled", `for` = "showcase_button_doc_disabled"),
+                block_checkbox("showcase_button_doc_disabled", "Disabled", value = FALSE)
+              )
+            ),
+            # Actions controls
+            htmltools::div(
+              style = "display: flex; flex-direction: column; gap: 1rem;",
+              htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
+              htmltools::div(
+                style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+                button_action_button("showcase_button_set_label", "Set label \"Saved!\""),
+                button_action_button("showcase_button_cycle_variant", "Cycle variant"),
+                button_action_button("showcase_button_disable", "Disable"),
+                button_action_button("showcase_button_enable", "Enable"),
+                button_action_button("showcase_button_set_icon", "Set icon: check"),
+                button_action_button("showcase_button_clear_icon", "Clear icon")
+              )
             )
           ),
           # Styling controls
@@ -77,5 +102,18 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_button_api_table")
+  shiny::tableOutput("showcase_button_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instances used by tools/parity/. Do not remove."
+  ),
+  htmltools::div(
+    style = "display: flex; gap: 0.75rem; flex-wrap: wrap;",
+    block_button("Default", class = "sb-parity-button-default"),
+    block_button("Disabled", disabled = TRUE, class = "sb-parity-button-disabled")
+  )
 )

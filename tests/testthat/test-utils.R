@@ -121,6 +121,80 @@ test_that("validate_select_choice_values rejects invalid values", {
   expect_invisible(validate_select_choice_values(c("free", "pro")))
 })
 
+test_that("block_button(id =) emits a runtime input id and shinyblocks.button binding", {
+  tag <- block_button("Continue", id = "confirm")
+  html <- as.character(htmltools::renderTags(tag)$html)
+
+  expect_match(html, 'data-sb-component="button"', fixed = TRUE)
+  expect_match(html, 'data-sb-input-id="confirm"', fixed = TRUE)
+  expect_match(html, 'id="sb-runtime-button-confirm"', fixed = TRUE)
+  expect_match(html, '"binding":\\{"input":false,"type":"shinyblocks\\.button"\\}')
+  # id moved into the runtime mount; it must not leak onto inner attrs
+  expect_false(grepl('"attrs":\\{[^}]*"id"', html))
+})
+
+test_that("block_button() without id omits binding and input-id markers", {
+  tag <- block_button("Continue")
+  html <- as.character(htmltools::renderTags(tag)$html)
+  expect_false(grepl("data-sb-input-id", html, fixed = TRUE))
+  expect_false(grepl("shinyblocks.button", html, fixed = TRUE))
+})
+
+test_that("update_block_button sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_button(
+      session,
+      "confirm",
+      label = "Save",
+      variant = "destructive",
+      size = "lg",
+      icon = "check",
+      icon_position = "inline-end",
+      disabled = TRUE,
+      style = "min-width: 10rem;",
+      class = "custom-button"
+    )
+  )
+
+  expect_identical(message$input_id, "sb-runtime-button-confirm")
+  expect_match(message$payload$labelHtml, "Save", fixed = TRUE)
+  expect_identical(message$payload$variant, "destructive")
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$iconName, "check")
+  expect_null(message$payload$iconHtml)
+  expect_identical(message$payload$iconPosition, "inline-end")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$style$minWidth, "10rem")
+  expect_identical(message$payload$class, "custom-button")
+})
+
+test_that("update_block_button clears icon and style via NULL", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_button(session, "confirm", icon = NULL, style = NULL)
+
+  expect_true("iconName" %in% names(message))
+  expect_null(message$iconName)
+  expect_true("iconHtml" %in% names(message))
+  expect_null(message$iconHtml)
+  expect_true("style" %in% names(message))
+  expect_null(message$style)
+})
+
 test_that("update_block_select sends input binding messages", {
   message <- NULL
   session <- list(
