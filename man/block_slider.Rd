@@ -13,6 +13,8 @@ block_slider(
   ticks = FALSE,
   width = NULL,
   disabled = FALSE,
+  invalid = FALSE,
+  style = NULL,
   class = NULL
 )
 }
@@ -34,15 +36,19 @@ length 2 for a range slider.}
 
 \item{disabled}{Whether the control is disabled.}
 
-\item{class}{Additional classes.}
+\item{invalid}{Whether the control should show invalid styling
+(sets \code{aria-invalid="true"}).}
+
+\item{style}{Inline CSS styles for the slider control.}
+
+\item{class}{Additional classes for the wrapper.}
 }
 \value{
 An \code{htmltools} tag.
 }
 \description{
-Wraps \code{\link[shiny:sliderInput]{shiny::sliderInput()}} with token-driven track, range, and
-thumb styling that tracks the shadcn slider contract. Wrap-by-
-default per ADR 0014.
+Runtime-rendered slider with a dedicated Shiny input binding. Supports
+single-value and two-value range sliders.
 }
 \seealso{
 Other forms: 
@@ -65,6 +71,7 @@ Other forms:
 \code{\link{update_block_input}()},
 \code{\link{update_block_radio_group}()},
 \code{\link{update_block_select}()},
+\code{\link{update_block_slider}()},
 \code{\link{update_block_switch}()},
 \code{\link{update_block_textarea}()}
 }

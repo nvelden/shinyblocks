@@ -347,12 +347,15 @@ test_that("textarea emits a runtime payload and hidden native textarea", {
   expect_identical(payload$binding$type, "shinyblocks.textarea")
 })
 
-test_that("slider wraps Shiny markup and exposes the data-disabled flag", {
+test_that("slider emits runtime payload and binding metadata", {
   slider <- block_slider(
     "volume",
     value = 50,
     min = 0,
     max = 100,
+    step = 5,
+    invalid = TRUE,
+    style = "max-width: 20rem;",
     class = "custom"
   )
   range <- block_slider("price", value = c(25, 75), min = 0, max = 100)
@@ -364,20 +367,29 @@ test_that("slider wraps Shiny markup and exposes the data-disabled flag", {
     disabled = TRUE
   )
 
-  expect_identical(tag_attr(slider, "class"), "sb-slider custom")
-  expect_null(tag_attr(slider, "data-disabled"))
-  expect_identical(tag_attr(disabled, "data-disabled"), "true")
+  payload <- runtime_payload_from(slider)
+  range_payload <- runtime_payload_from(range)
 
   slider_html <- render_html(slider)
-  expect_match(slider_html, "sb-slider-control", fixed = TRUE)
-  expect_match(slider_html, 'data-min="0"', fixed = TRUE)
-  expect_match(slider_html, 'data-max="100"', fixed = TRUE)
-  expect_match(slider_html, 'data-from="50"', fixed = TRUE)
+  expect_identical(
+    tag_attr(slider, "class"),
+    "sb-runtime-mount sb-slider custom"
+  )
+  expect_match(slider_html, 'data-sb-component="slider"', fixed = TRUE)
+  expect_match(slider_html, '<input id="volume" type="hidden" class="sb-slider-native"', fixed = TRUE)
+  expect_match(slider_html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(render_html(disabled), 'data-sb-component="slider"', fixed = TRUE)
 
-  range_html <- render_html(range)
-  expect_match(range_html, 'data-type="double"', fixed = TRUE)
-  expect_match(range_html, 'data-from="25"', fixed = TRUE)
-  expect_match(range_html, 'data-to="75"', fixed = TRUE)
+  expect_identical(payload$component, "slider")
+  expect_identical(payload$id, "volume")
+  expect_equal(payload$state$value, 50)
+  expect_equal(payload$props$min, 0)
+  expect_equal(payload$props$max, 100)
+  expect_equal(payload$props$step, 5)
+  expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$props$style$maxWidth, "20rem")
+  expect_identical(payload$binding$type, "shinyblocks.slider")
+  expect_equal(unlist(range_payload$state$value), c(25, 75))
 })
 
 test_that("block_slider validates its arguments", {
@@ -394,6 +406,11 @@ test_that("block_slider validates its arguments", {
   expect_error(
     block_slider("x", value = 50, min = 100, max = 100),
     "strictly less than",
+    fixed = TRUE
+  )
+  expect_error(
+    block_slider("x", value = 50, min = 0, max = 100, step = 0),
+    "positive numeric",
     fixed = TRUE
   )
   expect_error(

@@ -26,6 +26,7 @@ Collate:
     'input-group.R'
     'select.R'
     'form-controls.R'
+    'radio-group.R'
     'tabs.R'
     'theme.R'
     'dark-mode.R'

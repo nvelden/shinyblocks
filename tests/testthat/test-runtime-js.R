@@ -34,6 +34,8 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "sb:checkbox-change", fixed = TRUE)
   expect_match(js, "shinyblocks.switch", fixed = TRUE)
   expect_match(js, "sb:switch-change", fixed = TRUE)
+  expect_match(js, "shinyblocks.slider", fixed = TRUE)
+  expect_match(js, "sb:slider-change", fixed = TRUE)
 })
 
 test_that("runtime JS includes dynamic UI lifecycle hooks", {

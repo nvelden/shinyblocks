@@ -68,6 +68,7 @@ reference:
       - block_checkbox
       - block_switch
       - block_slider
+      - update_block_slider
   - title: Theme
     contents:
       - block_theme

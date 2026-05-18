@@ -63,6 +63,7 @@ Other forms:
 \code{\link{update_block_input}()},
 \code{\link{update_block_radio_group}()},
 \code{\link{update_block_select}()},
+\code{\link{update_block_slider}()},
 \code{\link{update_block_switch}()},
 \code{\link{update_block_textarea}()}
 }
