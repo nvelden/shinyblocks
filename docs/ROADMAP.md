@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: Phase 5 — controls runtime migration (status as of 2026-05-15).**
+> **In progress: Phase 4/5 — overlays and controls runtime migration (status as of 2026-05-18).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -169,6 +169,41 @@ phase begins.
 >   binding, arrow-key navigation, `orientation` (vertical/
 >   horizontal), `invalid` flag, and a server updater covering
 >   selected/choices/disabled/invalid/orientation/style/class.
+> - **Parity gate cleared (2026-05-18)** — `make parity-ci` is fully
+>   green across all nine registered components (alert, badge, button,
+>   checkbox, select, separator, slider, switch, textarea). Issues
+>   #2–#8 closed. Resolution touched runtime CSS (select trigger
+>   bg/padding/focus-shadow, textarea shadow/line-height, separator
+>   vertical-mount flex stretch), parity references aligned to current
+>   shadcn New York v4 source (select / switch / checkbox / textarea),
+>   the parity normaliser (collapse `display: flex|inline-flex`,
+>   `border-radius: pill`, `min-height: 0|auto`), and a harness bug
+>   where `page.goto` to the same URL with same hash was doing
+>   SPA-style hash navigation instead of a full reload (fixed with
+>   `about:blank` between captures).
+> - **Phase 3 cleanup gate (post-migration)** — removed ~110 lines of
+>   dead legacy CSS from `inst/www/src/shinyblocks.css` for the six
+>   fully-migrated presentational components (alert, value-box,
+>   separator, skeleton, spinner, empty) plus the stale
+>   `.sb-checkbox-indicator`/`.sb-switch-track`/`.selectize-*`
+>   invalid-state selectors. `.sb-button*` legacy CSS retained because
+>   `block_dark_mode_toggle()` still emits it from outside the runtime
+>   root.
+> - **Showcase reorganization (2026-05-18)** — split the umbrella
+>   **Field** tab. **Switch** gets its own full interactive playground
+>   with `update_block_switch()` Actions. **Input group** gets its own
+>   variant-style tab. The seven `block_field*()` helpers continue to
+>   appear transitively through every form tab (textarea, switch,
+>   input, radio_group, etc.). Parity fixtures relocated from the
+>   defunct field section into the owning component tabs
+>   (`#select`, `#checkbox`, `#switch`, `#textarea`) and the parity
+>   registry was updated accordingly.
+> - **Phase 4 overlay slice — `block_tooltip()` (2026-05-18)** —
+>   hover- and focus-triggered text overlay rendered through the
+>   runtime React layer. `side` (default `"top"`), `align`,
+>   `delay_duration` (default 700 ms), `Escape` close, portal
+>   rendering via `[data-shinyblocks-portal-root]`, primary-toned
+>   styling per shadcn. No Shiny input binding (purely presentational).
 >
 > Historical native work already landed:
 > - **Phase 1** — package shell, Tailwind v4 source, committed compiled
@@ -193,13 +228,13 @@ phase begins.
 >   `block_theme()`, `block_dark_mode_toggle()`, and
 >   `update_block_theme()`.
 >
-> Current blocking gate item:
-> - `make parity-ci` still fails on **17 badge parity drifts**:
->   `borderRadius` (`3.35544e+07px` vs `9999px`), `display`
->   (`flex` vs `inline-flex`), and dark destructive background tint
->   (`dark:bg-destructive/60` vs solid `--destructive`).
-> - Remaining post-popover controls work is tracked as normal phase
->   work, but parity remains the hard blocker before any phase-exit tag.
+> Current natural-next work (no hard gate blocker):
+> - Phase 5 remaining controls — `block_slider()` runtime migration,
+>   `block_input_group()` runtime migration, `block_tabs()` /
+>   `block_tab()` cleanup, then deletion of ionRangeSlider /
+>   Bootstrap-tab / wrapped-input CSS + tests.
+> - Phase 4 remaining overlays — `block_dropdown_menu()`,
+>   `block_sheet()`, `block_drawer()`, `block_hover_card()`.
 >
 > **Component-by-component hand-off:** after button and select are
 > accepted, proceed one component at a time. Each slice should
@@ -642,12 +677,12 @@ package-owned visual CSS.
 
 Goal: migrate behavior-heavy Radix components.
 
-- `block_dialog()`
-- `block_popover()`
+- `block_dialog()` ✅ shipped (4.1 – 4.4)
+- `block_popover()` ✅ shipped (5.1 – 5.3, naming legacy)
+- `block_tooltip()` ✅ shipped (2026-05-18)
 - `block_dropdown_menu()`
 - `block_sheet()`
 - `block_drawer()`
-- `block_tooltip()`
 - `block_hover_card()`
 
 Exit: portal, focus, Escape, outside-click, open-state, and removal
