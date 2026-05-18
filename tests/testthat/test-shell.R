@@ -146,8 +146,7 @@ test_that("nav items and buttons decorate icons", {
   expect_match(nav, 'data-icon="inline-start"', fixed = TRUE)
   expect_match(
     nav,
-    'href="shinyblocks-0.0.0.9000/icons/sprite.svg#sb-icon-home"',
-    fixed = TRUE
+    'href="shinyblocks-0\\.0\\.0\\.9000(?:\\.[0-9]+)?/icons/sprite\\.svg#sb-icon-home"'
   )
   expect_identical(button_start$props$iconName, "search")
   expect_identical(button_start$props$iconPosition, "inline-start")
