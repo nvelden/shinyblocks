@@ -11,6 +11,8 @@ source(file.path("R", "server_popover.R"), local = TRUE)
 source(file.path("R", "server_textarea.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
+source(file.path("R", "server_switch.R"), local = TRUE)
+source(file.path("R", "server_input_group.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -143,15 +145,26 @@ sections <- list(
     file = "radio_group.R"
   ),
   list(
-    id = "field",
-    label = "Field",
-    icon = "edit",
-    title = "Fields and input groups",
+    id = "switch",
+    label = "Switch",
+    icon = "circle-half-stroke",
+    title = "Switch",
     lead = paste(
-      "Composable form primitives plus first-class select, textarea,",
-      "checkbox, and switch controls with helper text and invalid states."
+      "Runtime-rendered toggle switch with native Shiny value binding,",
+      "checked/disabled state, and update_block_switch() server updates."
     ),
-    file = "field.R"
+    file = "switch.R"
+  ),
+  list(
+    id = "input-group",
+    label = "Input group",
+    icon = "search",
+    title = "Input group",
+    lead = paste(
+      "Wraps a Shiny input with leading/trailing addon slots — icons,",
+      "prefixes, suffixes — via block_input_group() and block_input_group_addon()."
+    ),
+    file = "input_group.R"
   ),
   list(
     id = "slider",
@@ -364,6 +377,8 @@ server <- function(input, output, session) {
   register_textarea_showcase(input, output, session)
   register_input_showcase(input, output, session)
   register_radio_group_showcase(input, output, session)
+  register_switch_showcase(input, output, session)
+  register_input_group_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
 }

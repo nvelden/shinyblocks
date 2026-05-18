@@ -122,5 +122,47 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_textarea_api_table")
+  shiny::tableOutput("showcase_textarea_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instances captured by tools/parity/. Do not remove."
+  ),
+  htmltools::div(
+    style = "display: flex; flex-direction: column; gap: 1rem; padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+    block_field(
+      block_field_label("Default", `for` = "showcase_parity_textarea_default"),
+      block_textarea(
+        "showcase_parity_textarea_default",
+        placeholder = "Record rollout details for the next operator.",
+        rows = 2,
+        class = "sb-parity-textarea-default"
+      )
+    ),
+    block_field(
+      block_field_label("Disabled", `for` = "showcase_parity_textarea_disabled"),
+      block_textarea(
+        "showcase_parity_textarea_disabled",
+        value = "Escalate to the on-call operator if retries fail.",
+        rows = 2,
+        disabled = TRUE,
+        class = "sb-parity-textarea-disabled"
+      )
+    ),
+    block_field_invalid(
+      block_field(
+        block_field_label("Invalid", `for` = "showcase_parity_textarea_invalid"),
+        block_textarea(
+          "showcase_parity_textarea_invalid",
+          value = "Document rollback steps before continuing.",
+          rows = 2,
+          class = "sb-parity-textarea-invalid"
+        )
+      ),
+      "A rollback plan is required before deployment."
+    )
+  )
 )

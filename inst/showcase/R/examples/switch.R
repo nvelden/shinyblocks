@@ -1,4 +1,4 @@
-checkbox_action_button <- function(input_id, label) {
+switch_action_button <- function(input_id, label) {
   shiny::actionButton(
     input_id,
     label,
@@ -13,26 +13,26 @@ htmltools::tagList(
       style = "display: flex; flex-direction: column; gap: 1.5rem;",
       htmltools::div(
         style = "width: 100%;",
-        shiny::uiOutput("showcase_checkbox_preview_ui")
+        shiny::uiOutput("showcase_switch_preview_ui")
       ),
       htmltools::div(
         style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
         htmltools::div(
           style = "flex: 1 1 320px; min-width: 280px; display: flex; flex-direction: column; gap: 1rem;",
-          shiny::verbatimTextOutput("showcase_checkbox_preview_value"),
+          shiny::verbatimTextOutput("showcase_switch_preview_value"),
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
               "UI Definition"
             ),
-            shiny::verbatimTextOutput("showcase_checkbox_preview_code")
+            shiny::verbatimTextOutput("showcase_switch_preview_code")
           ),
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
               "Server Action"
             ),
-            shiny::verbatimTextOutput("showcase_checkbox_reactive_code")
+            shiny::verbatimTextOutput("showcase_switch_reactive_code")
           )
         ),
         htmltools::div(
@@ -41,28 +41,8 @@ htmltools::tagList(
             style = "display: flex; flex-direction: column; gap: 1rem;",
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
             block_field(
-              block_field_label("label", `for` = "showcase_checkbox_doc_label"),
-              block_textarea(
-                "showcase_checkbox_doc_label",
-                value = "Email me product updates",
-                rows = 1
-              )
-            ),
-            block_field(
-              block_field_label("description", `for` = "showcase_checkbox_doc_description"),
-              block_textarea(
-                "showcase_checkbox_doc_description",
-                value = "Unchecked default checkbox state.",
-                rows = 2
-              )
-            ),
-            block_field(
-              block_field_label("invalid message", `for` = "showcase_checkbox_doc_invalid_message"),
-              block_textarea(
-                "showcase_checkbox_doc_invalid_message",
-                value = "You must confirm the rollout checklist before continuing.",
-                rows = 2
-              )
+              block_field_label("label", `for` = "showcase_switch_doc_label"),
+              block_input("showcase_switch_doc_label", value = "Send incident alerts")
             )
           ),
           htmltools::div(
@@ -71,16 +51,12 @@ htmltools::tagList(
               style = "display: flex; flex-direction: column; gap: 1rem;",
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
               block_field(
-                block_field_label("checked", `for` = "showcase_checkbox_doc_checked"),
-                block_checkbox("showcase_checkbox_doc_checked", "Checked", value = FALSE)
+                block_field_label("value (checked)", `for` = "showcase_switch_doc_value"),
+                block_checkbox("showcase_switch_doc_value", "Checked", value = FALSE)
               ),
               block_field(
-                block_field_label("disabled", `for` = "showcase_checkbox_doc_disabled"),
-                block_checkbox("showcase_checkbox_doc_disabled", "Disabled", value = FALSE)
-              ),
-              block_field(
-                block_field_label("invalid", `for` = "showcase_checkbox_doc_invalid"),
-                block_checkbox("showcase_checkbox_doc_invalid", "Invalid", value = FALSE)
+                block_field_label("disabled", `for` = "showcase_switch_doc_disabled"),
+                block_checkbox("showcase_switch_doc_disabled", "Disabled", value = FALSE)
               )
             ),
             htmltools::div(
@@ -88,10 +64,11 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                checkbox_action_button("showcase_checkbox_set_checked", "Set checked"),
-                checkbox_action_button("showcase_checkbox_clear", "Clear"),
-                checkbox_action_button("showcase_checkbox_disable", "Disable"),
-                checkbox_action_button("showcase_checkbox_enable", "Enable")
+                switch_action_button("showcase_switch_turn_on", "Turn on"),
+                switch_action_button("showcase_switch_turn_off", "Turn off"),
+                switch_action_button("showcase_switch_disable", "Disable"),
+                switch_action_button("showcase_switch_enable", "Enable"),
+                switch_action_button("showcase_switch_rename", "Rename label")
               )
             )
           ),
@@ -99,17 +76,17 @@ htmltools::tagList(
             style = "display: flex; flex-direction: column; gap: 1rem;",
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
             block_field(
-              block_field_label("style", `for` = "showcase_checkbox_doc_style"),
+              block_field_label("style", `for` = "showcase_switch_doc_style"),
               block_textarea(
-                "showcase_checkbox_doc_style",
+                "showcase_switch_doc_style",
                 value = "",
                 rows = 1,
-                placeholder = "e.g., background: rgba(0,0,0,.03); padding: 0.5rem;"
+                placeholder = "e.g., padding: 0.5rem;"
               )
             ),
             block_field(
-              block_field_label("class", `for` = "showcase_checkbox_doc_class"),
-              block_checkbox("showcase_checkbox_doc_class", "Use custom dashed-border class", value = FALSE)
+              block_field_label("class", `for` = "showcase_switch_doc_class"),
+              block_checkbox("showcase_switch_doc_class", "Use custom dashed-border class", value = FALSE)
             )
           )
         )
@@ -117,7 +94,7 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_checkbox_api_table"),
+  shiny::tableOutput("showcase_switch_api_table"),
   htmltools::tags$h3(
     style = "margin-top: 2rem; font-size: 1.125rem;",
     "Parity fixtures"
@@ -128,24 +105,24 @@ htmltools::tagList(
   ),
   htmltools::div(
     style = "display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
-    block_checkbox(
-      "showcase_parity_checkbox_default",
-      "Default checkbox",
+    block_switch(
+      "showcase_parity_switch_default",
+      "Default switch",
       value = FALSE,
-      class = "sb-parity-checkbox-default"
+      class = "sb-parity-switch-default"
     ),
-    block_checkbox(
-      "showcase_parity_checkbox_checked",
-      "Checked checkbox",
+    block_switch(
+      "showcase_parity_switch_checked",
+      "Checked switch",
       value = TRUE,
-      class = "sb-parity-checkbox-checked"
+      class = "sb-parity-switch-checked"
     ),
-    block_checkbox(
-      "showcase_parity_checkbox_disabled",
-      "Disabled checkbox",
+    block_switch(
+      "showcase_parity_switch_disabled",
+      "Disabled switch",
       value = FALSE,
       disabled = TRUE,
-      class = "sb-parity-checkbox-disabled"
+      class = "sb-parity-switch-disabled"
     )
   )
 )

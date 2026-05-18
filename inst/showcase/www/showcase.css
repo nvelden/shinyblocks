@@ -6,7 +6,9 @@
 #showcase_checkbox_api_table table,
 #showcase_textarea_api_table table,
 #showcase_input_api_table table,
-#showcase_radio_group_api_table table {
+#showcase_radio_group_api_table table,
+#showcase_switch_api_table table,
+#showcase_input_group_api_table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
@@ -26,7 +28,11 @@
 #showcase_input_api_table th,
 #showcase_input_api_table td,
 #showcase_radio_group_api_table th,
-#showcase_radio_group_api_table td {
+#showcase_radio_group_api_table td,
+#showcase_switch_api_table th,
+#showcase_switch_api_table td,
+#showcase_input_group_api_table th,
+#showcase_input_group_api_table td {
   border-bottom: 1px solid var(--border);
   padding: 0.75rem;
   text-align: left;
@@ -39,7 +45,9 @@
 #showcase_checkbox_api_table th,
 #showcase_textarea_api_table th,
 #showcase_input_api_table th,
-#showcase_radio_group_api_table th {
+#showcase_radio_group_api_table th,
+#showcase_switch_api_table th,
+#showcase_input_group_api_table th {
   color: var(--muted-foreground);
   font-weight: 600;
 }
@@ -66,7 +74,13 @@
 #showcase_input_api_table td:nth-child(3),
 #showcase_radio_group_api_table td:nth-child(1),
 #showcase_radio_group_api_table td:nth-child(2),
-#showcase_radio_group_api_table td:nth-child(3) {
+#showcase_radio_group_api_table td:nth-child(3),
+#showcase_switch_api_table td:nth-child(1),
+#showcase_switch_api_table td:nth-child(2),
+#showcase_switch_api_table td:nth-child(3),
+#showcase_input_group_api_table td:nth-child(1),
+#showcase_input_group_api_table td:nth-child(2),
+#showcase_input_group_api_table td:nth-child(3) {
   white-space: nowrap;
   width: 1%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -105,6 +119,11 @@
 .showcase-input-preview-custom .sb-input-control {
   border-style: dashed !important;
   border-width: 2px !important;
+}
+
+.showcase-switch-preview-custom .sb-switch-button {
+  outline: 2px dashed var(--ring) !important;
+  outline-offset: 2px;
 }
 
 .showcase-radio-group-preview-custom .sb-radio-group-control {
