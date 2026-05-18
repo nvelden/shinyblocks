@@ -42,6 +42,7 @@ htmltools::tagList(
         block_textarea(
           "showcase_note",
           placeholder = "Record rollout details for the next operator.",
+          rows = 2,
           class = "sb-parity-textarea-default"
         ),
         block_field_description("Stored with the current workspace.")
@@ -63,6 +64,7 @@ htmltools::tagList(
           block_textarea(
             "showcase_rollback",
             value = "Document rollback steps before continuing.",
+            rows = 2,
             class = "sb-parity-textarea-invalid"
           ),
           block_field_description("Invalid textarea state.")
