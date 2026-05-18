@@ -1008,6 +1008,16 @@ Exit criteria:
 
 Goal: remove the wrapped-Shiny-control strategy for shadcn controls.
 
+Status as of 2026-05-18: checkbox, switch, textarea, input,
+radio group, and slider render through the package runtime with Shiny
+input bindings and updater helpers. The slider slice removed the
+`shiny::sliderInput()` / ion.rangeSlider wrapper, added single/range
+runtime value sync, pointer and keyboard interaction, invalid/style
+state, and `update_block_slider()`. The current remaining Phase 5 work
+is `block_input_group()` runtime/layout cleanup, `block_tabs()` /
+`block_tab()` cleanup, then deletion of the residual wrapped-input and
+Bootstrap-tab CSS/tests.
+
 Order:
 
 1. `block_checkbox()`
@@ -1033,16 +1043,15 @@ Tasks:
    interaction.
 6. Add or update one showcase page/section per form/control component. Each
    input-like page must include:
-   - basic example;
-   - all variants/sizes/orientations;
-   - all choices/item/group patterns;
-   - disabled state;
-   - invalid/error state;
-   - value display from `input$...`;
-   - server-side value update;
-   - server-side options/choices update where supported;
-   - server-side enable/disable where supported;
-   - reset/clear behavior where supported;
+   - a preview;
+   - live `input$...` value display;
+   - UI Definition and Server Action code blocks;
+   - Content controls for every public constructor argument;
+   - State controls for disabled/invalid/open/value-like state;
+   - Actions (Server Update) buttons for every supported updater field;
+   - Styling controls for `style` and `class`, applied to the owned control
+     element rather than the whole playground block;
+   - API Reference using the concise table pattern used by Input/Slider;
    - module namespacing example where the component owns an input id.
 
 Tests/checks:

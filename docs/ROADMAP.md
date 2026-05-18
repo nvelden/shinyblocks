@@ -175,7 +175,15 @@ phase begins.
 >   `<input>`, dedicated `shinyblocks.slider` binding, single-value and
 >   range support, pointer/keyboard interaction, `invalid` and `style`
 >   args, and `update_block_slider()` for value/min/max/step/disabled/
->   invalid/style/class server updates.
+>   invalid/style/class server updates. Follow-up fixes aligned the
+>   Slider API Reference table with the Input table pattern and changed
+>   package-local asset dependency versions to include file mtimes so a
+>   restarted showcase app does not keep stale runtime CSS/JS paths.
+> - **Phase 5.10 verification** — latest checks passed:
+>   `npm run build`, `Rscript -e "devtools::test()"`,
+>   `npm run test:runtime`, `npm run test:runtime-shiny`, and
+>   `npm run test:showcase`. The local showcase was fully restarted
+>   after runtime/showcase edits.
 > - **Parity gate cleared (2026-05-18)** — `make parity-ci` is fully
 >   green across all nine registered components (alert, badge, button,
 >   checkbox, select, separator, slider, switch, textarea). Issues

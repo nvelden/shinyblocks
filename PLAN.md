@@ -96,10 +96,12 @@ legacy native component is migrated, `make parity-ci` remains useful
 for the existing shared registry; runtime-migrated components are
 verified against the shipped runtime behavior instead.
 
-As of 2026-05-12, the shared registry slice covers `alert`, `badge`,
+As of 2026-05-18, the shared registry slice covers `alert`, `badge`,
 `button`, `checkbox`, `select`, `separator`, `slider`, `switch`, and
-`textarea`. Remaining component families still need to be migrated
-before parity becomes the repo-wide primary verifier.
+`textarea`, and `make parity-ci` is green for that slice. Runtime
+browser and Shiny smoke tests are now the primary verifier for
+runtime-migrated controls. Remaining component families still need to
+be migrated before parity becomes the repo-wide primary verifier.
 
 The list below is the final pre-public sweep on top of that:
 
