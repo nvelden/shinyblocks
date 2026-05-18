@@ -8,7 +8,8 @@
 #showcase_input_api_table table,
 #showcase_radio_group_api_table table,
 #showcase_switch_api_table table,
-#showcase_input_group_api_table table {
+#showcase_input_group_api_table table,
+#showcase_tooltip_api_table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
@@ -32,7 +33,9 @@
 #showcase_switch_api_table th,
 #showcase_switch_api_table td,
 #showcase_input_group_api_table th,
-#showcase_input_group_api_table td {
+#showcase_input_group_api_table td,
+#showcase_tooltip_api_table th,
+#showcase_tooltip_api_table td {
   border-bottom: 1px solid var(--border);
   padding: 0.75rem;
   text-align: left;
@@ -47,7 +50,8 @@
 #showcase_input_api_table th,
 #showcase_radio_group_api_table th,
 #showcase_switch_api_table th,
-#showcase_input_group_api_table th {
+#showcase_input_group_api_table th,
+#showcase_tooltip_api_table th {
   color: var(--muted-foreground);
   font-weight: 600;
 }
@@ -80,7 +84,10 @@
 #showcase_switch_api_table td:nth-child(3),
 #showcase_input_group_api_table td:nth-child(1),
 #showcase_input_group_api_table td:nth-child(2),
-#showcase_input_group_api_table td:nth-child(3) {
+#showcase_input_group_api_table td:nth-child(3),
+#showcase_tooltip_api_table td:nth-child(1),
+#showcase_tooltip_api_table td:nth-child(2),
+#showcase_tooltip_api_table td:nth-child(3) {
   white-space: nowrap;
   width: 1%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;

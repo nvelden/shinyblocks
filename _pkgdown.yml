@@ -44,6 +44,8 @@ reference:
       - block_dialog
       - update_block_dialog
       - block_popover
+      - update_block_popover
+      - block_tooltip
   - title: Forms
     contents:
       - block_field_group

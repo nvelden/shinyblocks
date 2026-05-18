@@ -428,6 +428,38 @@ test_that("block_popover rejects invalid side and align", {
   expect_error(block_popover(trigger = "x", align = "weird"), "should be one of")
 })
 
+test_that("block_tooltip emits a runtime payload with trigger and body", {
+  payload <- runtime_payload_from(
+    block_tooltip(
+      trigger = "Hover me",
+      htmltools::tags$p("Hello"),
+      side = "bottom",
+      align = "start",
+      delay_duration = 500
+    )
+  )
+
+  expect_identical(payload$component, "tooltip")
+  expect_identical(payload$props$triggerLabel, "Hover me")
+  expect_match(payload$props$bodyHtml, "Hello", fixed = TRUE)
+  expect_identical(payload$props$side, "bottom")
+  expect_identical(payload$props$align, "start")
+  expect_identical(payload$props$delayDuration, 500L)
+  expect_identical(payload$binding$input, FALSE)
+})
+
+test_that("block_tooltip rejects bad trigger, side, align, and delay", {
+  expect_error(block_tooltip(trigger = NULL), "`trigger`", fixed = TRUE)
+  expect_error(block_tooltip(trigger = c("a", "b")), "single string", fixed = TRUE)
+  expect_error(block_tooltip(trigger = "x", side = "diagonal"), "should be one of")
+  expect_error(block_tooltip(trigger = "x", align = "weird"), "should be one of")
+  expect_error(
+    block_tooltip(trigger = "x", delay_duration = -1),
+    "non-negative",
+    fixed = TRUE
+  )
+})
+
 test_that("block_popover without id is client-only", {
   payload <- runtime_payload_from(block_popover(trigger = "Open"))
 
