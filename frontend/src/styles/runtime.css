@@ -329,7 +329,7 @@
   min-height: 1.5rem;
 }
 
-.sb-runtime-mount[data-sb-component="separator"]:has(.sb-separator-vertical) {
+[data-shinyblocks-root].sb-runtime-mount[data-sb-component="separator"]:has(.sb-separator-vertical) {
   align-self: stretch;
   display: flex;
 }
@@ -458,6 +458,7 @@
 }
 
 [data-shinyblocks-root] .sb-alert {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   row-gap: 0.125rem;
