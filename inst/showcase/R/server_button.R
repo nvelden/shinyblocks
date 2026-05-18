@@ -6,8 +6,20 @@ register_button_showcase <- function(input, output, session) {
     icon_value
   }
 
+  variant_choices <- c(
+    "default",
+    "secondary",
+    "outline",
+    "ghost",
+    "destructive",
+    "link"
+  )
+
   output$showcase_button_preview_ui <- shiny::renderUI({
     label <- input$showcase_button_doc_label %||% "Continue"
+    if (!nzchar(label)) {
+      label <- "Continue"
+    }
     variant <- input$showcase_button_doc_variant %||% "default"
     size <- input$showcase_button_doc_size %||% "default"
     icon <- button_doc_icon(input$showcase_button_doc_icon)
@@ -51,6 +63,9 @@ register_button_showcase <- function(input, output, session) {
     }
 
     label_val <- input$showcase_button_doc_label %||% "Continue"
+    if (!nzchar(label_val)) {
+      label_val <- "Continue"
+    }
     variant_val <- input$showcase_button_doc_variant %||% "default"
     size_val <- input$showcase_button_doc_size %||% "default"
     icon_val <- button_doc_icon(input$showcase_button_doc_icon)
@@ -100,17 +115,88 @@ register_button_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
+  reactive_code <- shiny::reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_button() code here."
+  ))
+
   output$showcase_button_reactive_code <- shiny::renderText({
-    paste0(
-      "# block_button() has no runtime update helper yet.\n",
-      "# Change the controls to re-render this preview."
-    )
+    reactive_code()
   })
   shiny::outputOptions(
     output,
     "showcase_button_reactive_code",
     suspendWhenHidden = FALSE
   )
+
+  shiny::observeEvent(input$showcase_button_set_label, {
+    update_block_button(session, "showcase_button_preview", label = "Saved!")
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  label = \"Saved!\"\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_button_cycle_variant, {
+    current <- input$showcase_button_doc_variant %||% "default"
+    idx <- match(current, variant_choices, nomatch = 0L)
+    next_variant <- variant_choices[(idx %% length(variant_choices)) + 1L]
+    update_block_button(session, "showcase_button_preview", variant = next_variant)
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  variant = \"", next_variant, "\"\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_button_disable, {
+    update_block_button(session, "showcase_button_preview", disabled = TRUE)
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  disabled = TRUE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_button_enable, {
+    update_block_button(session, "showcase_button_preview", disabled = FALSE)
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  disabled = FALSE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_button_set_icon, {
+    update_block_button(session, "showcase_button_preview", icon = "check")
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  icon = \"check\"\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_button_clear_icon, {
+    update_block_button(session, "showcase_button_preview", icon = NULL)
+    reactive_code(paste0(
+      "update_block_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_button_preview\",\n",
+      "  icon = NULL\n",
+      ")"
+    ))
+  })
 
   output$showcase_button_api_table <- shiny::renderTable({
     data.frame(
@@ -123,7 +209,7 @@ register_button_showcase <- function(input, output, session) {
         "Button size. One of default, sm, lg, or icon.",
         "Optional leading/trailing icon name or tag.",
         "Controls icon placement when an icon is present.",
-        "Additional button attributes such as id, disabled, aria-label, style, and data-*.",
+        "Additional button attributes. Pass id = \"...\" to address the button from update_block_button().",
         "Additional class merged onto the runtime button element."
       )
     )

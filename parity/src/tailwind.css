@@ -202,6 +202,14 @@
     position: relative;
   }
 
+  [data-theme="dark"] .parity-checkbox-indicator:not(.parity-checkbox-indicator-checked) {
+    background-color: color-mix(in oklch, var(--input) 30%, transparent);
+  }
+
+  [data-theme="dark"] .parity-select-trigger {
+    background-color: color-mix(in oklch, var(--input) 30%, transparent) !important;
+  }
+
   .parity-checkbox-indicator::after {
     content: "";
     width: 0.28rem;

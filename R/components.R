@@ -141,7 +141,9 @@ block_card_footer <- function(..., class = NULL) {
 #' @param size Button size.
 #' @param icon Optional icon tag or vendored icon name.
 #' @param icon_position Whether the icon appears before or after the label.
-#' @param ... Additional attributes passed to `htmltools::tags$button`.
+#' @param ... Additional attributes passed to `htmltools::tags$button`. Pass
+#'   `id = "..."` here to make the button addressable via
+#'   [update_block_button()].
 #' @param class Additional classes.
 #'
 #' @return An `htmltools` tag.
@@ -176,6 +178,8 @@ block_button <- function(
   attrs <- named_attrs(list(...))
   disabled <- isTRUE(attrs$disabled) || identical(attrs$disabled, NA)
   attrs$disabled <- NULL
+  input_id <- if (is.null(attrs$id)) NULL else as.character(attrs$id)
+  attrs$id <- NULL
   if (!is.null(attrs$style)) {
     attrs$style <- normalize_runtime_style(attrs$style)
   }
@@ -192,6 +196,11 @@ block_button <- function(
     }
   }
 
+  binding <- if (is.null(input_id)) list() else list(
+    input = FALSE,
+    type = "shinyblocks.button"
+  )
+
   runtime_component(
     component = "button",
     props = list(
@@ -205,8 +214,108 @@ block_button <- function(
       attrs = attrs,
       disabled = disabled
     ),
+    input_id = input_id,
+    binding = binding,
     class = class
   )
+}
+
+#' Update a runtime button
+#'
+#' Send a runtime message to a [block_button()] created with `id = "..."`.
+#' Any argument left unspecified is preserved on the client. Pass `NULL` for
+#' `icon` or `style` to clear them.
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_button()` (via `id = "..."`).
+#' @param label Optional replacement label.
+#' @param variant Optional new visual variant.
+#' @param size Optional new size.
+#' @param icon Optional vendored icon name, `shiny.tag`, or `NULL` to clear.
+#' @param icon_position Optional `"inline-start"` / `"inline-end"`.
+#' @param disabled Optional disabled state.
+#' @param style Optional inline CSS styles, or `NULL` to clear.
+#' @param class Optional replacement classes for the wrapper.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family action
+#' @export
+update_block_button <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  label,
+  variant,
+  size,
+  icon,
+  icon_position,
+  disabled,
+  style,
+  class
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(label)) {
+    payload$labelHtml <- html_fragment(label)
+  }
+  if (!missing(variant)) {
+    variant <- match_arg(
+      variant,
+      c("default", "secondary", "outline", "ghost", "destructive", "link")
+    )
+    payload$variant <- variant
+  }
+  if (!missing(size)) {
+    size <- match_arg(size, c("default", "sm", "lg", "icon"))
+    payload$size <- size
+  }
+  if (!missing(icon_position)) {
+    icon_position <- match_arg(
+      icon_position,
+      c("inline-start", "inline-end"),
+      "icon_position"
+    )
+    payload$iconPosition <- icon_position
+  }
+  if (!missing(icon)) {
+    if (is.null(icon)) {
+      payload["iconName"] <- list(NULL)
+      payload["iconHtml"] <- list(NULL)
+    } else if (inherits(icon, "shiny.tag")) {
+      pos <- payload$iconPosition %||% "inline-start"
+      icon$attribs[["data-icon"]] <- pos
+      payload["iconName"] <- list(NULL)
+      payload$iconHtml <- html_fragment(icon)
+    } else {
+      validate_icon_name(icon)
+      payload$iconName <- icon
+      payload["iconHtml"] <- list(NULL)
+    }
+    payload$spriteHref <- sprite_href()
+  }
+  if (!missing(disabled)) {
+    payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["class"] <- list(class)
+  }
+
+  message_target <- runtime_mount_id("button", session$ns(input_id))
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
 }
 
 #' Create a badge

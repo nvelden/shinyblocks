@@ -74,6 +74,7 @@ reference:
   - title: Action
     contents:
       - block_button
+      - update_block_button
   - title: Icon
     contents:
       - block_icon

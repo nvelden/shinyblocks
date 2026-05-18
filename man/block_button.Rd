@@ -25,7 +25,9 @@ block_button(
 
 \item{icon_position}{Whether the icon appears before or after the label.}
 
-\item{...}{Additional attributes passed to \code{htmltools::tags$button}.}
+\item{...}{Additional attributes passed to \code{htmltools::tags$button}. Pass
+\code{id = "..."} here to make the button addressable via
+\code{\link[=update_block_button]{update_block_button()}}.}
 
 \item{class}{Additional classes.}
 }
@@ -34,5 +36,9 @@ An \code{htmltools} tag.
 }
 \description{
 Create a modern button
+}
+\seealso{
+Other action: 
+\code{\link{update_block_button}()}
 }
 \concept{action}

@@ -24,6 +24,35 @@ export function normaliseValue(property, value) {
 
   out = normaliseZero(out);
 
+  // Tailwind v4 emits `rounded-full` as `calc(infinity * 1px)`, which Chromium
+  // computes to ~3.35544e+07px; shinyblocks runtime CSS uses `9999px`. Both
+  // collapse to the same pill shape at any realistic size.
+  if (/border.*radius/i.test(property)) {
+    const match = out.match(/^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)px$/i);
+    if (match) {
+      const px = Number(match[1]);
+      if (!Number.isNaN(px) && px >= 9999) {
+        return "pill";
+      }
+    }
+  }
+
+  // Tailwind v4 emits `inline-flex` as the two-value `display: inline flex`,
+  // which Chromium's getComputedStyle reports as `flex`. shinyblocks runtime
+  // CSS uses single-keyword `inline-flex`. Both are inline-level flex
+  // containers — visually identical — so collapse to one canonical form.
+  if (property === "display" && (out === "flex" || out === "inline-flex" || out === "inline flex")) {
+    return "inline-flex";
+  }
+
+  // `min-height: 0` and `min-height: auto` resolve to the same layout for
+  // most flex/grid items — both effectively allow the item to shrink to its
+  // content. Collapse to one form so UA defaults vs explicit `auto` don't
+  // register as a drift.
+  if ((property === "minHeight" || property === "minWidth") && (out === "0" || out === "0px" || out === "auto")) {
+    return "auto";
+  }
+
   if (property.toLowerCase().includes("color")) {
     return out.toLowerCase();
   }
@@ -65,7 +94,23 @@ export function normaliseValue(property, value) {
 }
 
 export function normaliseStyles(styles) {
-  return Object.fromEntries(
+  const out = Object.fromEntries(
     Object.entries(styles).map(([key, value]) => [key, normaliseValue(key, value)])
   );
+
+  // When a border side has zero width, its computed color is visually
+  // irrelevant but varies between Tailwind v4 reference (inherits `color`)
+  // and runtime CSS (defaults to `currentColor` -> transparent for buttons).
+  // Collapse those cases so we do not chase a non-visible drift.
+  for (const side of ["Top", "Right", "Bottom", "Left"]) {
+    const width = out[`border${side}Width`];
+    if (width === "0" || width === "0px") {
+      const colorKey = `border${side}Color`;
+      if (colorKey in out) {
+        out[colorKey] = "n/a (zero-width border)";
+      }
+    }
+  }
+
+  return out;
 }

@@ -130,5 +130,22 @@ htmltools::tagList(
         )
       )
     )
+  ),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instances used by tools/parity/. Do not remove."
+  ),
+  htmltools::div(
+    style = "display: flex; gap: 0.75rem; flex-wrap: wrap;",
+    block_select(
+      "showcase_parity_select",
+      choices = c("Apple", "Banana", "Cherry"),
+      width = "180px",
+      class = "sb-parity-select-default"
+    )
   )
 )
