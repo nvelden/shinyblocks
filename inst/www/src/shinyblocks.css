@@ -532,13 +532,7 @@
   }
 
   .sb-field[data-invalid="true"] :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
-  .sb-field[data-invalid="true"] .selectize-control .selectize-input,
   .sb-field[data-invalid="true"] .sb-input-group {
-    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
-  }
-
-  .sb-field[data-invalid="true"] .sb-checkbox-indicator,
-  .sb-field[data-invalid="true"] .sb-switch-track {
     border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
   }
 
