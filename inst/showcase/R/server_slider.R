@@ -119,19 +119,19 @@ register_slider_showcase <- function(input, output, session) {
   output$showcase_slider_api_table <- shiny::renderTable({
     data.frame(
       Argument = c("input_id", "value", "min", "max", "step", "ticks", "width", "disabled", "invalid", "style", "class"),
-      Type = c("character", "numeric(1 | 2)", "numeric", "numeric", "numeric | NULL", "logical", "character", "logical", "logical", "character | list", "character"),
+      Type = c("character", "numeric", "numeric", "numeric", "numeric | NULL", "logical", "character", "logical", "logical", "character | list", "character"),
       Default = c("required", "required", "required", "required", "NULL", "FALSE", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
       Description = c(
-        "Input id reported back to Shiny as input$<id>.",
-        "Initial value: one number for a single thumb, two numbers for a range.",
-        "Lower bound.",
-        "Upper bound.",
-        "Keyboard and drag increment. NULL uses the runtime default of 1.",
-        "Accepted for API compatibility; runtime slider does not render tick labels yet.",
-        "CSS width applied to the wrapper.",
-        "Disables pointer and keyboard interaction while preserving server updates.",
+        "Input id for the slider value.",
+        "Initial slider value. Use one number for a single thumb or two numbers for a range.",
+        "Minimum slider value.",
+        "Maximum slider value.",
+        "Optional step size for pointer and keyboard updates.",
+        "Accepted for API compatibility; tick labels are not rendered yet.",
+        "Optional CSS width applied to the wrapper.",
+        "Disables user interaction while preserving server updates.",
         "Sets aria-invalid='true' to surface destructive styling.",
-        "Inline CSS styles applied to the slider control.",
+        "Inline CSS styles applied to the slider element.",
         "Additional class merged onto the runtime slider wrapper."
       )
     )
