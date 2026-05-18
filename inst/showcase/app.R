@@ -13,6 +13,7 @@ source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
+source(file.path("R", "server_tooltip.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -270,6 +271,18 @@ sections <- list(
       "and Shiny open-state/update wiring."
     ),
     file = "popover.R"
+  ),
+  list(
+    id = "tooltip",
+    label = "Tooltip",
+    icon = "info",
+    title = "Tooltip",
+    lead = paste(
+      "Hover- and focus-triggered text overlay with side/align placement,",
+      "configurable open delay, and Escape-to-close. Renders through the",
+      "package portal root to avoid clipping."
+    ),
+    file = "tooltip.R"
   )
 )
 
@@ -379,6 +392,7 @@ server <- function(input, output, session) {
   register_radio_group_showcase(input, output, session)
   register_switch_showcase(input, output, session)
   register_input_group_showcase(input, output, session)
+  register_tooltip_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
 }

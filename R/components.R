@@ -729,6 +729,65 @@ update_block_popover <- function(
   invisible(NULL)
 }
 
+#' Create a tooltip
+#'
+#' Wraps a trigger label with a small floating panel that opens on
+#' hover or keyboard focus and closes on leave, blur, or `Escape`. The
+#' content panel renders through `[data-shinyblocks-portal-root]` to
+#' avoid clipping by ancestor `overflow` or `transform`. Tooltips have
+#' no Shiny input binding; treat them as purely presentational.
+#'
+#' @param trigger Single string label rendered on the trigger button.
+#' @param ... Tooltip content. HTML tags or text are accepted and
+#'   serialized into the runtime payload.
+#' @param side Side relative to the trigger. One of `"bottom"`,
+#'   `"top"`, `"left"`, `"right"`. Defaults to `"top"`.
+#' @param align Alignment along the anchored side. One of `"center"`,
+#'   `"start"`, `"end"`. Defaults to `"center"`.
+#' @param delay_duration Milliseconds to wait after hover/focus before
+#'   opening. Defaults to `700`.
+#' @param style Optional inline CSS applied to the tooltip content
+#'   container (string or named list).
+#' @param class Additional classes for the tooltip content container.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_tooltip <- function(
+  trigger,
+  ...,
+  side = c("top", "bottom", "left", "right"),
+  align = c("center", "start", "end"),
+  delay_duration = 700,
+  style = NULL,
+  class = NULL
+) {
+  if (missing(trigger) || is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
+    stop("`trigger` must be a single string label.", call. = FALSE)
+  }
+  side <- match.arg(side)
+  align <- match.arg(align)
+  if (!is.numeric(delay_duration) || length(delay_duration) != 1 || delay_duration < 0) {
+    stop("`delay_duration` must be a non-negative numeric scalar.", call. = FALSE)
+  }
+
+  content_style <- if (!is.null(style)) normalize_runtime_style(style) else NULL
+
+  runtime_component(
+    component = "tooltip",
+    props = list(
+      triggerLabel = trigger,
+      bodyHtml = html_fragment(...),
+      side = side,
+      align = align,
+      delayDuration = as.integer(delay_duration),
+      contentStyle = content_style,
+      contentClass = class
+    ),
+    binding = list(input = FALSE)
+  )
+}
+
 #' Create a value box
 #'
 #' @param title Value box title.
