@@ -89,7 +89,7 @@ sprite_href <- function() {
     return("shinyblocks/icons/sprite.svg")
   }
 
-  sprintf("shinyblocks-%s/icons/sprite.svg", shinyblocks_version())
+  sprintf("shinyblocks-%s/icons/sprite.svg", shinyblocks_asset_version())
 }
 
 icon_symbol_id <- function(name) {
