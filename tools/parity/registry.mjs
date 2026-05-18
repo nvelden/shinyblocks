@@ -414,9 +414,9 @@ export const REGISTRY = {
             '[data-parity-component="slider"] [data-parity-state="disabled"][data-parity-role="root"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny',
-          hover: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny',
-          disabled: '[data-sb-section="slider"] .sb-slider[data-disabled="true"] .irs--shiny'
+          default: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider"]',
+          hover: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider"]',
+          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled [data-slot="slider"]'
         }
       },
       rail: {
@@ -428,9 +428,9 @@ export const REGISTRY = {
             '[data-parity-component="slider"] [data-parity-state="disabled"] [data-parity-role="rail"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-line',
-          hover: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-line',
-          disabled: '[data-sb-section="slider"] .sb-slider[data-disabled="true"] .irs--shiny .irs-line'
+          default: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-track"]',
+          hover: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-track"]',
+          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled [data-slot="slider-track"]'
         }
       },
       range: {
@@ -442,9 +442,9 @@ export const REGISTRY = {
             '[data-parity-component="slider"] [data-parity-state="disabled"] [data-parity-role="range"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-bar',
-          hover: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-bar',
-          disabled: '[data-sb-section="slider"] .sb-slider[data-disabled="true"] .irs--shiny .irs-bar'
+          default: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-range"]',
+          hover: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-range"]',
+          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled [data-slot="slider-range"]'
         }
       },
       thumb: {
@@ -456,9 +456,9 @@ export const REGISTRY = {
             '[data-parity-component="slider"] [data-parity-state="disabled"] [data-parity-role="thumb"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-handle',
-          hover: '[data-sb-section="slider"] .sb-slider:not([data-disabled="true"]) .irs--shiny .irs-handle',
-          disabled: '[data-sb-section="slider"] .sb-slider[data-disabled="true"] .irs--shiny .irs-handle'
+          default: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-thumb"]',
+          hover: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider-thumb"]',
+          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled [data-slot="slider-thumb"]'
         }
       }
     },

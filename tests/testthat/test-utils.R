@@ -318,6 +318,57 @@ test_that("cosmetic update_block_switch messages do not notify", {
   expect_null(message$checked)
 })
 
+test_that("update_block_slider sends input binding messages", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- list(input_id = input_id, payload = payload)
+    }
+  )
+
+  expect_invisible(
+    update_block_slider(
+      session,
+      "volume",
+      value = c(25, 75),
+      min = 0,
+      max = 100,
+      step = 5,
+      disabled = TRUE,
+      invalid = TRUE,
+      style = "max-width: 20rem;",
+      class = "custom-slider",
+      notify = TRUE
+    )
+  )
+
+  expect_identical(message$input_id, "sb-runtime-slider-volume")
+  expect_identical(message$payload$value, c(25, 75))
+  expect_identical(message$payload$min, 0)
+  expect_identical(message$payload$max, 100)
+  expect_identical(message$payload$step, 5)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$invalid, TRUE)
+  expect_identical(message$payload$style$maxWidth, "20rem")
+  expect_identical(message$payload$class, "custom-slider")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_slider messages do not notify", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_slider(session, "volume", class = "renamed")
+  expect_identical(message$notify, FALSE)
+  expect_null(message$value)
+})
+
 test_that("update_block_dialog sends input binding messages", {
   message <- NULL
   session <- list(

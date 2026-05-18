@@ -95,13 +95,20 @@ try {
     "true"
   );
 
-  await page.fill("#showcase_button_doc_style", "color: red;");
+  await page.fill(
+    "[data-sb-component='textarea'][data-sb-input-id='showcase_button_doc_style'] [data-slot='textarea-control']",
+    "color: red;"
+  );
   await page.waitForFunction(() => {
-    const button = document.querySelector("#showcase_button_preview");
+    const button = document.querySelector(
+      "[data-sb-component='button'][data-sb-input-id='showcase_button_preview'] [data-slot='button']"
+    );
     return button && getComputedStyle(button).color === "rgb(255, 0, 0)";
   });
 
-  const preview = await page.locator("#showcase_button_preview").evaluate((node) => {
+  const preview = await page.locator(
+    "[data-sb-component='button'][data-sb-input-id='showcase_button_preview'] [data-slot='button']"
+  ).evaluate((node) => {
     const style = getComputedStyle(node);
     return {
       display: style.display,

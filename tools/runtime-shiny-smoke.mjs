@@ -157,6 +157,25 @@ try {
       document.querySelector("[data-sb-component='switch'] [data-slot='switch-control']")?.disabled === false;
   });
 
+  await assertText(page, "#runtime_slider_value", "50");
+  await page.click("#set_slider_75");
+  await assertText(page, "#runtime_slider_value", "75");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_slider")?.value),
+    "75",
+    "runtime slider should keep the hidden native value"
+  );
+  await page.click("#disable_slider");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_slider")?.disabled === true &&
+      document.querySelector("[data-sb-component='slider'] [data-slot='slider-thumb']")?.disabled === true;
+  });
+  await page.click("#enable_slider");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_slider")?.disabled === false &&
+      document.querySelector("[data-sb-component='slider'] [data-slot='slider-thumb']")?.disabled === false;
+  });
+
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
   await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({

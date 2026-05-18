@@ -479,9 +479,8 @@ update_block_switch <- function(
 
 #' Create a styled slider input
 #'
-#' Wraps [`shiny::sliderInput()`] with token-driven track, range, and
-#' thumb styling that tracks the shadcn slider contract. Wrap-by-
-#' default per ADR 0014.
+#' Runtime-rendered slider with a dedicated Shiny input binding. Supports
+#' single-value and two-value range sliders.
 #'
 #' @param input_id Input id.
 #' @param value Initial value. Length 1 for a single-handle slider;
@@ -492,7 +491,10 @@ update_block_switch <- function(
 #' @param ticks Whether to show tick marks on the rail.
 #' @param width Optional CSS width value.
 #' @param disabled Whether the control is disabled.
-#' @param class Additional classes.
+#' @param invalid Whether the control should show invalid styling
+#'   (sets `aria-invalid="true"`).
+#' @param style Inline CSS styles for the slider control.
+#' @param class Additional classes for the wrapper.
 #'
 #' @return An `htmltools` tag.
 #' @family forms
@@ -506,8 +508,11 @@ block_slider <- function(
   ticks = FALSE,
   width = NULL,
   disabled = FALSE,
+  invalid = FALSE,
+  style = NULL,
   class = NULL
 ) {
+  validate_input_id(input_id)
   if (missing(value) || !is.numeric(value) || length(value) < 1 ||
         length(value) > 2 || any(is.na(value))) {
     stop(
@@ -524,31 +529,134 @@ block_slider <- function(
   if (min >= max) {
     stop("`min` must be strictly less than `max`.", call. = FALSE)
   }
-
-  slider_tag <- shiny::sliderInput(
-    inputId = input_id,
-    label = NULL,
-    min = min,
-    max = max,
-    value = value,
-    step = step,
-    ticks = isTRUE(ticks),
-    width = width %||% "100%"
-  )
-
-  query <- htmltools::tagQuery(slider_tag)
-  query$find("input")$addClass("sb-slider-control")
-
-  if (disabled) {
-    query$find("input")$addAttrs(disabled = NA)
+  if (!is.null(step) && (!is.numeric(step) || length(step) != 1 || is.na(step) || step <= 0)) {
+    stop("`step` must be a single positive numeric value.", call. = FALSE)
   }
 
-  attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes("sb-slider", class),
-      `data-disabled` = if (disabled) "true" else NULL,
-      query$allTags()
-    )
+  hidden_native <- htmltools::tags$input(
+    id = input_id,
+    type = "hidden",
+    class = "sb-slider-native",
+    tabindex = "-1",
+    `aria-hidden` = "true",
+    `data-shiny-no-bind-input` = "",
+    value = paste(value, collapse = ",")
+  )
+
+  wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
+
+  runtime_component(
+    component = "slider",
+    props = list(
+      min = min,
+      max = max,
+      step = step,
+      ticks = isTRUE(ticks),
+      disabled = isTRUE(disabled),
+      invalid = isTRUE(invalid),
+      style = normalize_runtime_style(style)
+    ),
+    input_id = input_id,
+    state = list(value = as.numeric(value)),
+    binding = list(input = TRUE, type = "shinyblocks.slider"),
+    class = merge_classes("sb-slider", class),
+    style = wrapper_style,
+    children = list(hidden_native)
   )
 }
 
+#' Update a runtime slider input
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_slider()`.
+#' @param value Optional replacement value. One or two numeric values.
+#' @param min Optional lower bound.
+#' @param max Optional upper bound.
+#' @param step Optional step size.
+#' @param disabled Optional disabled state.
+#' @param invalid Optional invalid flag.
+#' @param style Optional replacement inline CSS styles for the slider.
+#' @param class Optional replacement classes for the wrapper.
+#' @param notify Whether Shiny should receive an input event when `value`
+#'   changes. Cosmetic-only updates never notify.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family forms
+#' @export
+update_block_slider <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  value,
+  min,
+  max,
+  step,
+  disabled,
+  invalid,
+  style,
+  class,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$ns)) {
+    stop("`session` must provide an `ns()` method.", call. = FALSE)
+  }
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  payload <- list()
+
+  if (!missing(value)) {
+    if (is.null(value) || !is.numeric(value) || length(value) < 1 ||
+          length(value) > 2 || any(is.na(value))) {
+      stop("`value` must be one or two numeric values.", call. = FALSE)
+    }
+    payload$value <- as.numeric(value)
+  }
+  if (!missing(min)) {
+    if (!is.numeric(min) || length(min) != 1 || is.na(min)) {
+      stop("`min` must be a single numeric value.", call. = FALSE)
+    }
+    payload$min <- as.numeric(min)
+  }
+  if (!missing(max)) {
+    if (!is.numeric(max) || length(max) != 1 || is.na(max)) {
+      stop("`max` must be a single numeric value.", call. = FALSE)
+    }
+    payload$max <- as.numeric(max)
+  }
+  if (!missing(min) && !missing(max) && min >= max) {
+    stop("`min` must be strictly less than `max`.", call. = FALSE)
+  }
+  if (!missing(step)) {
+    if (is.null(step)) {
+      payload["step"] <- list(NULL)
+    } else {
+      if (!is.numeric(step) || length(step) != 1 || is.na(step) || step <= 0) {
+        stop("`step` must be a single positive numeric value.", call. = FALSE)
+      }
+      payload$step <- as.numeric(step)
+    }
+  }
+  if (!missing(disabled)) {
+    payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(invalid)) {
+    payload$invalid <- isTRUE(invalid)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+  }
+  if (!missing(class)) {
+    payload["class"] <- list(class)
+  }
+
+  payload$notify <- isTRUE(notify) && "value" %in% names(payload)
+  message_target <- runtime_mount_id("slider", session$ns(input_id))
+
+  session$sendInputMessage(message_target, payload)
+  invisible(NULL)
+}

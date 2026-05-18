@@ -169,6 +169,13 @@ phase begins.
 >   binding, arrow-key navigation, `orientation` (vertical/
 >   horizontal), `invalid` flag, and a server updater covering
 >   selected/choices/disabled/invalid/orientation/style/class.
+> - **Phase 5.10 slider runtime migration** — `block_slider()` now
+>   renders through the package runtime instead of
+>   `shiny::sliderInput()` / ion.rangeSlider, with a hidden native
+>   `<input>`, dedicated `shinyblocks.slider` binding, single-value and
+>   range support, pointer/keyboard interaction, `invalid` and `style`
+>   args, and `update_block_slider()` for value/min/max/step/disabled/
+>   invalid/style/class server updates.
 > - **Parity gate cleared (2026-05-18)** — `make parity-ci` is fully
 >   green across all nine registered components (alert, badge, button,
 >   checkbox, select, separator, slider, switch, textarea). Issues
@@ -229,9 +236,8 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Current natural-next work (no hard gate blocker):
-> - Phase 5 remaining controls — `block_slider()` runtime migration,
->   `block_input_group()` runtime migration, `block_tabs()` /
->   `block_tab()` cleanup, then deletion of ionRangeSlider /
+> - Phase 5 remaining controls — `block_input_group()` runtime
+>   migration, `block_tabs()` / `block_tab()` cleanup, then deletion of
 >   Bootstrap-tab / wrapped-input CSS + tests.
 > - Phase 4 remaining overlays — `block_dropdown_menu()`,
 >   `block_sheet()`, `block_drawer()`, `block_hover_card()`.

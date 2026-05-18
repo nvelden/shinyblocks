@@ -13,6 +13,7 @@ source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
+source(file.path("R", "server_slider.R"), local = TRUE)
 source(file.path("R", "server_tooltip.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
@@ -173,8 +174,8 @@ sections <- list(
     icon = "sliders-horizontal",
     title = "Slider",
     lead = paste(
-      "Wraps shiny::sliderInput with token-driven track, range, and",
-      "thumb styling that tracks the shadcn slider contract."
+      "Runtime-rendered single-value and range slider with Shiny value binding,",
+      "disabled/invalid state, and update_block_slider() server updates."
     ),
     file = "slider.R"
   ),
@@ -392,6 +393,7 @@ server <- function(input, output, session) {
   register_radio_group_showcase(input, output, session)
   register_switch_showcase(input, output, session)
   register_input_group_showcase(input, output, session)
+  register_slider_showcase(input, output, session)
   register_tooltip_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)

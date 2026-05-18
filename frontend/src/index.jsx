@@ -110,6 +110,10 @@ function isRadioGroupPayload(payload) {
   return payload && payload.component === "radio-group";
 }
 
+function isSliderPayload(payload) {
+  return payload && payload.component === "slider";
+}
+
 function nativeSelect(root) {
   return root ? root.querySelector(".sb-select-native") : null;
 }
@@ -158,6 +162,40 @@ function setNativeRadioGroupValue(root, value) {
   const native = nativeRadioGroup(root);
   if (!native) return;
   native.value = value == null ? "" : String(value);
+}
+
+function nativeSlider(root) {
+  return root ? root.querySelector("input.sb-slider-native") : null;
+}
+
+function sliderValueToNative(value) {
+  if (Array.isArray(value)) return value.join(",");
+  return value == null ? "" : String(value);
+}
+
+function normalizeSliderValue(value, min, max) {
+  const fallback = Number.isFinite(min) ? min : 0;
+  const values = Array.isArray(value) ? value : [value];
+  const normalized = values
+    .slice(0, 2)
+    .map((item) => Number(item))
+    .filter((item) => Number.isFinite(item));
+  if (!normalized.length) normalized.push(fallback);
+  const low = Number.isFinite(min) ? min : Math.min(...normalized);
+  const high = Number.isFinite(max) ? max : Math.max(...normalized);
+  const clamped = normalized.map((item) => Math.min(high, Math.max(low, item)));
+  if (clamped.length === 2 && clamped[0] > clamped[1]) clamped.sort((a, b) => a - b);
+  return Array.isArray(value) ? clamped.slice(0, 2) : clamped[0];
+}
+
+function setNativeSliderValue(root, value, notify) {
+  const native = nativeSlider(root);
+  if (!native) return;
+  native.value = sliderValueToNative(value);
+  if (notify) {
+    native.dispatchEvent(new Event("input", { bubbles: true }));
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 }
 
 function nativeSwitch(root) {
@@ -969,6 +1007,89 @@ function unbindRadioGroupRoot(root) {
   window.Shiny.unbindAll(root);
 }
 
+function registerSliderBinding() {
+  if (
+    window.shinyblocksSliderBindingRegistered ||
+    !window.Shiny ||
+    !window.Shiny.InputBinding ||
+    !window.Shiny.inputBindings
+  ) {
+    return;
+  }
+
+  class ShinyblocksSliderBinding extends window.Shiny.InputBinding {
+    find(scope) {
+      const selector =
+        "[data-shinyblocks-runtime='true'][data-sb-component='slider'][data-sb-input-id]";
+      const root = scope || document;
+      const matches = Array.from(root.querySelectorAll(selector));
+      if (root.matches && root.matches(selector)) {
+        matches.unshift(root);
+      }
+      return matches.filter((el) => Boolean(el.dataset.sbInputId));
+    }
+
+    getId(el) {
+      return el.dataset.sbInputId;
+    }
+
+    getType() {
+      return null;
+    }
+
+    getValue(el) {
+      if (Object.prototype.hasOwnProperty.call(el, "__sbSliderValue")) {
+        return el.__sbSliderValue;
+      }
+      return currentValue(readPayload(el));
+    }
+
+    setValue(el, value) {
+      if (typeof el.__sbSliderReceive === "function") {
+        el.__sbSliderReceive({ value, notify: false });
+      }
+    }
+
+    subscribe(el, callback) {
+      const handler = () => callback(false);
+      el.addEventListener("sb:slider-change", handler);
+      el.__sbSliderChangeHandler = handler;
+    }
+
+    unsubscribe(el) {
+      if (!el.__sbSliderChangeHandler) return;
+      el.removeEventListener("sb:slider-change", el.__sbSliderChangeHandler);
+      delete el.__sbSliderChangeHandler;
+    }
+
+    receiveMessage(el, data) {
+      if (typeof el.__sbSliderReceive === "function") {
+        el.__sbSliderReceive(data || {});
+      }
+    }
+
+    getRatePolicy() {
+      return null;
+    }
+  }
+
+  window.Shiny.inputBindings.register(
+    new ShinyblocksSliderBinding(),
+    "shinyblocks.slider"
+  );
+  window.shinyblocksSliderBindingRegistered = true;
+}
+
+function bindSliderRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindSliderRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
+}
+
 function RuntimeMount({ payload, root }) {
   if (payload.component === "button") {
     return <Button payload={payload} root={root} />;
@@ -1036,6 +1157,10 @@ function RuntimeMount({ payload, root }) {
 
   if (payload.component === "radio-group") {
     return <RadioGroup payload={payload} root={root} />;
+  }
+
+  if (payload.component === "slider") {
+    return <Slider payload={payload} root={root} />;
   }
 
   if (payload.component === "select") {
@@ -1997,6 +2122,12 @@ function Checkbox({ payload, root }) {
         const nextChecked = Boolean(nextData.checked);
         setCheckedState(nextChecked);
         setNativeCheckboxValue(root, nextChecked, Boolean(nextData.notify));
+        if (nextData.notify) {
+          requestAnimationFrame(() => {
+            root.__sbCheckboxValue = nextChecked;
+            root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
+          });
+        }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
         const nextDisabled = Boolean(nextData.disabled);
@@ -2135,6 +2266,12 @@ function Switch({ payload, root }) {
         const nextChecked = Boolean(nextData.checked);
         setCheckedState(nextChecked);
         setNativeSwitchValue(root, nextChecked, Boolean(nextData.notify));
+        if (nextData.notify) {
+          requestAnimationFrame(() => {
+            root.__sbSwitchValue = nextChecked;
+            root.dispatchEvent(new CustomEvent("sb:switch-change"));
+          });
+        }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
         const nextDisabled = Boolean(nextData.disabled);
@@ -2488,6 +2625,254 @@ function RadioGroup({ payload, root }) {
           </label>
         );
       })}
+    </div>
+  );
+}
+
+function Slider({ payload, root }) {
+  const props = payload.props || {};
+  const state = payload.state || {};
+  const inputId = payload.id;
+  const initialMin = Number(props.min);
+  const initialMax = Number(props.max);
+  const [min, setMin] = useState(Number.isFinite(initialMin) ? initialMin : 0);
+  const [max, setMax] = useState(Number.isFinite(initialMax) ? initialMax : 100);
+  const [step, setStep] = useState(Number(props.step) > 0 ? Number(props.step) : 1);
+  const [disabled, setDisabled] = useState(Boolean(props.disabled));
+  const [invalid, setInvalid] = useState(Boolean(props.invalid));
+  const [style, setStyle] = useState(props.style || {});
+  const [className, setClassName] = useState(payload.className || "");
+  const [activeThumb, setActiveThumb] = useState(0);
+  const rangeMode = Array.isArray(state.value) && state.value.length > 1;
+  const [value, setValueState] = useState(
+    normalizeSliderValue(rangeMode ? state.value.slice(0, 2) : state.value, min, max)
+  );
+  const labelledBy = inputId ? labelIdForInput(inputId) : null;
+  const describedBy = root?.getAttribute("aria-describedby") || undefined;
+  const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
+  const isInvalid = invalid || wrapperInvalid;
+  const trackRef = useRef(null);
+
+  function valuesArray(nextValue = value) {
+    return Array.isArray(nextValue) ? nextValue : [nextValue];
+  }
+
+  function percentFor(item) {
+    if (max === min) return 0;
+    return ((Number(item) - min) / (max - min)) * 100;
+  }
+
+  function quantize(raw, nextMin = min, nextMax = max, nextStep = step) {
+    const usableStep = Number(nextStep) > 0 ? Number(nextStep) : 1;
+    const clamped = Math.min(nextMax, Math.max(nextMin, Number(raw)));
+    const snapped = Math.round((clamped - nextMin) / usableStep) * usableStep + nextMin;
+    const precision = Math.max(0, String(usableStep).split(".")[1]?.length || 0);
+    return Number(Math.min(nextMax, Math.max(nextMin, snapped)).toFixed(precision));
+  }
+
+  function normalized(nextValue, nextMin = min, nextMax = max, nextStep = step) {
+    const next = normalizeSliderValue(nextValue, nextMin, nextMax);
+    if (Array.isArray(next)) return next.map((item) => quantize(item, nextMin, nextMax, nextStep));
+    return quantize(next, nextMin, nextMax, nextStep);
+  }
+
+  function commit(nextValue, notify = false) {
+    const next = normalized(nextValue);
+    setValueState(next);
+    if (!root) return;
+    root.__sbSliderValue = next;
+    root.dataset.sbSliderValue = sliderValueToNative(next);
+    setNativeSliderValue(root, next, notify);
+    if (notify) root.dispatchEvent(new CustomEvent("sb:slider-change"));
+  }
+
+  function valueFromPointer(event) {
+    const track = trackRef.current;
+    if (!track) return min;
+    const rect = track.getBoundingClientRect();
+    const ratio = rect.width <= 0 ? 0 : (event.clientX - rect.left) / rect.width;
+    return quantize(min + Math.min(1, Math.max(0, ratio)) * (max - min));
+  }
+
+  function chooseThumb(nextValue) {
+    const values = valuesArray();
+    if (values.length < 2) return 0;
+    return Math.abs(nextValue - values[0]) <= Math.abs(nextValue - values[1]) ? 0 : 1;
+  }
+
+  function updateThumb(index, nextValue, notify = true) {
+    const values = valuesArray();
+    if (values.length === 1) {
+      commit(nextValue, notify);
+      return;
+    }
+    const nextValues = values.slice(0, 2);
+    nextValues[index] = nextValue;
+    if (index === 0) nextValues[0] = Math.min(nextValues[0], nextValues[1]);
+    if (index === 1) nextValues[1] = Math.max(nextValues[0], nextValues[1]);
+    commit(nextValues, notify);
+  }
+
+  function handlePointerDown(event) {
+    if (disabled) return;
+    event.preventDefault();
+    const nextValue = valueFromPointer(event);
+    const thumb = chooseThumb(nextValue);
+    setActiveThumb(thumb);
+    updateThumb(thumb, nextValue, true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }
+
+  function handlePointerMove(event) {
+    if (disabled || event.buttons !== 1) return;
+    updateThumb(activeThumb, valueFromPointer(event), true);
+  }
+
+  function handleKeyDown(event, index) {
+    if (disabled) return;
+    const values = valuesArray();
+    const current = values[index] ?? values[0] ?? min;
+    let next = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowUp") next = current + step;
+    if (event.key === "ArrowLeft" || event.key === "ArrowDown") next = current - step;
+    if (event.key === "PageUp") next = current + step * 10;
+    if (event.key === "PageDown") next = current - step * 10;
+    if (event.key === "Home") next = min;
+    if (event.key === "End") next = max;
+    if (next == null) return;
+
+    event.preventDefault();
+    setActiveThumb(index);
+    updateThumb(index, next, true);
+  }
+
+  useEffect(() => {
+    if (root) {
+      root.__sbSliderValue = value;
+      root.dataset.sbSliderValue = sliderValueToNative(value);
+      setNativeSliderValue(root, value, false);
+    }
+  }, [value, root]);
+
+  useEffect(() => {
+    if (!root) return undefined;
+
+    root.__sbSliderReceive = (data) => {
+      const nextData = data || {};
+      let nextMin = min;
+      let nextMax = max;
+      let nextStep = step;
+
+      if (Object.prototype.hasOwnProperty.call(nextData, "min")) {
+        const parsedMin = Number(nextData.min);
+        if (Number.isFinite(parsedMin)) {
+          nextMin = parsedMin;
+          setMin(parsedMin);
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "max")) {
+        const parsedMax = Number(nextData.max);
+        if (Number.isFinite(parsedMax)) {
+          nextMax = parsedMax;
+          setMax(parsedMax);
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "step")) {
+        const parsedStep = Number(nextData.step);
+        nextStep = parsedStep > 0 ? parsedStep : 1;
+        setStep(nextStep);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "value")) {
+        const nextValue = normalizeSliderValue(nextData.value, nextMin, nextMax);
+        const next = Array.isArray(nextValue)
+          ? nextValue.map((item) => quantize(item, nextMin, nextMax, nextStep))
+          : quantize(nextValue, nextMin, nextMax, nextStep);
+        setValueState(next);
+        setNativeSliderValue(root, next, Boolean(nextData.notify));
+        if (nextData.notify) {
+          requestAnimationFrame(() => {
+            root.__sbSliderValue = next;
+            root.dispatchEvent(new CustomEvent("sb:slider-change"));
+          });
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
+        const nextDisabled = Boolean(nextData.disabled);
+        setDisabled(nextDisabled);
+        root.toggleAttribute("data-disabled", nextDisabled);
+        const native = nativeSlider(root);
+        if (native) native.disabled = nextDisabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "invalid")) {
+        setInvalid(Boolean(nextData.invalid));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setClassName(nextData.class || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setStyle(nextData.style || {});
+      }
+    };
+
+    return () => {
+      delete root.__sbSliderReceive;
+    };
+  }, [max, min, root, step, value]);
+
+  useEffect(() => {
+    if (!root) return;
+    root.toggleAttribute("data-disabled", disabled);
+    const native = nativeSlider(root);
+    if (native) native.disabled = disabled;
+  }, [disabled, root]);
+
+  const values = valuesArray();
+  const lower = values.length > 1 ? values[0] : min;
+  const upper = values.length > 1 ? values[1] : values[0];
+  const left = Math.min(100, Math.max(0, percentFor(lower)));
+  const right = Math.min(100, Math.max(0, percentFor(upper)));
+
+  return (
+    <div
+      className={classNames("sb-slider", className)}
+      data-slot="slider"
+      data-disabled={disabled ? "true" : undefined}
+      data-invalid={isInvalid ? "true" : undefined}
+      style={style}
+    >
+      <div
+        ref={trackRef}
+        className="sb-slider-track"
+        data-slot="slider-track"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+      >
+        <div
+          className="sb-slider-range"
+          data-slot="slider-range"
+          style={{ left: `${left}%`, width: `${Math.max(0, right - left)}%` }}
+        />
+      </div>
+      {values.map((item, index) => (
+        <button
+          key={index}
+          type="button"
+          className="sb-slider-thumb"
+          data-slot="slider-thumb"
+          role="slider"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={item}
+          aria-labelledby={labelledBy || undefined}
+          aria-describedby={describedBy}
+          aria-invalid={isInvalid || undefined}
+          disabled={disabled}
+          style={{ left: `${percentFor(item)}%` }}
+          onFocus={() => setActiveThumb(index)}
+          onKeyDown={(event) => handleKeyDown(event, index)}
+        />
+      ))}
     </div>
   );
 }
@@ -2977,6 +3362,7 @@ function mountRoot(root) {
   registerPopoverBinding();
   registerCheckboxBinding();
   registerSwitchBinding();
+  registerSliderBinding();
   payload.rootAttrs = {
     ariaInvalid: root.getAttribute("aria-invalid"),
     ariaDescribedby: root.getAttribute("aria-describedby")
@@ -3005,6 +3391,8 @@ function mountRoot(root) {
     bindInputRoot(root);
   } else if (isRadioGroupPayload(payload)) {
     bindRadioGroupRoot(root);
+  } else if (isSliderPayload(payload)) {
+    bindSliderRoot(root);
   } else {
     bindShinyChildren(root);
   }
@@ -3020,7 +3408,8 @@ function mountRoot(root) {
     !isSwitchPayload(payload) &&
     !isTextareaPayload(payload) &&
     !isInputPayload(payload) &&
-    !isRadioGroupPayload(payload)
+    !isRadioGroupPayload(payload) &&
+    !isSliderPayload(payload)
   ) {
     const initialized = setInputValue(payload.id, currentValue(payload), "event");
     if (!initialized) {
@@ -3050,6 +3439,8 @@ function unmountRoot(root) {
     unbindInputRoot(root);
   } else if (isRadioGroupPayload(mountedRoot.payload)) {
     unbindRadioGroupRoot(root);
+  } else if (isSliderPayload(mountedRoot.payload)) {
+    unbindSliderRoot(root);
   } else {
     unbindShinyChildren(root);
   }
@@ -3073,6 +3464,7 @@ function flushPendingInputs(container) {
       isSelectPayload(payload) ||
       isCheckboxPayload(payload) ||
       isSwitchPayload(payload) ||
+      isSliderPayload(payload) ||
       !payload.id ||
       !payload.binding ||
       !payload.binding.input
@@ -3196,6 +3588,7 @@ function init() {
   registerTextareaBinding();
   registerInputBinding();
   registerRadioGroupBinding();
+  registerSliderBinding();
   mountAll(document);
   observeDynamicUi();
   registerUpdateHandler();
@@ -3224,6 +3617,7 @@ document.addEventListener("shiny:connected", function connected() {
   registerTextareaBinding();
   registerInputBinding();
   registerRadioGroupBinding();
+  registerSliderBinding();
   flushPendingInputs(document);
   schedulePendingInputFlush();
 });
