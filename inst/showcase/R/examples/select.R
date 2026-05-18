@@ -106,5 +106,22 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_select_api_table")
+  shiny::tableOutput("showcase_select_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instance captured by tools/parity/. Do not remove."
+  ),
+  htmltools::div(
+    style = "padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+    block_select(
+      "showcase_parity_select",
+      choices = c("Apple", "Banana", "Cherry"),
+      width = "180px",
+      class = "sb-parity-select-default"
+    )
+  )
 )

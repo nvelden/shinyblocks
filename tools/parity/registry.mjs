@@ -379,16 +379,16 @@ export const REGISTRY = {
   select: {
     component: "select",
     parityUrl: "http://127.0.0.1:5173/?component=select",
-    showcaseUrl: "http://127.0.0.1:4321/#field",
-    showcaseReadySelector: '[data-sb-section="field"]:not([hidden])',
+    showcaseUrl: "http://127.0.0.1:4321/#select",
+    showcaseReadySelector: '[data-sb-section="select"]:not([hidden])',
     referenceSelectors: {
       default: '[data-parity-component="select"] [data-parity-state="default"]',
       open: '[data-parity-component="select"] [data-parity-state="open"]'
     },
     showcaseSelectors: {
       default:
-        '[data-sb-section="field"] .sb-parity-select-default button[data-slot="select-trigger"]',
-      open: '[data-sb-section="field"] .sb-parity-select-default button[data-slot="select-trigger"]'
+        '[data-sb-section="select"] .sb-parity-select-default button[data-slot="select-trigger"]',
+      open: '[data-sb-section="select"] .sb-parity-select-default button[data-slot="select-trigger"]'
     },
     props: SELECT_PROPS,
     states: ["default", "open"],
@@ -471,8 +471,8 @@ export const REGISTRY = {
   checkbox: {
     component: "checkbox",
     parityUrl: "http://127.0.0.1:5173/?component=checkbox",
-    showcaseUrl: "http://127.0.0.1:4321/#field",
-    showcaseReadySelector: '[data-sb-section="field"]:not([hidden])',
+    showcaseUrl: "http://127.0.0.1:4321/#checkbox",
+    showcaseReadySelector: '[data-sb-section="checkbox"]:not([hidden])',
     roles: {
       text: {
         props: CHECKBOX_TEXT_PROPS,
@@ -484,11 +484,11 @@ export const REGISTRY = {
         },
         showcaseSelectors: {
           default:
-            '[data-sb-section="field"] .sb-parity-checkbox-default .sb-checkbox-text',
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-default .sb-checkbox-text',
           checked:
-            '[data-sb-section="field"] .sb-parity-checkbox-checked .sb-checkbox-text',
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-checked .sb-checkbox-text',
           disabled:
-            '[data-sb-section="field"] .sb-parity-checkbox-disabled .sb-checkbox-text'
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-disabled .sb-checkbox-text'
         }
       },
       indicator: {
@@ -501,11 +501,11 @@ export const REGISTRY = {
         },
         showcaseSelectors: {
           default:
-            '[data-sb-section="field"] .sb-parity-checkbox-default button[data-slot="checkbox-control"]',
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-default button[data-slot="checkbox-control"]',
           checked:
-            '[data-sb-section="field"] .sb-parity-checkbox-checked button[data-slot="checkbox-control"]',
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-checked button[data-slot="checkbox-control"]',
           disabled:
-            '[data-sb-section="field"] .sb-parity-checkbox-disabled button[data-slot="checkbox-control"]'
+            '[data-sb-section="checkbox"] .sb-parity-checkbox-disabled button[data-slot="checkbox-control"]'
         }
       }
     },
@@ -515,8 +515,8 @@ export const REGISTRY = {
   switch: {
     component: "switch",
     parityUrl: "http://127.0.0.1:5173/?component=switch",
-    showcaseUrl: "http://127.0.0.1:4321/#field",
-    showcaseReadySelector: '[data-sb-section="field"]:not([hidden])',
+    showcaseUrl: "http://127.0.0.1:4321/#switch",
+    showcaseReadySelector: '[data-sb-section="switch"]:not([hidden])',
     roles: {
       text: {
         props: SWITCH_TEXT_PROPS,
@@ -527,9 +527,9 @@ export const REGISTRY = {
             '[data-parity-component="switch"] [data-parity-state="disabled"] [data-parity-role="text"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="field"] .sb-parity-switch-default .sb-switch-text',
-          checked: '[data-sb-section="field"] .sb-parity-switch-checked .sb-switch-text',
-          disabled: '[data-sb-section="field"] .sb-parity-switch-disabled .sb-switch-text'
+          default: '[data-sb-section="switch"] .sb-parity-switch-default .sb-switch-text',
+          checked: '[data-sb-section="switch"] .sb-parity-switch-checked .sb-switch-text',
+          disabled: '[data-sb-section="switch"] .sb-parity-switch-disabled .sb-switch-text'
         }
       },
       track: {
@@ -541,9 +541,9 @@ export const REGISTRY = {
             '[data-parity-component="switch"] [data-parity-state="disabled"] [data-parity-role="track"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="field"] .sb-parity-switch-default button[data-slot="switch-control"]',
-          checked: '[data-sb-section="field"] .sb-parity-switch-checked button[data-slot="switch-control"]',
-          disabled: '[data-sb-section="field"] .sb-parity-switch-disabled button[data-slot="switch-control"]'
+          default: '[data-sb-section="switch"] .sb-parity-switch-default button[data-slot="switch-control"]',
+          checked: '[data-sb-section="switch"] .sb-parity-switch-checked button[data-slot="switch-control"]',
+          disabled: '[data-sb-section="switch"] .sb-parity-switch-disabled button[data-slot="switch-control"]'
         }
       }
     },
@@ -553,8 +553,8 @@ export const REGISTRY = {
   textarea: {
     component: "textarea",
     parityUrl: "http://127.0.0.1:5173/?component=textarea",
-    showcaseUrl: "http://127.0.0.1:4321/#field",
-    showcaseReadySelector: '[data-sb-section="field"]:not([hidden])',
+    showcaseUrl: "http://127.0.0.1:4321/#textarea",
+    showcaseReadySelector: '[data-sb-section="textarea"]:not([hidden])',
     referenceSelectors: {
       default: '[data-parity-component="textarea"] [data-parity-state="default"]',
       focus: '[data-parity-component="textarea"] [data-parity-state="focus"]',
@@ -562,10 +562,10 @@ export const REGISTRY = {
       invalid: '[data-parity-component="textarea"] [data-parity-state="invalid"]'
     },
     showcaseSelectors: {
-      default: '[data-sb-section="field"] .sb-parity-textarea-default textarea',
-      focus: '[data-sb-section="field"] .sb-parity-textarea-default textarea',
-      disabled: '[data-sb-section="field"] .sb-parity-textarea-disabled textarea',
-      invalid: '[data-sb-section="field"] .sb-parity-textarea-invalid textarea'
+      default: '[data-sb-section="textarea"] .sb-parity-textarea-default textarea',
+      focus: '[data-sb-section="textarea"] .sb-parity-textarea-default textarea',
+      disabled: '[data-sb-section="textarea"] .sb-parity-textarea-disabled textarea',
+      invalid: '[data-sb-section="textarea"] .sb-parity-textarea-invalid textarea'
     },
     props: TEXTAREA_PROPS,
     states: ["default", "focus", "disabled", "invalid"],
