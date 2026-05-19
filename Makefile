@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links parity-install parity-build-css parity-setup parity parity-stop \
+	doc-links legacy-audit parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
 	preview-shinylive quarto-setup gallery skills-install
 
@@ -37,6 +37,7 @@ help:
 	@echo "  check           - R CMD check --as-cran"
 	@echo "  pkgdown         - pkgdown::build_site()"
 	@echo "  budget          - tools/budget.R (asset size report)"
+	@echo "  legacy-audit    - fail on unclassified legacy wrapper/CSS/JS hits"
 	@echo "  parity-install  - install parity/ React app dependencies"
 	@echo "  parity-build-css- compile parity reference CSS"
 	@echo "  parity-setup    - launch the parity reference app on :5173"
@@ -147,10 +148,13 @@ budget:
 doc-links:
 	$(R) tools/check-doc-links.R
 
+legacy-audit:
+	$(R) tools/check-legacy-audit.R
+
 # Quality Gate runs the same sequence as docs/ROADMAP.md. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.
 # See docs/phase-exits/TEMPLATE.md.
-gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check pkgdown budget doc-links parity-ci
+gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check pkgdown budget doc-links legacy-audit parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"
