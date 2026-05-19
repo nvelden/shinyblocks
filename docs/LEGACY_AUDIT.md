@@ -16,7 +16,7 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
 - Tab tests may mention old Bootstrap/Shiny tab internals only to assert they are absent from the rendered shinyblocks contract.
 - Runtime CSS tests may list forbidden host selectors because they assert those selectors are absent from `shinyblocks-runtime.css`.
 - Runtime Shiny collision fixtures may create host Bootstrap/Selectize-like nodes and one nested raw Shiny text input to prove scoped runtime CSS does not affect them.
-- `inst/www/src/shinyblocks.css` and `R/dark-mode.R` may keep `.sb-button-*` only for `block_dark_mode_toggle()` until shell migration removes that dependency.
+- `inst/www/src/shinyblocks.css` may still contain `.sb-button-*` while shell/showcase cleanup migrates the remaining non-runtime button snippets. `R/dark-mode.R` is no longer an allowlisted reason for keeping those selectors.
 - Showcase source snippets may keep `.sb-button-*` only for action-button examples until those snippets migrate to `block_button()`.
 - `docs/component-specs/slider.md` may state that slider no longer wraps `shiny::sliderInput()` / ionRangeSlider.
 - `docs/skills/shinyblocks-component.md` may retain historical pitfall notes until the runtime-skill refresh is completed.

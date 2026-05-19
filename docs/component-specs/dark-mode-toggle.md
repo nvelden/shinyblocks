@@ -29,6 +29,9 @@
 - shadcn does not ship a canonical standalone dark-mode-toggle
   component; this is a shinyblocks convenience wrapper built from the
   same button + theme conventions.
+- The helper now delegates to the shipped runtime `block_button()`
+  contract and layers only the theme-toggle icon swap/state behavior on
+  top.
 
 ## Reference screenshot
 

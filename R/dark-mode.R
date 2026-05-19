@@ -7,18 +7,8 @@
 #' @family theme
 #' @export
 block_dark_mode_toggle <- function(label = "Theme", class = NULL) {
-  attach_shinyblocks_deps(
-    htmltools::tags$button(
-      class = merge_classes(
-        "sb-button",
-        "sb-button-outline",
-        "sb-button-size-sm",
-        "sb-dark-mode-toggle",
-        class
-      ),
-      type = "button",
-      `data-sb-theme-toggle` = "true",
-      `aria-pressed` = "false",
+  block_button(
+    label = htmltools::tagList(
       htmltools::tags$span(
         class = "sb-dark-mode-icon-light",
         block_icon("sun")
@@ -28,6 +18,11 @@ block_dark_mode_toggle <- function(label = "Theme", class = NULL) {
         block_icon("moon")
       ),
       htmltools::tags$span(class = "sb-dark-mode-label", label)
-    )
+    ),
+    variant = "outline",
+    size = "sm",
+    class = merge_classes("sb-dark-mode-toggle", class),
+    `data-sb-theme-toggle` = "true",
+    `aria-pressed` = "false"
   )
 }

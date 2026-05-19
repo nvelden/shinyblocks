@@ -500,22 +500,6 @@
     @apply size-9 p-0;
   }
 
-  .sb-dark-mode-toggle {
-    @apply gap-2;
-  }
-
-  .sb-dark-mode-toggle .sb-dark-mode-icon-dark {
-    display: none;
-  }
-
-  [data-theme="dark"] .sb-dark-mode-toggle .sb-dark-mode-icon-light {
-    display: none;
-  }
-
-  [data-theme="dark"] .sb-dark-mode-toggle .sb-dark-mode-icon-dark {
-    display: inline-flex;
-  }
-
   /* Alert, value-box, separator, skeleton, spinner, and empty are
    * runtime components; their styling lives in frontend/src/styles/
    * runtime.css under [data-shinyblocks-root]. */
