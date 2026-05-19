@@ -189,6 +189,11 @@ work; tackle once the simpler cross-cuts are in.
 `data-state` / `data-orientation` / `data-variant` attribute model.
 Add the `line` variant.
 
+**Status:** completed on 2026-05-19 in `d83d9f1`. `block_tabs()` now
+emits package-owned R-side markup, keeps selection/keyboard behavior in
+`shinyblocks.js`, and updates Shiny `input$<id>` without rendering
+Bootstrap tabset internals.
+
 **Files to edit:**
 - `R/tabs.R` — `block_tabs()` and `block_tab()` emit
   `data-state="active|inactive"`, `data-orientation="horizontal|vertical"`,

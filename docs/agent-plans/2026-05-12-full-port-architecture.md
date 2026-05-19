@@ -1008,7 +1008,7 @@ Exit criteria:
 
 Goal: remove the wrapped-Shiny-control strategy for shadcn controls.
 
-Status as of 2026-05-18: checkbox, switch, textarea, input,
+Status as of 2026-05-19: checkbox, switch, textarea, input,
 radio group, and slider render through the package runtime with Shiny
 input bindings and updater helpers. The slider slice removed the
 `shiny::sliderInput()` / ion.rangeSlider wrapper, added single/range

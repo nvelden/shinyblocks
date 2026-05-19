@@ -96,12 +96,15 @@ legacy native component is migrated, `make parity-ci` remains useful
 for the existing shared registry; runtime-migrated components are
 verified against the shipped runtime behavior instead.
 
-As of 2026-05-18, the shared registry slice covers `alert`, `badge`,
+As of 2026-05-19, the shared registry slice covers `alert`, `badge`,
 `button`, `checkbox`, `select`, `separator`, `slider`, `switch`, and
 `textarea`, and `make parity-ci` is green for that slice. Runtime
 browser and Shiny smoke tests are now the primary verifier for
-runtime-migrated controls. Remaining component families still need to
-be migrated before parity becomes the repo-wide primary verifier.
+runtime-migrated controls. Phase 5 cleanup has also resolved input
+group ownership as an R-side composition primitive and removed
+Bootstrap/Shiny tabset dependencies from the rendered tabs contract.
+Remaining component families still need to be migrated before parity
+becomes the repo-wide primary verifier.
 
 The list below is the final pre-public sweep on top of that:
 

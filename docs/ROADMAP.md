@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: Phase 4/5 — overlays and controls runtime migration (status as of 2026-05-18).**
+> **In progress: Phase 4/5 — overlays and controls runtime migration (status as of 2026-05-19).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -192,11 +192,12 @@ phase begins.
 >   behavior in `shinyblocks.js`, and pushes selected values to Shiny via
 >   `input$<id>` without `nav-link`, `tab-pane`, or `shiny-tab-input`
 >   dependencies in the rendered contract.
-> - **Phase 5.10 verification** — latest checks passed:
->   `npm run build`, `Rscript -e "devtools::test()"`,
->   `npm run test:runtime`, `npm run test:runtime-shiny`, and
->   `npm run test:showcase`. The local showcase was fully restarted
->   after runtime/showcase edits.
+> - **Phase 5.12 verification** — latest checks passed:
+>   `make build-css`, `Rscript -e "devtools::document()"`,
+>   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,
+>   `npm run test:runtime`, `npm run test:runtime-shiny`,
+>   `npm run test:showcase`, and `make legacy-audit`. The local
+>   showcase was fully restarted after JS/CSS/showcase edits.
 > - **Parity gate cleared (2026-05-18)** — `make parity-ci` is fully
 >   green across all nine registered components (alert, badge, button,
 >   checkbox, select, separator, slider, switch, textarea). Issues
