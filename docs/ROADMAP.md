@@ -203,6 +203,10 @@ phase begins.
 >   `block_button()` contract and keeps only theme-toggle-specific icon
 >   swap behavior. It is no longer a reason to retain legacy
 >   `.sb-button*` CSS outside the runtime.
+> - **Phase 6 helper cleanup — page/theme portal scope** —
+>   `block_page()` now keeps the owned runtime portal root inside the
+>   `.sb-app` shell so `block_theme()` page-scoped token overrides also
+>   reach overlay/select portal content.
 > - **Phase 5.12 verification** — latest checks passed:
 >   `make build-css`, `Rscript -e "devtools::document()"`,
 >   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,

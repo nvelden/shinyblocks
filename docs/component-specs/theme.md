@@ -5,15 +5,17 @@
 
 ## States
 
-- **default** — emits page-scoped CSS variable overrides for `.sb-app`.
+- **default** — emits page-scoped CSS variable overrides for the owned
+  page shell.
 - **overridden** — supplied token values replace the vendored defaults
-  for components inside the page shell only.
+  for components inside the page shell, including owned runtime portal
+  content.
 
 ## Token contract
 
 | Visual role | Token |
 | --- | --- |
-| Override scope | `.sb-app` CSS custom properties |
+| Override scope | page-shell CSS custom properties |
 | Primary example | `--primary` |
 | Radius example | `--radius` |
 

@@ -10,6 +10,9 @@
   the sidebar/backdrop/header-shell composition.
 - **theme-mode** — bootstraps `data-theme` from system, light, or dark
   mode before the app paints.
+- **portal-owned** — keeps the runtime portal root inside the page
+  shell so theme overrides and tokens apply to overlay/select portal
+  content too.
 
 ## Token contract
 

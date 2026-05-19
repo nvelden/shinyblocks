@@ -66,9 +66,9 @@ block_page <- function(
             },
             block_body(...)
           )
-        )
-      ),
-      runtime_portal_root()
+        ),
+        runtime_portal_root()
+      )
     )
   )
 }
