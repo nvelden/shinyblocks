@@ -207,6 +207,11 @@ phase begins.
 >   `block_page()` now keeps the owned runtime portal root inside the
 >   `.sb-app` shell so `block_theme()` page-scoped token overrides also
 >   reach overlay/select portal content.
+> - **Phase 6 helper cleanup — sidebar/nav composition** —
+>   `block_sidebar()` now reuses a provided `block_nav()` container
+>   instead of nesting a second nav landmark around it, while still
+>   wrapping direct `block_nav_item()` children into one sidebar nav
+>   region.
 > - **Phase 5.12 verification** — latest checks passed:
 >   `make build-css`, `Rscript -e "devtools::document()"`,
 >   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,

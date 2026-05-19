@@ -11,6 +11,9 @@
   spacing.
 - **keyboard-enhanced** — sidebar runtime enables arrow/home/end
   traversal across child items.
+- **sidebar-composed** — when used inside `block_sidebar()`, the nav
+  container is promoted to the sidebar navigation region instead of
+  being wrapped again.
 
 ## Token contract
 

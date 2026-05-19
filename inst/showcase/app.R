@@ -300,8 +300,7 @@ ui <- block_page(
       c(
         lapply(sections, function(s) {
           block_nav_item(s$label, href = paste0("#", s$id), icon = s$icon)
-        }),
-        list(class = "sb-sidebar-nav")
+        })
       )
     )
   ),

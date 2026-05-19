@@ -87,6 +87,20 @@ test_that("nav containers merge classes and wrap items", {
   expect_identical(tag_attr(nav, "class"), "sb-nav custom")
 })
 
+test_that("sidebar reuses a provided nav container instead of nesting nav landmarks", {
+  sidebar <- block_sidebar(
+    title = "Navigation",
+    block_nav(
+      block_nav_item("Home"),
+      block_nav_item("Reports")
+    )
+  )
+  html <- render_html(sidebar)
+
+  expect_match(html, '<nav class="sb-nav sb-sidebar-nav">', fixed = TRUE)
+  expect_false(grepl('<nav class="sb-sidebar-nav">\\s*<nav', html, perl = TRUE))
+})
+
 test_that("block_tabs emits package-owned tab markup", {
   tabs <- block_tabs(
     id = "demo_tabs",

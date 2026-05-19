@@ -18,6 +18,8 @@ block_sidebar <- function(
   id = NULL,
   class = NULL
 ) {
+  children <- list(...)
+
   attach_shinyblocks_deps(
     htmltools::tags$aside(
       id = id,
@@ -39,7 +41,7 @@ block_sidebar <- function(
           }
         )
       },
-      htmltools::tags$nav(class = "sb-sidebar-nav", ...)
+      sidebar_content(children)
     )
   )
 }
@@ -108,4 +110,32 @@ block_nav_item <- function(
       htmltools::tags$span(class = "sb-nav-label", label)
     )
   )
+}
+
+sidebar_content <- function(children) {
+  if (length(children) == 0) {
+    return(NULL)
+  }
+
+  if (all(vapply(children, is_nav_item_tag, logical(1)))) {
+    return(htmltools::tags$nav(class = "sb-sidebar-nav", children))
+  }
+
+  if (length(children) == 1 && is_nav_container_tag(children[[1]])) {
+    nav <- children[[1]]
+    nav$attribs$class <- merge_classes(nav$attribs$class, "sb-sidebar-nav")
+    return(nav)
+  }
+
+  children
+}
+
+is_nav_item_tag <- function(x) {
+  inherits(x, "shiny.tag") &&
+    identical(x$attribs[["data-sb-child"]], "nav-item")
+}
+
+is_nav_container_tag <- function(x) {
+  inherits(x, "shiny.tag") &&
+    identical(x$name, "nav")
 }
