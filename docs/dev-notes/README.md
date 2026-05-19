@@ -45,6 +45,7 @@ Do **not** write a note when:
 
 ## Index
 
+- [2026-05-19 sandbox-shell-quoting-and-port-probes](2026-05-19-sandbox-shell-quoting-and-port-probes.md) — sandboxed local port probes and complex inline shell quoting can fail before the real `showcase`/`gh` command runs; use escalation or `--body-file`.
 - [2026-05-19 showcase-sandbox-port-binding](2026-05-19-showcase-sandbox-port-binding.md) — `make showcase` can fail after the "Listening" log line inside the Codex sandbox; rerun outside the sandbox and verify port `4321`.
 
 <!-- Format:
