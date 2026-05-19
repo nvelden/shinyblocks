@@ -45,7 +45,7 @@ Do **not** write a note when:
 
 ## Index
 
-(Empty — populated as development proceeds.)
+- [2026-05-19 showcase-sandbox-port-binding](2026-05-19-showcase-sandbox-port-binding.md) — `make showcase` can fail after the "Listening" log line inside the Codex sandbox; rerun outside the sandbox and verify port `4321`.
 
 <!-- Format:
 - [YYYY-MM-DD slug](YYYY-MM-DD-slug.md) — one-line summary.
