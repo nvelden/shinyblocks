@@ -12,7 +12,8 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
 
 - Historical ADRs and agent plans may mention old approaches for context.
 - `docs/ROADMAP.md` may track removed and pending migration work.
-- `docs/troubleshooting.md`, `R/tabs.R`, `inst/www/shinyblocks.js`, and tab tests may mention Bootstrap/Shiny tab internals until issue #10 is complete.
+- `docs/troubleshooting.md` may mention Bootstrap as user-facing host context.
+- Tab tests may mention old Bootstrap/Shiny tab internals only to assert they are absent from the rendered shinyblocks contract.
 - Runtime CSS tests may list forbidden host selectors because they assert those selectors are absent from `shinyblocks-runtime.css`.
 - Runtime Shiny collision fixtures may create host Bootstrap/Selectize-like nodes to prove scoped runtime CSS does not affect them.
 - `inst/www/src/shinyblocks.css` and `R/dark-mode.R` may keep `.sb-button-*` only for `block_dark_mode_toggle()` until shell migration removes that dependency.

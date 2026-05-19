@@ -82,7 +82,7 @@ test_that("nav containers merge classes and wrap items", {
   expect_identical(tag_attr(nav, "class"), "sb-nav custom")
 })
 
-test_that("block_tabs preserves Shiny tabset markup and adds sb classes", {
+test_that("block_tabs emits package-owned tab markup", {
   tabs <- block_tabs(
     id = "demo_tabs",
     selected = "usage",
@@ -95,27 +95,30 @@ test_that("block_tabs preserves Shiny tabset markup and adds sb classes", {
 
   expect_match(
     html,
-    'class="tabbable sb-tabs custom" data-sb-tabs="true"',
+    'id="demo_tabs" class="sb-tabs custom" data-sb-tabs="true"',
     fixed = TRUE
   )
   expect_match(
     html,
-    'class="nav shiny-tab-input sb-tabs-list"',
+    'data-sb-tabs-input-id="demo_tabs"',
     fixed = TRUE
   )
+  expect_match(html, 'class="sb-tabs-list" role="tablist"', fixed = TRUE)
   expect_match(html, 'data-variant="line"', fixed = TRUE)
-  expect_match(html, 'role="tablist"', fixed = TRUE)
   expect_match(html, 'aria-orientation="horizontal"', fixed = TRUE)
-  expect_match(html, 'data-bs-toggle="tab"', fixed = TRUE)
-  expect_match(html, 'class="nav-link sb-tabs-trigger"', fixed = TRUE)
+  expect_false(grepl("data-bs-toggle", html, fixed = TRUE))
+  expect_false(grepl("shiny-tab-input", html, fixed = TRUE))
+  expect_false(grepl("nav-link", html, fixed = TRUE))
+  expect_false(grepl("tab-pane", html, fixed = TRUE))
+  expect_match(html, 'class="sb-tabs-trigger"', fixed = TRUE)
   expect_match(html, 'role="tab"', fixed = TRUE)
   expect_match(html, 'data-state="active"', fixed = TRUE)
   expect_match(html, 'data-state="inactive"', fixed = TRUE)
   expect_match(html, 'aria-selected="true"', fixed = TRUE)
   expect_match(html, 'tabindex="-1"', fixed = TRUE)
-  expect_match(html, 'class="tab-content sb-tabs-content"', fixed = TRUE)
+  expect_match(html, 'class="sb-tabs-content"', fixed = TRUE)
   expect_match(html, 'role="tabpanel"', fixed = TRUE)
-  expect_match(html, 'class="tab-pane sb-tabs-panel"', fixed = TRUE)
+  expect_match(html, 'class="sb-tabs-panel"', fixed = TRUE)
   expect_match(html, 'hidden="hidden"', fixed = TRUE)
 })
 

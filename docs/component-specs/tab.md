@@ -5,12 +5,12 @@
 
 ## States
 
-- **default** — wraps a Shiny `tabPanel()` and carries no standalone
-  styling until rendered inside `block_tabs()`.
+- **default** — records a title, value, and content payload for the
+  parent `block_tabs()` component.
 - **selected** — delegated to the parent tabset; the matching trigger
-  receives `.active`.
-- **content** — content is rendered inside Bootstrap's `.tab-pane`
-  container and inherits shinyblocks surface/content styling around it.
+  receives `data-state="active"` and `aria-selected="true"`.
+- **content** — content is rendered inside a package-owned
+  `.sb-tabs-panel` container.
 
 ## Token contract
 
@@ -22,10 +22,10 @@
 
 ## Deliberate divergences from shadcn
 
-- `block_tab()` is sugar over `shiny::tabPanel()`, not a standalone DOM
-  primitive like shadcn's `TabsContent`.
-- Selection and keyboard behavior are owned by Shiny/Bootstrap through
-  the parent `block_tabs()` wrapper.
+- `block_tab()` is a lightweight R-side source tag, not a standalone
+  React/Radix primitive like shadcn's `TabsContent`.
+- Selection and keyboard behavior are owned by the parent
+  `block_tabs()` wrapper and local `shinyblocks.js` bridge.
 
 ## Reference screenshot
 

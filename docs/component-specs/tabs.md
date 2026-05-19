@@ -18,8 +18,8 @@
   opacity instead of relying on a global outline fallback.
 - **orientation** — markup now carries `data-orientation` and supports
   both `horizontal` and `vertical`.
-- **content** — tab content stays reactive through Shiny's tabset
-  binding and renders inside `.tab-content.sb-tabs-content`.
+- **content** — tab content renders inside package-owned
+  `.sb-tabs-content` / `.sb-tabs-panel` containers.
 
 ## Token contract
 
@@ -35,11 +35,14 @@
 
 ## Deliberate divergences from shadcn
 
-- `block_tabs()` still decorates `shiny::tabsetPanel()` markup instead
-  of emitting a bespoke Radix-like DOM tree.
-- Runtime selection is handled by the local `shinyblocks.js` tab
-  behavior so the component does not depend on Bootstrap's tab plugin
-  being present.
+- `block_tabs()` is still an R-side component, not a React/Radix runtime
+  component, but it now emits package-owned tab markup instead of
+  decorating Shiny/Bootstrap tabset output.
+- Selection, keyboard behavior, `aria-selected`, panel visibility, and
+  Shiny `input$<id>` updates are handled by the local
+  `shinyblocks.js` tab behavior.
+- `shiny::tabPanel()` inputs remain accepted as a compatibility source,
+  but the rendered DOM no longer keeps Bootstrap tab classes.
 
 ## Reference screenshot
 

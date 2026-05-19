@@ -14,7 +14,7 @@ block_tab(title, ..., value = NULL)
 \item{value}{Optional tab value.}
 }
 \value{
-A Shiny tab panel.
+An \code{htmltools} tag.
 }
 \description{
 Create a tab

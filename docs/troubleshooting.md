@@ -16,12 +16,11 @@ constructor. Replace `fluidPage()` with `block_page()`.
 
 ## Tabs aren't switching
 
-`block_tabs()` wraps `shiny::tabsetPanel()` and relies on Shiny's
-existing tab input binding. The binding keys off specific classes
-(`nav`, `nav-link`, `shiny-tab-input`, `data-bs-toggle="tab"`,
-`data-value`). If you post-process the result of `block_tabs()` and
-strip those, switching breaks. Decorate with `tagQuery()$addClass()`
-only — never replace the underlying elements.
+`block_tabs()` owns its rendered trigger and panel markup. If you
+post-process the result and remove `data-sb-tabs`, trigger
+`data-value` attributes, ARIA relationships, or the package-owned
+classes, switching breaks. Prefer the public `class` argument for
+styling and avoid replacing the underlying trigger/panel elements.
 
 ## Dark mode briefly flashes light on first paint
 
@@ -44,10 +43,10 @@ automatic system-theme detection.
 
 That's expected. shinyblocks does not restyle every Shiny input
 globally because Shiny ships Bootstrap and a global override would
-collide with bslib/shinydashboard if also loaded. To get shadcn
-styling on Shiny inputs, wrap them in `block_field()` (for
-labelled inputs) or `block_input_group()` (for prefixed/suffixed
-inputs). The wrapper supplies the styling scope.
+collide with bslib/shinydashboard if also loaded. Prefer runtime
+controls such as `block_input()`, `block_textarea()`, `block_select()`,
+`block_checkbox()`, and `block_slider()`. Use `block_input_group()`
+when you need prefixed/suffixed composition around a runtime control.
 
 ## I see two labels on my input
 

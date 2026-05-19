@@ -84,7 +84,7 @@
     var targetId = (trigger.getAttribute("aria-controls") || "")
       .replace(/^#/, "");
     var panes = Array.prototype.slice.call(
-      tabset.querySelectorAll(".sb-tabs-content > .tab-pane")
+      tabset.querySelectorAll(".sb-tabs-content > .sb-tabs-panel")
     );
 
     triggers.forEach(function (item) {
@@ -105,15 +105,18 @@
     });
 
     if (updateInput && window.Shiny && window.Shiny.setInputValue) {
-      var tabsetId = tabset.querySelector(".sb-tabs-list");
+      var tabsetId = tabset.getAttribute("data-sb-tabs-input-id");
       var value = trigger.getAttribute("data-value");
-      if (tabsetId && tabsetId.id && value) {
-        window.Shiny.setInputValue(tabsetId.id, value, { priority: "event" });
+      if (tabsetId && value) {
+        window.Shiny.setInputValue(tabsetId, value, { priority: "event" });
       }
     }
   }
 
   function wireTabs(tabset) {
+    if (tabset.getAttribute("data-sb-tabs-wired") === "true") return;
+    tabset.setAttribute("data-sb-tabs-wired", "true");
+
     var triggers = tabTriggers(tabset);
     if (!triggers.length) return;
 
@@ -144,7 +147,17 @@
         trigger.getAttribute("data-state") === "active";
     }) || triggers[0];
 
-    activateTab(tabset, initial, { updateInput: false });
+    activateTab(tabset, initial, { updateInput: true });
+  }
+
+  function syncTabInputs() {
+    tabs().forEach(function (tabset) {
+      var active = tabTriggers(tabset).find(function (trigger) {
+        return trigger.getAttribute("aria-selected") === "true" ||
+          trigger.getAttribute("data-state") === "active";
+      });
+      if (active) activateTab(tabset, active, { updateInput: true });
+    });
   }
 
   function sidebarPages() {
@@ -276,4 +289,6 @@
   } else {
     init();
   }
+
+  document.addEventListener("shiny:connected", syncTabInputs);
 })();
