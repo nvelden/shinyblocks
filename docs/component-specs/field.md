@@ -2,6 +2,7 @@
 
 > Shinyblocks function: `block_field()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/input>
+> Status: Phase 5.13 — ownership resolved as an R-side composition primitive
 
 ## States
 
@@ -19,10 +20,19 @@
 | Helper text | `--muted-foreground` |
 | Invalid text | `--destructive` |
 
+## Runtime ownership
+
+`block_field()` remains a package-owned R-side composition wrapper. It
+owns layout, label/helper-text placement, and field-level invalid
+messaging. Interactive control behavior belongs to the child component,
+which should normally be a runtime control such as `block_input()`,
+`block_textarea()`, `block_select()`, `block_checkbox()`, or
+`block_switch()`.
+
 ## Deliberate divergences from shadcn
 
-- `block_field()` is a composition wrapper around Shiny controls, not a
-  direct upstream shadcn primitive.
+- `block_field()` is a composition wrapper, not a direct upstream shadcn
+  primitive.
 
 ## Reference screenshot
 

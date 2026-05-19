@@ -62,11 +62,6 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Hide Shiny's empty placeholder labels. See troubleshooting.md. */
-  .sb-app .shiny-label-null {
-    display: none;
-  }
-
 }
 
 /* Component layer.
@@ -347,16 +342,10 @@
     box-shadow: none;
   }
 
-  .sb-app .sb-field .shiny-input-container,
   .sb-app .sb-input-group .shiny-input-container {
-    @apply mb-0 w-full;
+    @apply mb-0 w-full min-w-0 flex-1;
   }
 
-  .sb-app .sb-input-group .shiny-input-container {
-    @apply min-w-0 flex-1;
-  }
-
-  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
     @apply flex min-h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs;
     outline: none;
@@ -374,20 +363,11 @@
     box-shadow: none;
   }
 
-  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):disabled,
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
 
-  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus-visible {
-    border-color: var(--ring);
-    box-shadow:
-      0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
-      0 1px 2px 0 rgb(0 0 0 / 0.05);
-  }
-
-  .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"],
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
     border-color: var(--destructive);
     box-shadow:
@@ -395,7 +375,6 @@
       0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
-  [data-theme="dark"] .sb-app .sb-field :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"],
   [data-theme="dark"] .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
     box-shadow:
       0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent),
@@ -416,7 +395,6 @@
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
   }
 
-  .sb-field[data-invalid="true"] :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea),
   .sb-field[data-invalid="true"] .sb-input-group {
     border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
   }

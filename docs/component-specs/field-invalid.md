@@ -2,13 +2,15 @@
 
 > Shinyblocks function: `block_field_invalid()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/input>
+> Status: Phase 5.13 — ownership resolved as an R-side composition primitive
 
 ## States
 
 - **default** — decorates a `block_field()` with destructive helper text
   and invalid attrs on wrapped controls.
-- **text-control** — marks nested `input`, `select`, and `textarea`
-  with `aria-invalid="true"` and `aria-describedby`.
+- **runtime-control** — marks runtime control mounts with
+  `aria-invalid="true"` and `aria-describedby` so the owned control can
+  inherit invalid styling.
 - **choice-control** — checkbox and switch invalid styling is driven by
   the same field-level `data-invalid="true"` wrapper.
 
