@@ -22,6 +22,8 @@
 
 - shinyblocks serves icons from a local SVG sprite instead of importing
   Lucide React components.
+- The curated icon list is owned by `inst/www/icons/MANIFEST.json`; the
+  committed sprite is a build artifact derived from that manifest.
 
 ## Reference screenshot
 
