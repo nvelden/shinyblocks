@@ -198,6 +198,11 @@ phase begins.
 >   text inputs inside fields were migrated to runtime controls, and the
 >   legacy raw-input styling under `.sb-field` was removed from the source
 >   stylesheet.
+> - **Phase 6 helper cleanup — dark mode toggle** —
+>   `block_dark_mode_toggle()` now delegates to the shipped runtime
+>   `block_button()` contract and keeps only theme-toggle-specific icon
+>   swap behavior. It is no longer a reason to retain legacy
+>   `.sb-button*` CSS outside the runtime.
 > - **Phase 5.12 verification** — latest checks passed:
 >   `make build-css`, `Rscript -e "devtools::document()"`,
 >   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,
@@ -221,9 +226,9 @@ phase begins.
 >   fully-migrated presentational components (alert, value-box,
 >   separator, skeleton, spinner, empty) plus the stale
 >   `.sb-checkbox-indicator`/`.sb-switch-track`/`.selectize-*`
->   invalid-state selectors. `.sb-button*` legacy CSS retained because
->   `block_dark_mode_toggle()` still emits it from outside the runtime
->   root.
+>   invalid-state selectors. `.sb-button*` legacy CSS is no longer kept
+>   alive by `block_dark_mode_toggle()`; remaining retention should be
+>   treated as shell/showcase cleanup debt only.
 > - **Showcase reorganization (2026-05-18)** — split the umbrella
 >   **Field** tab. **Switch** gets its own full interactive playground
 >   with `update_block_switch()` Actions. **Input group** gets its own

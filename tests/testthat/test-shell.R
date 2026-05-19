@@ -215,14 +215,20 @@ test_that("runtime inline style fails hard for malformed input", {
 test_that("dark mode toggle renders expected button attrs", {
   toggle <- block_dark_mode_toggle(class = "custom")
   html <- render_html(toggle)
+  payload <- runtime_payload_from(toggle)
 
   expect_identical(
     tag_attr(toggle, "class"),
-    "sb-button sb-button-outline sb-button-size-sm sb-dark-mode-toggle custom"
+    "sb-runtime-mount sb-dark-mode-toggle custom"
   )
-  expect_identical(tag_attr(toggle, "data-sb-theme-toggle"), "true")
-  expect_match(html, "sb-dark-mode-icon-light", fixed = TRUE)
-  expect_match(html, "sb-dark-mode-icon-dark", fixed = TRUE)
+  expect_match(html, 'data-sb-component="button"', fixed = TRUE)
+  expect_identical(payload$className, "sb-dark-mode-toggle custom")
+  expect_identical(payload$props$variant, "outline")
+  expect_identical(payload$props$size, "sm")
+  expect_identical(payload$props$attrs$`data-sb-theme-toggle`, "true")
+  expect_identical(payload$props$attrs$`aria-pressed`, "false")
+  expect_match(payload$props$labelHtml, "sb-dark-mode-icon-light", fixed = TRUE)
+  expect_match(payload$props$labelHtml, "sb-dark-mode-icon-dark", fixed = TRUE)
 })
 
 test_that("field wrappers expose expected classes and child markers", {

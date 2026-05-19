@@ -267,6 +267,19 @@
   text-decoration-line: underline;
 }
 
+[data-shinyblocks-root] .sb-dark-mode-toggle {
+  gap: 0.5rem;
+}
+
+[data-shinyblocks-root] .sb-dark-mode-toggle .sb-dark-mode-icon-dark,
+[data-theme="dark"] [data-shinyblocks-root] .sb-dark-mode-toggle .sb-dark-mode-icon-light {
+  display: none;
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-dark-mode-toggle .sb-dark-mode-icon-dark {
+  display: inline-flex;
+}
+
 [data-shinyblocks-root] .sb-badge {
   display: inline-flex;
   width: fit-content;
