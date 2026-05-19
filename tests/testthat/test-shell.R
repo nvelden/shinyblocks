@@ -228,7 +228,7 @@ test_that("dark mode toggle renders expected button attrs", {
 test_that("field wrappers expose expected classes and child markers", {
   field <- block_field(
     block_field_label("Email", `for` = "email"),
-    shiny::textInput("email", NULL),
+    block_input("email"),
     block_field_description("We won't share it."),
     class = "custom"
   )
@@ -501,7 +501,7 @@ test_that("invalid fields decorate controls and append an error message", {
     block_field_invalid(
       block_field(
         block_field_label("API key", `for` = "api_key"),
-        shiny::textInput("api_key", NULL)
+        block_input("api_key")
       ),
       "API key is required."
     )

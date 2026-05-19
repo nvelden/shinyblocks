@@ -1017,11 +1017,13 @@ state, and `update_block_slider()`. As of Phase 5.11,
 `block_input_group()` and `block_input_group_addon()` are resolved as
 R-side composition/layout primitives around runtime controls such as
 `block_input()`, not standalone runtime bindings. The current remaining
-Phase 5 work is deletion of residual wrapped-input CSS/tests and the
-field-helper ownership decision. As of Phase 5.12, `block_tabs()` /
+Phase 5 work is dependency cleanup and any residual wrapped-input notes
+or tests exposed by that cleanup. As of Phase 5.12, `block_tabs()` /
 `block_tab()` emit package-owned R-side markup with a local Shiny value
 bridge instead of wrapping `shiny::tabsetPanel()` or Bootstrap tab
-internals.
+internals. As of Phase 5.13, `block_field_*()` is explicitly retained
+as R-side composition around runtime controls; raw `.sb-field`
+wrapped-input styling is no longer part of the shipped contract.
 
 Order:
 

@@ -103,6 +103,9 @@ browser and Shiny smoke tests are now the primary verifier for
 runtime-migrated controls. Phase 5 cleanup has also resolved input
 group ownership as an R-side composition primitive and removed
 Bootstrap/Shiny tabset dependencies from the rendered tabs contract.
+Field helpers likewise remain R-side composition primitives, and the
+legacy raw-input styling under `.sb-field` has been removed in favor of
+runtime controls inside fields.
 Remaining component families still need to be migrated before parity
 becomes the repo-wide primary verifier.
 

@@ -11,7 +11,7 @@ htmltools::tagList(
         block_field_group(
           block_field(
             block_field_label("Name", `for` = "tabs_workspace_name"),
-            shiny::textInput("tabs_workspace_name", NULL, "Acme"),
+            block_input("tabs_workspace_name", value = "Acme"),
             block_field_description("Used in the sidebar and header shell.")
           ),
           block_field(

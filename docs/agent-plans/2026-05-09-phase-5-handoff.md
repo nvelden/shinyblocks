@@ -124,6 +124,11 @@ For controls without a border (e.g. `.sb-button-default`), the
 **Skill:** `shinyblocks-component` — adds an invalid state to every
 interactive component.
 
+**Status:** Completed by the Phase 5 runtime migration. Runtime controls
+now own invalid-state styling directly, and `block_field_invalid()`
+remains an R-side composition helper that passes `aria-invalid`,
+descriptions, and message wiring into those runtime mounts.
+
 **Why second:** pairs with the focus-ring change because both touch
 the same CSS bases. Ship together if possible.
 
@@ -175,11 +180,19 @@ accepts `aria-invalid`.
 - Spec docs for the affected components note the new state in the
   "States" section.
 
+Result: Landed. Follow-up work moved to ownership cleanup, which
+explicitly retained `block_field_*()` as composition helpers rather
+than promoting them into standalone runtime bindings.
+
 ---
 
 ### Slice 3 — Tabs refactor to shadcn's data-attribute model
 
 **Skill:** `shinyblocks-component` (this is a refactor + parity slice).
+
+**Status:** Completed in Phase 5.12. `block_tabs()` / `block_tab()` now
+emit package-owned markup and selection behavior rather than wrapping
+`shiny::tabsetPanel()` / Bootstrap tab internals.
 
 **Why third:** independent of slices 1–2 but the largest piece of
 work; tackle once the simpler cross-cuts are in.

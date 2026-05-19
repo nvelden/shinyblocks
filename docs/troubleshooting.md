@@ -50,17 +50,18 @@ when you need prefixed/suffixed composition around a runtime control.
 
 ## I see two labels on my input
 
-You passed a `label` to both the Shiny input and `block_field_label()`.
-Pass `label = NULL` to the Shiny input so only the shadcn label is
-visible. Shiny still emits an empty `<label class="shiny-label-null">`
-for `aria-labelledby` purposes; shinyblocks's CSS hides it.
+You are probably still composing a raw Shiny input inside
+`block_field()` while also adding `block_field_label()`. The supported
+contract is to use runtime controls such as `block_input()` or
+`block_textarea()` inside the field wrapper. If you keep a raw Shiny
+input there, its label behavior is outside the migrated field contract.
 
 ## A ghost label is showing despite `label = NULL`
 
-The CSS rule `.shiny-label-null { display: none }` is part of
-shinyblocks's stylesheet. If a ghost label is visible, the
-stylesheet did not load. Check that `block_page()` is the page
-constructor and that the network tab shows `shinyblocks.css` loaded.
+That points to a raw Shiny input still being used where a runtime
+control should be used instead. Migrate that field to the corresponding
+`block_*()` input helper rather than relying on the old wrapped-input
+path.
 
 ## `block_icon("foo")` errors
 
