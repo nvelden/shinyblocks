@@ -1,0 +1,86 @@
+name: Deploy docs site
+
+# WHEN THIS RUNS:
+#   - On push to main, if docs-site/, NEWS.md, or inst/www/ changed
+#   - On manual dispatch
+#
+# REQUIRED REPO SETTING (one-time, in GitHub UI):
+#   Settings → Pages → Source = "GitHub Actions"
+#
+# NOTE: GitHub Pages on a PRIVATE repo requires GitHub Pro/Team/Enterprise.
+# On a free private repo this workflow runs and builds, but the deploy step
+# will fail until the repo is made public OR Pages is enabled.
+#
+# Live URL once Pages is enabled:
+#   https://nvelden.github.io/shinyblocks/
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs-site/**"
+      - "NEWS.md"
+      - "inst/www/**"
+      - ".github/workflows/docs-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs-site
+    steps:
+      - uses: actions/checkout@v4
+
+      # R is needed by `Rscript scripts/generate-previews.R` (Phase 2+).
+      # Until that script lands the prebuild is a no-op, but the action is
+      # cheap so we keep it warm.
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::htmltools
+          working-directory: .
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # GitHub Pages would otherwise run Jekyll over `out/` and discard
+      # the `_next/` folder.
+      - run: touch out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs-site/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
