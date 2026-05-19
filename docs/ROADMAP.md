@@ -179,6 +179,13 @@ phase begins.
 >   Slider API Reference table with the Input table pattern and changed
 >   package-local asset dependency versions to include file mtimes so a
 >   restarted showcase app does not keep stale runtime CSS/JS paths.
+> - **Phase 5.11 input group ownership cleanup** —
+>   `block_input_group()` and `block_input_group_addon()` are explicitly
+>   classified as R-side composition/layout primitives, not standalone
+>   runtime input bindings. The showcase and shell tests now compose the
+>   group with runtime `block_input()`, and the source stylesheet includes
+>   group-specific runtime input merge rules while keeping raw Shiny input
+>   compatibility as migration scaffolding.
 > - **Phase 5.10 verification** — latest checks passed:
 >   `npm run build`, `Rscript -e "devtools::test()"`,
 >   `npm run test:runtime`, `npm run test:runtime-shiny`, and
@@ -244,9 +251,9 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Current natural-next work (no hard gate blocker):
-> - Phase 5 remaining controls — `block_input_group()` runtime
->   migration, `block_tabs()` / `block_tab()` cleanup, then deletion of
->   Bootstrap-tab / wrapped-input CSS + tests.
+> - Phase 5 remaining cleanup — `block_tabs()` / `block_tab()` cleanup,
+>   then deletion of Bootstrap-tab / no-longer-needed wrapped-input CSS
+>   + tests.
 > - Phase 4 remaining overlays — `block_dropdown_menu()`,
 >   `block_sheet()`, `block_drawer()`, `block_hover_card()`.
 >
@@ -712,13 +719,16 @@ Goal: remove the wrapped-Shiny-control strategy for shadcn controls.
 - `block_textarea()`
 - `block_slider()`
 - `block_input()`
-- `block_input_group()` and addons
+- `block_input_group()` and addons (R-side composition primitives around
+  runtime controls, not standalone runtime bindings)
 - `block_field_*()`
 - `block_tabs()` and `block_tab()`
 
 Exit: controls use runtime input bindings and updater helpers. Old
 Selectize, ion.rangeSlider, Bootstrap-tab, checkbox, switch, textarea,
-and field visual override CSS/tests are gone.
+and field visual override CSS/tests are gone. `block_input_group()` and
+addons remain as R-side layout primitives where they compose migrated
+runtime controls.
 
 ## Runtime Phase 6 — Shell, Icons, and Theme
 

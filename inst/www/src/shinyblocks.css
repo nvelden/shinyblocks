@@ -331,6 +331,26 @@
     @apply inline-flex shrink-0 items-center border-r border-input px-3 text-sm text-muted-foreground;
   }
 
+  .sb-input-group-addon:last-child {
+    @apply border-l border-r-0;
+  }
+
+  .sb-input-group [data-shinyblocks-root].sb-input {
+    @apply min-w-0 flex-1;
+  }
+
+  .sb-input-group [data-shinyblocks-root].sb-input [data-shinyblocks-react] {
+    @apply w-full;
+  }
+
+  .sb-input-group .sb-input-control {
+    @apply rounded-none border-0 shadow-none;
+  }
+
+  .sb-input-group .sb-input-control:focus-visible {
+    box-shadow: none;
+  }
+
   .sb-app .sb-field .shiny-input-container,
   .sb-app .sb-input-group .shiny-input-container {
     @apply mb-0 w-full;

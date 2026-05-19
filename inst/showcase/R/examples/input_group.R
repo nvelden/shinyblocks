@@ -7,9 +7,8 @@ htmltools::tagList(
         block_field_label("Leading icon", `for` = "showcase_input_group_search"),
         block_input_group(
           block_input_group_addon(block_icon("search")),
-          shiny::textInput(
+          block_input(
             "showcase_input_group_search",
-            NULL,
             placeholder = "Search workspace"
           )
         ),
@@ -18,9 +17,8 @@ htmltools::tagList(
       block_field(
         block_field_label("Trailing icon", `for` = "showcase_input_group_email"),
         block_input_group(
-          shiny::textInput(
+          block_input(
             "showcase_input_group_email",
-            NULL,
             placeholder = "name@company.com"
           ),
           block_input_group_addon(block_icon("mail"))
@@ -31,11 +29,11 @@ htmltools::tagList(
         block_field_label("Both addons", `for` = "showcase_input_group_amount"),
         block_input_group(
           block_input_group_addon("$"),
-          shiny::numericInput(
+          block_input(
             "showcase_input_group_amount",
-            NULL,
+            type = "number",
             value = 0,
-            min = 0
+            placeholder = "0"
           ),
           block_input_group_addon("USD")
         ),
@@ -45,9 +43,8 @@ htmltools::tagList(
         block_field_label("Workspace slug", `for` = "showcase_input_group_slug"),
         block_input_group(
           block_input_group_addon("acme.app/"),
-          shiny::textInput(
+          block_input(
             "showcase_input_group_slug",
-            NULL,
             placeholder = "your-team"
           )
         ),
@@ -62,10 +59,10 @@ htmltools::tagList(
         block_field_label("API key", `for` = "showcase_input_group_api"),
         block_input_group(
           block_input_group_addon(block_icon("lock")),
-          shiny::textInput(
+          block_input(
             "showcase_input_group_api",
-            NULL,
-            value = "sk-test"
+            value = "sk-test",
+            invalid = TRUE
           )
         ),
         block_field_description("Production keys must start with sk-live-.")

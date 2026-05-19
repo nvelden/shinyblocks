@@ -19,6 +19,7 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
 - Showcase source snippets may keep `.sb-button-*` only for action-button examples until those snippets migrate to `block_button()`.
 - `docs/component-specs/slider.md` may state that slider no longer wraps `shiny::sliderInput()` / ionRangeSlider.
 - `docs/skills/shinyblocks-component.md` may retain historical pitfall notes until the runtime-skill refresh is completed.
+- `block_input_group()` and `block_input_group_addon()` are not audit failures by themselves: they are explicitly classified as R-side composition/layout primitives. New examples should compose them with runtime controls such as `block_input()` rather than reintroducing wrapped Shiny inputs.
 
 ## Rule
 

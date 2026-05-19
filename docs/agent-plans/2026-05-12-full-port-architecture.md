@@ -1013,10 +1013,12 @@ radio group, and slider render through the package runtime with Shiny
 input bindings and updater helpers. The slider slice removed the
 `shiny::sliderInput()` / ion.rangeSlider wrapper, added single/range
 runtime value sync, pointer and keyboard interaction, invalid/style
-state, and `update_block_slider()`. The current remaining Phase 5 work
-is `block_input_group()` runtime/layout cleanup, `block_tabs()` /
-`block_tab()` cleanup, then deletion of the residual wrapped-input and
-Bootstrap-tab CSS/tests.
+state, and `update_block_slider()`. As of Phase 5.11,
+`block_input_group()` and `block_input_group_addon()` are resolved as
+R-side composition/layout primitives around runtime controls such as
+`block_input()`, not standalone runtime bindings. The current remaining
+Phase 5 work is `block_tabs()` / `block_tab()` cleanup, then deletion of
+the residual wrapped-input and Bootstrap-tab CSS/tests.
 
 Order:
 
@@ -1026,7 +1028,7 @@ Order:
 4. `block_textarea()`
 5. `block_slider()`
 6. `block_input()`
-7. `block_input_group()` and addons
+7. `block_input_group()` and addons (R-side composition primitives)
 8. `block_field_*()` helpers
 9. `block_tabs()` and `block_tab()`
 
