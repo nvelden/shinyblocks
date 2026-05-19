@@ -15,8 +15,16 @@ Thumbs.db
 node_modules/
 dist/
 tmp/
-site/
 .verify*
+
+# Next.js docs site (see docs-site/)
+docs-site/.next/
+docs-site/out/
+docs-site/playwright-report/
+docs-site/test-results/
+docs-site/public/runtime/
+docs-site/content/previews/*.html
+docs-site/lib/shinylive-manifest.json
 
 # Local agent and assistant runtime caches
 .agents/
@@ -28,6 +36,8 @@ skills-lock.json
 AGENTS.md
 CLAUDE.md
 HANDOFF.md
+# The docs-site handoff is a real artifact, not a private workspace note.
+!docs-site/HANDOFF.md
 
 # Compiled package docs
 inst/doc/

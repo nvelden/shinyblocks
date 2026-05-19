@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* -----------------------------------------------------------------------------
+ * Design tokens — copied verbatim from inst/www/shinyblocks.css so the docs
+ * site and the live Shiny runtime share one design system.
+ *
+ * Dark mode is toggled by setting `data-theme="dark"` on <html> (next-themes
+ * is configured with attribute="data-theme" in app/layout.tsx).
+ *
+ * IF YOU UPDATE TOKENS IN THE PACKAGE'S CSS, RE-COPY THE :root and
+ * [data-theme=dark] blocks here. They must stay in sync.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(100% 0 0);
+  --foreground: oklch(14.5% 0 0);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(14.5% 0 0);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(14.5% 0 0);
+  --primary: oklch(20.5% 0 0);
+  --primary-foreground: oklch(98.5% 0 0);
+  --secondary: oklch(97% 0 0);
+  --secondary-foreground: oklch(20.5% 0 0);
+  --muted: oklch(97% 0 0);
+  --muted-foreground: oklch(55.6% 0 0);
+  --accent: oklch(97% 0 0);
+  --accent-foreground: oklch(20.5% 0 0);
+  --destructive: oklch(57.7% 0.245 27.325);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --border: oklch(92.2% 0 0);
+  --input: oklch(92.2% 0 0);
+  --ring: oklch(70.8% 0 0);
+}
+
+[data-theme="dark"] {
+  --background: oklch(14.5% 0 0);
+  --foreground: oklch(98.5% 0 0);
+  --card: oklch(14.5% 0 0);
+  --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(14.5% 0 0);
+  --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(98.5% 0 0);
+  --primary-foreground: oklch(20.5% 0 0);
+  --secondary: oklch(26.9% 0 0);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(26.9% 0 0);
+  --muted-foreground: oklch(70.8% 0 0);
+  --accent: oklch(26.9% 0 0);
+  --accent-foreground: oklch(98.5% 0 0);
+  --destructive: oklch(39.6% 0.141 25.723);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --border: oklch(26.9% 0 0);
+  --input: oklch(26.9% 0 0);
+  --ring: oklch(43.9% 0 0);
+}
+
+/* Make Tailwind v4 utility classes aware of our tokens.
+ * `bg-background`, `text-foreground`, `border-border`, etc. all work. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* `dark:` utility — kept for ergonomics. Active whenever data-theme=dark. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+html {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
