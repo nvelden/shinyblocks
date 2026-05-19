@@ -1,5 +1,12 @@
 # Phase 5 Hand-off (2026-05-09, updated 2026-05-11)
 
+Status: historical pre-runtime-cleanup hand-off. Large parts of this
+document were written before ADR 0017 fully displaced the wrapper-era
+form strategy. Use it only for drift history and superseded slice
+context; current implementation planning lives in
+[`2026-05-12-full-port-architecture.md`](2026-05-12-full-port-architecture.md)
+plus the live [roadmap](../ROADMAP.md).
+
 A consolidated, actionable hand-off plan for the next implementer
 picking up Phase 5 of `shinyblocks`. Each slice below is sized to
 land as one commit.
@@ -29,7 +36,7 @@ property-only harness missed; that lesson is now baked into the
 skill. The decisions and scaffolding for follow-up are in place:
 
 - [ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md) —
-  wrap-by-default for form inputs.
+  historical wrap-by-default policy for form inputs.
 - [ADR 0015](../decisions/0015-component-specs.md) — per-component
   spec doc with reference screenshot.
 - [ADR 0016](../decisions/0016-visual-parity-harness.md) —
@@ -455,8 +462,9 @@ Before tagging, every slice above must be green and:
 
 ## Things not to break
 
-- The wrap-by-default policy ([ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md)).
-  Don't reintroduce headless input runtimes.
+- The current runtime direction in [ADR 0017](../decisions/0017-full-runtime-port.md).
+  Don't reintroduce wrapper-era assumptions or old native fallback paths
+  while cleaning up shipped components.
 - Tailwind v4 source contract ([ADR 0006](../decisions/0006-styling-foundation.md)).
   Compiled CSS must regenerate cleanly via `make build-css`.
 - Per-gate sync rule. Every new spec/page/example/section must land

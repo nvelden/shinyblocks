@@ -940,9 +940,35 @@ Exit criteria:
 
 ## Phase 4 - Overlay and Menu Components
 
-Goal: migrate components where Radix behavior matters most.
+Goal: finish cleanup of the overlay components that already shipped.
+New overlay additions are deferred until the migration cleanup of the
+existing exported surface is complete.
 
-Order:
+Shipped:
+
+1. `block_dialog()`
+2. `block_popover()`
+3. `block_tooltip()`
+
+Deferred additions:
+
+1. `block_dropdown_menu()`
+2. `block_sheet()`
+3. `block_drawer()`
+4. `block_hover_card()`
+
+Current cleanup tasks:
+
+1. Audit shipped overlay docs/specs/showcase sections for wrapper-era
+   assumptions, stale prop descriptions, or runtime drift.
+2. Keep the runtime portal strategy. Do not reintroduce local
+   positioning logic in `inst/www/shinyblocks.js`.
+3. Keep open-state Shiny bindings only where the shipped overlay helper
+   documents them.
+4. Keep the showcase/docs/tests for shipped overlays aligned with the
+   runtime contract.
+
+Historical addition plan:
 
 1. `block_dialog()`
 2. `block_popover()`
@@ -952,7 +978,7 @@ Order:
 6. `block_tooltip()`
 7. `block_hover_card()`
 
-Tasks:
+Historical addition tasks:
 
 1. Add R APIs and docs for components that do not exist yet.
 2. Use upstream composition rules: trigger, content, title, description, item,
@@ -1017,8 +1043,9 @@ state, and `update_block_slider()`. As of Phase 5.11,
 `block_input_group()` and `block_input_group_addon()` are resolved as
 R-side composition/layout primitives around runtime controls such as
 `block_input()`, not standalone runtime bindings. The current remaining
-Phase 5 work is dependency cleanup and any residual wrapped-input notes
-or tests exposed by that cleanup. As of Phase 5.12, `block_tabs()` /
+Phase 5 work is stale docs/decision cleanup plus any residual
+wrapped-input notes, tests, or scaffolding exposed by that audit. As of
+Phase 5.12, `block_tabs()` /
 `block_tab()` emit package-owned R-side markup with a local Shiny value
 bridge instead of wrapping `shiny::tabsetPanel()` or Bootstrap tab
 internals. As of Phase 5.13, `block_field_*()` is explicitly retained

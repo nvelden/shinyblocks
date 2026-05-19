@@ -1,6 +1,10 @@
 # Port Strategy for shinyblocks
 
-Status: canonical strategy as of 2026-05-08. Replaces earlier brainstorming.
+Status: historical native/wrapper strategy as of 2026-05-08.
+Superseded by [ADR 0017](../decisions/0017-full-runtime-port.md) and
+[`2026-05-12-full-port-architecture.md`](2026-05-12-full-port-architecture.md)
+for current implementation work. Keep this file only as context for how
+the project started and why the runtime pivot happened.
 
 ## Goal
 

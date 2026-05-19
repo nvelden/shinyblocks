@@ -122,12 +122,10 @@ focus-ring story are not present.
 
 ### Select / textarea / checkbox / switch
 
-Per [ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md),
-these are wrappers around native Shiny inputs. The visible "shadcn
-look" comes from CSS that overrides Shiny's defaults. The current
-implementation tracks shadcn's structural shape (custom checkbox
-indicator div, sr-only native input, etc.) but has not been audited
-state-by-state against shadcn's source. Pending — own slice.
+At the time of this audit, [ADR 0014](../decisions/0014-wrap-by-default-form-inputs.md)
+was still the active wrapper policy. This section is historical: those
+controls now render through the shipped runtime migration rather than
+through native Shiny wrappers plus override CSS.
 
 ## Plan from here
 

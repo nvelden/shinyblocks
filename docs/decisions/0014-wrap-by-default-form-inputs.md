@@ -2,9 +2,16 @@
 
 ## Status
 
-Superseded by [ADR 0017](0017-full-runtime-port.md) for future
-component work (2026-05-12). Existing wrapped controls are migration
-scaffolding until the runtime implementation replaces them.
+Superseded by [ADR 0017](0017-full-runtime-port.md) and the shipped
+runtime control migration work (2026-05-19)
+
+## Superseded Note
+
+This ADR records the short-lived native/wrapper strategy where form
+controls would wrap Shiny inputs by default and only re-implement by
+exception. That is no longer the destination architecture for migrated
+controls. Keep this file only as historical context for why the wrapper
+path existed during the transition.
 
 ## Context
 
@@ -97,7 +104,7 @@ Every exception requires a dedicated ADR that:
 - The package will need a clear per-control line between "good enough
   via wrapper" and "needs a dedicated implementation."
 
-## Initial Application
+## Historical Application
 
 - `block_field_*()` and `block_input_group_*()` remain wrapper
   primitives.
