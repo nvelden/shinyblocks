@@ -559,7 +559,7 @@ test_that("buttons accept aria-invalid passthrough attrs", {
 test_that("input groups merge user classes and render addons", {
   input_group <- block_input_group(
     block_input_group_addon(block_icon("search"), class = "addon-custom"),
-    shiny::textInput("query", NULL),
+    block_input("query", placeholder = "Search"),
     class = "custom"
   )
   html <- render_html(input_group)
@@ -567,6 +567,7 @@ test_that("input groups merge user classes and render addons", {
   expect_identical(tag_attr(input_group, "class"), "sb-input-group custom")
   expect_match(html, 'class="sb-input-group-addon addon-custom"', fixed = TRUE)
   expect_match(html, "sb-icon-search", fixed = TRUE)
+  expect_match(html, '"component":"input"', fixed = TRUE)
 })
 
 test_that("block_select emits a runtime select payload", {

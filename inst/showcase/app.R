@@ -163,7 +163,7 @@ sections <- list(
     icon = "search",
     title = "Input group",
     lead = paste(
-      "Wraps a Shiny input with leading/trailing addon slots — icons,",
+      "Composes a runtime block_input() with leading/trailing addon slots — icons,",
       "prefixes, suffixes — via block_input_group() and block_input_group_addon()."
     ),
     file = "input_group.R"

@@ -3,6 +3,7 @@
 > Shinyblocks function: `block_input_group()`
 > Shadcn reference: input-with-addon composition built from Input
 > patterns
+> Status: Phase 5.11 — ownership resolved as an R-side layout primitive
 
 ## States
 
@@ -20,6 +21,17 @@
 | Border | `--input` |
 | Focus ring | `--ring` |
 | Invalid ring | `--destructive`, `--border` |
+
+## Runtime ownership
+
+`block_input_group()` is not a standalone runtime input binding. It is a
+package-owned R-side composition wrapper that lays out addon slots around
+a child control. The preferred control child is runtime `block_input()`,
+which owns Shiny value binding, invalid state, disabled state, and server
+updates through `update_block_input()`.
+
+Raw Shiny inputs remain tolerated for backward-compatible composition, but
+new showcase, docs, and tests should use runtime controls inside the group.
 
 ## Deliberate divergences from shadcn
 

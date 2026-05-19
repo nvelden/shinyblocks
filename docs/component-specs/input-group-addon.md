@@ -3,6 +3,7 @@
 > Shinyblocks function: `block_input_group_addon()`
 > Shadcn reference: input-with-addon composition built from Input
 > patterns
+> Status: Phase 5.11 — ownership resolved as an R-side layout primitive
 
 ## States
 
@@ -17,6 +18,13 @@
 | --- | --- |
 | Text/icon | `--muted-foreground` |
 | Divider border | `--input` |
+
+## Runtime ownership
+
+`block_input_group_addon()` is a static R-side slot helper. It does not
+own Shiny value binding or runtime state. Addons should be composed around
+runtime controls such as `block_input()` when an interactive input is
+needed.
 
 ## Deliberate divergences from shadcn
 
