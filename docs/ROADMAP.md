@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: Phase 4/5 — overlays and controls runtime migration (status as of 2026-05-19).**
+> **In progress: migration cleanup for shipped components (status as of 2026-05-19).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -263,12 +263,16 @@ phase begins.
 >   `block_theme()`, `block_dark_mode_toggle()`, and
 >   `update_block_theme()`.
 >
-> Current natural-next work (no hard gate blocker):
-> - Phase 5 remaining cleanup — audit/drop `bslib` if tabs were the last
->   dependency reason and remove any now-dead wrapped-input notes/tests
->   revealed by that dependency cleanup.
-> - Phase 4 remaining overlays — `block_dropdown_menu()`,
->   `block_sheet()`, `block_drawer()`, `block_hover_card()`.
+> Current natural-next work (migration scope only):
+> - Phase 5 remaining cleanup — audit stale wrapped-input and
+>   Bootstrap-tab assumptions out of the docs/decision stack, and
+>   remove any now-dead notes/tests/scaffolding that audit reveals.
+> - Phase 6 shipped-helper cleanup — finish runtime/shell cleanup for
+>   already-exported helpers such as `block_page()`, `block_sidebar()`,
+>   `block_nav()`, `block_icon()`, `block_dark_mode_toggle()`, and
+>   `block_theme()` / `update_block_theme()`.
+> - Remaining overlay additions are explicitly deferred until the
+>   migration/cleanup of shipped components is complete.
 >
 > **Component-by-component hand-off:** after button and select are
 > accepted, proceed one component at a time. Each slice should
@@ -295,11 +299,12 @@ phase begins.
 >    examples, scoped CSS, bundle-size reporting, and native cleanup.
 > 3. **Presentational components** — migrate low-risk visual
 >    components and remove their native CSS/tests.
-> 4. **Overlay/menu components** — migrate Radix portal/focus behavior.
-> 5. **Forms and controls** — migrate stateful controls and Shiny
->    updater examples.
+> 4. **Overlay/menu cleanup for shipped helpers** — finish portal/focus
+>    cleanup on existing overlay components.
+> 5. **Forms and controls** — finish migration cleanup of shipped
+>    stateful controls and their updater examples.
 > 6. **Layout, navigation, icons, theme** — finish shell decisions and
->    remove obsolete compatibility assets.
+>    remove obsolete compatibility assets for already-exported helpers.
 > 7. **Parity/spec/docs reset** — verification targets shipped runtime
 >    behavior and upstream sync drift, not native CSS translation.
 
@@ -714,15 +719,15 @@ package-owned visual CSS.
 
 ## Runtime Phase 4 — Overlays and Menus
 
-Goal: migrate behavior-heavy Radix components.
+Goal: finish migration cleanup for the behavior-heavy overlay components
+that already shipped. New overlay additions stay deferred until the
+current exported surface is fully cleaned up.
 
 - `block_dialog()` ✅ shipped (4.1 – 4.4)
 - `block_popover()` ✅ shipped (5.1 – 5.3, naming legacy)
 - `block_tooltip()` ✅ shipped (2026-05-18)
-- `block_dropdown_menu()`
-- `block_sheet()`
-- `block_drawer()`
-- `block_hover_card()`
+- Deferred: `block_dropdown_menu()`, `block_sheet()`,
+  `block_drawer()`, `block_hover_card()`
 
 Exit: portal, focus, Escape, outside-click, open-state, and removal
 behavior come from the runtime and are covered by browser tests.

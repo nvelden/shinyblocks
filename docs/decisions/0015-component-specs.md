@@ -68,7 +68,7 @@ Each exported `block_*()` ships with a **component spec** at
 that asserts every exported `block_*()` has a matching
 `docs/component-specs/<name>.md`, with the same shape as the existing
 pkgdown-reference and gallery checks. The check is active immediately
-for new components.
+for each newly migrated or newly exported component slice.
 
 A `backfill_pending` allowlist in the test names every component that
 exists today without a spec, so the suite stays green while the
@@ -108,14 +108,15 @@ reference screenshot as the anchor.
 
 - One short markdown file per exported component. ~30 lines of mostly
   mechanical content. Scales linearly with surface area, which is the
-  intended cost — every new component is a parity commitment.
+  intended cost — every shipped component is a parity commitment.
 - Reference screenshots have to be captured manually until shadcn
   exposes them as static assets at stable URLs. Acceptable: the
   screenshot is a once-per-component task and a once-per-shadcn-bump
   refresh.
 - Backfill is real work. Mitigated by the `backfill_pending`
-  allowlist — the rule applies to new components today, existing
-  components catch up incrementally without blocking other work.
+  allowlist — the rule applies to newly migrated/exported components
+  today, existing components catch up incrementally without blocking
+  other work.
 
 **Out of scope for this ADR:**
 
