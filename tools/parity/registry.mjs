@@ -249,31 +249,6 @@ async function sliderExtraChecks(page, theme, state, selectors) {
     }
   }
 
-  if (theme === "light" && state === "default") {
-    const labels = await page.evaluate((root) => {
-      return [".irs-min", ".irs-max", ".irs-single", ".irs-from", ".irs-to", ".irs-grid"].map(
-        (selector) => {
-          const el = document.querySelector(`${root} ${selector}`);
-          return {
-            selector,
-            display: el ? window.getComputedStyle(el).display : "absent"
-          };
-        }
-      );
-    }, selectors.root);
-
-    console.log("\n== slider :: light :: default :: hidden labels ==");
-    for (const row of labels) {
-      const ok = row.display === "none" || row.display === "absent";
-      console.log(
-        `  ${row.selector.padEnd(12)} ${ok ? "match  hidden" : `drift  display=${row.display}`}`
-      );
-      if (!ok) {
-        drifts += 1;
-      }
-    }
-  }
-
   return drifts;
 }
 

@@ -41,11 +41,11 @@ skill. The decisions and scaffolding for follow-up are in place:
 
 Recent slices fixed the safe drifts (badge `rounded-full` +
 `text-xs`, button link `text-primary`, button outline `shadow-xs`,
-destructive `text-white` + dark-mode dim) and built two
-proof-of-concept parity scripts (`tools/parity/select-poc.mjs` and
-`tools/parity/slider-poc.mjs`) that demonstrate the harness catches
-real drift. What's left is the structural cross-cuts and the
-slice-by-slice rollout.
+destructive `text-white` + dark-mode dim) and built proof-of-concept
+parity scripts that demonstrated the harness catches real drift. Those
+POCs have since been superseded by the registry-driven parity harness.
+What's left is the structural cross-cuts and the slice-by-slice
+rollout.
 
 ## Slice order
 
