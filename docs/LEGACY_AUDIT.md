@@ -17,7 +17,7 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
 - Runtime CSS tests may list forbidden host selectors because they assert those selectors are absent from `shinyblocks-runtime.css`.
 - Runtime Shiny collision fixtures may create host Bootstrap/Selectize-like nodes and one nested raw Shiny text input to prove scoped runtime CSS does not affect them.
 - `inst/www/src/shinyblocks.css` may still contain `.sb-button-*` while shell/showcase cleanup migrates the remaining non-runtime button snippets. `R/dark-mode.R` is no longer an allowlisted reason for keeping those selectors.
-- Showcase source snippets may keep `.sb-button-*` only for action-button examples until those snippets migrate to `block_button()`.
+- Showcase source snippets may still reference `.sb-button-*` only through the centralized `showcase_action_button()` helper in `inst/showcase/R/render_example.R`, because those server-update controls still need native `actionButton()` click semantics. Do not reintroduce per-example wrappers.
 - `docs/component-specs/slider.md` may state that slider no longer wraps `shiny::sliderInput()` / ionRangeSlider.
 - `docs/skills/shinyblocks-component.md` may retain historical pitfall notes until the runtime-skill refresh is completed.
 - `block_input_group()` and `block_input_group_addon()` are not audit failures by themselves: they are explicitly classified as R-side composition/layout primitives. New examples should compose them with runtime controls such as `block_input()` rather than reintroducing wrapped Shiny inputs.

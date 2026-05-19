@@ -89,10 +89,12 @@ register_dialog_showcase <- function(input, output, session) {
         "trigger label is empty - set one in the Content panel to render a trigger button here."
       ))
     }
-    shiny::actionButton(
+    showcase_action_button(
       "showcase_dialog_trigger_click",
       label,
-      class = "sb-button sb-button-default sb-button-size-default"
+      variant = "default",
+      size = "default",
+      class = NULL
     )
   })
   shiny::outputOptions(

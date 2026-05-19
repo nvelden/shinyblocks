@@ -1,11 +1,3 @@
-input_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -83,11 +75,11 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                input_action_button("showcase_input_set_value", "Set value"),
-                input_action_button("showcase_input_clear", "Clear"),
-                input_action_button("showcase_input_disable", "Disable"),
-                input_action_button("showcase_input_enable", "Enable"),
-                input_action_button("showcase_input_to_password", "Type → password")
+                showcase_action_button("showcase_input_set_value", "Set value"),
+                showcase_action_button("showcase_input_clear", "Clear"),
+                showcase_action_button("showcase_input_disable", "Disable"),
+                showcase_action_button("showcase_input_enable", "Enable"),
+                showcase_action_button("showcase_input_to_password", "Type → password")
               )
             )
           ),
