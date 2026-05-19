@@ -216,14 +216,13 @@ One commit, all artifacts. Suggested commit-message shape:
 ```
 feat: block_<name>() — <shadcn-component-name> wrapper / port
 
-R/<file>.R          — wrap shiny::<widget> with token-driven styling
-inst/www/src/       — ion.rangeSlider/Selectize/etc overrides for
-                      shadcn parity
+R/<file>.R          — validate the R API and emit runtime payloads
+frontend/src/       — runtime component, Shiny binding, update handling
+inst/www/src/       — only shell CSS or explicitly allowlisted legacy CSS
 inst/showcase/      — gallery section + example
 _pkgdown.yml        — Forms/Content/Action reference entry
 tests/              — tag-shape + validation cases
 docs/component-specs/<slug>.md   — spec per ADR 0015
-tools/parity/<name>-poc.mjs      — visual-parity check
 
 Parity harness verdict: X drifts surfaced, Y fixed, Z documented as
 deliberate divergences. <bullet list of fixes>.
@@ -231,7 +230,7 @@ deliberate divergences. <bullet list of fixes>.
 
 ## Pitfalls (real bugs that have shipped)
 
-- **Off-centre thumb in slider.** Symptom: thumb visually floats above the rail. Cause: harness `THUMB_PROPS` didn't include `top`/`transform`, and didn't cross-check rail vs thumb bounding rects. Fix: add positioning to property set and a centring assertion (the [slider-poc.mjs](../../tools/parity/slider-poc.mjs) is the corrected template).
+- **Off-centre thumb in slider.** Symptom: thumb visually floats above the rail. Cause: the parity harness did not include positioning properties and did not cross-check rail vs thumb bounding rects. Fix: keep slider centring assertions in the registry-driven parity checks rather than one-off POC scripts.
 - **Selectize trigger had `rounded-md` instead of `rounded-lg`.** Symptom: trigger looks rectangular vs shadcn's lozenge. Cause: relied on Selectize default for radius. Fix: explicit `border-radius: var(--radius-lg) !important;`.
 - **Double-hover in select dropdown.** Symptom: keyboard-selected row and pointer-hovered row both lit up at the same time. Cause: `.option.selected` styled with the same accent fill as `.option:hover`. Fix: drop the `.option.selected` background; mark selected with font weight only.
 - **Container height wrong.** ion.rangeSlider/Selectize set their container heights via their own CSS. Without `!important`, your shorter container loses. Always pin.
