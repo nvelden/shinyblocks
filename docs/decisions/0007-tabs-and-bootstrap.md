@@ -2,7 +2,16 @@
 
 ## Status
 
-Accepted (2026-05-08)
+Superseded by [ADR 0017](0017-full-runtime-port.md) and the Phase 5.12
+tabs ownership cleanup (2026-05-19)
+
+## Superseded Note
+
+This ADR documents the original native/wrapper strategy where
+`block_tabs()` decorated `shiny::tabsetPanel()` / Bootstrap tab markup.
+That is no longer the shipped direction. Keep this file only as
+historical context for why the wrapper existed and what constraints it
+was designed around.
 
 ## Context
 
