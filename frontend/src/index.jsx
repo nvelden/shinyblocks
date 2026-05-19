@@ -1,82 +1,41 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
+import {
+  currentValue,
+  ensurePortalRoot,
+  labelIdForInput,
+  readPayload,
+  runtimeRoots
+} from "./runtime/dom.js";
+import {
+  bindShinyChildren,
+  forgetRevision,
+  isFreshRevision,
+  setInputValue,
+  unbindShinyChildren
+} from "./runtime/shiny.js";
+import {
+  installNativeFocusForwarding,
+  nativeCheckbox,
+  nativeInput,
+  nativeSelect,
+  nativeSlider,
+  nativeSwitch,
+  nativeTextarea,
+  normalizeSliderValue,
+  setNativeCheckboxValue,
+  setNativeChoices,
+  setNativeInputValue,
+  setNativeRadioGroupValue,
+  setNativeSliderValue,
+  setNativeSwitchValue,
+  setNativeTextareaValue,
+  setNativeValue,
+  sliderValueToNative
+} from "./runtime/native-inputs.js";
 
 const mounted = new Map();
-const revisions = new Map();
-
-function runtimeRoots(container) {
-  return Array.from(
-    (container || document).querySelectorAll("[data-shinyblocks-runtime='true']")
-  );
-}
-
-function readPayload(root) {
-  const script = root.querySelector("script[data-shinyblocks-payload]");
-  if (!script) return null;
-
-  try {
-    return JSON.parse(script.textContent || "{}");
-  } catch (error) {
-    root.dataset.sbRuntimeError = "payload";
-    console.error("shinyblocks: invalid runtime payload", error);
-    return null;
-  }
-}
-
-function currentValue(payload) {
-  if (!payload || !payload.state) return null;
-  if (!Object.prototype.hasOwnProperty.call(payload.state, "value")) return null;
-  return payload.state.value;
-}
-
-function ensurePortalRoot() {
-  let portal = document.querySelector("[data-shinyblocks-portal-root]");
-  if (portal) return portal;
-
-  portal = document.createElement("div");
-  portal.setAttribute("data-shinyblocks-portal-root", "");
-  document.body.appendChild(portal);
-  return portal;
-}
-
-function isShinyReady() {
-  if (!window.Shiny || !window.Shiny.setInputValue) return false;
-  if (!window.Shiny.shinyapp) return true;
-
-  const socket = window.Shiny.shinyapp.$socket;
-  return Boolean(socket && socket.readyState === 1);
-}
-
-function setInputValue(id, value, priority) {
-  if (!id || !isShinyReady()) return false;
-  window.Shiny.setInputValue(id, value, { priority: priority || "event" });
-  return true;
-}
-
-function bindShinyChildren(root) {
-  if (!window.Shiny || !window.Shiny.bindAll) return;
-  const children = root.querySelector("[data-shinyblocks-children]") || root;
-  window.Shiny.bindAll(children);
-}
-
-function unbindShinyChildren(root) {
-  if (!window.Shiny || !window.Shiny.unbindAll) return;
-  const children = root.querySelector("[data-shinyblocks-children]") || root;
-  window.Shiny.unbindAll(children);
-}
-
-function isFreshRevision(id, revision) {
-  const next = Number(revision || 0);
-  const current = revisions.get(id) || 0;
-  if (next < current) return false;
-  revisions.set(id, next);
-  return true;
-}
-
-function forgetRevision(id) {
-  revisions.delete(id);
-}
 
 function isSelectPayload(payload) {
   return payload && payload.component === "select";
@@ -112,182 +71,6 @@ function isRadioGroupPayload(payload) {
 
 function isSliderPayload(payload) {
   return payload && payload.component === "slider";
-}
-
-function nativeSelect(root) {
-  return root ? root.querySelector(".sb-select-native") : null;
-}
-
-function nativeCheckbox(root) {
-  return root ? root.querySelector(".sb-checkbox-native") : null;
-}
-
-function nativeTextarea(root) {
-  return root.querySelector("textarea.sb-textarea-native");
-}
-
-function setNativeTextareaValue(root, value, notify) {
-  const native = nativeTextarea(root);
-  if (!native) return;
-  const next = value == null ? "" : String(value);
-  if (native.value === next) return;
-  native.value = next;
-  if (notify) {
-    native.dispatchEvent(new Event("input", { bubbles: true }));
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function nativeInput(root) {
-  return root.querySelector("input.sb-input-native");
-}
-
-function setNativeInputValue(root, value, notify) {
-  const native = nativeInput(root);
-  if (!native) return;
-  const next = value == null ? "" : String(value);
-  if (native.value === next) return;
-  native.value = next;
-  if (notify) {
-    native.dispatchEvent(new Event("input", { bubbles: true }));
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function nativeRadioGroup(root) {
-  return root.querySelector("input.sb-radio-group-native");
-}
-
-function setNativeRadioGroupValue(root, value) {
-  const native = nativeRadioGroup(root);
-  if (!native) return;
-  native.value = value == null ? "" : String(value);
-}
-
-function nativeSlider(root) {
-  return root ? root.querySelector("input.sb-slider-native") : null;
-}
-
-function sliderValueToNative(value) {
-  if (Array.isArray(value)) return value.join(",");
-  return value == null ? "" : String(value);
-}
-
-function normalizeSliderValue(value, min, max) {
-  const fallback = Number.isFinite(min) ? min : 0;
-  const values = Array.isArray(value) ? value : [value];
-  const normalized = values
-    .slice(0, 2)
-    .map((item) => Number(item))
-    .filter((item) => Number.isFinite(item));
-  if (!normalized.length) normalized.push(fallback);
-  const low = Number.isFinite(min) ? min : Math.min(...normalized);
-  const high = Number.isFinite(max) ? max : Math.max(...normalized);
-  const clamped = normalized.map((item) => Math.min(high, Math.max(low, item)));
-  if (clamped.length === 2 && clamped[0] > clamped[1]) clamped.sort((a, b) => a - b);
-  return Array.isArray(value) ? clamped.slice(0, 2) : clamped[0];
-}
-
-function setNativeSliderValue(root, value, notify) {
-  const native = nativeSlider(root);
-  if (!native) return;
-  native.value = sliderValueToNative(value);
-  if (notify) {
-    native.dispatchEvent(new Event("input", { bubbles: true }));
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function nativeSwitch(root) {
-  return root ? root.querySelector(".sb-switch-native") : null;
-}
-
-function setNativeCheckboxValue(root, checked, notify) {
-  const native = nativeCheckbox(root);
-  if (!native) return;
-
-  native.checked = Boolean(checked);
-  if (notify) {
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function setNativeSwitchValue(root, checked, notify) {
-  const native = nativeSwitch(root);
-  if (!native) return;
-
-  native.checked = Boolean(checked);
-  if (notify) {
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function cssEscape(value) {
-  if (window.CSS && typeof window.CSS.escape === "function") {
-    return window.CSS.escape(value);
-  }
-  return String(value).replace(/["\\#.;,[\]()=>+~*^$|!]/g, "\\$&");
-}
-
-function setNativeChoices(root, choices, placeholder, selected) {
-  const native = nativeSelect(root);
-  if (!native) return;
-
-  native.textContent = "";
-
-  if (placeholder != null && String(placeholder).length > 0) {
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = String(placeholder);
-    native.appendChild(option);
-  }
-
-  (choices || []).forEach((choice) => {
-    const option = document.createElement("option");
-    option.value = String(choice.value);
-    option.textContent = String(choice.label);
-    native.appendChild(option);
-  });
-
-  native.value = selected == null ? "" : String(selected);
-}
-
-function setNativeValue(root, value, notify) {
-  const native = nativeSelect(root);
-  if (!native) return;
-
-  native.value = value == null ? "" : String(value);
-  if (notify) {
-    native.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-}
-
-function labelIdForInput(inputId) {
-  if (!inputId) return null;
-
-  const label = document.querySelector(`label[for="${cssEscape(inputId)}"]`);
-  if (!label) return null;
-
-  if (!label.id) {
-    label.id = `${inputId}-label`;
-  }
-  return label.id;
-}
-
-function focusSelectTrigger(root) {
-  const trigger = root && root.querySelector(".sb-select-trigger");
-  if (trigger && !trigger.disabled) {
-    trigger.focus();
-  }
-}
-
-function installNativeFocusForwarding(root) {
-  const native = nativeSelect(root);
-  if (!native || native.__sbSelectFocusForwarding) return;
-
-  const handler = () => focusSelectTrigger(root);
-  native.addEventListener("focus", handler);
-  native.__sbSelectFocusForwarding = handler;
 }
 
 function registerSelectBinding() {
@@ -3607,7 +3390,6 @@ if (document.readyState === "loading") {
   init();
 }
 
-  registerButtonBinding();
 document.addEventListener("shiny:connected", function connected() {
   registerSelectBinding();
   registerDialogBinding();
