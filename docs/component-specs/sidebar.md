@@ -12,6 +12,8 @@
   `data-collapsed="true"`.
 - **mobile-open** — page-level runtime opens the sidebar as a sheet
   with backdrop handling.
+- **nav-composed** — when passed a `block_nav()` container, reuses that
+  nav landmark instead of wrapping it in a second nested nav region.
 
 ## Token contract
 
@@ -26,6 +28,9 @@
 
 - shinyblocks keeps the sidebar runtime small and page-scoped instead of
   porting the full React/sidebar provider model.
+- `block_sidebar()` normalizes either direct `block_nav_item()` children
+  or a provided `block_nav()` container into one sidebar navigation
+  landmark, avoiding nested nav semantics.
 
 ## Reference screenshot
 
