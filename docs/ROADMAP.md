@@ -186,6 +186,12 @@ phase begins.
 >   group with runtime `block_input()`, and the source stylesheet includes
 >   group-specific runtime input merge rules while keeping raw Shiny input
 >   compatibility as migration scaffolding.
+> - **Phase 5.12 tabs ownership cleanup** — `block_tabs()` no longer
+>   wraps `shiny::tabsetPanel()` or decorates Bootstrap tab markup. It now
+>   emits package-owned triggers and panels, keeps local keyboard/selection
+>   behavior in `shinyblocks.js`, and pushes selected values to Shiny via
+>   `input$<id>` without `nav-link`, `tab-pane`, or `shiny-tab-input`
+>   dependencies in the rendered contract.
 > - **Phase 5.10 verification** — latest checks passed:
 >   `npm run build`, `Rscript -e "devtools::test()"`,
 >   `npm run test:runtime`, `npm run test:runtime-shiny`, and
@@ -251,9 +257,9 @@ phase begins.
 >   `update_block_theme()`.
 >
 > Current natural-next work (no hard gate blocker):
-> - Phase 5 remaining cleanup — `block_tabs()` / `block_tab()` cleanup,
->   then deletion of Bootstrap-tab / no-longer-needed wrapped-input CSS
->   + tests.
+> - Phase 5 remaining cleanup — delete no-longer-needed wrapped-input CSS
+>   + tests and decide whether `block_field_*()` remains R-side
+>   composition or moves to runtime markup.
 > - Phase 4 remaining overlays — `block_dropdown_menu()`,
 >   `block_sheet()`, `block_drawer()`, `block_hover_card()`.
 >
@@ -722,13 +728,15 @@ Goal: remove the wrapped-Shiny-control strategy for shadcn controls.
 - `block_input_group()` and addons (R-side composition primitives around
   runtime controls, not standalone runtime bindings)
 - `block_field_*()`
-- `block_tabs()` and `block_tab()`
+- `block_tabs()` and `block_tab()` (package-owned R-side markup with a
+  local Shiny value bridge)
 
 Exit: controls use runtime input bindings and updater helpers. Old
 Selectize, ion.rangeSlider, Bootstrap-tab, checkbox, switch, textarea,
 and field visual override CSS/tests are gone. `block_input_group()` and
 addons remain as R-side layout primitives where they compose migrated
-runtime controls.
+runtime controls. `block_tabs()` remains R-side markup, but no longer
+wraps Shiny/Bootstrap tabset output.
 
 ## Runtime Phase 6 — Shell, Icons, and Theme
 

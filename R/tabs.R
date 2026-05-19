@@ -4,14 +4,15 @@
 #' @param ... Tab content.
 #' @param value Optional tab value.
 #'
-#' @return A Shiny tab panel.
+#' @return An `htmltools` tag.
 #' @family navigation
 #' @export
 block_tab <- function(title, ..., value = NULL) {
-  shiny::tabPanel(
-    title = title,
-    htmltools::tags$div(class = "sb-tab", ...),
-    value = value %||% title
+  htmltools::tags$div(
+    class = "sb-tab-source",
+    `data-title` = title,
+    `data-value` = value %||% title,
+    ...
   )
 }
 
@@ -37,98 +38,107 @@ block_tabs <- function(
 ) {
   variant <- match_arg(variant, c("default", "line"))
   orientation <- match_arg(orientation, c("horizontal", "vertical"))
-  tabs <- shiny::tabsetPanel(..., id = id, selected = selected)
-  tabs$attribs[["data-sb-tabs"]] <- "true"
-  tabs$attribs[["data-orientation"]] <- orientation
-  tabs$attribs[["data-variant"]] <- variant
-  query <- htmltools::tagQuery(tabs)
-  anchors <- query$find("ul.nav > li > a")$selectedTags()
-  selected_value <- selected %||% anchors[[1]]$attribs[["data-value"]] %||% ""
+  tab_items <- lapply(list(...), normalize_block_tab)
+  if (!length(tab_items)) {
+    stop("`block_tabs()` requires at least one tab.", call. = FALSE)
+  }
 
-  query$
-    addClass(merge_classes("sb-tabs", class))$
-    find("ul.nav")$
-    each(function(tag, index) {
-      tag$attribs[["role"]] <- "tablist"
-      tag$attribs[["aria-orientation"]] <- orientation
-      tag$attribs[["class"]] <- merge_classes(
-        gsub("\\bnav-tabs\\b", "", tag$attribs[["class"]] %||% ""),
-        "sb-tabs-list"
-      )
-      tag$attribs[["data-orientation"]] <- orientation
-      tag$attribs[["data-variant"]] <- variant
-    })$
-  resetSelected()$
-    find("ul.nav > li")$
-    each(function(tag, index) {
-      tag$attribs[["class"]] <- merge_classes(
-        gsub("\\bactive\\b", "", tag$attribs[["class"]] %||% ""),
-        "nav-item"
-      )
-    })$
-  resetSelected()$
-    find("ul.nav > li > a")$
-    each(function(tag, index) {
-      is_active <- identical(
-        tag$attribs[["data-value"]] %||% "",
-        selected_value
-      )
-      controls <- sub("^#", "", tag$attribs[["href"]] %||% "")
+  values <- vapply(tab_items, function(tab) tab$value, character(1))
+  selected_value <- selected %||% values[[1]]
+  if (!selected_value %in% values) {
+    selected_value <- values[[1]]
+  }
 
-      tag$attribs[["id"]] <- paste0(controls, "-trigger")
+  tabset_id <- id %||% paste0("sb-tabs-", tab_id_suffix(values))
+  trigger_tags <- Map(function(tab, index) {
+    panel_id <- paste0(tabset_id, "-panel-", index)
+    trigger_id <- paste0(tabset_id, "-trigger-", index)
+    active <- identical(tab$value, selected_value)
 
-      tag$attribs[["class"]] <- merge_classes(
-        gsub("\\bactive\\b", "", tag$attribs[["class"]] %||% ""),
-        "nav-link",
-        "sb-tabs-trigger"
-      )
-      tag$attribs[["role"]] <- "tab"
-      tag$attribs[["aria-selected"]] <- if (is_active) "true" else "false"
-      tag$attribs[["tabindex"]] <- if (is_active) "0" else "-1"
-      tag$attribs[["aria-controls"]] <- controls
-      tag$attribs[["data-state"]] <- if (is_active) "active" else "inactive"
-      tag$attribs[["data-orientation"]] <- orientation
-      tag$attribs[["data-variant"]] <- variant
-    })$
-  resetSelected()$
-    find(".tab-content")$
-    each(function(tag, index) {
-      tag$attribs[["class"]] <- merge_classes(
-        tag$attribs[["class"]],
-        "sb-tabs-content"
-      )
-      tag$attribs[["data-orientation"]] <- orientation
-      tag$attribs[["data-variant"]] <- variant
-    })$
-  resetSelected()$
-    find(".tab-pane")$
-    each(function(tag, index) {
-      is_active <- identical(
-        tag$attribs[["data-value"]] %||% "",
-        selected_value
-      )
-      pane_id <- tag$attribs[["id"]] %||% ""
+    htmltools::tags$button(
+      id = trigger_id,
+      type = "button",
+      class = "sb-tabs-trigger",
+      role = "tab",
+      `aria-selected` = if (active) "true" else "false",
+      `aria-controls` = panel_id,
+      tabindex = if (active) "0" else "-1",
+      `data-value` = tab$value,
+      `data-state` = if (active) "active" else "inactive",
+      `data-orientation` = orientation,
+      `data-variant` = variant,
+      tab$title
+    )
+  }, tab_items, seq_along(tab_items))
 
-      tag$attribs[["class"]] <- merge_classes(
-        gsub("\\bactive\\b", "", tag$attribs[["class"]] %||% ""),
-        "tab-pane",
-        "sb-tabs-panel"
+  panel_tags <- Map(function(tab, index) {
+    panel_id <- paste0(tabset_id, "-panel-", index)
+    trigger_id <- paste0(tabset_id, "-trigger-", index)
+    active <- identical(tab$value, selected_value)
+
+    htmltools::tags$div(
+      id = panel_id,
+      class = "sb-tabs-panel",
+      role = "tabpanel",
+      tabindex = "0",
+      `aria-labelledby` = trigger_id,
+      `data-value` = tab$value,
+      `data-state` = if (active) "active" else "inactive",
+      `data-orientation` = orientation,
+      `data-variant` = variant,
+      hidden = if (active) NULL else "hidden",
+      tab$children
+    )
+  }, tab_items, seq_along(tab_items))
+
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      id = tabset_id,
+      class = merge_classes("sb-tabs", class),
+      `data-sb-tabs` = "true",
+      `data-sb-tabs-input-id` = id,
+      `data-orientation` = orientation,
+      `data-variant` = variant,
+      htmltools::tags$div(
+        class = "sb-tabs-list",
+        role = "tablist",
+        `aria-orientation` = orientation,
+        `data-orientation` = orientation,
+        `data-variant` = variant,
+        trigger_tags
+      ),
+      htmltools::tags$div(
+        class = "sb-tabs-content",
+        `data-orientation` = orientation,
+        `data-variant` = variant,
+        panel_tags
       )
-      tag$attribs[["role"]] <- "tabpanel"
-      tag$attribs[["tabindex"]] <- "0"
-      tag$attribs[["data-state"]] <- if (is_active) "active" else "inactive"
-      tag$attribs[["data-orientation"]] <- orientation
-      tag$attribs[["data-variant"]] <- variant
-      if (nzchar(pane_id)) {
-        tag$attribs[["aria-labelledby"]] <- paste0(pane_id, "-trigger")
-      }
+    )
+  )
+}
 
-      if (is_active) {
-        tag$attribs[["hidden"]] <- NULL
-      } else {
-        tag$attribs[["hidden"]] <- "hidden"
-      }
-    })
+normalize_block_tab <- function(tab) {
+  if (!inherits(tab, "shiny.tag")) {
+    stop("`block_tabs()` children must be `block_tab()` or `shiny::tabPanel()` tags.", call. = FALSE)
+  }
 
-  attach_shinyblocks_deps(query$allTags())
+  title <- tab$attribs[["data-title"]] %||% tab$attribs[["title"]]
+  value <- tab$attribs[["data-value"]] %||% title
+  if (is.null(title) || !nzchar(as.character(title))) {
+    stop("Each tab must have a non-empty title.", call. = FALSE)
+  }
+  if (is.null(value) || !nzchar(as.character(value))) {
+    value <- title
+  }
+
+  list(
+    title = as.character(title),
+    value = as.character(value),
+    children = tab$children
+  )
+}
+
+tab_id_suffix <- function(values) {
+  text <- paste(values, collapse = "|")
+  sum(utf8ToInt(text) * seq_along(utf8ToInt(text)))
 }

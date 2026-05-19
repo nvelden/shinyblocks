@@ -216,10 +216,6 @@
     border-right: 1px solid var(--border);
   }
 
-  .sb-tabs-list > li {
-    @apply list-none;
-  }
-
   .sb-tabs-trigger {
     @apply inline-flex h-8 items-center justify-center rounded-md px-2.5 py-1 text-sm font-medium whitespace-nowrap text-muted-foreground shadow-none;
     border: 0 !important;
@@ -281,14 +277,14 @@
     background-color: var(--foreground);
   }
 
-  .sb-tabs .tab-content.sb-tabs-content {
+  .sb-tabs-content {
     @apply flex flex-col;
     margin-top: 0.5rem;
     min-width: 0;
     flex: 1;
   }
 
-  .sb-tabs .tab-content.sb-tabs-content[data-orientation="vertical"] {
+  .sb-tabs-content[data-orientation="vertical"] {
     margin-top: 0;
     margin-left: 1rem;
   }

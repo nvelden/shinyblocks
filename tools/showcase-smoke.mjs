@@ -121,6 +121,36 @@ try {
   assert.equal(preview.text, "Continue");
   assert.equal(preview.style, "color: red;");
 
+  await page.goto(`${url}/#tabs`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#tabs:not([hidden])");
+  const tabsRoot = page.locator("#showcase_tabs");
+  await tabsRoot.locator(".sb-tabs-trigger[data-value='usage']").click();
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector(
+      "#showcase_tabs .sb-tabs-trigger[data-value='usage']"
+    );
+    const panel = document.querySelector(
+      "#showcase_tabs .sb-tabs-panel[data-value='usage']"
+    );
+    return trigger?.getAttribute("aria-selected") === "true" &&
+      trigger?.getAttribute("data-state") === "active" &&
+      panel?.getAttribute("data-state") === "active" &&
+      !panel.hasAttribute("hidden");
+  });
+
+  await tabsRoot.locator(".sb-tabs-trigger[data-value='usage']").press("ArrowRight");
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector(
+      "#showcase_tabs .sb-tabs-trigger[data-value='settings']"
+    );
+    const previousPanel = document.querySelector(
+      "#showcase_tabs .sb-tabs-panel[data-value='usage']"
+    );
+    return trigger?.getAttribute("aria-selected") === "true" &&
+      trigger?.getAttribute("data-state") === "active" &&
+      previousPanel?.hasAttribute("hidden");
+  });
+
   console.log("Showcase smoke test passed.");
 } catch (error) {
   console.error(stdout);

@@ -1017,8 +1017,11 @@ state, and `update_block_slider()`. As of Phase 5.11,
 `block_input_group()` and `block_input_group_addon()` are resolved as
 R-side composition/layout primitives around runtime controls such as
 `block_input()`, not standalone runtime bindings. The current remaining
-Phase 5 work is `block_tabs()` / `block_tab()` cleanup, then deletion of
-the residual wrapped-input and Bootstrap-tab CSS/tests.
+Phase 5 work is deletion of residual wrapped-input CSS/tests and the
+field-helper ownership decision. As of Phase 5.12, `block_tabs()` /
+`block_tab()` emit package-owned R-side markup with a local Shiny value
+bridge instead of wrapping `shiny::tabsetPanel()` or Bootstrap tab
+internals.
 
 Order:
 
@@ -1030,7 +1033,7 @@ Order:
 6. `block_input()`
 7. `block_input_group()` and addons (R-side composition primitives)
 8. `block_field_*()` helpers
-9. `block_tabs()` and `block_tab()`
+9. `block_tabs()` and `block_tab()` (R-side package-owned markup)
 
 Tasks:
 
@@ -1041,8 +1044,9 @@ Tasks:
    - `data-invalid` on field-level components;
    - `aria-invalid` on controls;
    - error/description IDs wired by payload, not post-render DOM mutation.
-5. Rework tabs away from Bootstrap tabset assumptions once runtime tabs own the
-   interaction.
+5. Keep tabs independent of Bootstrap tabset assumptions; the local
+   `shinyblocks.js` bridge owns selection, keyboard behavior, panel
+   visibility, and Shiny value updates.
 6. Add or update one showcase page/section per form/control component. Each
    input-like page must include:
    - a preview;
@@ -1080,7 +1084,7 @@ Cleanup gate:
   - `shiny::textAreaInput()`;
   - `shiny::checkboxInput()`;
   - `shiny::sliderInput()`;
-  - `shiny::tabsetPanel()`, once runtime tabs land.
+  - `shiny::tabsetPanel()`.
 - Delete Selectize, ionRangeSlider, Bootstrap tab, checkbox, switch, textarea,
   and field visual override CSS.
 - Delete tests that assert Shiny-generated Bootstrap/Selectize/ionRangeSlider
