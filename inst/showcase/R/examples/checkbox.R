@@ -1,11 +1,3 @@
-checkbox_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -88,10 +80,10 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                checkbox_action_button("showcase_checkbox_set_checked", "Set checked"),
-                checkbox_action_button("showcase_checkbox_clear", "Clear"),
-                checkbox_action_button("showcase_checkbox_disable", "Disable"),
-                checkbox_action_button("showcase_checkbox_enable", "Enable")
+                showcase_action_button("showcase_checkbox_set_checked", "Set checked"),
+                showcase_action_button("showcase_checkbox_clear", "Clear"),
+                showcase_action_button("showcase_checkbox_disable", "Disable"),
+                showcase_action_button("showcase_checkbox_enable", "Enable")
               )
             )
           ),

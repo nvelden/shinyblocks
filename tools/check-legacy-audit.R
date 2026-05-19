@@ -40,9 +40,8 @@ allowlist <- data.frame(
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
     "^inst/www/src/shinyblocks\\.css$",
-    "^R/dark-mode\\.R$",
     "^tests/testthat/test-shell\\.R$",
-    "^inst/showcase/R/(examples/.+\\.R|server_dialog\\.R)$"
+    "^inst/showcase/R/(examples/.+\\.R|render_example\\.R|server_dialog\\.R)$"
   ),
   pattern = c(
     ".*",
@@ -52,7 +51,6 @@ allowlist <- data.frame(
     "selectize|Selectize|ionRangeSlider",
     "selectize|irs-|nav-link|tab-pane",
     "selectize|Selectize|nav-link|shiny::textInput",
-    "sb-button-",
     "sb-button-",
     "shiny-tab-input|nav-link|tab-pane|sb-button-",
     "sb-button-"
@@ -65,10 +63,9 @@ allowlist <- data.frame(
     "Tracked skill retains historical pitfalls until the runtime-skill refresh lands.",
     "Runtime CSS test asserts these host selectors are absent from runtime CSS.",
     "Host collision fixture intentionally creates non-shinyblocks Bootstrap/Selectize-like nodes and one nested raw Shiny text input.",
-    "Legacy button CSS remains for block_dark_mode_toggle until shell migration.",
-    "block_dark_mode_toggle still uses button classes until shell migration.",
-    "Shell tests assert old tab internals are absent and dark-mode keeps temporary button classes.",
-    "Showcase action snippets still use legacy button classes until source examples migrate to block_button()."
+    "Legacy button CSS remains while shell/showcase cleanup narrows the last non-runtime action-button surface.",
+    "Shell tests assert old tab internals are absent and may reference temporary legacy button classes.",
+    "Showcase action controls use one centralized actionButton() helper because server-update demos still need click-count semantics."
   ),
   stringsAsFactors = FALSE
 )

@@ -1,11 +1,3 @@
-dialog_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -70,11 +62,11 @@ htmltools::tagList(
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
             htmltools::div(
               style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-              dialog_action_button("showcase_dialog_open", "Open modal"),
-              dialog_action_button("showcase_dialog_close", "Close modal"),
-              dialog_action_button("showcase_dialog_resize_sm", "Resize sm"),
-              dialog_action_button("showcase_dialog_resize_lg", "Resize lg"),
-              dialog_action_button("showcase_dialog_swap_footer", "Swap footer")
+              showcase_action_button("showcase_dialog_open", "Open modal"),
+              showcase_action_button("showcase_dialog_close", "Close modal"),
+              showcase_action_button("showcase_dialog_resize_sm", "Resize sm"),
+              showcase_action_button("showcase_dialog_resize_lg", "Resize lg"),
+              showcase_action_button("showcase_dialog_swap_footer", "Swap footer")
             )
           )
         ),

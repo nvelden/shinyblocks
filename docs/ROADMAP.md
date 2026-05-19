@@ -212,6 +212,11 @@ phase begins.
 >   instead of nesting a second nav landmark around it, while still
 >   wrapping direct `block_nav_item()` children into one sidebar nav
 >   region.
+> - **Phase 6 helper cleanup — showcase action controls** —
+>   the remaining showcase-only server-update buttons now flow through one
+>   `showcase_action_button()` helper instead of duplicated per-example
+>   wrappers, preserving native `actionButton()` click semantics while
+>   narrowing the last `.sb-button*` legacy shell dependency.
 > - **Phase 6 helper cleanup — icon manifest contract** —
 >   `block_icon()` now reads the curated icon list from
 >   `inst/www/icons/MANIFEST.json` directly instead of scraping the
@@ -286,10 +291,10 @@ phase begins.
 > - Phase 5 remaining cleanup — audit stale wrapped-input and
 >   Bootstrap-tab assumptions out of the docs/decision stack, and
 >   remove any now-dead notes/tests/scaffolding that audit reveals.
-> - Phase 6 shipped-helper cleanup — finish runtime/shell cleanup for
->   already-exported helpers such as `block_page()`, `block_sidebar()`,
->   `block_nav()`, `block_icon()`, `block_dark_mode_toggle()`, and
->   `block_theme()` / `update_block_theme()`.
+> - Phase 6 shipped-helper cleanup — finish the remaining shell/runtime
+>   cleanup for already-exported helpers, with the biggest open slice now
+>   being whether legacy `.sb-button*` shell CSS can be reduced further
+>   after centralizing showcase-only action controls.
 > - Remaining overlay additions are explicitly deferred until the
 >   migration/cleanup of shipped components is complete.
 >

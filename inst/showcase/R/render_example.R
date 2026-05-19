@@ -1,9 +1,30 @@
+showcase_action_button <- function(
+  input_id,
+  label,
+  variant = "outline",
+  size = "sm",
+  class = "action-button"
+) {
+  classes <- c(
+    "sb-button",
+    paste0("sb-button-", variant),
+    paste0("sb-button-size-", size),
+    class
+  )
+
+  shiny::actionButton(
+    input_id,
+    label,
+    class = paste(stats::na.omit(classes), collapse = " ")
+  )
+}
+
 render_example <- function(path) {
   code <- readLines(path, warn = FALSE, encoding = "UTF-8")
   Encoding(code) <- "UTF-8"
   rendered <- eval(
     parse(text = code, encoding = "UTF-8"),
-    envir = new.env(parent = globalenv())
+    envir = new.env(parent = environment(render_example))
   )
   list(rendered = rendered, code = paste(code, collapse = "\n"))
 }

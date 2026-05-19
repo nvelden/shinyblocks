@@ -1,11 +1,3 @@
-switch_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -64,11 +56,11 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                switch_action_button("showcase_switch_turn_on", "Turn on"),
-                switch_action_button("showcase_switch_turn_off", "Turn off"),
-                switch_action_button("showcase_switch_disable", "Disable"),
-                switch_action_button("showcase_switch_enable", "Enable"),
-                switch_action_button("showcase_switch_rename", "Rename label")
+                showcase_action_button("showcase_switch_turn_on", "Turn on"),
+                showcase_action_button("showcase_switch_turn_off", "Turn off"),
+                showcase_action_button("showcase_switch_disable", "Disable"),
+                showcase_action_button("showcase_switch_enable", "Enable"),
+                showcase_action_button("showcase_switch_rename", "Rename label")
               )
             )
           ),

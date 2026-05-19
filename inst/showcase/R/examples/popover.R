@@ -1,11 +1,3 @@
-popover_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -68,10 +60,10 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                popover_action_button("showcase_popover_open", "Open"),
-                popover_action_button("showcase_popover_close", "Close"),
-                popover_action_button("showcase_popover_reposition", "Move"),
-                popover_action_button("showcase_popover_swap_body", "Swap text")
+                showcase_action_button("showcase_popover_open", "Open"),
+                showcase_action_button("showcase_popover_close", "Close"),
+                showcase_action_button("showcase_popover_reposition", "Move"),
+                showcase_action_button("showcase_popover_swap_body", "Swap text")
               )
             )
           ),

@@ -1,11 +1,3 @@
-button_action_button <- function(input_id, label) {
-  shiny::actionButton(
-    input_id,
-    label,
-    class = "sb-button sb-button-outline sb-button-size-sm action-button"
-  )
-}
-
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
@@ -71,12 +63,12 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
               htmltools::div(
                 style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                button_action_button("showcase_button_set_label", "Set label \"Saved!\""),
-                button_action_button("showcase_button_cycle_variant", "Cycle variant"),
-                button_action_button("showcase_button_disable", "Disable"),
-                button_action_button("showcase_button_enable", "Enable"),
-                button_action_button("showcase_button_set_icon", "Set icon: check"),
-                button_action_button("showcase_button_clear_icon", "Clear icon")
+                showcase_action_button("showcase_button_set_label", "Set label \"Saved!\""),
+                showcase_action_button("showcase_button_cycle_variant", "Cycle variant"),
+                showcase_action_button("showcase_button_disable", "Disable"),
+                showcase_action_button("showcase_button_enable", "Enable"),
+                showcase_action_button("showcase_button_set_icon", "Set icon: check"),
+                showcase_action_button("showcase_button_clear_icon", "Clear icon")
               )
             )
           ),
