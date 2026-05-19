@@ -212,6 +212,11 @@ phase begins.
 >   instead of nesting a second nav landmark around it, while still
 >   wrapping direct `block_nav_item()` children into one sidebar nav
 >   region.
+> - **Phase 6 helper cleanup — icon manifest contract** —
+>   `block_icon()` now reads the curated icon list from
+>   `inst/www/icons/MANIFEST.json` directly instead of scraping the
+>   generated sprite for names; the manifest is the R-side source of
+>   truth and the sprite remains the build artifact.
 > - **Phase 5.12 verification** — latest checks passed:
 >   `make build-css`, `Rscript -e "devtools::document()"`,
 >   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,

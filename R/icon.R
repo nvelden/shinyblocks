@@ -65,14 +65,21 @@ shinyblocks_icon_names <- local({
       return(cache)
     }
 
-    sprite <- icon_sprite_path()
-    lines <- readLines(sprite, warn = FALSE)
-    matches <- regmatches(lines, gregexpr('id="[^"]+"', lines, perl = TRUE))
-    ids <- unlist(matches, use.names = FALSE)
-    cache <<- sub("^sb-icon-", "", sub('^id="([^"]+)"$', "\\1", ids))
+    manifest <- jsonlite::fromJSON(icon_manifest_path(), simplifyVector = FALSE)
+    cache <<- unique(as.character(manifest$icons %||% character()))
     cache
   }
 })
+
+icon_manifest_path <- function() {
+  path <- system.file("www", "icons", "MANIFEST.json", package = "shinyblocks")
+
+  if (!nzchar(path)) {
+    path <- file.path("inst", "www", "icons", "MANIFEST.json")
+  }
+
+  path
+}
 
 icon_sprite_path <- function() {
   path <- system.file("www", "icons", "sprite.svg", package = "shinyblocks")
