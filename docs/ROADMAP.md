@@ -395,6 +395,11 @@ During active development, prefer `make showcase` (which uses
 `devtools::load_all(".")`) so the app reflects the current checkout.
 `shinyblocks::run_showcase()` launches the installed package copy and
 requires reinstalling to pick up local file edits.
+In Codex-style sandboxed sessions, the app may print `Listening on
+http://127.0.0.1:4321` and then fail with `createTcpServer: operation
+not permitted`. Treat that as a sandbox port-bind limitation, not an app
+bug: rerun the restart outside the sandbox / with escalation, then
+verify the port with `curl -sSI http://127.0.0.1:4321/`.
 
 | Command | Serves | Port | When to run |
 | --- | --- | --- | --- |
