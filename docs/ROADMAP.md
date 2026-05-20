@@ -261,6 +261,23 @@ phase begins.
 >   token override / runtime mode-driver split, the
 >   `inst/www/icons/MANIFEST.json` source-of-truth contract, and the
 >   thin `block_button()`-delegated dark-mode toggle.
+> - **Phase 7 specs slice — runtime spike (2026-05-20)** —
+>   Button, Badge, and Select specs now describe the shipped runtime
+>   variant/size contract, receive-only button binding, full updater
+>   surfaces, hidden-native-select bridge, and portal-rendered popup.
+> - **Phase 7 specs slice — presentational (2026-05-20)** —
+>   Separator, Spinner, Skeleton, Empty, and Value Box specs now
+>   describe shipped runtime payload shapes and slot composition.
+> - **Phase 7 specs slice — card + alert families (2026-05-20)** —
+>   `block_card()` + 5 composition primitives and `block_alert()` +
+>   2 composition primitives now describe shipped runtime/R-side
+>   contracts, `data-sb-child` region markers, and runtime child
+>   binding behavior.
+> - **Phase 7 specs slice — tabs + slider + code + field-description (2026-05-20)** —
+>   Tabs/Tab, Slider, Code, and Field Description specs now describe
+>   shipped runtime/R-side contracts. All 47 component specs are now
+>   refreshed for the runtime migration; the Phase 7 spec-rewrite
+>   gate is closed.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,

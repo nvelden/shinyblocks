@@ -2,14 +2,38 @@
 
 > Shinyblocks function: `block_value_box()`
 > Shadcn reference: <https://ui.shadcn.com/blocks>
+> Status: Runtime composition primitive; Phase 7 spec refreshed around
+> the shipped title/value/description/icon/content slot contract.
 
 ## States
 
 - **default** — compact metric card with title, primary value, and
   optional description.
 - **with-icon** — optional leading metric icon.
-- **with-extra-body** — supports supplementary body content below the
+- **with-extra-body** — supplementary body content via `...` below the
   main value.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `title` | Metric title. String or tag. Required. |
+| `value` | Primary metric value. String or tag. Required. |
+| `...` | Additional body content rendered below the value. |
+| `description` | Optional description text. |
+| `icon` | Optional icon tag or vendored icon name. Forced to `inline-start` placement. |
+| `class` | Extra classes merged onto the runtime wrapper. |
+
+## Runtime mapping
+
+| R input | Runtime payload |
+| --- | --- |
+| `title` | `props$titleHtml` |
+| `value` | `props$valueHtml` |
+| `description` | `props$descriptionHtml` |
+| `...` | `props$contentHtml` |
+| `icon` | `props$iconHtml` |
+| `class` | `className` |
 
 ## Token contract
 

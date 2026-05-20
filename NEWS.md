@@ -2,6 +2,13 @@
 
 * Refreshed the Page, Body, Header, Sidebar, Nav, and Nav Item component specs around their shipped R-side composition contracts, page-scoped sidebar runtime behavior, stable shell hooks, and accessibility wiring.
 * Refreshed the Theme, Icon, and Dark Mode Toggle component specs around the shipped token override / runtime mode-driver split, the manifest-as-source-of-truth icon contract, and the `block_button()`-delegated dark-mode toggle.
+* Refreshed the Button, Badge, and Select component specs around the shipped runtime variant/size contract, receive-only button binding, full updater surfaces, hidden-native-select bridge, and portal-rendered select popup.
+* Refreshed the Separator, Spinner, Skeleton, Empty, and Value Box specs around their shipped runtime payload shapes (orientation, accessible label, attrs passthrough, and title/value/description/icon/content/action slots).
+* Refreshed the Card family specs (`block_card()` plus the five composition primitives) around the shipped flat-argument convenience, `data-sb-child` region markers, runtime child binding through `[data-shinyblocks-children]`, and the dashboard-specific `value =` metric slot.
+* Refreshed the Alert family specs (`block_alert()`, `block_alert_title()`, `block_alert_description()`) around the shipped runtime variant + slot contract and `data-sb-child` composition markers.
+* Refreshed the Tabs and Tab specs around the shipped package-owned tablist/tabpanel markup, local `shinyblocks.js` selection/keyboard/ARIA runtime, and the `shiny::tabPanel()` compatibility input boundary.
+* Refreshed the Slider spec around the shipped runtime payload, hidden native-input bridge, single/range modes, pointer/keyboard behavior, and `update_block_slider()` notify semantics.
+* Refreshed the Code and Field Description specs around their shipped runtime payload + composition contracts.
 * Added `block_code()`, a shadcn-docs-style code block with line numbers, copy-to-clipboard interactions, and an optional editor-style header.
 * Refreshed the Dialog, Popover, and Tooltip component specs around their shipped runtime API, Shiny state/update contracts, accessibility behavior, and known divergences.
 * Refreshed the Input, Textarea, Checkbox, Switch, and Radio Group component specs around their shipped runtime API, Shiny state/update contracts, keyboard behavior, and known divergences.

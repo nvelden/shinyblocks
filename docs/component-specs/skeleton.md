@@ -2,13 +2,31 @@
 
 > Shinyblocks function: `block_skeleton()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/skeleton>
+> Status: Runtime presentational component with HTML attribute
+> passthrough; Phase 7 spec refreshed around shipped runtime attrs
+> contract.
 
 ## States
 
-- **default** — animated muted placeholder block.
-- **custom-size** — caller-controlled dimensions through classes or
-  extra attrs.
+- **default** — animated muted placeholder block with scoped pulse
+  animation under `[data-shinyblocks-root]`.
+- **custom-size** — caller controls dimensions through extra inline
+  styles, classes, or HTML attributes.
 - **decorative** — always `aria-hidden="true"`.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `class` | Extra classes merged onto the runtime wrapper. |
+| `...` | Additional HTML attributes passed through to the runtime element. `style` is normalised. `class` from `...` is merged with the `class` argument. |
+
+## Runtime mapping
+
+| R input | Runtime payload |
+| --- | --- |
+| `...` HTML attrs | `props$attrs` (object of attr name → value) |
+| `class` + `...$class` | `className` (merged) |
 
 ## Token contract
 
@@ -18,8 +36,9 @@
 
 ## Deliberate divergences from shadcn
 
-- shinyblocks exposes the skeleton as a plain `div` helper with attrs
-  passthrough instead of a framework-specific utility component.
+- The runtime element is a `<div>` with attrs passthrough rather than
+  a framework-specific utility component. Sizing comes from CSS
+  classes or inline style.
 
 ## Reference screenshot
 

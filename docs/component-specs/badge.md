@@ -2,15 +2,37 @@
 
 > Shinyblocks function: `block_badge()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/badge>
+> Status: Runtime presentational component; Phase 7 spec refreshed
+> around the shipped variant contract and parity normaliser notes.
 
 ## States
 
-- **default** — compact pill with token-driven fill and text.
-- **hover** — interactive-looking variants keep their token treatment
-  without adding a button/link runtime.
-- **destructive** — destructive surface with white text and dark-mode
-  dimming aligned to the shadcn contract.
-- **outline** — transparent surface with bordered treatment.
+- **default** — compact pill with `--primary` surface and
+  `--primary-foreground` text.
+- **secondary** — `--secondary` surface and `--secondary-foreground` text.
+- **outline** — transparent surface with 1px `--border` outline and
+  `--foreground` text.
+- **destructive** — `--destructive` surface with white text and a
+  dark-mode dimming treatment aligned with shadcn's
+  `dark:bg-destructive/60`.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `label` | Badge content. Accepts a string, an `htmltools` tag, or a tag list. Serialised through `html_fragment()`. |
+| `variant` | One of `default`, `secondary`, `outline`, `destructive`. |
+| `class` | Extra classes merged onto the runtime wrapper. |
+
+There is no `update_block_badge()` — badge is purely presentational.
+
+## Runtime mapping
+
+| R input | Runtime payload |
+| --- | --- |
+| `label` | `props$labelHtml` (HTML fragment) |
+| `variant` | `props$variant` |
+| `class` | `className` |
 
 ## Token contract
 
@@ -25,11 +47,6 @@
 | Destructive text | `--destructive-foreground` |
 | Focus ring | `--ring` |
 
-## Deliberate divergences from shadcn
-
-- `block_badge()` is a plain content primitive; if a consumer wants a
-  clickable badge, they compose that outside the helper.
-
 ## Parity normalisation notes
 
 The runtime CSS and the Tailwind v4 reference page produce visually
@@ -43,12 +60,20 @@ normalised in `tools/parity/normalise.mjs`:
 - **`display`** — Tailwind v4 emits `inline-flex` using the two-value
   syntax `display: inline flex`, which Chromium's `getComputedStyle`
   reports as `flex`. The runtime uses single-keyword `inline-flex`.
-  Both yield an inline-level flex container; the normaliser collapses
-  `flex`, `inline-flex`, and `inline flex` to canonical `inline-flex`.
+  The normaliser collapses `flex`, `inline-flex`, and `inline flex` to
+  canonical `inline-flex`.
 
 The dark-mode destructive tint (`color-mix(... 60%, transparent)`) is
 implemented in `frontend/src/styles/runtime.css` to match
 `dark:bg-destructive/60` upstream.
+
+## Deliberate divergences from shadcn
+
+- `block_badge()` is a plain content primitive. If a consumer wants a
+  clickable badge they compose it outside the helper (e.g. inside a
+  `block_button(variant = "ghost")`).
+- The runtime does not register a binding — badge never reads or
+  receives Shiny messages.
 
 ## Reference screenshot
 

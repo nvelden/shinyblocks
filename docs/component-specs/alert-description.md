@@ -2,13 +2,31 @@
 
 > Shinyblocks function: `block_alert_description()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/alert>
+> Status: R-side composition primitive; Phase 7 spec refreshed around
+> the `data-sb-child="alert-description"` marker used by `block_alert()`
+> for region detection.
 
 ## States
 
-- **default** — compact supporting text beneath the alert title.
+- **default** — compact supporting text rendered as
+  `<div class="sb-alert-description">` beneath the alert title.
 - **destructive** — inherits the destructive context from the parent
   alert.
-- **composed** — intended to be rendered inside `block_alert()`.
+- **composed** — intended to be passed as `block_alert(description = ...)`
+  either as a prebuilt tag or as a bare string.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `...` | Description content. |
+| `class` | Extra classes merged onto the `.sb-alert-description` element. |
+
+## Composition contract
+
+Stamps `data-sb-child="alert-description"`. `block_alert()` reuses
+prebuilt description tags carrying this marker; bare strings get
+wrapped automatically.
 
 ## Token contract
 
@@ -19,8 +37,8 @@
 
 ## Deliberate divergences from shadcn
 
-- shadcn does not expose a standalone AlertDescription page; this is a
-  composition helper around the alert content contract.
+- shadcn does not expose a standalone AlertDescription docs page; this
+  is a composition helper around the alert content contract.
 
 ## Reference screenshot
 
