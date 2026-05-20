@@ -9,7 +9,7 @@ phase begins.
 
 ## Current Status
 
-> **In progress: migration cleanup for shipped components (status as of 2026-05-19).**
+> **In progress: migration cleanup for shipped components (status as of 2026-05-20).**
 >
 > Landed and verified locally:
 > - **Legacy native phases 0–5** — ADRs `0006`–`0016`, package shell,
@@ -222,6 +222,15 @@ phase begins.
 >   `inst/www/icons/MANIFEST.json` directly instead of scraping the
 >   generated sprite for names; the manifest is the R-side source of
 >   truth and the sprite remains the build artifact.
+> - **Code block component + docs integration** — `block_code()` now
+>   ships as a runtime-rendered shadcn-docs-style code frame with copy
+>   controls, line numbers, lightweight tokenization for R/Python/TSX,
+>   and wrap-by-default long-line behavior. The Shiny showcase now uses
+>   `block_code()` for UI Definition, Server Action, value readouts, and
+>   section View source panels. The custom docs site generates
+>   `block_code()` HTML for every component recipe and serves those
+>   blocks on component detail pages instead of raw `<pre><code>`
+>   markup.
 > - **Phase 5.12 verification** — latest checks passed:
 >   `make build-css`, `Rscript -e "devtools::document()"`,
 >   `Rscript -e "devtools::test(filter = 'tabs|shell|runtime|showcase|doc-coverage')"`,

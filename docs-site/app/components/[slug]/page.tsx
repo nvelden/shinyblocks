@@ -82,11 +82,12 @@ export default async function ComponentDetailPage({ params }: PageProps) {
             {/* Section 2: Code Recipe */}
             <section className="flex flex-col gap-4">
               <h2 className="text-xl font-bold tracking-tight text-foreground">R Code</h2>
-              <div className="relative overflow-hidden rounded-xl border border-border bg-muted/40 font-mono text-sm leading-relaxed p-6 shadow-inner transition-colors duration-200">
-                <pre className="overflow-x-auto whitespace-pre font-mono text-muted-foreground">
-                  <code>{component.code}</code>
-                </pre>
-              </div>
+              <div
+                className="component-code-block"
+                dangerouslySetInnerHTML={{
+                  __html: component.codeHtml,
+                }}
+              />
             </section>
 
             {/* Section 3: API Reference */}
@@ -141,4 +142,3 @@ export default async function ComponentDetailPage({ params }: PageProps) {
     </div>
   );
 }
-

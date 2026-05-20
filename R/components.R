@@ -349,15 +349,21 @@ block_badge <- function(
 
 #' Create a code block
 #'
-#' A premium pre-formatted code block with monospace typography, optional
-#' line numbers, copy-to-clipboard button, and terminal-style header.
+#' A pre-formatted code block following the shadcn documentation code
+#' surface: bordered frame, monospace text, optional line numbers, and an
+#' optional copy-to-clipboard button.
 #'
 #' @param code The code string to display.
-#' @param language Optional programming language name to display in the header.
-#' @param copyable Logical. If \code{TRUE} (default), displays a copy-to-clipboard button.
-#' @param line_numbers Logical. If \code{TRUE} (default), displays line numbers.
-#' @param header Logical. If \code{TRUE}, displays a terminal-style header with window dots. Defaults to \code{FALSE}.
-#' @param variant Visual variant. One of "default" (muted background) or "outline" (border only).
+#' @param language Optional programming language name to display when
+#'   `header = TRUE`.
+#' @param copyable Logical. If `TRUE` (default), displays a
+#'   copy-to-clipboard button.
+#' @param line_numbers Logical. If `TRUE` (default), displays line numbers.
+#' @param header Logical. If `TRUE`, displays an optional header with editor
+#'   dots and the language label. Defaults to `FALSE` to match the shadcn
+#'   documentation examples.
+#' @param variant Visual variant. One of `"default"` (background surface) or
+#'   `"outline"` (transparent surface).
 #' @param class Additional CSS classes.
 #' @param style Optional inline custom styles.
 #' @param ... Additional attributes or child elements (passed down).
@@ -378,6 +384,15 @@ block_code <- function(
 ) {
   if (missing(code) || !is.character(code) || length(code) != 1) {
     stop("`code` must be a single non-empty character string.", call. = FALSE)
+  }
+  if (!nzchar(code)) {
+    stop("`code` must be a single non-empty character string.", call. = FALSE)
+  }
+  if (
+    !is.null(language) &&
+      (!is.character(language) || length(language) != 1)
+  ) {
+    stop("`language` must be NULL or a single character string.", call. = FALSE)
   }
 
   variant <- match_arg(variant, c("default", "outline"))

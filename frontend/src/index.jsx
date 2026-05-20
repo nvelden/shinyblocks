@@ -304,7 +304,9 @@ function Code({ payload }) {
 
   const handleCopy = () => {
     if (!props.code) return;
-    navigator.clipboard.writeText(props.code).then(() => {
+    const clipboard = window.navigator && window.navigator.clipboard;
+    if (!clipboard) return;
+    clipboard.writeText(props.code).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -394,16 +396,135 @@ function Code({ payload }) {
         <code
           className="sb-code-block-code"
           data-line-numbers={isLineNumbers ? "" : undefined}
+          tabIndex={0}
         >
           {lines.map((line, idx) => (
             <span key={idx} className="sb-code-block-line" data-line="">
-              {line || " "}
+              {highlightCodeLine(line, props.language)}
             </span>
           ))}
         </code>
       </pre>
     </figure>
   );
+}
+
+function highlightCodeLine(line, language) {
+  if (!line) return " ";
+
+  const lang = String(language || "").toLowerCase();
+  if (["js", "jsx", "ts", "tsx", "javascript", "typescript"].includes(lang)) {
+    return highlightTokens(
+      line,
+      /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|<\/?[A-Z][A-Za-z0-9.]*(?=[\s>/])|[A-Za-z_$][\w$]*(?=\s*\()|\b(?:import|from|export|function|return|const|let|var|if|else)\b|[{}()[\];,=<>/])/g,
+      classifyJsToken
+    );
+  }
+
+  if (["py", "python"].includes(lang)) {
+    return highlightTokens(
+      line,
+      /(#.*$|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b\d+(?:\.\d+)?\b|[A-Za-z_]\w*(?=\s*\()|\b(?:and|as|class|def|elif|else|except|False|finally|for|from|if|import|in|is|lambda|None|not|or|pass|raise|return|True|try|while|with|yield)\b|[{}()[\]:,=<>.+*/-])/g,
+      classifyPythonToken
+    );
+  }
+
+  if (["r", "rscript"].includes(lang)) {
+    return highlightTokens(
+      line,
+      /(#.*$|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\b\d+(?:\.\d+)?\b|[A-Za-z.]\w*(?=\s*\()|\b(?:function|if|else|for|while|repeat|in|next|break|TRUE|FALSE|NULL|NA|NaN|Inf)\b|<-|->|::|[{}()[\],=<>+$*/~-])/g,
+      classifyRToken
+    );
+  }
+
+  return line;
+}
+
+function highlightTokens(line, pattern, classifyToken) {
+  const nodes = [];
+  let cursor = 0;
+  let match;
+  let key = 0;
+
+  while ((match = pattern.exec(line)) !== null) {
+    if (match.index > cursor) {
+      nodes.push(line.slice(cursor, match.index));
+    }
+
+    const token = match[0];
+    const tokenClass = classifyToken(token);
+    nodes.push(
+      tokenClass ? (
+        <span key={`token-${key++}`} className={tokenClass}>
+          {token}
+        </span>
+      ) : token
+    );
+    cursor = pattern.lastIndex;
+  }
+
+  if (cursor < line.length) {
+    nodes.push(line.slice(cursor));
+  }
+
+  return nodes.length ? nodes : line;
+}
+
+function classifyJsToken(token) {
+  if (/^["'`]/.test(token)) {
+    return "sb-code-token-string";
+  }
+  if (/^<\/?[A-Z]/.test(token)) {
+    return "sb-code-token-tag";
+  }
+  if (/^(import|from|export|function|return|const|let|var|if|else)$/.test(token)) {
+    return "sb-code-token-keyword";
+  }
+  if (/^[A-Za-z_$]/.test(token)) {
+    return "sb-code-token-function";
+  }
+  if (/^[{}()[\];,=<>/]$/.test(token)) {
+    return "sb-code-token-punctuation";
+  }
+  return null;
+}
+
+function classifyPythonToken(token) {
+  if (token.startsWith("#")) {
+    return "sb-code-token-comment";
+  }
+  if (/^["']/.test(token)) {
+    return "sb-code-token-string";
+  }
+  if (/^\d/.test(token)) {
+    return "sb-code-token-number";
+  }
+  if (/^(and|as|class|def|elif|else|except|False|finally|for|from|if|import|in|is|lambda|None|not|or|pass|raise|return|True|try|while|with|yield)$/.test(token)) {
+    return "sb-code-token-keyword";
+  }
+  if (/^[A-Za-z_]/.test(token)) {
+    return "sb-code-token-function";
+  }
+  return "sb-code-token-punctuation";
+}
+
+function classifyRToken(token) {
+  if (token.startsWith("#")) {
+    return "sb-code-token-comment";
+  }
+  if (/^["']/.test(token)) {
+    return "sb-code-token-string";
+  }
+  if (/^\d/.test(token)) {
+    return "sb-code-token-number";
+  }
+  if (/^(function|if|else|for|while|repeat|in|next|break|TRUE|FALSE|NULL|NA|NaN|Inf)$/.test(token)) {
+    return "sb-code-token-keyword";
+  }
+  if (/^[A-Za-z.]/.test(token)) {
+    return "sb-code-token-function";
+  }
+  return "sb-code-token-punctuation";
 }
 
 

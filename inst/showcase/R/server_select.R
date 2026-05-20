@@ -8,7 +8,7 @@ register_select_showcase <- function(input, output, session) {
     )
   }
 
-  output$showcase_select_preview_value <- shiny::renderText({
+  output$showcase_select_preview_value <- showcase_render_code({
     value <- input$showcase_select_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -94,7 +94,7 @@ register_select_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_select_preview_code <- shiny::renderText({
+  output$showcase_select_preview_code <- showcase_render_code({
     choices_val <- input$showcase_select_doc_choices %||% "plans"
     choices_str <- switch(
       choices_val,
@@ -155,7 +155,7 @@ register_select_showcase <- function(input, output, session) {
     "# the update_block_select() code here."
   ))
 
-  output$showcase_select_reactive_code <- shiny::renderText({
+  output$showcase_select_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(

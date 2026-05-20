@@ -24,7 +24,7 @@ register_code_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_code_preview_code <- shiny::renderText({
+  output$showcase_code_preview_code <- showcase_render_code({
     code_val <- input$showcase_code_doc_code %||% ""
     # Escape quotes and formatting for R string representation
     escaped_code <- gsub("\n", "\\\\n", gsub('"', '\\\\"', code_val))
@@ -81,7 +81,7 @@ register_code_showcase <- function(input, output, session) {
         "Optional programming language label to show in the header bar.",
         "If TRUE, enables the dynamic copy-to-clipboard action button.",
         "If TRUE, displays dynamic line numbers in the left column margin.",
-        "If TRUE, displays macOS-style window dots and the header bar.",
+        "If TRUE, displays editor dots and the header bar.",
         "Visual variant container design theme. One of default or outline.",
         "Additional CSS custom stylesheet classes to apply.",
         "Inline CSS custom stylesheet style declarations."

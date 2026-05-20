@@ -33,7 +33,7 @@ register_input_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_input_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_input_preview_value <- shiny::renderText({
+  output$showcase_input_preview_value <- showcase_render_code({
     value <- input$showcase_input_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -46,7 +46,7 @@ register_input_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_input_preview_value", suspendWhenHidden = FALSE)
 
-  output$showcase_input_preview_code <- shiny::renderText({
+  output$showcase_input_preview_code <- showcase_render_code({
     placeholder <- input$showcase_input_doc_placeholder %||% "name@example.com"
     initial_value <- input$showcase_input_doc_value %||% ""
     type_val <- input$showcase_input_doc_type %||% "text"
@@ -80,7 +80,7 @@ register_input_showcase <- function(input, output, session) {
     "# the update_block_input() code here."
   ))
 
-  output$showcase_input_reactive_code <- shiny::renderText({
+  output$showcase_input_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(output, "showcase_input_reactive_code", suspendWhenHidden = FALSE)

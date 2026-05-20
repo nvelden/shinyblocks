@@ -38,19 +38,32 @@ sb_section <- function(id, title, lead, example_path, active = FALSE) {
         ),
         "View source"
       ),
-      htmltools::tags$pre(
-        style = paste(
-          "margin: 0.5rem 0 0 0;",
-          "padding: 0.75rem 1rem;",
-          "overflow-x: auto;",
-          "background: var(--muted);",
-          "color: var(--foreground);",
-          "border-radius: 0.5rem;",
-          "font-size: 0.8125rem;",
-          "line-height: 1.5;"
-        ),
-        htmltools::tags$code(ex$code)
+      htmltools::tags$div(
+        style = "margin-top: 0.5rem;",
+        block_code(
+          code = ex$code,
+          language = "r",
+          copyable = TRUE,
+          line_numbers = TRUE
+        )
       )
     )
   )
+}
+
+showcase_render_code <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  shiny::renderUI({
+    value <- eval(quoted, envir = env)
+    if (is.null(value) || !length(value)) {
+      value <- ""
+    }
+    block_code(
+      code = paste(as.character(value), collapse = "\n"),
+      language = "r",
+      copyable = TRUE,
+      line_numbers = TRUE
+    )
+  })
 }

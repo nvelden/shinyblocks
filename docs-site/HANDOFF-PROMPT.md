@@ -1,7 +1,13 @@
 # Handoff prompt for Gemini Flash
 
-Paste the block below into Flash to kick off Phase 2. It points Flash at the
-right docs and sets the rails it must stay on.
+Historical prompt used to kick off Phase 2. The docs site phases are now
+complete; keep this file as context for how the current implementation was
+intended to be built.
+
+The live docs-site pipeline now generates static preview fragments and
+`block_code()`-rendered recipe snippets through
+`docs-site/scripts/generate-previews.R`. Local preview is served with
+`npm run preview` at `http://localhost:4173/shinyblocks/`.
 
 ---
 

@@ -100,3 +100,26 @@ body {
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+pre,
+code {
+  max-width: 100%;
+}
+
+pre {
+  overflow-x: hidden;
+  white-space: pre-wrap;
+}
+
+.component-code-block [data-shinyblocks-root] {
+  max-width: 100%;
+}
+
+.component-code-block .sb-code-block-pre {
+  overflow-x: hidden;
+}
+
+.component-code-block .sb-code-block-line {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

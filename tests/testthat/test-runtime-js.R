@@ -18,6 +18,11 @@ app_js <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+runtime_bindings_source <- function() {
+  path <- testthat::test_path("..", "..", "frontend", "src", "runtime", "bindings.js")
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 test_that("runtime JS includes Shiny bridge hooks", {
   js <- runtime_js()
 
@@ -36,6 +41,14 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "sb:switch-change", fixed = TRUE)
   expect_match(js, "shinyblocks.slider", fixed = TRUE)
   expect_match(js, "sb:slider-change", fixed = TRUE)
+})
+
+test_that("checkbox and switch bindings fall back to native initial values", {
+  js <- runtime_bindings_source()
+
+  expect_match(js, "const native = nativeCheckbox(el);", fixed = TRUE)
+  expect_match(js, "return native ? native.checked : false;", fixed = TRUE)
+  expect_match(js, "const native = nativeSwitch(el);", fixed = TRUE)
 })
 
 test_that("runtime JS includes dynamic UI lifecycle hooks", {

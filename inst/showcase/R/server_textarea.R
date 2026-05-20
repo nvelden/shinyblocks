@@ -35,7 +35,7 @@ register_textarea_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_textarea_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_textarea_preview_value <- shiny::renderText({
+  output$showcase_textarea_preview_value <- showcase_render_code({
     value <- input$showcase_textarea_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -48,7 +48,7 @@ register_textarea_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_textarea_preview_value", suspendWhenHidden = FALSE)
 
-  output$showcase_textarea_preview_code <- shiny::renderText({
+  output$showcase_textarea_preview_code <- showcase_render_code({
     placeholder <- input$showcase_textarea_doc_placeholder %||% "Add release notes here…"
     initial_value <- input$showcase_textarea_doc_value %||% ""
     rows_text <- input$showcase_textarea_doc_rows %||% "3"
@@ -84,7 +84,7 @@ register_textarea_showcase <- function(input, output, session) {
     "# the update_block_textarea() code here."
   ))
 
-  output$showcase_textarea_reactive_code <- shiny::renderText({
+  output$showcase_textarea_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(output, "showcase_textarea_reactive_code", suspendWhenHidden = FALSE)

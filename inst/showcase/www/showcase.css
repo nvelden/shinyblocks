@@ -160,6 +160,8 @@
 
 .sb-code-custom {
   border-style: dashed !important;
+  border-width: 2px !important;
+  background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;
 }
 
 /* Styles for native shiny::verbatimTextOutput blocks */
