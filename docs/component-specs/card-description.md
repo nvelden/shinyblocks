@@ -2,12 +2,29 @@
 
 > Shinyblocks function: `block_card_description()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/card>
+> Status: R-side composition primitive; Phase 7 spec refreshed around
+> the `data-sb-child="card-description"` marker used for region
+> detection.
 
 ## States
 
-- **default** — muted supporting text inside the card header.
-- **composed** — may be used directly in `block_card_header()` or
-  created from the flat `description =` argument on `block_card()`.
+- **default** — muted supporting text rendered as
+  `<p class="sb-card-description">` inside the card header.
+- **composed** — used directly inside `block_card_header()`, or via
+  the flat `description =` argument on `block_card()`.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `...` | Description content. |
+| `class` | Extra classes merged onto the `.sb-card-description` element. |
+
+## Composition contract
+
+Stamps `data-sb-child="card-description"`. `block_card()` reuses any
+existing description tag carrying this marker; bare strings passed via
+`description =` are auto-wrapped.
 
 ## Token contract
 
@@ -17,8 +34,8 @@
 
 ## Deliberate divergences from shadcn
 
-- shinyblocks auto-wraps flat description text into this primitive when
-  `block_card(description = ...)` is used.
+- Always renders as `<p>`; for non-paragraph content prefer composing
+  inside `block_card_header()` directly.
 
 ## Reference screenshot
 
