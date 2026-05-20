@@ -184,7 +184,7 @@ register_dialog_showcase <- function(input, output, session) {
       args <- c(args, paste0('size = "', size_val, '"'))
     }
     if (hide_title_val) {
-      args <- c(args, 'hide_title = TRUE')
+      args <- c(args, "hide_title = TRUE")
     }
     style_val <- input$showcase_dialog_doc_style %||% ""
     if (nzchar(style_val)) {

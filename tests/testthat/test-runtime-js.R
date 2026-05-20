@@ -100,5 +100,5 @@ test_that("app JS delegates dark-mode toggle clicks", {
   expect_match(js, "document.addEventListener(\"click\"", fixed = TRUE)
   expect_match(js, "target.closest(\"[data-sb-theme-toggle]\")", fixed = TRUE)
   expect_match(js, "applyTheme(currentThemeMode())", fixed = TRUE)
-  expect_no_match(js, "querySelectorAll(\"[data-sb-theme-toggle]\")\n    ).forEach(function (button) {\n      button.addEventListener(\"click\"", fixed = TRUE)
+  expect_no_match(js, "querySelectorAll(\"[data-sb-theme-toggle]\")\n    ).forEach(function (button) {\n      button.addEventListener(\"click\"", fixed = TRUE) # nolint: line_length_linter
 })

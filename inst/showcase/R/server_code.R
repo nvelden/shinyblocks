@@ -3,10 +3,10 @@ register_code_showcase <- function(input, output, session) {
     code_val <- input$showcase_code_doc_code %||% ""
     lang_val <- input$showcase_code_doc_language %||% ""
     if (!nzchar(lang_val)) lang_val <- NULL
-    
+
     style_val <- input$showcase_code_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
-    
+
     block_code(
       code = code_val,
       language = lang_val,
@@ -28,7 +28,7 @@ register_code_showcase <- function(input, output, session) {
     code_val <- input$showcase_code_doc_code %||% ""
     # Escape quotes and formatting for R string representation
     escaped_code <- gsub("\n", "\\\\n", gsub('"', '\\\\"', code_val))
-    
+
     lang_val <- input$showcase_code_doc_language %||% ""
     copyable_val <- input$showcase_code_doc_copyable
     line_numbers_val <- input$showcase_code_doc_line_numbers
@@ -45,13 +45,13 @@ register_code_showcase <- function(input, output, session) {
       args <- c(args, paste0('language = "', lang_val, '"'))
     }
     if (!isTRUE(copyable_val)) {
-      args <- c(args, 'copyable = FALSE')
+      args <- c(args, "copyable = FALSE")
     }
     if (!isTRUE(line_numbers_val)) {
-      args <- c(args, 'line_numbers = FALSE')
+      args <- c(args, "line_numbers = FALSE")
     }
     if (isTRUE(header_val)) {
-      args <- c(args, 'header = TRUE')
+      args <- c(args, "header = TRUE")
     }
     if (variant_val != "default") {
       args <- c(args, paste0('variant = "', variant_val, '"'))

@@ -329,7 +329,7 @@ test_that("block_input emits a runtime payload and hidden native input", {
     '<input id="email" type="email" class="sb-input-native"',
     fixed = TRUE
   )
-  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_identical(payload$id, "email")
   expect_identical(payload$state$value, "n@example.com")
   expect_identical(payload$props$placeholder, "you@example.com")
@@ -362,7 +362,7 @@ test_that("textarea emits a runtime payload and hidden native textarea", {
     '<textarea id="notes" class="sb-textarea-native"',
     fixed = TRUE
   )
-  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_identical(payload$id, "notes")
   expect_identical(payload$state$value, "hello")
   expect_identical(payload$props$placeholder, "Write a note")
@@ -402,7 +402,7 @@ test_that("slider emits runtime payload and binding metadata", {
   )
   expect_match(slider_html, 'data-sb-component="slider"', fixed = TRUE)
   expect_match(slider_html, '<input id="volume" type="hidden" class="sb-slider-native"', fixed = TRUE)
-  expect_match(slider_html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(slider_html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_match(render_html(disabled), 'data-sb-component="slider"', fixed = TRUE)
 
   expect_identical(payload$component, "slider")
@@ -474,7 +474,7 @@ test_that("checkbox and switch emit runtime payloads", {
     '<input id="marketing" type="checkbox" class="sb-checkbox-native"',
     fixed = TRUE
   )
-  expect_match(checkbox_html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(checkbox_html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_match(checkbox_html, "Email me updates", fixed = TRUE)
   expect_identical(checkbox_payload$id, "marketing")
   expect_identical(checkbox_payload$state$value, TRUE)
@@ -492,7 +492,7 @@ test_that("checkbox and switch emit runtime payloads", {
     '<input id="alerts" type="checkbox" class="sb-switch-native"',
     fixed = TRUE
   )
-  expect_match(switch_html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(switch_html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_match(switch_html, "Send incident alerts", fixed = TRUE)
   expect_identical(switch_payload$id, "alerts")
   expect_identical(switch_payload$state$value, TRUE)
@@ -613,7 +613,7 @@ test_that("block_select emits a runtime select payload", {
   expect_identical(tag_attr(select, "class"), "sb-runtime-mount custom")
   expect_match(html, 'data-sb-component="select"', fixed = TRUE)
   expect_match(html, '<select id="plan" class="sb-select-native"', fixed = TRUE)
-  expect_match(html, 'data-shiny-no-bind-input', fixed = TRUE)
+  expect_match(html, "data-shiny-no-bind-input", fixed = TRUE)
   expect_match(html, '<option value="pro" selected', fixed = TRUE)
   expect_no_match(html, "sb-select-control", fixed = TRUE)
   expect_identical(payload$id, "plan")
@@ -932,7 +932,7 @@ test_that("block_code emits runtime payload with all props and custom styling", 
   expect_identical(payload$props$variant, "outline")
   expect_identical(payload$className, "custom-class")
   expect_identical(tag_attr(code_block, "style"), "margin-bottom: 2rem;")
-  
+
   expect_match(html, 'data-sb-component="code"', fixed = TRUE)
   expect_match(html, 'class="sb-runtime-mount custom-class"', fixed = TRUE)
 })

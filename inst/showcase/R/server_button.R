@@ -59,7 +59,7 @@ register_button_showcase <- function(input, output, session) {
 
   output$showcase_button_preview_code <- showcase_render_code({
     string_literal <- function(value) {
-      paste0('"', gsub('(["\\\\])', '\\\\\\1', value, perl = TRUE), '"')
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
     }
 
     label_val <- input$showcase_button_doc_label %||% "Continue"

@@ -138,7 +138,7 @@ test_that("runtime tokens are scoped to runtime and portal roots", {
   expect_match(css, "--background:oklch(100% 0 0)", fixed = TRUE)
   expect_match(
     css,
-    '[data-theme="dark"] [data-shinyblocks-root],[data-theme="dark"] [data-shinyblocks-portal-root]{--background:oklch(14.5% 0 0)',
+    '[data-theme="dark"] [data-shinyblocks-root],[data-theme="dark"] [data-shinyblocks-portal-root]{--background:oklch(14.5% 0 0)', # nolint: line_length_linter
     fixed = TRUE
   )
   expect_no_match(css, ":root{--radius", fixed = TRUE)

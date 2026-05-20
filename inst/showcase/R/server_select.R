@@ -114,7 +114,7 @@ register_select_showcase <- function(input, output, session) {
 
     args <- c(
       'input_id = "showcase_select_preview"',
-      paste0('choices = ', choices_str)
+      paste0("choices = ", choices_str)
     )
 
     if (!is.null(selected_val) && selected_val != "") {
@@ -124,7 +124,7 @@ register_select_showcase <- function(input, output, session) {
       args <- c(args, paste0('placeholder = "', placeholder_val, '"'))
     }
     if (isTRUE(disabled_val)) {
-      args <- c(args, 'disabled = TRUE')
+      args <- c(args, "disabled = TRUE")
     }
     if (!is.null(width_val) && nzchar(width_val) && width_val != "100%") {
       args <- c(args, paste0('width = "', width_val, '"'))
@@ -139,7 +139,7 @@ register_select_showcase <- function(input, output, session) {
       args <- c(args, paste0('size = "', size_val, '"'))
     }
     if (isTRUE(invalid_val)) {
-      args <- c(args, 'invalid = TRUE')
+      args <- c(args, "invalid = TRUE")
     }
 
     paste0("block_select(\n  ", paste(args, collapse = ",\n  "), "\n)")
