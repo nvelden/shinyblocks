@@ -2,15 +2,37 @@
 
 > Shinyblocks function: `block_header()`
 > Shadcn reference: <https://ui.shadcn.com/blocks>
+> Status: R-side layout primitive; Phase 7 spec refreshed around the
+> shipped shell hook contract.
 
 ## States
 
-- **default** — top page header band with shadcn-style spacing and
-  border treatment.
-- **with-sidebar-trigger** — renders beside the mobile sidebar trigger
-  inside `.sb-header-shell`.
+- **default** — top page header band rendered as `<header class="sb-header">`.
+- **with-sidebar-trigger** — composes beside the mobile sidebar
+  trigger inside the page-owned `.sb-header-shell` wrapper when
+  `block_page(sidebar = ...)` is used.
 - **responsive** — remains usable in both sidebar and no-sidebar page
   shells.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `...` | Header content. |
+| `class` | Extra classes for the `.sb-header` element. |
+
+## Stable shell hooks
+
+`block_header()` owns `.sb-header` and participates in the page-owned
+`.sb-header-shell` wrapper when a sidebar trigger is present. Both
+selectors stay package-owned shell contracts and are out of scope for
+runtime-rendered component styling.
+
+## Accessibility
+
+- Rendered as a `<header>` landmark.
+- The mobile sidebar trigger that may sit beside it carries its own
+  ARIA wiring (`aria-controls`, `aria-expanded`, accessible label).
 
 ## Token contract
 
@@ -20,16 +42,10 @@
 | Foreground | `--foreground` |
 | Border | `--border` |
 
-## Stable shell hooks
-
-`block_header()` owns `.sb-header` and participates in the page-owned
-`.sb-header-shell` wrapper when a sidebar trigger is present. These
-hooks stay package-owned shell contracts.
-
 ## Deliberate divergences from shadcn
 
-- `block_header()` packages a recurring app-shell pattern rather than a
-  direct upstream component export.
+- `block_header()` packages a recurring app-shell pattern rather than
+  a direct upstream shadcn component export.
 
 ## Reference screenshot
 
