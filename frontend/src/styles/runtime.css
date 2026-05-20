@@ -263,9 +263,14 @@
   color: var(--accent-foreground);
 }
 
+[data-shinyblocks-root] .sb-button-ghost {
+  box-shadow: none;
+}
+
 [data-shinyblocks-root] .sb-button-link {
   color: var(--primary);
   text-underline-offset: 4px;
+  box-shadow: none;
 }
 
 [data-shinyblocks-root] .sb-button-link:hover {

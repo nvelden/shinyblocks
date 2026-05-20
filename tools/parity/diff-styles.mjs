@@ -75,7 +75,7 @@ function roleSelectorMap(roles, kind, state) {
   );
 }
 
-async function captureRoles(page, roles, selectors) {
+async function captureRoles(page, roles, selectors, component) {
   const out = {};
   for (const [roleName, roleConfig] of Object.entries(roles)) {
     const selector = selectors[roleName];
@@ -83,7 +83,10 @@ async function captureRoles(page, roles, selectors) {
       throw new Error(`Missing selector for role "${roleName}".`);
     }
     await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
-    out[roleName] = normaliseStyles(await captureSelector(page, selector, roleConfig.props));
+    out[roleName] = normaliseStyles(
+      await captureSelector(page, selector, roleConfig.props),
+      { component, role: roleName }
+    );
   }
   return out;
 }
@@ -129,13 +132,16 @@ async function captureShowcaseState(page, config, theme, state) {
 
   if (config.roles) {
     return {
-      captured: await captureRoles(page, config.roles, selectors),
+      captured: await captureRoles(page, config.roles, selectors, config.component),
       selectors
     };
   }
 
   return {
-    captured: normaliseStyles(await captureSelector(page, selectors, config.props)),
+    captured: normaliseStyles(
+      await captureSelector(page, selectors, config.props),
+      { component: config.component }
+    ),
     selectors
   };
 }
@@ -171,17 +177,18 @@ async function main() {
         ? Object.fromEntries(
             Object.entries(rawExpected).map(([roleName, roleStyles]) => [
               roleName,
-              normaliseStyles(roleStyles)
+              normaliseStyles(roleStyles, { component: config.component, role: roleName })
             ])
           )
-        : normaliseStyles(rawExpected);
+        : normaliseStyles(rawExpected, { component: config.component });
 
       if (config.roles) {
         for (const [roleName, roleConfig] of Object.entries(config.roles)) {
           console.log(`\n== ${config.component} :: ${theme} :: ${state} :: ${roleName} ==`);
+          const roleContext = { component: config.component, role: roleName };
           for (const prop of roleConfig.props) {
-            const a = normaliseValue(prop, expected?.[roleName]?.[prop] ?? "");
-            const b = normaliseValue(prop, live?.[roleName]?.[prop] ?? "");
+            const a = normaliseValue(prop, expected?.[roleName]?.[prop] ?? "", roleContext);
+            const b = normaliseValue(prop, live?.[roleName]?.[prop] ?? "", roleContext);
             if (a === b) {
               console.log(`  ${prop.padEnd(20)} match  ${a}`);
               continue;
@@ -195,9 +202,10 @@ async function main() {
         }
       } else {
         console.log(`\n== ${config.component} :: ${theme} :: ${state} ==`);
+        const componentContext = { component: config.component };
         for (const prop of config.props) {
-          const a = normaliseValue(prop, expected[prop] ?? "");
-          const b = normaliseValue(prop, live[prop] ?? "");
+          const a = normaliseValue(prop, expected[prop] ?? "", componentContext);
+          const b = normaliseValue(prop, live[prop] ?? "", componentContext);
           if (a === b) {
             console.log(`  ${prop.padEnd(20)} match  ${a}`);
             continue;

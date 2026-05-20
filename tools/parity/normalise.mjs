@@ -16,7 +16,7 @@ function roundNumberString(raw, digits = 3) {
   return String(Math.round(number * 10 ** digits) / 10 ** digits);
 }
 
-export function normaliseValue(property, value) {
+export function normaliseValue(property, value, context = {}) {
   let out = collapseWhitespace(value);
   if (out === "none") {
     return out;
@@ -56,14 +56,15 @@ export function normaliseValue(property, value) {
   // Slider thumb positioning uses two equivalent techniques: shinyblocks
   // emits `translate(-50%, -50%)` plus `left: <percent>%`, while shadcn /
   // Radix emit `translate(0, -50%)` plus `left: calc(<percent>% - <half>px)`.
-  // Both render the thumb centered on the same point. Collapse the matrix
-  // form so the X-translate (centering offset) does not register as drift
-  // when the Y-translate matches.
-  if (property === "transform") {
+  // Both render the thumb centered on the same point. Scoped to the slider
+  // thumb role only so a future component that intentionally uses
+  // `translateX` as a visual primitive (sheet/drawer slide-in, carousel)
+  // is not silently masked.
+  if (property === "transform" && context.role === "thumb" && context.component === "slider") {
     const match = out.match(/^matrix\(\s*1\s*,\s*0\s*,\s*0\s*,\s*1\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)$/);
     if (match) {
       const [, , ty] = match;
-      return `matrix(1, 0, 0, 1, *, ${ty})`;
+      return `slider-thumb:translate-y(${roundNumberString(ty, 2)})`;
     }
   }
 
@@ -107,9 +108,9 @@ export function normaliseValue(property, value) {
   return out;
 }
 
-export function normaliseStyles(styles) {
+export function normaliseStyles(styles, context = {}) {
   const out = Object.fromEntries(
-    Object.entries(styles).map(([key, value]) => [key, normaliseValue(key, value)])
+    Object.entries(styles).map(([key, value]) => [key, normaliseValue(key, value, context)])
   );
 
   // When a border side has zero width, its computed color is visually

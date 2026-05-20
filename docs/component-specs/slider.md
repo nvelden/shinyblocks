@@ -51,6 +51,7 @@ numerics matching single vs range mode.
 | `input_id` | mount id | Drives `input$<id>`. |
 | `value` | `state$value` | Numeric scalar or two-number array. |
 | `min`/`max`/`step` | `props$min` / `props$max` / `props$step` | |
+| `ticks` | (ignored) | Accepted for API compatibility; the runtime does not render tick labels yet. |
 | `disabled` | `props$disabled` | |
 | `invalid` | `props$invalid` | |
 | `width` | mount `style.width` | |
