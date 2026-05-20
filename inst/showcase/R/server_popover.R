@@ -1,6 +1,6 @@
 register_popover_showcase <- function(input, output, session) {
   swapped_body <- shiny::reactiveVal(FALSE)
-  open_state <- shiny::reactiveVal(TRUE)
+  open_state <- shiny::reactiveVal(FALSE)
 
   shiny::observeEvent(
     input$showcase_popover_doc_open,

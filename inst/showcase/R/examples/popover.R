@@ -52,7 +52,7 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
               block_field(
                 block_field_label("open", `for` = "showcase_popover_doc_open"),
-                block_checkbox("showcase_popover_doc_open", "Open", value = TRUE)
+                block_checkbox("showcase_popover_doc_open", "Open", value = FALSE)
               )
             ),
             htmltools::div(
