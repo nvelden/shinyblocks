@@ -20,6 +20,12 @@
 | Foreground | `--foreground` |
 | Border | `--border` |
 
+## Stable shell hooks
+
+`block_header()` owns `.sb-header` and participates in the page-owned
+`.sb-header-shell` wrapper when a sidebar trigger is present. These
+hooks stay package-owned shell contracts.
+
 ## Deliberate divergences from shadcn
 
 - `block_header()` packages a recurring app-shell pattern rather than a

@@ -21,6 +21,12 @@
 | --- | --- |
 | Layout spacing | none (layout only) |
 
+## Stable shell hooks
+
+`block_nav()` owns `.sb-nav` and `.sb-sidebar-nav` when it is composed
+inside `block_sidebar()`. These hooks are R-side navigation contracts,
+not runtime component styling targets.
+
 ## Deliberate divergences from shadcn
 
 - `block_nav()` is an R-side validation wrapper; shadcn sidebar

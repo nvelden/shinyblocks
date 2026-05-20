@@ -91,78 +91,9 @@ block_body <- function(..., class = NULL) {
 }
 
 block_theme_script <- function(theme_mode) {
-  initial_mode <- if (identical(theme_mode, "system")) {
-    "localStorage.getItem('sb-theme') || 'system'"
-  } else {
-    sprintf("'%s'", theme_mode)
-  }
-
   script <- sprintf(
-    "
-(function () {
-  function validMode(mode) {
-    return mode === 'light' || mode === 'dark' || mode === 'system'
-      ? mode
-      : 'system';
-  }
-
-  function resolvedTheme(mode) {
-    if (mode === 'system') {
-      return matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-    }
-    return mode;
-  }
-
-  function syncThemeToggles(resolved) {
-    Array.prototype.slice.call(
-      document.querySelectorAll('[data-sb-theme-toggle]')
-    ).forEach(function (button) {
-      var dark = resolved === 'dark';
-      button.setAttribute('aria-pressed', dark ? 'true' : 'false');
-      button.setAttribute(
-        'aria-label',
-        dark ? 'Switch to light mode' : 'Switch to dark mode'
-      );
-    });
-  }
-
-  function applyTheme(mode) {
-    mode = validMode(mode);
-    var resolved = resolvedTheme(mode);
-    try {
-      localStorage.setItem('sb-theme', mode);
-    } catch (e) {}
-    document.documentElement.dataset.theme = resolved;
-    document.documentElement.dataset.themeMode = mode;
-    syncThemeToggles(resolved);
-  }
-
-  window.shinyblocksTheme = window.shinyblocksTheme || {};
-  window.shinyblocksTheme.apply = applyTheme;
-
-  try {
-    applyTheme(%s);
-  } catch (e) {}
-
-  if (!window.shinyblocksThemeToggleWired) {
-    window.shinyblocksThemeToggleWired = true;
-    document.addEventListener('click', function (event) {
-      var target = event.target;
-      var button = target && target.closest
-        ? target.closest('[data-sb-theme-toggle]')
-        : null;
-      if (!button) return;
-      event.preventDefault();
-      applyTheme(document.documentElement.dataset.theme === 'dark'
-        ? 'light'
-        : 'dark');
-    });
-  }
-})();
-",
-    initial_mode
+    "window.shinyblocksInitialThemeMode = %s;",
+    jsonlite::toJSON(theme_mode, auto_unbox = TRUE)
   )
 
   htmltools::tags$script(htmltools::HTML(script))

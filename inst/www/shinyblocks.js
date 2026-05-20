@@ -1,5 +1,10 @@
 (function () {
   function currentThemeMode() {
+    var initialMode = window.shinyblocksInitialThemeMode;
+    if (initialMode === "light" || initialMode === "dark") {
+      return initialMode;
+    }
+
     try {
       var mode = localStorage.getItem("theme") || localStorage.getItem("sb-theme") || "system";
       return mode === "light" || mode === "dark" || mode === "system"

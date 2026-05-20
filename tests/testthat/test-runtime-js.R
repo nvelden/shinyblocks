@@ -89,9 +89,11 @@ test_that("app JS delegates dark-mode toggle clicks", {
   js <- app_js()
 
   expect_match(js, "currentThemeMode", fixed = TRUE)
+  expect_match(js, "window.shinyblocksInitialThemeMode", fixed = TRUE)
   expect_match(js, "syncThemeToggles", fixed = TRUE)
   expect_match(js, "window.shinyblocksTheme.apply", fixed = TRUE)
   expect_match(js, "window.shinyblocksThemeToggleWired", fixed = TRUE)
+  expect_match(js, 'addCustomMessageHandler("sb:theme"', fixed = TRUE)
   expect_match(js, "document.addEventListener(\"click\"", fixed = TRUE)
   expect_match(js, "target.closest(\"[data-sb-theme-toggle]\")", fixed = TRUE)
   expect_match(js, "applyTheme(currentThemeMode())", fixed = TRUE)

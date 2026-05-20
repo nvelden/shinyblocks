@@ -16,6 +16,12 @@
 | Surface | `--background` |
 | Foreground | `--foreground` |
 
+## Stable shell hooks
+
+`block_body()` owns `.sb-body` as the package shell's main content
+layout hook. Runtime-rendered components should not depend on it for
+their visual states.
+
 ## Deliberate divergences from shadcn
 
 - `block_body()` is a semantic layout helper; shadcn block examples use

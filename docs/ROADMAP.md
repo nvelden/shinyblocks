@@ -231,6 +231,14 @@ phase begins.
 >   `inst/www/icons/MANIFEST.json` directly instead of scraping the
 >   generated sprite for names; the manifest is the R-side source of
 >   truth and the sprite remains the build artifact.
+> - **Phase 6 helper cleanup — theme runtime ownership** —
+>   `block_page()` now emits only initial theme-mode configuration and
+>   the package `shinyblocks.js` runtime owns applying modes, delegated
+>   dark-mode toggle clicks, and `update_block_theme()` Shiny messages.
+> - **Phase 6 helper cleanup — shell hook contract** —
+>   remaining `.sb-*` selectors in the package stylesheet are documented
+>   as shell/layout/navigation hooks for R-side helpers, not as visual
+>   styling targets for migrated runtime components.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,

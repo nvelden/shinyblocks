@@ -8,7 +8,8 @@
  * Layer ordering: tokens import sets CSS custom properties; @theme
  * exposes them to Tailwind utilities; @layer components defines
  * package classes (sb-*) using @apply. User markup never references
- * Tailwind utilities directly.
+ * Tailwind utilities directly. New runtime-rendered components should
+ * style themselves through frontend/src/styles/runtime.css instead.
  *
  * See ADR 0006 (styling foundation) and ADR 0009 (upstream sync).
  */
@@ -66,9 +67,9 @@
 
 /* Component layer.
  *
- * Phase 1 starts with empty rules for sb-app, sb-page, sb-header,
- * sb-sidebar, sb-body. Subsequent phases add components. Each
- * component must:
+ * Shell and R-side composition helpers use .sb-* classes as stable
+ * package hooks. Migrated runtime components do not add visual CSS
+ * here. Any package-owned helper that remains in this file must:
  *  - use semantic tokens only (no raw colors),
  *  - use gap-* not space-y-*,
  *  - use size-* when w==h,
@@ -78,10 +79,9 @@
  * See CONTRIBUTING.md for the full conventions list.
  */
 @layer components {
-  /* Phase 1: shell layout. Implementations land alongside R/page.R,
-   * R/header.R, R/sidebar.R. Empty selectors below are the contract:
-   * the R helpers emit these classes, and CSS rules fill in the
-   * styling per phase. */
+  /* Shell layout hooks. R/page.R and R/layout.R emit these classes for
+   * package-owned layout, navigation, and composition primitives. Keep
+   * them independent from runtime component styling. */
 
   .sb-page {
     @apply grid min-h-screen bg-background text-foreground;
