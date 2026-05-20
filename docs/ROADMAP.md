@@ -247,6 +247,10 @@ phase begins.
 >   Dialog, Popover, and Tooltip specs now describe shipped runtime API,
 >   payload mapping, Shiny state/update behavior, accessibility, tokens,
 >   and deliberate divergences instead of old sub-phase notes.
+> - **Phase 7 specs slice — form controls** —
+>   Input, Textarea, Checkbox, Switch, and Radio Group specs now describe
+>   shipped runtime API, payload mapping, Shiny state/update behavior,
+>   keyboard behavior where relevant, tokens, and deliberate divergences.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,
