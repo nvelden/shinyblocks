@@ -30,22 +30,24 @@ export default async function ComponentDetailPage({ params }: PageProps) {
           <div className="sticky top-20 flex flex-col gap-2">
             <div className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-2 px-2">Components</div>
             <nav className="flex flex-col gap-1">
-              {manifest.map((c) => {
-                const isActive = c.slug === slug;
-                return (
-                  <Link
-                    key={c.slug}
-                    href={`/components/${c.slug}/`}
-                    className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
-                      isActive 
-                        ? "bg-accent text-accent-foreground font-semibold" 
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    }`}
-                  >
-                    {c.name}
-                  </Link>
-                );
-              })}
+              {manifest
+                .filter((c) => c.slug !== "gallery")
+                .map((c) => {
+                  const isActive = c.slug === slug;
+                  return (
+                    <Link
+                      key={c.slug}
+                      href={`/components/${c.slug}/`}
+                      className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
+                        isActive 
+                          ? "bg-accent text-accent-foreground font-semibold" 
+                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                    >
+                      {c.name}
+                    </Link>
+                  );
+                })}
             </nav>
           </div>
         </aside>
