@@ -1,6 +1,7 @@
 # shinyblocks (development version)
 
 * Added `block_code()`, a shadcn-docs-style code block with line numbers, copy-to-clipboard interactions, and an optional editor-style header.
+* Refreshed the Dialog, Popover, and Tooltip component specs around their shipped runtime API, Shiny state/update contracts, accessibility behavior, and known divergences.
 * Cleaned up `block_tabs()` / `block_tab()` ownership for Phase 5. Tabs no longer wrap `shiny::tabsetPanel()` or decorate Bootstrap tab markup; `block_tabs()` now emits package-owned triggers and panels, local `shinyblocks.js` handles click/keyboard selection and panel visibility, and selected values are pushed to Shiny via `input$<id>` without `nav-link`, `tab-pane`, or `shiny-tab-input` dependencies in the rendered contract.
 * Cleaned up `block_theme()` / `update_block_theme()` ownership for Phase 6. `block_page()` now emits only the initial theme-mode configuration, while the package `shinyblocks.js` runtime owns theme application, dark-mode toggle delegation, and Shiny `sb:theme` messages through one path.
 * Documented the remaining `.sb-*` shell selectors as package-owned layout/navigation hooks, keeping them separate from runtime-rendered component styling.
