@@ -64,7 +64,7 @@ register_textarea_showcase <- function(input, output, session) {
       'input_id = "showcase_textarea_preview"',
       paste0('value = "', initial_value, '"'),
       paste0('placeholder = "', placeholder, '"'),
-      paste0('rows = ', rows_val)
+      paste0("rows = ", rows_val)
     )
     if (disabled) args <- c(args, "disabled = TRUE")
     if (invalid) args <- c(args, "invalid = TRUE")

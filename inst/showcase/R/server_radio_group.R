@@ -83,7 +83,7 @@ register_radio_group_showcase <- function(input, output, session) {
 
     args <- c(
       'input_id = "showcase_radio_group_preview"',
-      paste0('choices = c(', choices_text, ')'),
+      paste0("choices = c(", choices_text, ")"),
       paste0('selected = "', selected, '"'),
       paste0('orientation = "', orientation, '"')
     )
