@@ -1,0 +1,184 @@
+registry <- list(
+  list(
+    name = "Layout",
+    slug = "layout",
+    file = "layout.R",
+    description = "Page, sidebar, header, and body primitives that form the application frame.",
+    featured = TRUE
+  ),
+  list(
+    name = "Nav Item",
+    slug = "nav-item",
+    file = "nav_item.R",
+    description = "Sidebar navigation links with support for active selection states.",
+    featured = FALSE
+  ),
+  list(
+    name = "Card",
+    slug = "card",
+    file = "card.R",
+    description = "Group related content in structured, elegant containers.",
+    featured = TRUE
+  ),
+  list(
+    name = "Value Box",
+    slug = "value-box",
+    file = "value_box.R",
+    description = "High-signal key-value metric card displays with supporting icons.",
+    featured = TRUE
+  ),
+  list(
+    name = "Badge",
+    slug = "badge",
+    file = "badge.R",
+    description = "Compact, premium labels for displaying status and categories.",
+    featured = TRUE
+  ),
+  list(
+    name = "Alert",
+    slug = "alert",
+    file = "alert.R",
+    description = "Inline messaging blocks with semantic layouts and inline icons.",
+    featured = TRUE
+  ),
+  list(
+    name = "Button",
+    slug = "button",
+    file = "button.R",
+    description = "Interactive controls for triggers, forms, and custom actions.",
+    featured = TRUE
+  ),
+  list(
+    name = "Select",
+    slug = "select",
+    file = "select.R",
+    description = "Interactive dropdown control for single-value choice selection.",
+    featured = TRUE
+  ),
+  list(
+    name = "Checkbox",
+    slug = "checkbox",
+    file = "checkbox.R",
+    description = "Stateful toggle selector for standalone options or boolean flags.",
+    featured = TRUE
+  ),
+  list(
+    name = "Textarea",
+    slug = "textarea",
+    file = "textarea.R",
+    description = "Multi-line text editor with native height adjustments and error states.",
+    featured = TRUE
+  ),
+  list(
+    name = "Input",
+    slug = "input",
+    file = "input.R",
+    description = "Premium single-line text input fields supporting diverse types.",
+    featured = TRUE
+  ),
+  list(
+    name = "Radio Group",
+    slug = "radio-group",
+    file = "radio_group.R",
+    description = "Set of mutually exclusive options with clean arrow keyboard support.",
+    featured = TRUE
+  ),
+  list(
+    name = "Switch",
+    slug = "switch",
+    file = "switch.R",
+    description = "Highly interactive slider-toggle switch for toggle inputs.",
+    featured = TRUE
+  ),
+  list(
+    name = "Input Group",
+    slug = "input-group",
+    file = "input_group.R",
+    description = "Unified input control wrapping leading/trailing addon elements.",
+    featured = FALSE
+  ),
+  list(
+    name = "Slider",
+    slug = "slider",
+    file = "slider.R",
+    description = "Interactive range controls for single values or interval bounds.",
+    featured = TRUE
+  ),
+  list(
+    name = "Tabs",
+    slug = "tabs",
+    file = "tabs.R",
+    description = "Structured navigation tabs that organize views and options.",
+    featured = TRUE
+  ),
+  list(
+    name = "Theme",
+    slug = "theme",
+    file = "theme.R",
+    description = "Application-wide style engine managing design tokens and dark mode.",
+    featured = FALSE
+  ),
+  list(
+    name = "Icon",
+    slug = "icon",
+    file = "icon.R",
+    description = "High-quality vector graphics backed by a curated Lucide set.",
+    featured = FALSE
+  ),
+  list(
+    name = "Separator",
+    slug = "separator",
+    file = "separator.R",
+    description = "Clean visual divider lines with vertical or horizontal orientation.",
+    featured = FALSE
+  ),
+  list(
+    name = "Skeleton",
+    slug = "skeleton",
+    file = "skeleton.R",
+    description = "Dynamic placeholder panels simulating asynchronous content loading.",
+    featured = FALSE
+  ),
+  list(
+    name = "Spinner",
+    slug = "spinner",
+    file = "spinner.R",
+    description = "Elegant CSS-driven loading indicator animations.",
+    featured = FALSE
+  ),
+  list(
+    name = "Empty",
+    slug = "empty",
+    file = "empty.R",
+    description = "Premium messaging cards for zero-state scenarios.",
+    featured = TRUE
+  ),
+  list(
+    name = "Dialog",
+    slug = "dialog",
+    file = "dialog.R",
+    description = "Portal-rendered modal views containing forms, alerts, or details.",
+    featured = TRUE
+  ),
+  list(
+    name = "Popover",
+    slug = "popover",
+    file = "popover.R",
+    description = "Non-modal overlay boxes that host dynamic contextual controls.",
+    featured = TRUE
+  ),
+  list(
+    name = "Tooltip",
+    slug = "tooltip",
+    file = "tooltip.R",
+    description = "Lightweight, hover-triggered informational hint overlays.",
+    featured = TRUE
+  ),
+  list(
+    name = "Gallery",
+    slug = "gallery",
+    file = "gallery.R",
+    description = "Interactive cohesive dashboard layout prerendered directly from R package components.",
+    featured = FALSE
+  )
+)

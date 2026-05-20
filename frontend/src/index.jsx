@@ -2002,12 +2002,13 @@ function Select({ payload, root }) {
     const index = selectedIndex();
     setHighlighted(index >= 0 ? index : 0);
     setOpen(true);
-    requestAnimationFrame(updatePosition);
+    updatePosition();
   }
 
   function closeSelect({ focus = false } = {}) {
     setOpen(false);
     setHighlighted(-1);
+    setPosition(null);
     if (focus) {
       requestAnimationFrame(() => triggerRef.current?.focus());
     }
@@ -2136,10 +2137,21 @@ function Select({ payload, root }) {
 
   useEffect(() => {
     if (!open || highlighted < 0) return;
+    const viewport = contentRef.current?.querySelector(
+      '[data-slot="select-viewport"]'
+    );
     const item = contentRef.current?.querySelector(
       `[data-sb-index="${highlighted}"]`
     );
-    item?.scrollIntoView({ block: "nearest" });
+    if (viewport && item) {
+      const containerRect = viewport.getBoundingClientRect();
+      const itemRect = item.getBoundingClientRect();
+      if (itemRect.top < containerRect.top) {
+        viewport.scrollTop -= (containerRect.top - itemRect.top);
+      } else if (itemRect.bottom > containerRect.bottom) {
+        viewport.scrollTop += (itemRect.bottom - containerRect.bottom);
+      }
+    }
   }, [highlighted, open]);
 
   function moveHighlight(delta) {
