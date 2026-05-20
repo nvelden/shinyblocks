@@ -11,7 +11,7 @@ export default function HomePage() {
       <section className="mx-auto flex max-w-3xl flex-col items-center px-6 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/80 px-4 py-1.5 text-xs font-semibold text-secondary-foreground shadow-sm backdrop-blur-md">
           <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
-          <span>v0.4.0 · Authentically R-Rendered Dashboard</span>
+          <span>Runtime preview · shadcn-inspired Shiny components</span>
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl bg-gradient-to-r from-foreground via-foreground/90 to-foreground/75 bg-clip-text text-transparent">
           The Foundation for your Shiny App
