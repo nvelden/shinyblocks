@@ -239,6 +239,10 @@ phase begins.
 >   remaining `.sb-*` selectors in the package stylesheet are documented
 >   as shell/layout/navigation hooks for R-side helpers, not as visual
 >   styling targets for migrated runtime components.
+> - **Phase 6 helper cleanup — shell CSS guardrail** —
+>   runtime CSS tests now also scan the package source stylesheet and
+>   fail if a selector outside the allowed shell/composition hook
+>   families is added.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,

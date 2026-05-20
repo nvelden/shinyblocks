@@ -8,11 +8,24 @@ runtime_css <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+package_source_css <- function() {
+  path <- testthat::test_path("..", "..", "inst", "www", "src", "shinyblocks.css")
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 css_selectors <- function(css) {
   rules <- unlist(strsplit(css, "}"), use.names = FALSE)
   selectors <- sub("\\{.*$", "", rules)
   selectors <- trimws(unlist(strsplit(selectors, ","), use.names = FALSE))
   selectors[nzchar(selectors)]
+}
+
+source_class_selectors <- function(css) {
+  lines <- trimws(unlist(strsplit(css, "\n", fixed = TRUE), use.names = FALSE))
+  lines <- lines[grepl("^\\.sb-", lines)]
+  lines <- sub("\\s*\\{.*$", "", lines)
+  lines <- sub(",\\s*$", "", lines)
+  lines[nzchar(lines)]
 }
 
 test_that("runtime CSS selectors are scoped to shinyblocks roots", {
@@ -33,6 +46,46 @@ test_that("runtime CSS selectors are scoped to shinyblocks roots", {
     selectors[!allowed],
     character()
   )
+})
+
+test_that("package source CSS only owns shell and composition hooks", {
+  selectors <- source_class_selectors(package_source_css())
+  allowed <- grepl(
+    paste0(
+      "^\\.sb-app\\b|",
+      "^\\.sb-page\\b|",
+      "^\\.sb-page-main\\b|",
+      "^\\.sb-header\\b|",
+      "^\\.sb-header-shell\\b|",
+      "^\\.sb-sidebar\\b|",
+      "^\\.sb-sidebar-title\\b|",
+      "^\\.sb-sidebar-title-text\\b|",
+      "^\\.sb-sidebar-nav\\b|",
+      "^\\.sb-sidebar-toggle\\b|",
+      "^\\.sb-sidebar-mobile-trigger\\b|",
+      "^\\.sb-sidebar-backdrop\\b|",
+      "^\\.sb-nav\\b|",
+      "^\\.sb-nav-item\\b|",
+      "^\\.sb-body\\b|",
+      "^\\.sb-icon\\b|",
+      "^\\.sb-tabs\\b|",
+      "^\\.sb-tabs-list\\b|",
+      "^\\.sb-tabs-trigger\\b|",
+      "^\\.sb-tabs-content\\b|",
+      "^\\.sb-tabs-panel\\b|",
+      "^\\.sb-field\\b|",
+      "^\\.sb-field-group\\b|",
+      "^\\.sb-field-label\\b|",
+      "^\\.sb-field-legend\\b|",
+      "^\\.sb-field-description\\b|",
+      "^\\.sb-field-set\\b|",
+      "^\\.sb-input-group\\b|",
+      "^\\.sb-input-group-addon\\b"
+    ),
+    selectors
+  )
+
+  expect_identical(selectors[!allowed], character())
 })
 
 test_that("runtime CSS does not target host framework selectors", {
