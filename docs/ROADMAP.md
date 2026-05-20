@@ -217,6 +217,11 @@ phase begins.
 >   `showcase_action_button()` helper instead of duplicated per-example
 >   wrappers, preserving native `actionButton()` click semantics while
 >   narrowing the last `.sb-button*` legacy shell dependency.
+> - **Phase 6 helper cleanup — legacy button CSS removal** —
+>   showcase-only server-update buttons now use local
+>   `.showcase-action-button-*` classes in `inst/showcase/www/showcase.css`,
+>   and the package shell stylesheet no longer ships legacy `.sb-button*`
+>   rules outside the scoped React runtime.
 > - **Phase 6 helper cleanup — icon manifest contract** —
 >   `block_icon()` now reads the curated icon list from
 >   `inst/www/icons/MANIFEST.json` directly instead of scraping the
@@ -301,9 +306,8 @@ phase begins.
 >   Bootstrap-tab assumptions out of the docs/decision stack, and
 >   remove any now-dead notes/tests/scaffolding that audit reveals.
 > - Phase 6 shipped-helper cleanup — finish the remaining shell/runtime
->   cleanup for already-exported helpers, with the biggest open slice now
->   being whether legacy `.sb-button*` shell CSS can be reduced further
->   after centralizing showcase-only action controls.
+>   cleanup for already-exported helpers now that the legacy `.sb-button*`
+>   shell CSS has been removed.
 > - Remaining overlay additions are explicitly deferred until the
 >   migration/cleanup of shipped components is complete.
 >
@@ -437,7 +441,11 @@ In Codex-style sandboxed sessions, the app may print `Listening on
 http://127.0.0.1:4321` and then fail with `createTcpServer: operation
 not permitted`. Treat that as a sandbox port-bind limitation, not an app
 bug: rerun the restart outside the sandbox / with escalation, then
-verify the port with `curl -sSI http://127.0.0.1:4321/`.
+verify the port with `curl -sSI http://127.0.0.1:4321/`. Before
+retrying, check whether a previous showcase is already listening:
+`lsof -nP -iTCP:4321 -sTCP:LISTEN`. If it is, stop that process first;
+otherwise the escalated retry can fail with `createTcpServer: address
+already in use` and leave stale CSS/JS loaded in the old process.
 
 | Command | Serves | Port | When to run |
 | --- | --- | --- | --- |

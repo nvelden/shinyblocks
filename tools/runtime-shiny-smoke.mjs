@@ -175,6 +175,20 @@ try {
     return document.querySelector("#runtime_slider")?.disabled === false &&
       document.querySelector("[data-sb-component='slider'] [data-slot='slider-thumb']")?.disabled === false;
   });
+  const sliderThumb = await page.locator("[data-sb-component='slider'] [data-slot='slider-thumb']").boundingBox();
+  const sliderTrack = await page.locator("[data-sb-component='slider'] [data-slot='slider-track']").boundingBox();
+  assert(sliderThumb, "runtime slider thumb should be measurable");
+  assert(sliderTrack, "runtime slider track should be measurable");
+  await page.mouse.move(sliderThumb.x + sliderThumb.width / 2, sliderThumb.y + sliderThumb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(sliderTrack.x + sliderTrack.width * 0.2, sliderTrack.y - 40, { steps: 2 });
+  await page.mouse.up();
+  await assertText(page, "#runtime_slider_value", "20");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_slider")?.value),
+    "20",
+    "runtime slider thumb drag should keep updating after the pointer leaves the track"
+  );
 
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
