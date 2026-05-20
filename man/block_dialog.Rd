@@ -68,6 +68,7 @@ Other content:
 \code{\link{block_card_footer}()},
 \code{\link{block_card_header}()},
 \code{\link{block_card_title}()},
+\code{\link{block_code}()},
 \code{\link{block_empty}()},
 \code{\link{block_popover}()},
 \code{\link{block_separator}()},
