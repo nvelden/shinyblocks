@@ -876,3 +876,64 @@ test_that("empty states render icon, description, and action", {
   expect_match(empty$props$actionHtml, 'data-sb-component="button"', fixed = TRUE)
   expect_match(empty_html, 'data-sb-component="empty"', fixed = TRUE)
 })
+
+test_that("block_code validates its arguments", {
+  expect_error(
+    block_code(),
+    "`code` must be a single non-empty character string.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_code(123),
+    "`code` must be a single non-empty character string.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_code(c("line1", "line2")),
+    "`code` must be a single non-empty character string.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_code("print('hello')", variant = "invalid-variant"),
+    "`variant` must be one of \"default\", \"outline\".",
+    fixed = TRUE
+  )
+})
+
+test_that("block_code emits runtime payload with all props and custom styling", {
+  code_block <- block_code(
+    "console.log('hello');",
+    language = "javascript",
+    copyable = TRUE,
+    line_numbers = FALSE,
+    header = TRUE,
+    variant = "outline",
+    class = "custom-class",
+    style = "margin-bottom: 2rem;"
+  )
+
+  payload <- runtime_payload_from(code_block)
+  html <- render_html(code_block)
+
+  expect_identical(payload$component, "code")
+  expect_identical(payload$props$code, "console.log('hello');")
+  expect_identical(payload$props$language, "javascript")
+  expect_identical(payload$props$copyable, TRUE)
+  expect_identical(payload$props$line_numbers, FALSE)
+  expect_identical(payload$props$header, TRUE)
+  expect_identical(payload$props$variant, "outline")
+  expect_identical(payload$className, "custom-class")
+  expect_identical(tag_attr(code_block, "style"), "margin-bottom: 2rem;")
+  
+  expect_match(html, 'data-sb-component="code"', fixed = TRUE)
+  expect_match(html, 'class="sb-runtime-mount custom-class"', fixed = TRUE)
+})
+
+test_that("block_code handles defaults correctly", {
+  code_block <- block_code("console.log('hello');")
+  payload <- runtime_payload_from(code_block)
+  expect_identical(payload$props$header, FALSE)
+  expect_identical(payload$props$line_numbers, TRUE)
+  expect_identical(payload$props$copyable, TRUE)
+  expect_identical(payload$props$variant, "default")
+})

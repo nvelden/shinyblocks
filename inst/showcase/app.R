@@ -15,6 +15,7 @@ source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
 source(file.path("R", "server_slider.R"), local = TRUE)
 source(file.path("R", "server_tooltip.R"), local = TRUE)
+source(file.path("R", "server_code.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -82,6 +83,17 @@ sections <- list(
       "and description slots, and a leading icon."
     ),
     file = "alert.R"
+  ),
+  list(
+    id = "code",
+    label = "Code",
+    icon = "code",
+    title = "Code block",
+    lead = paste(
+      "A premium pre-formatted code block with monospace typography,",
+      "optional language badge, copy-to-clipboard button, and terminal-style header."
+    ),
+    file = "code.R"
   ),
   list(
     id = "button",
@@ -385,6 +397,7 @@ ui <- block_page(
 
 server <- function(input, output, session) {
   register_button_showcase(input, output, session)
+  register_code_showcase(input, output, session)
   register_select_showcase(input, output, session)
   register_checkbox_showcase(input, output, session)
   register_textarea_showcase(input, output, session)

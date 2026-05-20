@@ -164,6 +164,22 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  code: [
+    {
+      name: "block_code",
+      description: "A premium monospace pre-formatted code block with custom line numbers, copy-to-clipboard button, and optional terminal header.",
+      arguments: [
+        { argument: "code", type: "character", defaultVal: "required", description: "The raw code string to display inside the block." },
+        { argument: "language", type: "character", defaultVal: "NULL", description: "Optional programming language name displayed in the header." },
+        { argument: "copyable", type: "logical", defaultVal: "TRUE", description: "Display a copy-to-clipboard action button." },
+        { argument: "line_numbers", type: "logical", defaultVal: "TRUE", description: "Display sequential line numbers in the left margin." },
+        { argument: "header", type: "logical", defaultVal: "FALSE", description: "Display macOS window control dots and language header bar." },
+        { argument: "variant", type: "'default' | 'outline'", defaultVal: "'default'", description: "Thematic background card styling variant." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes to apply." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline custom CSS styles." }
+      ]
+    }
+  ],
   button: [
     {
       name: "block_button",

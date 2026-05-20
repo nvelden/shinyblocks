@@ -42,6 +42,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Code",
+    slug = "code",
+    file = "code.R",
+    description = "A premium monospace pre-formatted code block with terminal-style controls and copy actions.",
+    featured = TRUE
+  ),
+  list(
     name = "Button",
     slug = "button",
     file = "button.R",

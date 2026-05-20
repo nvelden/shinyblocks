@@ -28,6 +28,7 @@ Other content:
 \code{\link{block_card_description}()},
 \code{\link{block_card_footer}()},
 \code{\link{block_card_header}()},
+\code{\link{block_code}()},
 \code{\link{block_dialog}()},
 \code{\link{block_empty}()},
 \code{\link{block_popover}()},

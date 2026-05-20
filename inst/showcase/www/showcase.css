@@ -10,6 +10,7 @@
 #showcase_switch_api_table table,
 #showcase_slider_api_table table,
 #showcase_input_group_api_table table,
+#showcase_code_api_table table,
 #showcase_tooltip_api_table table {
   width: 100%;
   border-collapse: collapse;
@@ -37,6 +38,8 @@
 #showcase_slider_api_table td,
 #showcase_input_group_api_table th,
 #showcase_input_group_api_table td,
+#showcase_code_api_table th,
+#showcase_code_api_table td,
 #showcase_tooltip_api_table th,
 #showcase_tooltip_api_table td {
   border-bottom: 1px solid var(--border);
@@ -55,6 +58,7 @@
 #showcase_switch_api_table th,
 #showcase_slider_api_table th,
 #showcase_input_group_api_table th,
+#showcase_code_api_table th,
 #showcase_tooltip_api_table th {
   color: var(--muted-foreground);
   font-weight: 600;
@@ -92,6 +96,9 @@
 #showcase_input_group_api_table td:nth-child(1),
 #showcase_input_group_api_table td:nth-child(2),
 #showcase_input_group_api_table td:nth-child(3),
+#showcase_code_api_table td:nth-child(1),
+#showcase_code_api_table td:nth-child(2),
+#showcase_code_api_table td:nth-child(3),
 #showcase_tooltip_api_table td:nth-child(1),
 #showcase_tooltip_api_table td:nth-child(2),
 #showcase_tooltip_api_table td:nth-child(3) {
@@ -149,6 +156,10 @@
 .showcase-slider-preview-custom .sb-slider-thumb {
   border-style: dashed !important;
   border-width: 2px !important;
+}
+
+.sb-code-custom {
+  border-style: dashed !important;
 }
 
 /* Styles for native shiny::verbatimTextOutput blocks */
