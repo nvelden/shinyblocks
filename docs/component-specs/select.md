@@ -33,6 +33,7 @@
 | `placeholder` | Empty-value prompt shown before selection. |
 | `disabled` | Disables browser interaction while keeping server updates possible. |
 | `width` | CSS width for the runtime select wrapper. |
+| `style` | Inline style on the runtime wrapper. |
 | `class` | Additional class merged onto the runtime wrapper. |
 | `size` | One of `default`, `sm`, or `lg`. |
 | `invalid` | Applies `aria-invalid` and destructive border/ring styling. |
