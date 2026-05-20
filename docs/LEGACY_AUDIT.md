@@ -13,7 +13,8 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
 - Historical ADRs and agent plans may mention old approaches for context.
 - `docs/ROADMAP.md` may track removed and pending migration work.
 - `docs/troubleshooting.md` may mention Bootstrap as user-facing host context.
-- Tab tests may mention old Bootstrap/Shiny tab internals only to assert they are absent from the rendered shinyblocks contract.
+- Tab tests may mention old tab-framework internals only to assert they
+  are absent from the rendered shinyblocks contract.
 - Runtime CSS tests may list forbidden host selectors because they assert those selectors are absent from `shinyblocks-runtime.css`.
 - Runtime Shiny collision fixtures may create host Bootstrap/Selectize-like nodes and one nested raw Shiny text input to prove scoped runtime CSS does not affect them.
 - The shipped shell stylesheet should not contain `.sb-button-*` rules.
@@ -22,7 +23,9 @@ The audit scans `R/`, `inst/`, `tests/`, `tools/`, and `docs/` for old wrapper a
   `inst/showcase/www/showcase.css` so native `actionButton()` click
   semantics do not keep package-level button CSS alive.
 - `docs/component-specs/slider.md` may state that slider no longer wraps `shiny::sliderInput()` / ionRangeSlider.
-- `docs/skills/shinyblocks-component.md` may retain historical pitfall notes until the runtime-skill refresh is completed.
+- `docs/skills/shinyblocks-component.md` and the active local
+  `.agents/skills/shinyblocks-component/SKILL.md` should describe the
+  current runtime-first workflow, not the historical wrapper path.
 - `block_input_group()` and `block_input_group_addon()` are not audit failures by themselves: they are explicitly classified as R-side composition/layout primitives. New examples should compose them with runtime controls such as `block_input()` rather than reintroducing wrapped Shiny inputs.
 - New live code should not reintroduce `shiny::textInput()` inside migrated field/showcase paths. If a raw Shiny text input is still needed for a collision or child-binding fixture, it must be narrowly allowlisted with its reason.
 

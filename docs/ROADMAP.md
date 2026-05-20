@@ -222,6 +222,10 @@ phase begins.
 >   `.showcase-action-button-*` classes in `inst/showcase/www/showcase.css`,
 >   and the package shell stylesheet no longer ships legacy `.sb-button*`
 >   rules outside the scoped React runtime.
+> - **Phase 6 cleanup — component workflow refresh** —
+>   the repo-local `shinyblocks-component` skill and mirrored docs now
+>   describe the runtime-first component workflow from ADR 0017 instead
+>   of the superseded wrap-by-default/Selectize/ionRangeSlider path.
 > - **Phase 6 helper cleanup — icon manifest contract** —
 >   `block_icon()` now reads the curated icon list from
 >   `inst/www/icons/MANIFEST.json` directly instead of scraping the

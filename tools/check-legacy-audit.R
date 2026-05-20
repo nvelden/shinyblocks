@@ -36,7 +36,6 @@ allowlist <- data.frame(
     "^docs/agent-plans/",
     "^docs/ROADMAP\\.md$",
     "^docs/component-specs/slider\\.md$",
-    "^docs/skills/shinyblocks-component\\.md$",
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
     "^tests/testthat/test-shell\\.R$"
@@ -46,20 +45,18 @@ allowlist <- data.frame(
     ".*",
     ".*",
     "shiny::sliderInput|ionRangeSlider",
-    "selectize|Selectize|ionRangeSlider",
     "selectize|irs-|nav-link|tab-pane",
     "selectize|Selectize|nav-link|shiny::textInput",
-    "shiny-tab-input|nav-link|tab-pane|sb-button-"
+    "shiny-tab-input|nav-link|tab-pane"
   ),
   reason = c(
     "Historical ADRs are retained for decision context.",
     "Historical/current implementation plans intentionally name old patterns for cleanup.",
     "Current roadmap tracks removed and pending legacy migration work.",
     "Component specs document current slider migration state.",
-    "Tracked skill retains historical pitfalls until the runtime-skill refresh lands.",
     "Runtime CSS test asserts these host selectors are absent from runtime CSS.",
     "Host collision fixture intentionally creates non-shinyblocks Bootstrap/Selectize-like nodes and one nested raw Shiny text input.",
-    "Shell tests assert old tab internals are absent and may reference temporary legacy button classes."
+    "Shell tests assert old tab internals are absent from the rendered contract."
   ),
   stringsAsFactors = FALSE
 )
