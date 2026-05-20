@@ -53,6 +53,20 @@ export function normaliseValue(property, value) {
     return "auto";
   }
 
+  // Slider thumb positioning uses two equivalent techniques: shinyblocks
+  // emits `translate(-50%, -50%)` plus `left: <percent>%`, while shadcn /
+  // Radix emit `translate(0, -50%)` plus `left: calc(<percent>% - <half>px)`.
+  // Both render the thumb centered on the same point. Collapse the matrix
+  // form so the X-translate (centering offset) does not register as drift
+  // when the Y-translate matches.
+  if (property === "transform") {
+    const match = out.match(/^matrix\(\s*1\s*,\s*0\s*,\s*0\s*,\s*1\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)$/);
+    if (match) {
+      const [, , ty] = match;
+      return `matrix(1, 0, 0, 1, *, ${ty})`;
+    }
+  }
+
   if (property.toLowerCase().includes("color")) {
     return out.toLowerCase();
   }
