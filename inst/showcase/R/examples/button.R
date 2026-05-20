@@ -15,11 +15,11 @@ htmltools::tagList(
             style = "display: flex; flex-direction: column; gap: 1rem;",
             htmltools::tags$div(
               htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::verbatimTextOutput("showcase_button_preview_code")
+              shiny::uiOutput("showcase_button_preview_code")
             ),
             htmltools::tags$div(
               htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "Server Action"),
-              shiny::verbatimTextOutput("showcase_button_reactive_code")
+              shiny::uiOutput("showcase_button_reactive_code")
             )
           )
         ),

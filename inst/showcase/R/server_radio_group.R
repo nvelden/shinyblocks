@@ -53,7 +53,7 @@ register_radio_group_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_radio_group_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_radio_group_preview_value <- shiny::renderText({
+  output$showcase_radio_group_preview_value <- showcase_render_code({
     value <- input$showcase_radio_group_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -66,7 +66,7 @@ register_radio_group_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_radio_group_preview_value", suspendWhenHidden = FALSE)
 
-  output$showcase_radio_group_preview_code <- shiny::renderText({
+  output$showcase_radio_group_preview_code <- showcase_render_code({
     choices <- parse_radio_choices(input$showcase_radio_group_doc_choices %||% "")
     if (!length(choices)) choices <- c(All = "all", Mentions = "mentions", None = "none")
     selected <- input$showcase_radio_group_doc_selected %||% as.character(choices)[[1]]
@@ -105,7 +105,7 @@ register_radio_group_showcase <- function(input, output, session) {
     "# the update_block_radio_group() code here."
   ))
 
-  output$showcase_radio_group_reactive_code <- shiny::renderText({
+  output$showcase_radio_group_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(output, "showcase_radio_group_reactive_code", suspendWhenHidden = FALSE)

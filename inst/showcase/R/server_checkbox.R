@@ -43,7 +43,7 @@ register_checkbox_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_checkbox_preview_value <- shiny::renderText({
+  output$showcase_checkbox_preview_value <- showcase_render_code({
     value <- input$showcase_checkbox_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -60,7 +60,7 @@ register_checkbox_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_checkbox_preview_code <- shiny::renderText({
+  output$showcase_checkbox_preview_code <- showcase_render_code({
     label <- input$showcase_checkbox_doc_label %||% "Email me product updates"
     description <- input$showcase_checkbox_doc_description %||%
       "Unchecked default checkbox state."
@@ -128,7 +128,7 @@ register_checkbox_showcase <- function(input, output, session) {
     "# the update_block_checkbox() code here."
   ))
 
-  output$showcase_checkbox_reactive_code <- shiny::renderText({
+  output$showcase_checkbox_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(

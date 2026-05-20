@@ -11,28 +11,43 @@ dir.create("lib", recursive = TRUE, showWarnings = FALSE)
 manifest_list <- list()
 all_deps <- list()
 
+clean_runtime_paths <- function(html) {
+  gsub(
+    "(shinyblocks-[0-9a-fA-F.-]+/icons/sprite.svg)",
+    "/shinyblocks/runtime/\\1",
+    html
+  )
+}
+
+render_fragment <- function(ui) {
+  rendered <- htmltools::renderTags(ui)
+  all_deps <<- c(all_deps, rendered$dependencies)
+  clean_runtime_paths(rendered$html)
+}
+
 for (entry in registry) {
   # Source preview file to get the tag object
   preview_file <- file.path("content/previews", entry$file)
   ui <- source(preview_file)$value
   
   # Render the tags
-  rendered <- htmltools::renderTags(ui)
-  
-  # Clean HTML sprite URLs to point to absolute static path
-  html_cleaned <- gsub("(shinyblocks-[0-9a-fA-F.-]+/icons/sprite.svg)", "/shinyblocks/runtime/\\1", rendered$html)
+  html_cleaned <- render_fragment(ui)
   
   # Write HTML fragment to sibling .html file
   html_file <- file.path("content/previews", paste0(entry$slug, ".html"))
   writeLines(html_cleaned, html_file)
   
-  # Capture HTML dependencies
-  if (!is.null(rendered$dependencies)) {
-    all_deps <- c(all_deps, rendered$dependencies)
-  }
-  
   # Read code recipe content
   code_content <- paste(readLines(preview_file, warn = FALSE), collapse = "\n")
+  code_html <- render_fragment(
+    shinyblocks::block_code(
+      code = code_content,
+      language = "r",
+      copyable = TRUE,
+      line_numbers = TRUE,
+      variant = "default"
+    )
+  )
   
   # Add to manifest
   manifest_list[[length(manifest_list) + 1]] <- list(
@@ -41,6 +56,7 @@ for (entry in registry) {
     description = entry$description,
     featured = entry$featured,
     code = code_content,
+    codeHtml = code_html,
     html = html_cleaned
   )
 }

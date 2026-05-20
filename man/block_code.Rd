@@ -19,15 +19,20 @@ block_code(
 \arguments{
 \item{code}{The code string to display.}
 
-\item{language}{Optional programming language name to display in the header.}
+\item{language}{Optional programming language name to display when
+\code{header = TRUE}.}
 
-\item{copyable}{Logical. If \code{TRUE} (default), displays a copy-to-clipboard button.}
+\item{copyable}{Logical. If \code{TRUE} (default), displays a
+copy-to-clipboard button.}
 
 \item{line_numbers}{Logical. If \code{TRUE} (default), displays line numbers.}
 
-\item{header}{Logical. If \code{TRUE}, displays a terminal-style header with window dots. Defaults to \code{FALSE}.}
+\item{header}{Logical. If \code{TRUE}, displays an optional header with editor
+dots and the language label. Defaults to \code{FALSE} to match the shadcn
+documentation examples.}
 
-\item{variant}{Visual variant. One of "default" (muted background) or "outline" (border only).}
+\item{variant}{Visual variant. One of \code{"default"} (background surface) or
+\code{"outline"} (transparent surface).}
 
 \item{class}{Additional CSS classes.}
 
@@ -39,8 +44,9 @@ block_code(
 An \code{htmltools} tag.
 }
 \description{
-A premium pre-formatted code block with monospace typography, optional
-line numbers, copy-to-clipboard button, and terminal-style header.
+A pre-formatted code block following the shadcn documentation code
+surface: bordered frame, monospace text, optional line numbers, and an
+optional copy-to-clipboard button.
 }
 \seealso{
 Other content: 

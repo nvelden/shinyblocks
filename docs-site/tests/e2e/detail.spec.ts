@@ -9,7 +9,13 @@ test("component detail page displays preview and code block", async ({ page }) =
   
   // Displays R Code section and recipe content.
   await expect(page.getByRole("heading", { level: 2, name: "R Code" })).toBeVisible();
-  await expect(page.locator("pre code")).toContainText("shinyblocks::block_button");
+  const codeBlock = page.locator("[data-sb-component='code']").last();
+  await expect(codeBlock).toContainText("shinyblocks::block_button");
+  await expect(codeBlock.locator(".sb-code-block-pre")).toHaveCSS("overflow-x", "hidden");
+  const overflow = await codeBlock.locator(".sb-code-block-pre").evaluate((node) => {
+    return node.scrollWidth > node.clientWidth + 1;
+  });
+  expect(overflow).toBe(false);
   
   // Navigation back works.
   await page.getByRole("link", { name: /Back to Components/ }).click();

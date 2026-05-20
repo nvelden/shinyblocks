@@ -57,7 +57,7 @@ register_button_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_button_preview_code <- shiny::renderText({
+  output$showcase_button_preview_code <- showcase_render_code({
     string_literal <- function(value) {
       paste0('"', gsub('(["\\\\])', '\\\\\\1', value, perl = TRUE), '"')
     }
@@ -120,7 +120,7 @@ register_button_showcase <- function(input, output, session) {
     "# the update_block_button() code here."
   ))
 
-  output$showcase_button_reactive_code <- shiny::renderText({
+  output$showcase_button_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(

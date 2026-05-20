@@ -90,8 +90,8 @@ sections <- list(
     icon = "code",
     title = "Code block",
     lead = paste(
-      "A premium pre-formatted code block with monospace typography,",
-      "optional language badge, copy-to-clipboard button, and terminal-style header."
+      "A shadcn-docs-style code frame with line numbers,",
+      "copy-to-clipboard button, and optional editor header."
     ),
     file = "code.R"
   ),

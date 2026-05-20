@@ -15,7 +15,7 @@ htmltools::tagList(
             style = "display: flex; flex-direction: column; gap: 1rem;",
             htmltools::tags$div(
               htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::verbatimTextOutput("showcase_code_preview_code")
+              shiny::uiOutput("showcase_code_preview_code")
             )
           )
         ),
@@ -27,11 +27,15 @@ htmltools::tagList(
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
             block_field(
               block_field_label("code", `for` = "showcase_code_doc_code"),
-              block_textarea("showcase_code_doc_code", value = "npm install shinyblocks\n# or\ninstall.packages(\"shinyblocks\")", rows = 4)
+              block_textarea(
+                "showcase_code_doc_code",
+                value = "plot_data <- function(x) {\n  # Simple summary for a Shiny dashboard\n  mean(x, na.rm = TRUE)\n}\n\nplot_data(c(12, 18, NA, 24))",
+                rows = 6
+              )
             ),
             block_field(
               block_field_label("language", `for` = "showcase_code_doc_language"),
-              block_textarea("showcase_code_doc_language", value = "bash", rows = 1)
+              block_textarea("showcase_code_doc_language", value = "r", rows = 1)
             )
           ),
           htmltools::div(
@@ -42,7 +46,7 @@ htmltools::tagList(
               htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
               block_field(
                 block_field_label("header", `for` = "showcase_code_doc_header"),
-                block_checkbox("showcase_code_doc_header", "Header (with terminal dots)", value = FALSE)
+                block_checkbox("showcase_code_doc_header", "Header with editor dots", value = FALSE)
               ),
               block_field(
                 block_field_label("line_numbers", `for` = "showcase_code_doc_line_numbers"),

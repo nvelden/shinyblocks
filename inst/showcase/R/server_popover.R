@@ -48,7 +48,7 @@ register_popover_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_popover_preview_value <- shiny::renderText({
+  output$showcase_popover_preview_value <- showcase_render_code({
     value <- input$showcase_popover_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -65,7 +65,7 @@ register_popover_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_popover_preview_code <- shiny::renderText({
+  output$showcase_popover_preview_code <- showcase_render_code({
     trigger <- input$showcase_popover_doc_trigger %||% "Open popover"
     body <- if (isTRUE(swapped_body())) {
       "Body updated from the server."
@@ -113,7 +113,7 @@ register_popover_showcase <- function(input, output, session) {
     "# the update_block_popover() code here."
   ))
 
-  output$showcase_popover_reactive_code <- shiny::renderText({
+  output$showcase_popover_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(

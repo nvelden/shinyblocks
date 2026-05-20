@@ -107,7 +107,7 @@ register_dialog_showcase <- function(input, output, session) {
     update_block_dialog(session, "showcase_dialog_preview", open = TRUE)
   })
 
-  output$showcase_dialog_preview_value <- shiny::renderText({
+  output$showcase_dialog_preview_value <- showcase_render_code({
     value <- input$showcase_dialog_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -153,7 +153,7 @@ register_dialog_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_dialog_preview_code <- shiny::renderText({
+  output$showcase_dialog_preview_code <- showcase_render_code({
     title_val <- input$showcase_dialog_doc_title %||% "Confirm action"
     desc_val <- input$showcase_dialog_doc_description %||% ""
     trigger_val <- input$showcase_dialog_doc_trigger %||% ""
@@ -207,7 +207,7 @@ register_dialog_showcase <- function(input, output, session) {
     "# the update_block_dialog() code here."
   ))
 
-  output$showcase_dialog_reactive_code <- shiny::renderText({
+  output$showcase_dialog_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(

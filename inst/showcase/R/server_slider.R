@@ -61,7 +61,7 @@ register_slider_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_slider_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_slider_preview_value <- shiny::renderText({
+  output$showcase_slider_preview_value <- showcase_render_code({
     value <- input$showcase_slider_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
@@ -74,7 +74,7 @@ register_slider_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_slider_preview_value", suspendWhenHidden = FALSE)
 
-  output$showcase_slider_preview_code <- shiny::renderText({
+  output$showcase_slider_preview_code <- showcase_render_code({
     min_val <- slider_number(input$showcase_slider_doc_min, 0)
     max_val <- slider_number(input$showcase_slider_doc_max, 100)
     value <- parse_slider_value(input$showcase_slider_doc_value, 50)
@@ -111,7 +111,7 @@ register_slider_showcase <- function(input, output, session) {
     "# the update_block_slider() code here."
   ))
 
-  output$showcase_slider_reactive_code <- shiny::renderText({
+  output$showcase_slider_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(output, "showcase_slider_reactive_code", suspendWhenHidden = FALSE)

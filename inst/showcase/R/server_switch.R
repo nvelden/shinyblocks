@@ -29,14 +29,14 @@ register_switch_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_switch_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_switch_preview_value <- shiny::renderText({
+  output$showcase_switch_preview_value <- showcase_render_code({
     value <- input$showcase_switch_preview
     val_str <- if (is.null(value)) "<NULL>" else as.character(isTRUE(value))
     paste0("input$showcase_switch_preview = ", val_str)
   })
   shiny::outputOptions(output, "showcase_switch_preview_value", suspendWhenHidden = FALSE)
 
-  output$showcase_switch_preview_code <- shiny::renderText({
+  output$showcase_switch_preview_code <- showcase_render_code({
     label <- input$showcase_switch_doc_label %||% preview_label()
     value <- isTRUE(input$showcase_switch_doc_value)
     disabled <- isTRUE(input$showcase_switch_doc_disabled)
@@ -65,7 +65,7 @@ register_switch_showcase <- function(input, output, session) {
     "# the update_block_switch() code here."
   ))
 
-  output$showcase_switch_reactive_code <- shiny::renderText({
+  output$showcase_switch_reactive_code <- showcase_render_code({
     reactive_code()
   })
   shiny::outputOptions(output, "showcase_switch_reactive_code", suspendWhenHidden = FALSE)

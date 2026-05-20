@@ -368,7 +368,12 @@ function registerCheckboxBinding() {
     }
 
     getValue(el) {
-      return Boolean(el.__sbCheckboxValue);
+      if (typeof el.__sbCheckboxValue !== "undefined") {
+        return Boolean(el.__sbCheckboxValue);
+      }
+
+      const native = nativeCheckbox(el);
+      return native ? native.checked : false;
     }
 
     setValue(el, value) {
@@ -448,7 +453,12 @@ function registerSwitchBinding() {
     }
 
     getValue(el) {
-      return Boolean(el.__sbSwitchValue);
+      if (typeof el.__sbSwitchValue !== "undefined") {
+        return Boolean(el.__sbSwitchValue);
+      }
+
+      const native = nativeSwitch(el);
+      return native ? native.checked : false;
     }
 
     setValue(el, value) {

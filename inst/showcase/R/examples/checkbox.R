@@ -11,20 +11,20 @@ htmltools::tagList(
         style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
         htmltools::div(
           style = "flex: 1 1 320px; min-width: 280px; display: flex; flex-direction: column; gap: 1rem;",
-          shiny::verbatimTextOutput("showcase_checkbox_preview_value"),
+          shiny::uiOutput("showcase_checkbox_preview_value"),
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
               "UI Definition"
             ),
-            shiny::verbatimTextOutput("showcase_checkbox_preview_code")
+            shiny::uiOutput("showcase_checkbox_preview_code")
           ),
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
               "Server Action"
             ),
-            shiny::verbatimTextOutput("showcase_checkbox_reactive_code")
+            shiny::uiOutput("showcase_checkbox_reactive_code")
           )
         ),
         htmltools::div(

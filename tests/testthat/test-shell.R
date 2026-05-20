@@ -894,6 +894,16 @@ test_that("block_code validates its arguments", {
     fixed = TRUE
   )
   expect_error(
+    block_code(""),
+    "`code` must be a single non-empty character string.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_code("print('hello')", language = c("r", "python")),
+    "`language` must be NULL or a single character string.",
+    fixed = TRUE
+  )
+  expect_error(
     block_code("print('hello')", variant = "invalid-variant"),
     "`variant` must be one of \"default\", \"outline\".",
     fixed = TRUE
