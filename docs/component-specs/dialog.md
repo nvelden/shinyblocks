@@ -1,102 +1,85 @@
 # Dialog
 
-> Shinyblocks function: `block_dialog()`
+> Shinyblocks function: `block_dialog()` / `update_block_dialog()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/dialog>
-> Status: **Phase 4.4 — size + footer slot**. Parity entry and final
-> cleanup arrive in 4.5. See GitHub issue #1 for the full sub-phase
-> breakdown.
+> Status: Runtime overlay component; Phase 7 spec refreshed around the
+> shipped API, state bridge, accessibility contract, and divergences.
 
-## Phase 4.4 variants + slots
+## States
 
-- New `size` argument: `"sm"` (24rem), `"default"` (32rem), `"lg"`
-  (48rem), `"xl"` (64rem). Emits an `sb-dialog-content-size-<size>`
-  class and a `data-size` attribute on the content container.
-  `update_block_dialog(size = ...)` resizes from the server. Invalid
-  values raise informative errors at both the R API and the updater.
-- New `footer` slot: optional `htmltools` content rendered below the
-  body in `.sb-dialog-footer`. Layout is a right-aligned, wrapping
-  flex row with `gap: 0.5rem`, so a single action button or a chain
-  of three buttons both render correctly without media queries. `update_block_dialog(footer = ...)` swaps the
-  footer content. Passing `footer = NULL` to the updater clears it.
-- Composed helpers (`block_dialog_header()`, `block_dialog_title()`,
-  `block_dialog_description()`, `block_dialog_footer()`) are
-  intentionally deferred — flat `title` / `description` / `footer`
-  arguments cover the Shiny composition story without requiring a
-  per-helper sync bundle. Revisit if user feedback demands richer
-  composition.
+- **closed** — only the optional trigger button is visible.
+- **open** — overlay and content render into
+  `[data-shinyblocks-portal-root]`.
+- **dismissed by interaction** — overlay click, close button, or
+  `Escape` closes the dialog and notifies Shiny.
+- **server-updated** — `update_block_dialog()` can open/close,
+  replace title/description/footer content, and resize the content
+  without remounting.
+- **sized** — content width uses `"sm"`, `"default"`, `"lg"`, or
+  `"xl"` via `data-size` and `sb-dialog-content-size-*`.
+- **title-hidden** — `hide_title = TRUE` keeps the accessible name in
+  the DOM while visually hiding it.
 
-## Phase 4.3 accessibility contract
+## Runtime Mapping
 
-- `Escape` closes the dialog (notifies the binding) and re-stops
-  propagation so host hash listeners do not also fire.
-- Focus is moved to the first focusable element inside the dialog
-  on open; if none exist, the content container itself receives
-  focus.
-- `Tab` and `Shift+Tab` cycle within the dialog's focusable
-  children, never escaping the modal.
-- Closing the dialog returns focus to whichever element held it
-  before open (typically the trigger button), preserving keyboard
-  context.
-- `document.body` overflow is locked while open and the previously
-  used `padding-right` value is restored on close; scrollbar-width
-  padding is applied to prevent layout shift.
-- ARIA wiring: `role="dialog"`, `aria-modal="true"`,
-  `aria-labelledby="<id>-title"`, and `aria-describedby="<id>-description"`
-  when a description is present.
-- `hide_title = TRUE` keeps the title in the DOM (and as the
-  accessible name) but renders it inside `.sb-visually-hidden` so it
-  is announced by screen readers without occupying visible space.
-- Trigger button advertises `aria-haspopup="dialog"` and
-  `aria-expanded` that tracks the current open state.
+| R argument | Runtime payload | Notes |
+| --- | --- | --- |
+| `id` | `input_id` / runtime mount id | Required; drives `input$<id>`. |
+| `title` | `props$titleHtml` | Required accessible name. |
+| `description` | `props$descriptionHtml` | Optional `aria-describedby` source. |
+| `...` | `props$bodyHtml` | Dialog body HTML. |
+| `footer` | `props$footerHtml` | Optional action/footer region. |
+| `trigger` | `props$triggerLabel` | Optional local opener button. |
+| `open` | `state$open`, `state$value` | Initial Shiny/open state. |
+| `size` | `props$size` | `"sm"`, `"default"`, `"lg"`, `"xl"`. |
+| `hide_title` | `props$hideTitle` | Applies `.sb-visually-hidden`. |
+| `class` | `className` | Merged onto dialog content. |
 
-## Phase 4.2 contract
+## Shiny State And Update Contract
 
-- Modal dialog rendered into the runtime portal root
-  (`[data-shinyblocks-portal-root]`).
-- Required `id`. `input$<id>` is `TRUE` when open, `FALSE` when closed.
-- Required `title`. Optional `description`, body (`...`), and
-  `trigger` label.
-- Trigger label renders an `sb-button` next to the mount node that
-  opens the dialog locally. Pass `NULL` (default) to drive open
-  state purely from the server.
-- Close button (`×`) and overlay click set `open = FALSE` and notify
-  the binding.
-- Server can call `update_block_dialog(session, id, open, title,
-  description, notify)` to drive open state, update slot content, or
-  silently apply cosmetic changes (`notify` defaults to `TRUE` only
-  when `open` is included).
-- Message routing follows the `block_select()` pattern:
-  `sendInputMessage(mount_id, payload)` with the dialog binding's
-  `receiveMessage` forwarding to a component-installed
-  `el.__sbDialogReceive`.
-- No focus management, scroll lock, escape key, or focus trap yet
-  (arrives in 4.3).
+- `input$<id>` is `TRUE` when open and `FALSE` when closed.
+- The runtime registers a dialog input binding and routes
+  `sendInputMessage()` payloads to `el.__sbDialogReceive`.
+- `update_block_dialog()` accepts `open`, `title`, `description`,
+  `footer`, and `size`.
+- Cosmetic updates do not notify. Open/close updates notify only when
+  `notify = TRUE`.
+- Passing `footer = NULL` clears an existing footer.
 
-## Token contract
+## Accessibility
+
+- Content carries `role="dialog"` and `aria-modal="true"`.
+- `aria-labelledby` points at the runtime title slot.
+- `aria-describedby` points at the description slot when present.
+- Opening moves focus into the dialog; closing returns focus to the
+  previously focused element.
+- `Tab` and `Shift+Tab` cycle inside the dialog.
+- Body scroll is locked while the dialog is open and restored on close.
+- Trigger button advertises `aria-haspopup="dialog"` and live
+  `aria-expanded`.
+
+## Token Contract
 
 | Visual role | Token |
 | --- | --- |
-| Overlay | `rgb(0 0 0 / 0.5)` (hardcoded; tokenized in 4.3) |
+| Overlay | `rgb(0 0 0 / 0.5)` |
 | Content surface | `--background` |
 | Content foreground | `--foreground` |
 | Border | `--border` |
 | Description text | `--muted-foreground` |
-| Close-button hover | `--accent` / `--accent-foreground` |
+| Close-button hover | `--accent`, `--accent-foreground` |
 
-## Slots (4.1)
+## Deliberate Divergences From Shadcn
 
-| Slot | Source | Notes |
-| --- | --- | --- |
-| `titleHtml` | `title` arg | Required. Serialized via `html_fragment()`. |
-| `descriptionHtml` | `description` arg | Optional. |
-| `bodyHtml` | `...` | Serialized in 4.1; will become Shiny-bound children in 4.2+. |
+- React runtime is package-local (`component = "dialog"`); shinyblocks
+  does not ship `@radix-ui/react-dialog`.
+- `block_dialog()` uses flat `title`, `description`, `footer`, and
+  body arguments instead of exported dialog subcomponent helpers.
+- Content is currently serialized HTML, not live Shiny-bound children.
+- The overlay color is a fixed translucent black rather than a token.
+- No animated open/close transition yet.
 
-## Planned divergences from shadcn
+## Reference Screenshot
 
-- React component is package-local; we do not ship `@radix-ui/react-dialog`.
-- The close button is a `<button>` with `aria-label="Close"` rather
-  than a `DialogPrimitive.Close` slot.
-
-## Reference screenshot
-
-Pending — capture and add under `_screenshots/dialog.png` during 4.5.
+Pending — capture and add under `_screenshots/dialog.png` during the
+Phase 7 screenshot refresh.

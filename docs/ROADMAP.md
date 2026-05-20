@@ -243,6 +243,10 @@ phase begins.
 >   runtime CSS tests now also scan the package source stylesheet and
 >   fail if a selector outside the allowed shell/composition hook
 >   families is added.
+> - **Phase 7 specs slice — overlays** —
+>   Dialog, Popover, and Tooltip specs now describe shipped runtime API,
+>   payload mapping, Shiny state/update behavior, accessibility, tokens,
+>   and deliberate divergences instead of old sub-phase notes.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,
