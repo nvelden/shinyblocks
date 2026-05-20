@@ -1,21 +1,47 @@
 # Checkbox
 
-> Shinyblocks function: `block_checkbox()`
+> Shinyblocks function: `block_checkbox()` / `update_block_checkbox()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/checkbox>
-> Status: **Phase 5.6 — popover/checkbox/switch parity + cleanup**.
+> Status: Runtime form control; Phase 7 spec refreshed around shipped
+> API, Shiny state bridge, and update contract.
 
 ## States
 
-- **default** — square control with border, subtle shadow, and inline
-  label text.
+- **unchecked** — square control with input-coloured border, subtle
+  shadow, and inline label text.
 - **checked** — primary-filled surface with a visible check mark.
 - **focus-visible** — 3px `--ring` shadow at 50% opacity with the
-  indicator border promoted to `--ring`.
-- **disabled** — reduced opacity for both indicator and label.
-- **invalid** — destructive-tinted border when wrapped in
-  `block_field_invalid()`.
+  control border promoted to `--ring`.
+- **disabled** — reduced opacity for both control and label.
+- **invalid** — destructive-tinted border/ring when a parent field
+  marks the control invalid.
+- **server-updated** — server can replace checked state, disabled
+  state, style, and class without remounting.
 
-## Token contract
+## Runtime Mapping
+
+| R argument | Runtime payload | Notes |
+| --- | --- | --- |
+| `input_id` | `input_id` / runtime mount id | Drives `input$<id>`. |
+| `label` | `props$labelHtml` | Inline label HTML. |
+| `value` | `state$value` | Initial checked state. |
+| `disabled` | `props$disabled` | Disables rendered checkbox. |
+| `style` | `props$style` | Inline style on visible checkbox shell. |
+| `class` | `className` | Extra class on wrapper. |
+
+## Shiny State And Update Contract
+
+- `input$<id>` reports `TRUE` when checked and `FALSE` when unchecked
+  through the `shinyblocks.checkbox` binding.
+- A hidden native `<input type="checkbox">` remains in the runtime
+  mount as a form bridge, but Shiny reads the package binding.
+- `update_block_checkbox()` accepts `checked`, `disabled`, `style`,
+  and `class`.
+- Cosmetic updates do not notify. Checked-state updates notify only
+  when `notify = TRUE`.
+- Passing `style = NULL` or `class = NULL` clears that field.
+
+## Token Contract
 
 | Visual role | Token |
 | --- | --- |
@@ -25,20 +51,19 @@
 | Checked fill | `--primary` |
 | Check mark | `--primary-foreground` |
 | Focus ring | `--ring` |
-| Invalid border | `--destructive`, `--border` |
+| Invalid border/ring | `--destructive`, `--border` |
 
-## Deliberate divergences from shadcn
+## Deliberate Divergences From Shadcn
 
-- React runtime is package-local (`component = "checkbox"`); we do not
-  ship Radix checkbox primitives.
-- A hidden native `<input type="checkbox">` remains in the mount so the
-  Shiny-side value source stays native while the visible shell matches
-  shadcn styling.
-- Shiny input wiring is handled by a component-specific
-  `ShinyblocksCheckboxBinding` (`shinyblocks.checkbox`) instead of
-  relying on Shiny's default checkbox binding.
+- React runtime is package-local (`component = "checkbox"`); shinyblocks
+  does not ship `@radix-ui/react-checkbox`.
+- Hidden native checkbox markup is retained for form submission and
+  assistive technology compatibility, while the visible control is
+  owned by the runtime.
+- Invalid styling is field-driven today; `block_checkbox()` itself does
+  not expose an `invalid` argument.
 
-## Reference screenshot
+## Reference Screenshot
 
 ![Checkbox](_screenshots/checkbox.png)
 
