@@ -24,6 +24,13 @@
 | Border | `--border` |
 | Focus ring | `--ring` |
 
+## Stable shell hooks
+
+`block_sidebar()` owns `.sb-sidebar`, `.sb-sidebar-title`,
+`.sb-sidebar-nav`, `.sb-sidebar-toggle`, and the page-level sidebar
+state attrs. These hooks are package shell contracts for layout,
+navigation, and responsive sidebar behavior only.
+
 ## Deliberate divergences from shadcn
 
 - shinyblocks keeps the sidebar runtime small and page-scoped instead of

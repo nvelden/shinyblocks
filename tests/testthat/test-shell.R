@@ -28,9 +28,7 @@ test_that("block_page renders the shell landmarks", {
     '<div class="sb-app">[\\s\\S]*data-shinyblocks-portal-root=""',
     perl = TRUE
   )
-  expect_match(head, "document.documentElement.dataset.theme", fixed = TRUE)
-  expect_match(head, "window.shinyblocksTheme.apply", fixed = TRUE)
-  expect_match(head, "data-sb-theme-toggle", fixed = TRUE)
+  expect_match(head, "window.shinyblocksInitialThemeMode", fixed = TRUE)
 })
 
 test_that("block_page includes optional theme overrides in head", {

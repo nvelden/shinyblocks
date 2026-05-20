@@ -10,6 +10,9 @@
 - **overridden** — supplied token values replace the vendored defaults
   for components inside the page shell, including owned runtime portal
   content.
+- **server-updated** — `update_block_theme()` sends a Shiny custom
+  message handled by the same package theme runtime used by the
+  dark-mode toggle.
 
 ## Token contract
 
@@ -23,6 +26,8 @@
 
 - `block_theme()` is an R helper that emits a `<style>` tag; shadcn
   itself expects the host app to own the CSS variable source.
+- `update_block_theme()` changes the active light/dark/system mode; it
+  does not mutate CSS token values emitted by `block_theme()`.
 
 ## Reference screenshot
 
