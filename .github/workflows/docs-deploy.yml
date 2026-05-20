@@ -69,7 +69,13 @@ jobs:
       # the `_next/` folder.
       - run: touch out/.nojekyll
 
+      # `enablement: true` lets the action turn on Pages (source = GitHub
+      # Actions) on first run so the deploy does not 404 on a fresh repo.
+      # On a free private repo this still fails until the repo is made
+      # public or Pages is otherwise available — see the note above.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
