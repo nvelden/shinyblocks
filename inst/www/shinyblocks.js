@@ -1,7 +1,7 @@
 (function () {
   function currentThemeMode() {
     try {
-      var mode = localStorage.getItem("sb-theme") || "system";
+      var mode = localStorage.getItem("theme") || localStorage.getItem("sb-theme") || "system";
       return mode === "light" || mode === "dark" || mode === "system"
         ? mode
         : "system";
@@ -219,10 +219,11 @@
   }
 
   function wirePage(page) {
+    if (page.getAttribute("data-sidebar-enhanced") === "true") return;
+    page.setAttribute("data-sidebar-enhanced", "true");
+
     var sidebar = page.querySelector(".sb-sidebar");
     if (!sidebar) return;
-
-    page.setAttribute("data-sidebar-enhanced", "true");
 
     var toggle = sidebar.querySelector(".sb-sidebar-toggle");
     if (toggle) {
@@ -271,11 +272,55 @@
     );
   }
 
+  function observeDOM() {
+    if (typeof MutationObserver === "undefined") return;
+
+    var observer = new MutationObserver(function (mutations) {
+      var needsTabs = false;
+      var needsPage = false;
+
+      mutations.forEach(function (mutation) {
+        if (!mutation.addedNodes.length) return;
+        
+        var nodes = Array.prototype.slice.call(mutation.addedNodes);
+        nodes.forEach(function (node) {
+          if (node.nodeType !== 1) return;
+          
+          if (node.matches && node.matches(".sb-tabs[data-sb-tabs='true']")) {
+            needsTabs = true;
+          }
+          if (node.querySelector && node.querySelector(".sb-tabs[data-sb-tabs='true']")) {
+            needsTabs = true;
+          }
+          if (node.matches && node.matches(".sb-page.has-sidebar")) {
+            needsPage = true;
+          }
+          if (node.querySelector && node.querySelector(".sb-page.has-sidebar")) {
+            needsPage = true;
+          }
+        });
+      });
+
+      if (needsTabs) {
+        tabs().forEach(wireTabs);
+      }
+      if (needsPage) {
+        sidebarPages().forEach(wirePage);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
   function init() {
     applyTheme(currentThemeMode());
     wireThemeToggleEvents();
     tabs().forEach(wireTabs);
     sidebarPages().forEach(wirePage);
+    observeDOM();
   }
 
   if (window.Shiny && window.Shiny.addCustomMessageHandler) {

@@ -4,6 +4,8 @@ import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import Script from "next/script";
+import { getRuntimeAssets } from "@/lib/runtime-assets";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,12 +19,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const assets = getRuntimeAssets();
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
+      <head>
+        <link rel="stylesheet" href="/shinyblocks/runtime/shinyblocks.css" />
+        {assets.css && <link rel="stylesheet" href={assets.css} />}
+      </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ThemeProvider>
           <div className="flex min-h-screen flex-col">
@@ -31,6 +39,18 @@ export default function RootLayout({
             <SiteFooter />
           </div>
         </ThemeProvider>
+        {assets.js && (
+          <Script 
+            src={assets.js} 
+            strategy="afterInteractive" 
+          />
+        )}
+        {assets.vanillaJs && (
+          <Script 
+            src={assets.vanillaJs} 
+            strategy="afterInteractive" 
+          />
+        )}
       </body>
     </html>
   );

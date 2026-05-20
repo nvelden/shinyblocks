@@ -72,6 +72,10 @@
   display: none;
 }
 
+[data-shinyblocks-root] > [data-shinyblocks-react] {
+  display: contents;
+}
+
 [data-shinyblocks-root].sb-card {
   display: flex;
   flex-direction: column;
@@ -984,6 +988,7 @@
   opacity: 0.5;
 }
 
+[data-shinyblocks-root].sb-slider,
 [data-shinyblocks-root] .sb-slider {
   position: relative;
   display: flex;

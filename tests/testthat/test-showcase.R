@@ -21,6 +21,9 @@ test_that("every showcase example evaluates to a tag", {
     package = "shinyblocks",
     mustWork = TRUE
   )
+  helpers_env <- new.env(parent = globalenv())
+  source(file.path(showcase_dir, "R", "render_example.R"), local = helpers_env)
+
   example_files <- list.files(
     file.path(showcase_dir, "R", "examples"),
     pattern = "\\.R$",
@@ -32,7 +35,7 @@ test_that("every showcase example evaluates to a tag", {
   for (path in example_files) {
     code <- readLines(path, warn = FALSE)
     result <- tryCatch(
-      eval(parse(text = code), envir = new.env(parent = globalenv())),
+      eval(parse(text = code), envir = new.env(parent = helpers_env)),
       error = function(e) {
         fail(sprintf(
           "Example %s failed to evaluate: %s",
@@ -219,7 +222,12 @@ test_that("interactive sections use the full playground layout", {
       section$file
     )
     code <- readLines(example_path, warn = FALSE)
-    example_tag <- eval(parse(text = code), envir = new.env(parent = globalenv()))
+    helpers_env <- new.env(parent = globalenv())
+    source(
+      file.path(system.file("showcase", package = "shinyblocks", mustWork = TRUE), "R", "render_example.R"),
+      local = helpers_env
+    )
+    example_tag <- eval(parse(text = code), envir = new.env(parent = helpers_env))
     html <- paste(htmltools::renderTags(example_tag)$html, collapse = "\n")
 
     for (label in required_labels) {

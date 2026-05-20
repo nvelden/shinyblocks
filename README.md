@@ -3,6 +3,9 @@
 An experimental R package for building Shiny dashboards with a
 shadcn/ui-inspired component system.
 
+[**Documentation & Component Gallery**](https://nvelden.github.io/shinyblocks/)
+
+
 The package aims to provide the authoring ergonomics of
 `shinydashboard`, but with:
 
