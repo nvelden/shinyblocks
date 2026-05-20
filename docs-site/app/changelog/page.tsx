@@ -21,7 +21,7 @@ export default function ChangelogPage() {
       <div className="flex flex-col lg:flex-row gap-12">
         
         {/* Main Content Area */}
-        <main className="flex-1 max-w-4xl">
+        <main className="flex-1 min-w-0 max-w-4xl">
           <div className="flex flex-col gap-4 mb-10 border-b border-border/60 pb-8">
             <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Changelog</h1>
             <p className="text-muted-foreground text-lg">

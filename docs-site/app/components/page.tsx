@@ -26,7 +26,7 @@ export default function ComponentsIndexPage() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <div className="flex flex-col gap-4 mb-8">
             <h1 className="text-3xl font-bold tracking-tight">Components</h1>
             <p className="text-muted-foreground text-sm">

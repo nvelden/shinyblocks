@@ -51,7 +51,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <div className="flex flex-col gap-10">
             
             {/* Header Navigation */}
