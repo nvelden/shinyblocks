@@ -39,9 +39,7 @@ allowlist <- data.frame(
     "^docs/skills/shinyblocks-component\\.md$",
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
-    "^inst/www/src/shinyblocks\\.css$",
-    "^tests/testthat/test-shell\\.R$",
-    "^inst/showcase/R/(examples/.+\\.R|render_example\\.R|server_dialog\\.R)$"
+    "^tests/testthat/test-shell\\.R$"
   ),
   pattern = c(
     ".*",
@@ -51,9 +49,7 @@ allowlist <- data.frame(
     "selectize|Selectize|ionRangeSlider",
     "selectize|irs-|nav-link|tab-pane",
     "selectize|Selectize|nav-link|shiny::textInput",
-    "sb-button-",
-    "shiny-tab-input|nav-link|tab-pane|sb-button-",
-    "sb-button-"
+    "shiny-tab-input|nav-link|tab-pane|sb-button-"
   ),
   reason = c(
     "Historical ADRs are retained for decision context.",
@@ -63,9 +59,7 @@ allowlist <- data.frame(
     "Tracked skill retains historical pitfalls until the runtime-skill refresh lands.",
     "Runtime CSS test asserts these host selectors are absent from runtime CSS.",
     "Host collision fixture intentionally creates non-shinyblocks Bootstrap/Selectize-like nodes and one nested raw Shiny text input.",
-    "Legacy button CSS remains while shell/showcase cleanup narrows the last non-runtime action-button surface.",
-    "Shell tests assert old tab internals are absent and may reference temporary legacy button classes.",
-    "Showcase action controls use one centralized actionButton() helper because server-update demos still need click-count semantics."
+    "Shell tests assert old tab internals are absent and may reference temporary legacy button classes."
   ),
   stringsAsFactors = FALSE
 )

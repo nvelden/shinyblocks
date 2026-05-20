@@ -1829,7 +1829,6 @@ function Slider({ payload, root }) {
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
   const [style, setStyle] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
-  const [activeThumb, setActiveThumb] = useState(0);
   const rangeMode = Array.isArray(state.value) && state.value.length > 1;
   const [value, setValueState] = useState(
     normalizeSliderValue(rangeMode ? state.value.slice(0, 2) : state.value, min, max)
@@ -1839,6 +1838,8 @@ function Slider({ payload, root }) {
   const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
   const isInvalid = invalid || wrapperInvalid;
   const trackRef = useRef(null);
+  const activeThumbRef = useRef(0);
+  const draggingRef = useRef(false);
 
   function valuesArray(nextValue = value) {
     return Array.isArray(nextValue) ? nextValue : [nextValue];
@@ -1900,19 +1901,29 @@ function Slider({ payload, root }) {
     commit(nextValues, notify);
   }
 
-  function handlePointerDown(event) {
+  function setCurrentThumb(index) {
+    activeThumbRef.current = index;
+  }
+
+  function handlePointerDown(event, thumbIndex = null) {
     if (disabled) return;
     event.preventDefault();
     const nextValue = valueFromPointer(event);
-    const thumb = chooseThumb(nextValue);
-    setActiveThumb(thumb);
+    const thumb = thumbIndex == null ? chooseThumb(nextValue) : thumbIndex;
+    draggingRef.current = true;
+    setCurrentThumb(thumb);
     updateThumb(thumb, nextValue, true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   }
 
-  function handlePointerMove(event) {
-    if (disabled || event.buttons !== 1) return;
-    updateThumb(activeThumb, valueFromPointer(event), true);
+  function handlePointerMove(event, thumbIndex = null) {
+    if (disabled || !draggingRef.current || event.buttons !== 1) return;
+    updateThumb(thumbIndex == null ? activeThumbRef.current : thumbIndex, valueFromPointer(event), true);
+  }
+
+  function handlePointerEnd(event) {
+    draggingRef.current = false;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
   }
 
   function handleKeyDown(event, index) {
@@ -1930,7 +1941,7 @@ function Slider({ payload, root }) {
     if (next == null) return;
 
     event.preventDefault();
-    setActiveThumb(index);
+    setCurrentThumb(index);
     updateThumb(index, next, true);
   }
 
@@ -2034,6 +2045,8 @@ function Slider({ payload, root }) {
         data-slot="slider-track"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
       >
         <div
           className="sb-slider-range"
@@ -2056,7 +2069,11 @@ function Slider({ payload, root }) {
           aria-invalid={isInvalid || undefined}
           disabled={disabled}
           style={{ left: `${percentFor(item)}%` }}
-          onFocus={() => setActiveThumb(index)}
+          onPointerDown={(event) => handlePointerDown(event, index)}
+          onPointerMove={(event) => handlePointerMove(event, index)}
+          onPointerUp={handlePointerEnd}
+          onPointerCancel={handlePointerEnd}
+          onFocus={() => setCurrentThumb(index)}
           onKeyDown={(event) => handleKeyDown(event, index)}
         />
       ))}

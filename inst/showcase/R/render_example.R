@@ -6,9 +6,9 @@ showcase_action_button <- function(
   class = "action-button"
 ) {
   classes <- c(
-    "sb-button",
-    paste0("sb-button-", variant),
-    paste0("sb-button-size-", size),
+    "showcase-action-button",
+    paste0("showcase-action-button-", variant),
+    paste0("showcase-action-button-size-", size),
     class
   )
 

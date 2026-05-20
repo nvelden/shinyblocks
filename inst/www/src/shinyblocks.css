@@ -176,8 +176,7 @@
     @apply size-4 shrink-0;
   }
 
-  .sb-nav-item > [data-icon],
-  .sb-button > [data-icon] {
+  .sb-nav-item > [data-icon] {
     @apply size-4 shrink-0;
   }
 
@@ -403,104 +402,7 @@
     color: var(--destructive);
   }
 
-  .sb-button {
-    @apply inline-flex shrink-0 appearance-none items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap;
-    @apply disabled:pointer-events-none disabled:opacity-50;
-    outline: none;
-    transition:
-      color 0.15s ease,
-      background-color 0.15s ease,
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
-  }
-
-  .sb-button:focus-visible {
-    border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
-  }
-
-  .sb-button[aria-invalid="true"] {
-    border-color: color-mix(in oklch, var(--destructive) 45%, var(--border));
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
-  }
-
-  [data-theme="dark"] .sb-button[aria-invalid="true"] {
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
-  }
-
-  /* shadcn button variants (apps/v4 new-york-v4 registry):
-   *   destructive uses text-white (matches shadcn intent),
-   *   outline carries shadow-xs, link uses text-primary.
-   *   Hover treatment uses color-mix instead of `bg-foo/90` so the
-   *   tokens stay opaque (Tailwind v4 emits opacity classes that
-   *   require @theme color-mix support; this form is equivalent and
-   *   compiled-CSS friendly). See ADR 0006 + the fidelity audit doc.
-   */
-  .sb-button-default {
-    @apply bg-primary text-primary-foreground shadow-xs;
-  }
-
-  .sb-button-default:hover {
-    @apply bg-primary/90;
-  }
-
-  .sb-button-secondary {
-    @apply bg-secondary text-secondary-foreground shadow-xs;
-  }
-
-  .sb-button-secondary:hover {
-    @apply bg-secondary/80;
-  }
-
-  .sb-button-outline {
-    @apply border border-input bg-background shadow-xs;
-  }
-
-  .sb-button-outline:hover {
-    @apply bg-accent text-accent-foreground;
-  }
-
-  .sb-button-ghost:hover {
-    @apply bg-accent text-accent-foreground;
-  }
-
-  .sb-button-destructive {
-    @apply bg-destructive text-white shadow-xs;
-  }
-
-  .sb-button-destructive:hover {
-    @apply bg-destructive/90;
-  }
-
-  [data-theme="dark"] .sb-button-destructive {
-    background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
-  }
-
-  .sb-button-link {
-    @apply text-primary underline-offset-4;
-  }
-
-  .sb-button-link:hover {
-    @apply underline;
-  }
-
-  .sb-button-size-default {
-    @apply h-9 px-4 py-2;
-  }
-
-  .sb-button-size-sm {
-    @apply h-8 rounded-md px-3 text-sm;
-  }
-
-  .sb-button-size-lg {
-    @apply h-10 rounded-md px-6 text-sm;
-  }
-
-  .sb-button-size-icon {
-    @apply size-9 p-0;
-  }
-
-  /* Alert, value-box, separator, skeleton, spinner, and empty are
+  /* Button, alert, value-box, separator, skeleton, spinner, and empty are
    * runtime components; their styling lives in frontend/src/styles/
    * runtime.css under [data-shinyblocks-root]. */
 
