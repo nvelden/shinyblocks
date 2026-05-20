@@ -1,7 +1,0 @@
----
-title: "Header"
-description: "Documentation for header component."
----
-
-Placeholder for header component article.
-

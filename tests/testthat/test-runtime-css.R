@@ -10,6 +10,9 @@ runtime_css <- function() {
 
 package_source_css <- function() {
   path <- testthat::test_path("..", "..", "inst", "www", "src", "shinyblocks.css")
+  if (!file.exists(path)) {
+    testthat::skip("package source CSS is repo-only and not present in R CMD check build")
+  }
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 

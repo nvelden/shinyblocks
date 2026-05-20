@@ -1,7 +1,0 @@
----
-title: "Spinner"
-description: "Documentation for spinner component."
----
-
-Placeholder for spinner component article.
-

@@ -20,6 +20,9 @@ app_js <- function() {
 
 runtime_bindings_source <- function() {
   path <- testthat::test_path("..", "..", "frontend", "src", "runtime", "bindings.js")
+  if (!file.exists(path)) {
+    testthat::skip("runtime bindings source is repo-only and not present in R CMD check build")
+  }
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 

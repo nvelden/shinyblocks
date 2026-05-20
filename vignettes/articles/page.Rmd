@@ -1,7 +1,0 @@
----
-title: "Page"
-description: "Documentation for page component."
----
-
-Placeholder for page component article.
-
