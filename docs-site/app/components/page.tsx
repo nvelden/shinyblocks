@@ -12,15 +12,17 @@ export default function ComponentsIndexPage() {
           <div className="sticky top-20 flex flex-col gap-2">
             <div className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-2 px-2">Components</div>
             <nav className="flex flex-col gap-1">
-              {manifest.map((component) => (
-                <Link
-                  key={component.slug}
-                  href={`/components/${component.slug}/`}
-                  className="rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                >
-                  {component.name}
-                </Link>
-              ))}
+              {manifest
+                .filter((c) => c.slug !== "gallery")
+                .map((component) => (
+                  <Link
+                    key={component.slug}
+                    href={`/components/${component.slug}/`}
+                    className="rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {component.name}
+                  </Link>
+                ))}
             </nav>
           </div>
         </aside>
@@ -35,15 +37,17 @@ export default function ComponentsIndexPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {manifest.map((component) => (
-              <ComponentPreview
-                key={component.slug}
-                slug={component.slug}
-                name={component.name}
-                href={`/components/${component.slug}/`}
-                html={component.html}
-              />
-            ))}
+            {manifest
+              .filter((c) => c.slug !== "gallery")
+              .map((component) => (
+                <ComponentPreview
+                  key={component.slug}
+                  slug={component.slug}
+                  name={component.name}
+                  href={`/components/${component.slug}/`}
+                  html={component.html}
+                />
+              ))}
           </div>
         </main>
       </div>
