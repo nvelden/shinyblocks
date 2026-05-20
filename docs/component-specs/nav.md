@@ -2,35 +2,52 @@
 
 > Shinyblocks function: `block_nav()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/sidebar>
+> Status: R-side navigation container; Phase 7 spec refreshed around
+> the shipped sidebar composition rule and runtime keyboard behavior.
 
 ## States
 
-- **default** — validated container for one or more `block_nav_item()`
-  children.
+- **default** — `<nav class="sb-nav">` container for one or more
+  `block_nav_item()` children. Validated at construction.
 - **stacked** — renders a vertical navigation list with sidebar-safe
   spacing.
-- **keyboard-enhanced** — sidebar runtime enables arrow/home/end
-  traversal across child items.
-- **sidebar-composed** — when used inside `block_sidebar()`, the nav
-  container is promoted to the sidebar navigation region instead of
-  being wrapped again.
+- **keyboard-enhanced** — when inside a sidebar, the package runtime
+  enables Up/Down/Home/End traversal across child items.
+- **sidebar-composed** — when passed as the single child of
+  `block_sidebar()`, the existing `<nav>` is promoted to the sidebar
+  navigation region (gets `.sb-sidebar-nav` merged into its class)
+  instead of being wrapped inside another `<nav>` landmark.
+
+## R API
+
+| Argument | Purpose |
+| --- | --- |
+| `...` | One or more `block_nav_item()` children. Other children fail validation. |
+| `class` | Extra classes for the `.sb-nav` element. |
+
+## Stable shell hooks
+
+`block_nav()` owns `.sb-nav` and contributes `.sb-sidebar-nav` when
+composed inside `block_sidebar()`. These hooks are R-side navigation
+contracts, not runtime component styling targets.
+
+## Accessibility
+
+- Rendered as `<nav>`.
+- The sidebar composition rule avoids nested `<nav>` landmarks.
+- Child `block_nav_item()` elements carry `aria-current="page"` when
+  selected.
 
 ## Token contract
 
 | Visual role | Token |
 | --- | --- |
-| Layout spacing | none (layout only) |
-
-## Stable shell hooks
-
-`block_nav()` owns `.sb-nav` and `.sb-sidebar-nav` when it is composed
-inside `block_sidebar()`. These hooks are R-side navigation contracts,
-not runtime component styling targets.
+| Layout spacing | none (layout only; visual tokens are owned by `block_nav_item()`) |
 
 ## Deliberate divergences from shadcn
 
 - `block_nav()` is an R-side validation wrapper; shadcn sidebar
-  examples rely on composition inside React providers.
+  examples rely on composition inside React providers and menu primitives.
 
 ## Reference screenshot
 

@@ -251,6 +251,16 @@ phase begins.
 >   Input, Textarea, Checkbox, Switch, and Radio Group specs now describe
 >   shipped runtime API, payload mapping, Shiny state/update behavior,
 >   keyboard behavior where relevant, tokens, and deliberate divergences.
+> - **Phase 7 specs slice — layout / nav (2026-05-20)** —
+>   Page, Body, Header, Sidebar, Nav, and Nav Item specs now describe
+>   shipped R-side composition contracts, the page-scoped sidebar runtime
+>   behavior, stable shell hooks, accessibility wiring, and the
+>   `block_nav()` sidebar promotion rule.
+> - **Phase 7 specs slice — theme / icon / dark-mode-toggle (2026-05-20)** —
+>   Theme, Icon, and Dark Mode Toggle specs now describe the shipped
+>   token override / runtime mode-driver split, the
+>   `inst/www/icons/MANIFEST.json` source-of-truth contract, and the
+>   thin `block_button()`-delegated dark-mode toggle.
 > - **Code block component + docs integration** — `block_code()` now
 >   ships as a runtime-rendered shadcn-docs-style code frame with copy
 >   controls, line numbers, lightweight tokenization for R/Python/TSX,

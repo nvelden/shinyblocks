@@ -1,5 +1,7 @@
 # shinyblocks (development version)
 
+* Refreshed the Page, Body, Header, Sidebar, Nav, and Nav Item component specs around their shipped R-side composition contracts, page-scoped sidebar runtime behavior, stable shell hooks, and accessibility wiring.
+* Refreshed the Theme, Icon, and Dark Mode Toggle component specs around the shipped token override / runtime mode-driver split, the manifest-as-source-of-truth icon contract, and the `block_button()`-delegated dark-mode toggle.
 * Added `block_code()`, a shadcn-docs-style code block with line numbers, copy-to-clipboard interactions, and an optional editor-style header.
 * Refreshed the Dialog, Popover, and Tooltip component specs around their shipped runtime API, Shiny state/update contracts, accessibility behavior, and known divergences.
 * Refreshed the Input, Textarea, Checkbox, Switch, and Radio Group component specs around their shipped runtime API, Shiny state/update contracts, keyboard behavior, and known divergences.
