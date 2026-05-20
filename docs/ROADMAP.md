@@ -352,15 +352,29 @@ phase begins.
 >   `block_theme()`, `block_dark_mode_toggle()`, and
 >   `update_block_theme()`.
 >
-> Current natural-next work (migration scope only):
-> - Phase 5 remaining cleanup — audit stale wrapped-input and
->   Bootstrap-tab assumptions out of the docs/decision stack, and
->   remove any now-dead notes/tests/scaffolding that audit reveals.
-> - Phase 6 shipped-helper cleanup — finish the remaining shell/runtime
->   cleanup for already-exported helpers now that the legacy `.sb-button*`
->   shell CSS has been removed.
-> - Remaining overlay additions are explicitly deferred until the
->   migration/cleanup of shipped components is complete.
+> **Phase 8 final-gate dry run cleared (2026-05-20).** Every automated
+> gate is green: `devtools::check(remote = TRUE)` reports 0 errors / 0
+> warnings / 2 benign notes (new-submission CRAN feasibility + an
+> environmental "unable to verify current time"), `lintr::lint_package()`
+> reports 0 lints, `devtools::spell_check()` and `devtools::test()` are
+> clean, the runtime / Shiny / showcase browser suites pass, and
+> `make parity-ci` is green across all 9 registered components. A
+> critical-code-review pass was run against the rewrite diff and all
+> required findings (slider normaliser scope, button shadow leak into
+> ghost/link, Select/Slider spec gaps) were addressed.
+>
+> Current natural-next work:
+> - Manual accessibility keyboard / screen-reader smoke sweep against
+>   the showcase. This is the last unticked Phase 8 item before tagging
+>   v0.0.0.9001.
+> - When the repo is made public (or GitHub Pro/Team/Enterprise is
+>   available), enable Pages so the
+>   `https://nvelden.github.io/shinyblocks/` URL referenced from
+>   DESCRIPTION / `man/shinyblocks-package.Rd` / `README.md` resolves
+>   and the docs deploy workflow can land its first successful run.
+> - Remaining overlay additions (`block_dropdown_menu()`, `block_sheet()`,
+>   `block_drawer()`, `block_hover_card()`) stay deferred until v0.0.0.9001
+>   is tagged.
 >
 > **Component-by-component hand-off:** after button and select are
 > accepted, proceed one component at a time. Each slice should
