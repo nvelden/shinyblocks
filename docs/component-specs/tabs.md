@@ -49,8 +49,8 @@
   `<div role="tabpanel">` per tab. Inactive panels are
   `hidden`/`data-state="inactive"`.
 
-No `nav-link`, `tab-pane`, or `shiny-tab-input` classes appear in the
-rendered contract.
+Legacy Bootstrap tab classes and Shiny's native tab input class are not
+part of the rendered contract.
 
 ## Shiny state contract
 
