@@ -202,13 +202,31 @@ async function prepareSelectOpenState(page, _state, selector) {
   await page.waitForTimeout(250);
 }
 
+async function forceHover(page, selector) {
+  const client = await page.context().newCDPSession(page);
+  await client.send("DOM.enable");
+  await client.send("CSS.enable");
+  const { root } = await client.send("DOM.getDocument");
+  const { nodeId } = await client.send("DOM.querySelector", {
+    nodeId: root.nodeId,
+    selector
+  });
+  if (!nodeId) {
+    throw new Error(`Cannot force :hover for missing selector "${selector}".`);
+  }
+  await client.send("CSS.forcePseudoState", {
+    nodeId,
+    forcedPseudoClasses: ["hover"]
+  });
+}
+
 async function prepareSliderHoverState(page, state, selectors) {
   if (state !== "hover") {
     return;
   }
 
-  await page.locator(selectors.thumb).first().hover();
-  await page.waitForTimeout(250);
+  await forceHover(page, selectors.thumb);
+  await page.waitForTimeout(500);
 }
 
 async function sliderExtraChecks(page, theme, state, selectors) {

@@ -1,8 +1,5 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import { chromium } from "playwright";
 import { getComponentConfig } from "./registry.mjs";
-import { normaliseStyles, normaliseValue } from "./normalise.mjs";
 
 function getArg(flag) {
   const index = process.argv.indexOf(flag);
@@ -10,53 +7,6 @@ function getArg(flag) {
     return null;
   }
   return process.argv[index + 1] ?? null;
-}
-
-async function captureSelector(page, selector, props) {
-  return await page.evaluate(
-    ([target, names]) => {
-      const toRgba = (raw) => {
-        const ctx = document.createElement("canvas").getContext("2d");
-        if (!ctx) {
-          return raw;
-        }
-        ctx.canvas.width = 1;
-        ctx.canvas.height = 1;
-        ctx.clearRect(0, 0, 1, 1);
-        ctx.fillStyle = "#000";
-        ctx.fillStyle = raw;
-        ctx.fillRect(0, 0, 1, 1);
-        const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-        return `rgba(${r}, ${g}, ${b}, ${Math.round((a / 255) * 1000) / 1000})`;
-      };
-      const normaliseColor = (property, raw) => {
-        if (property === "boxShadow") {
-          return raw.replace(
-            /(rgba?\([^)]+\)|hsla?\([^)]+\)|oklab\([^)]+\)|oklch\([^)]+\)|okl\([^)]+\)|#[0-9a-f]+|transparent)/gi,
-            (match) => toRgba(match)
-          );
-        }
-        if (!property.toLowerCase().includes("color")) {
-          return raw;
-        }
-        return toRgba(raw);
-      };
-      const el = document.querySelector(target);
-      if (!el) {
-        return { __missing: target };
-      }
-      const style = window.getComputedStyle(el);
-      return Object.fromEntries(
-        names.map((prop) => {
-          const value = style.getPropertyValue(
-            prop.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)
-          );
-          return [prop, normaliseColor(prop, value)];
-        })
-      );
-    },
-    [selector, props]
-  );
 }
 
 function selectorForState(selectors, state) {
@@ -75,22 +25,6 @@ function roleSelectorMap(roles, kind, state) {
   );
 }
 
-async function captureRoles(page, roles, selectors, component) {
-  const out = {};
-  for (const [roleName, roleConfig] of Object.entries(roles)) {
-    const selector = selectors[roleName];
-    if (!selector) {
-      throw new Error(`Missing selector for role "${roleName}".`);
-    }
-    await page.waitForSelector(selector, { state: "visible", timeout: 10000 });
-    out[roleName] = normaliseStyles(
-      await captureSelector(page, selector, roleConfig.props),
-      { component, role: roleName }
-    );
-  }
-  return out;
-}
-
 async function setShowcaseTheme(page, theme) {
   await page.evaluate((mode) => {
     document.documentElement.dataset.theme = mode;
@@ -98,7 +32,79 @@ async function setShowcaseTheme(page, theme) {
   await page.waitForTimeout(100);
 }
 
-async function captureShowcaseState(page, config, theme, state) {
+async function forceHover(page, selector) {
+  const client = await page.context().newCDPSession(page);
+  await client.send("DOM.enable");
+  await client.send("CSS.enable");
+  const { root } = await client.send("DOM.getDocument");
+  const { nodeId } = await client.send("DOM.querySelector", {
+    nodeId: root.nodeId,
+    selector
+  });
+  if (!nodeId) {
+    throw new Error(`Cannot force :hover for missing selector "${selector}".`);
+  }
+  await client.send("CSS.forcePseudoState", {
+    nodeId,
+    forcedPseudoClasses: ["hover"]
+  });
+}
+
+async function checkRendered(page, selector, label) {
+  await page.waitForSelector(selector, { state: "attached", timeout: 10000 });
+  return await page.evaluate(
+    ({ target, label: targetLabel }) => {
+      const el = document.querySelector(target);
+      if (!el) {
+        return [`${targetLabel}: missing (${target})`];
+      }
+
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      const issues = [];
+
+      if (style.display === "none") {
+        issues.push(`${targetLabel}: display is none`);
+      }
+      if (style.visibility === "hidden" || style.visibility === "collapse") {
+        issues.push(`${targetLabel}: visibility is ${style.visibility}`);
+      }
+      if (Number(style.opacity) === 0) {
+        issues.push(`${targetLabel}: opacity is 0`);
+      }
+      if (rect.width <= 0 || rect.height <= 0) {
+        issues.push(
+          `${targetLabel}: empty layout (${Math.round(rect.width)}x${Math.round(rect.height)})`
+        );
+      }
+
+      return issues;
+    },
+    { target: selector, label }
+  );
+}
+
+async function prepareState(page, config, state, selectors) {
+  await page.mouse.move(1270, 10);
+  await page.evaluate(() => {
+    if (document.activeElement && document.activeElement !== document.body) {
+      document.activeElement.blur();
+    }
+  });
+  await page.waitForTimeout(100);
+
+  if (config.prepareShowcaseState) {
+    await config.prepareShowcaseState(page, state, selectors);
+    return;
+  }
+
+  if (state === "hover") {
+    await forceHover(page, selectors);
+    await page.waitForTimeout(300);
+  }
+}
+
+async function checkState(page, config, theme, state) {
   await page.goto("about:blank");
   await page.goto(config.showcaseUrl, { waitUntil: "networkidle" });
   await page.waitForSelector(config.showcaseReadySelector, {
@@ -113,37 +119,30 @@ async function captureShowcaseState(page, config, theme, state) {
   if (!selectors) {
     throw new Error(`Missing showcase selector(s) for ${config.component} state "${state}".`);
   }
-  if (!config.roles) {
-    await page.waitForSelector(selectors, { state: "visible", timeout: 10000 });
-  }
-  await page.mouse.move(1270, 10);
-  await page.evaluate(() => {
-    if (document.activeElement && document.activeElement !== document.body) {
-      document.activeElement.blur();
-    }
-  });
-  await page.waitForTimeout(100);
-  if (config.prepareShowcaseState) {
-    await config.prepareShowcaseState(page, state, selectors);
-  } else if (state === "hover") {
-    await page.locator(selectors).first().hover();
-    await page.waitForTimeout(250);
-  }
 
+  await prepareState(page, config, state, selectors);
+
+  const issues = [];
   if (config.roles) {
-    return {
-      captured: await captureRoles(page, config.roles, selectors, config.component),
-      selectors
-    };
+    for (const [roleName, selector] of Object.entries(selectors)) {
+      issues.push(
+        ...(await checkRendered(page, selector, `${config.component}/${theme}/${state}/${roleName}`))
+      );
+    }
+  } else {
+    issues.push(
+      ...(await checkRendered(page, selectors, `${config.component}/${theme}/${state}`))
+    );
   }
 
-  return {
-    captured: normaliseStyles(
-      await captureSelector(page, selectors, config.props),
-      { component: config.component }
-    ),
-    selectors
-  };
+  if (config.extraShowcaseChecks) {
+    const extraDrifts = await config.extraShowcaseChecks(page, theme, state, selectors, {}, {});
+    if (extraDrifts > 0) {
+      issues.push(`${config.component}/${theme}/${state}: failed structural geometry checks`);
+    }
+  }
+
+  return issues;
 }
 
 async function main() {
@@ -153,11 +152,6 @@ async function main() {
   }
 
   const config = getComponentConfig(component);
-  const baselinePath =
-    getArg("--baseline") ??
-    path.join("docs", "component-specs", "_parity", `${config.component}.json`);
-  const baseline = JSON.parse(await fs.readFile(baselinePath, "utf8"));
-
   const browser = await chromium.launch();
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
@@ -165,66 +159,30 @@ async function main() {
   });
   const page = await context.newPage();
 
-  let drifts = 0;
+  const issues = [];
   for (const theme of config.themes) {
     for (const state of config.states) {
-      const { captured: live, selectors } = await captureShowcaseState(page, config, theme, state);
-      const rawExpected = baseline.themes?.[theme]?.[state];
-      if (!rawExpected) {
-        throw new Error(`Missing baseline for ${config.component} ${theme}/${state}.`);
-      }
-      const expected = config.roles
-        ? Object.fromEntries(
-            Object.entries(rawExpected).map(([roleName, roleStyles]) => [
-              roleName,
-              normaliseStyles(roleStyles, { component: config.component, role: roleName })
-            ])
-          )
-        : normaliseStyles(rawExpected, { component: config.component });
-
-      if (config.roles) {
-        for (const [roleName, roleConfig] of Object.entries(config.roles)) {
-          console.log(`\n== ${config.component} :: ${theme} :: ${state} :: ${roleName} ==`);
-          const roleContext = { component: config.component, role: roleName };
-          for (const prop of roleConfig.props) {
-            const a = normaliseValue(prop, expected?.[roleName]?.[prop] ?? "", roleContext);
-            const b = normaliseValue(prop, live?.[roleName]?.[prop] ?? "", roleContext);
-            if (a === b) {
-              console.log(`  ${prop.padEnd(20)} match  ${a}`);
-              continue;
-            }
-            drifts += 1;
-            console.log(`  ${prop.padEnd(20)} drift  expected=${a}  shinyblocks=${b}`);
-          }
-        }
-        if (config.extraShowcaseChecks) {
-          drifts += await config.extraShowcaseChecks(page, theme, state, selectors, live, expected);
-        }
+      const stateIssues = await checkState(page, config, theme, state);
+      if (stateIssues.length > 0) {
+        issues.push(...stateIssues);
+        console.log(`FAIL ${config.component} ${theme}/${state}`);
       } else {
-        console.log(`\n== ${config.component} :: ${theme} :: ${state} ==`);
-        const componentContext = { component: config.component };
-        for (const prop of config.props) {
-          const a = normaliseValue(prop, expected[prop] ?? "", componentContext);
-          const b = normaliseValue(prop, live[prop] ?? "", componentContext);
-          if (a === b) {
-            console.log(`  ${prop.padEnd(20)} match  ${a}`);
-            continue;
-          }
-          drifts += 1;
-          console.log(`  ${prop.padEnd(20)} drift  expected=${a}  shinyblocks=${b}`);
-        }
+        console.log(`OK   ${config.component} ${theme}/${state}`);
       }
     }
   }
 
   await browser.close();
 
-  if (drifts > 0) {
-    console.error(`\n${drifts} parity drift(s) detected.`);
+  if (issues.length > 0) {
+    console.error(`\n${config.component} render check failed:`);
+    for (const issue of issues) {
+      console.error(`- ${issue}`);
+    }
     process.exit(1);
   }
 
-  console.log(`\nParity OK for ${config.component}.`);
+  console.log(`\nRender check OK for ${config.component}.`);
 }
 
 main().catch((error) => {

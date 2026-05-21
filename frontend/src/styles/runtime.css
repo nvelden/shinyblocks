@@ -228,7 +228,7 @@
 }
 
 [data-shinyblocks-root] .sb-button-default:hover {
-  background-color: color-mix(in oklab, var(--primary) 90%, transparent);
+  background-color: color-mix(in oklch, var(--primary) 90%, transparent);
 }
 
 [data-shinyblocks-root] .sb-button-destructive {
@@ -777,6 +777,9 @@
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
 }
 
+[data-theme="dark"] [data-shinyblocks-root] .sb-checkbox-button[data-state="unchecked"] {
+  background-color: color-mix(in oklch, var(--input) 30%, transparent);
+}
 
 [data-theme="dark"] [data-shinyblocks-root] .sb-checkbox-button[aria-invalid="true"] {
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
@@ -1208,7 +1211,7 @@
   gap: 0.5rem;
   border: 1px solid var(--input);
   border-radius: calc(var(--radius) * 0.8);
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--foreground);
   padding: 0.5rem 0.75rem;
   min-height: auto;
@@ -1221,6 +1224,10 @@
     color 0.15s,
     border-color 0.15s,
     box-shadow 0.15s;
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-select-trigger {
+  background-color: color-mix(in oklch, var(--input) 30%, transparent);
 }
 
 [data-shinyblocks-root] .sb-select-trigger[data-placeholder="true"] {

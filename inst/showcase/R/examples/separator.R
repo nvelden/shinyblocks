@@ -60,6 +60,12 @@ htmltools::tagList(
   htmltools::div(
     style = "display: flex; flex-direction: column; gap: 0.75rem;",
     block_separator(class = "sb-parity-separator-horizontal"),
-    block_separator(orientation = "vertical", class = "sb-parity-separator-vertical")
+    htmltools::div(
+      style = "display: flex; height: 2rem; align-items: center; gap: 1rem;",
+      htmltools::tags$span("Filters"),
+      block_separator(orientation = "vertical", class = "sb-parity-separator-vertical"),
+      htmltools::tags$span("Sort"),
+      htmltools::tags$span("Export")
+    )
   )
 )
