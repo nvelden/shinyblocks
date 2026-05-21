@@ -7,9 +7,14 @@ on:
 
 name: Build and deploy wasm R package image
 
-permissions:
-  contents: write
-
 jobs:
   release-file-system-image:
     uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v2
+    with:
+      strip: "demo, doc, examples, help, html, include, tests, vignette"
+    permissions:
+      # For publishing artifact files to the release
+      contents: write
+      # To download GitHub Packages within action
+      repository-projects: read
+
