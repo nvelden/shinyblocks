@@ -52,22 +52,30 @@ for (slug in slugs) {
     unlink(out_dir, recursive = TRUE, force = TRUE)
   }
 
-  cat(sprintf("Exporting %s → %s\n", app_dir, out_dir))
-  shinylive::export(app_dir, out_dir)
-
-  # Copy the wasm filesystem image alongside the exported app so the
-  # bootstrap snippet's webr::mount("library.data.gz") resolves.
+  # Stage the wasm filesystem image *inside* the app source directory
+  # before exporting. shinylive::export() bundles every file next to
+  # app.R into app.json; webR mounts them at the app's working
+  # directory inside its virtual filesystem, so the bootstrap snippet's
+  # relative `webr::mount("library.data.gz")` resolves correctly.
+  staged <- c()
   for (asset in c("library.data.gz", "library.js.metadata")) {
     src <- file.path(wasm_src_dir, asset)
-    if (file.exists(src)) {
-      file.copy(src, file.path(out_dir, asset), overwrite = TRUE)
-    } else {
+    if (!file.exists(src)) {
       warning(sprintf(
         "Wasm asset %s not found at %s — playground will fail to load shinyblocks.",
         asset, src
       ), call. = FALSE)
+      next
     }
+    dest <- file.path(app_dir, asset)
+    file.copy(src, dest, overwrite = TRUE)
+    staged <- c(staged, dest)
   }
+
+  cat(sprintf("Exporting %s → %s\n", app_dir, out_dir))
+  on.exit(unlink(staged), add = TRUE)
+  shinylive::export(app_dir, out_dir)
+  unlink(staged)
 }
 
 # Merge playground metadata into preview-manifest.json
