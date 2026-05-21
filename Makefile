@@ -35,7 +35,7 @@ help:
 	@echo "  test            - devtools::test()"
 	@echo "  docs            - devtools::document()"
 	@echo "  check           - R CMD check --as-cran"
-	@echo "  pkgdown         - pkgdown::build_site()"
+	@echo "  pkgdown         - deprecated; docs are built from docs-site/"
 	@echo "  budget          - tools/budget.R (asset size report)"
 	@echo "  legacy-audit    - fail on unclassified legacy wrapper/CSS/JS hits"
 	@echo "  parity-install  - install parity/ React app dependencies"
@@ -140,7 +140,7 @@ check:
 	$(R) -e 'devtools::check(remote = TRUE, manual = FALSE)'
 
 pkgdown:
-	$(R) -e 'pkgdown::build_site(preview = FALSE)'
+	@echo "pkgdown has been decommissioned; build the custom docs site under docs-site/."
 
 budget:
 	$(R) tools/budget.R
@@ -154,7 +154,7 @@ legacy-audit:
 # Quality Gate runs the same sequence as docs/ROADMAP.md. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.
 # See docs/phase-exits/TEMPLATE.md.
-gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check pkgdown budget doc-links legacy-audit parity-ci
+gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check budget doc-links legacy-audit parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"
