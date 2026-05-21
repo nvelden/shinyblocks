@@ -53,6 +53,7 @@ jobs:
         with:
           extra-packages: |
             any::htmltools
+            any::shinylive
           working-directory: .
 
       - uses: actions/setup-node@v4
@@ -63,7 +64,33 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      # Fetch the wasm filesystem image (library.data.gz +
+      # library.js.metadata) from the latest GitHub release.
+      # Docs-site playgrounds reflect the most recent tagged release,
+      # not HEAD. See docs/agent-plans/2026-05-21-shinylive-playground-integration.md.
+      - name: Download wasm filesystem image from latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p playgrounds/_wasm
+          # Most recent release tag, including prereleases.
+          TAG=$(gh release list --repo "${{ github.repository }}" \
+                --limit 1 --json tagName --jq '.[0].tagName')
+          if [ -n "$TAG" ]; then
+            gh release download "$TAG" --repo "${{ github.repository }}" \
+              --pattern 'library.data.gz' \
+              --pattern 'library.js.metadata' \
+              --dir playgrounds/_wasm
+          else
+            echo "::warning::No release found; playgrounds will be skipped."
+          fi
+
+      # 1. Static previews + initial manifest.
+      # 2. Shinylive exports + merge hasPlayground into the manifest.
+      # 3. Next build consumes the merged manifest + exported assets.
+      - run: npm run prebuild
+      - run: Rscript scripts/generate-playgrounds.R
+      - run: npx next build
 
       # GitHub Pages would otherwise run Jekyll over `out/` and discard
       # the `_next/` folder.

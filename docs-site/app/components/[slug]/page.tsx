@@ -1,7 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import manifest from "@/lib/preview-manifest.json";
+import manifestData from "@/lib/preview-manifest.json";
 import { API_REFERENCE_DATABASE } from "@/lib/api-reference";
+
+interface ManifestEntry {
+  name: string;
+  slug: string;
+  description: string;
+  featured: boolean;
+  code: string;
+  codeHtml: string;
+  html: string;
+  hasPlayground?: boolean;
+  playgroundHeight?: number;
+}
+
+const manifest = manifestData as ManifestEntry[];
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -72,13 +86,27 @@ export default async function ComponentDetailPage({ params }: PageProps) {
 
             {/* Section 1: Preview Canvas */}
             <section className="flex flex-col gap-4">
-              <h2 className="text-xl font-bold tracking-tight text-foreground">Preview</h2>
-              <div className="rounded-xl border border-border bg-card p-10 shadow-sm relative overflow-hidden transition-colors duration-200">
-                <div
-                  className="pointer-events-none select-none w-full flex items-center justify-center min-h-[220px] rounded-lg bg-muted/40 p-8 border border-dashed border-border/80"
-                  dangerouslySetInnerHTML={{ __html: component.html }}
-                />
-              </div>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
+                {component.hasPlayground ? "Interactive Playground" : "Preview"}
+              </h2>
+              {component.hasPlayground ? (
+                <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                  <iframe
+                    src={`/shinyblocks/playgrounds/${slug}/`}
+                    title={`${component.name} playground`}
+                    loading="lazy"
+                    className="w-full block bg-background"
+                    style={{ height: `${component.playgroundHeight ?? 720}px`, border: 0 }}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-card p-10 shadow-sm relative overflow-hidden transition-colors duration-200">
+                  <div
+                    className="pointer-events-none select-none w-full flex items-center justify-center min-h-[220px] rounded-lg bg-muted/40 p-8 border border-dashed border-border/80"
+                    dangerouslySetInnerHTML={{ __html: component.html }}
+                  />
+                </div>
+              )}
             </section>
 
             {/* Section 2: Code Recipe */}

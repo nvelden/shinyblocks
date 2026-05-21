@@ -23,6 +23,9 @@ docs-site/out/
 docs-site/playwright-report/
 docs-site/test-results/
 docs-site/public/runtime/
+docs-site/public/playgrounds/
+docs-site/playgrounds/_wasm/
+docs-site/tsconfig.tsbuildinfo
 docs-site/content/previews/*.html
 docs-site/lib/shinylive-manifest.json
 
