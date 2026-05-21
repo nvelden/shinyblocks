@@ -76,6 +76,17 @@ for (slug in slugs) {
   on.exit(unlink(staged), add = TRUE)
   shinylive::export(app_dir, out_dir)
   unlink(staged)
+
+  # Copy the WASM assets directly into the export's output directory so they are
+  # served as static files on the web server.
+  for (asset in c("library.data.gz", "library.js.metadata")) {
+    src <- file.path(wasm_src_dir, asset)
+    if (file.exists(src)) {
+      dest <- file.path(out_dir, asset)
+      file.copy(src, dest, overwrite = TRUE)
+      cat(sprintf("  Static WASM asset copied: %s → %s\n", src, dest))
+    }
+  }
 }
 
 # Merge playground metadata into preview-manifest.json

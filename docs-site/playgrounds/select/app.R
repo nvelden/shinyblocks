@@ -1,6 +1,6 @@
 if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-  webr::mount("/packages", "library.data.gz")
+  webr::mount("/packages", "../../library.data.gz")
   .libPaths(c("/packages", .libPaths()))
 }
 
