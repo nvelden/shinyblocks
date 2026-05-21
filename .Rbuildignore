@@ -38,10 +38,12 @@
 
 # Docs site (Next.js — see docs-site/ and docs/agent-plans/2026-05-19-docs-site-*)
 ^docs-site$
+^site$
 
 # Component gallery — Quarto-rendered, dev-only. See ADR 0013.
 # Holds .qmd pages, _extensions/ shinylive, and _quarto.yml.
 ^gallery$
+^test_wasm_app$
 ^parity$
 ^\.verify
 
