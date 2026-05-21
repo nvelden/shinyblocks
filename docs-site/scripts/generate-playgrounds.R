@@ -53,7 +53,7 @@ for (slug in slugs) {
   }
 
   cat(sprintf("Exporting %s → %s\n", app_dir, out_dir))
-  shinylive::export(app_dir, out_dir, subdir = ".")
+  shinylive::export(app_dir, out_dir)
 
   # Copy the wasm filesystem image alongside the exported app so the
   # bootstrap snippet's webr::mount("library.data.gz") resolves.
