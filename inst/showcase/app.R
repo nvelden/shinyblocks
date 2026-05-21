@@ -29,6 +29,7 @@ source(file.path("R", "server_tabs.R"), local = TRUE)
 source(file.path("R", "server_theme.R"), local = TRUE)
 source(file.path("R", "server_layout.R"), local = TRUE)
 source(file.path("R", "server_nav_item.R"), local = TRUE)
+source(file.path("R", "server_field.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -118,6 +119,17 @@ sections <- list(
       "destructive, link), four sizes, and optional inline icons."
     ),
     file = "button.R"
+  ),
+  list(
+    id = "field",
+    label = "Field",
+    icon = "edit",
+    title = "Fields",
+    lead = paste(
+      "Composes labels, helper descriptions, legends, and validation states",
+      "around raw form control elements."
+    ),
+    file = "field.R"
   ),
   list(
     id = "select",
@@ -315,7 +327,7 @@ sections <- list(
 ui <- block_page(
   title = "shinyblocks — component gallery",
   htmltools::tags$head(
-    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css")
+    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260521_09")
   ),
   sidebar = block_sidebar(
     title = "shinyblocks",
@@ -435,6 +447,7 @@ server <- function(input, output, session) {
   register_theme_showcase(input, output, session)
   register_layout_showcase(input, output, session)
   register_nav_item_showcase(input, output, session)
+  register_field_showcase(input, output, session)
 }
 
 shinyApp(ui, server)

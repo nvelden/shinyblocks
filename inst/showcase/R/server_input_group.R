@@ -32,13 +32,20 @@ register_input_group_showcase <- function(input, output, session) {
       )
     }
     
+    style_val <- input$showcase_input_group_doc_style %||% ""
+    if (!nzchar(style_val)) style_val <- NULL
+
     class_val <- if (isTRUE(input$showcase_input_group_doc_class)) {
       "showcase-input-group-preview-custom"
     } else {
       NULL
     }
     
-    do.call(block_input_group, c(children, list(class = class_val)))
+    args_list <- c(children, list(class = class_val))
+    if (!is.null(style_val)) {
+      args_list <- c(args_list, list(style = style_val))
+    }
+    do.call(block_input_group, args_list)
   })
   shiny::outputOptions(output, "showcase_input_group_preview_ui", suspendWhenHidden = FALSE)
 
@@ -62,6 +69,7 @@ register_input_group_showcase <- function(input, output, session) {
     invalid <- isTRUE(input$showcase_input_group_doc_invalid)
     disabled <- isTRUE(input$showcase_input_group_doc_disabled)
     custom_class <- isTRUE(input$showcase_input_group_doc_class)
+    style_val <- input$showcase_input_group_doc_style %||% ""
     
     input_args <- c(
       'input_id = "showcase_input_group_preview"',
@@ -87,6 +95,9 @@ register_input_group_showcase <- function(input, output, session) {
     group_args <- c(children_code)
     if (custom_class) {
       group_args <- c(group_args, 'class = "showcase-input-group-preview-custom"')
+    }
+    if (nzchar(style_val)) {
+      group_args <- c(group_args, paste0('style = "', style_val, '"'))
     }
     
     paste0("block_input_group(\n", paste(group_args, collapse = ",\n"), "\n)")

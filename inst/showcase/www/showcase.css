@@ -88,36 +88,39 @@
 }
 
 .showcase-select-preview-custom .sb-select-trigger {
-  border-style: dashed;
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-button-preview-custom {
-  border-style: dashed !important;
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-dialog-preview-custom {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-popover-preview-custom {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
 }
 
-.showcase-checkbox-preview-custom .sb-checkbox-indicator {
-  border-style: dashed !important;
-  border-width: 2px !important;
+.showcase-tooltip-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+.showcase-checkbox-preview-custom .sb-checkbox-button {
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-textarea-preview-custom .sb-textarea-control {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-input-preview-custom .sb-input-control {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
+}
+
+.showcase-input-group-preview-custom {
+  border: 2px dashed var(--ring) !important;
 }
 
 .showcase-switch-preview-custom .sb-switch-button {
@@ -126,29 +129,44 @@
 }
 
 .showcase-radio-group-preview-custom .sb-radio-group-control {
-  border: 2px dashed var(--border) !important;
+  border: 2px dashed var(--ring) !important;
   padding: 0.75rem !important;
   border-radius: 0.5rem !important;
 }
 
 .showcase-slider-preview-custom .sb-slider-thumb {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
 }
 
 .sb-code-custom {
-  border-style: dashed !important;
-  border-width: 2px !important;
+  border: 2px dashed var(--ring) !important;
   background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;
 }
 
-/* Styles for native shiny::verbatimTextOutput blocks */
+/* Custom modern utility classes used by showcase dropdown selects */
+.border-dashed {
+  border: 2px dashed var(--ring) !important;
+}
+
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15) !important;
+}
+
+/* Styles for native shiny::verbatimTextOutput blocks with horizontal scrolling */
 pre.shiny-text-output {
   margin: 0;
   padding: 0.75rem 1rem;
-  overflow-x: hidden;
-  white-space: pre-wrap;
-  word-break: break-word;
+  overflow-x: auto !important;
+  white-space: pre !important;
+  word-break: normal !important;
   background: var(--muted);
   color: var(--foreground);
   border-radius: 0.5rem;
@@ -157,14 +175,58 @@ pre.shiny-text-output {
   border: none;
 }
 
-/* Premium Playground layout override for modern visual balance */
-.sb-field-set div[style*="flex-wrap"] > div:first-child {
-  flex: 2.5 !important; /* Spaciously display preview and code recipes */
-}
-.sb-field-set div[style*="flex-wrap"] > div:nth-child(2) {
-  flex: 1 !important; /* Compact control sidebar */
-  max-width: 360px !important; /* Prevent empty-space stretch */
-  min-width: 280px !important;
+/* Premium Playground layout override for modern visual balance and equal heights */
+@media (min-width: 768px) {
+  .sb-field-set > div > div[style*="flex-wrap"] {
+    display: block !important;
+    position: relative !important;
+    padding-left: 360px !important; /* Make room for the 330px wide sidebar + 30px gap */
+    min-height: 450px !important; /* Safe minimum height */
+    height: auto !important;
+  }
+
+  .sb-field-set > div > div[style*="flex-wrap"] > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2) {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 330px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2) div[style*="flex-wrap"] {
+    align-content: flex-start !important;
+    align-items: flex-start !important;
+  }
+
+  /* High-fidelity thin custom scrollbars for the sidebar */
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
 }
 
 /* Framed preview canvas styling */
