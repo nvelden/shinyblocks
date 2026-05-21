@@ -36,143 +36,172 @@ ui <- block_page(
   title = "shinyblocks · Select playground",
   block_body(
     htmltools::tags$div(
-      style = "padding: 1.5rem; max-width: 1200px; margin: 0 auto;",
-      htmltools::tagList(
-        block_field_set(
-          block_field_legend("Interactive Playground"),
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1.5rem;",
-            htmltools::div(
-              style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
-              htmltools::div(
-                style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
-                block_field(
-                  block_field_label("Preview", `for` = "showcase_select_preview"),
-                  uiOutput("showcase_select_preview_ui")
-                ),
-                uiOutput("showcase_select_preview_value"),
-                htmltools::tags$div(
-                  style = "display: flex; flex-direction: column; gap: 1rem;",
-                  htmltools::tags$div(
-                    htmltools::tags$div(
-                      style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
-                      "UI Definition"
-                    ),
-                    uiOutput("showcase_select_preview_code")
-                  ),
-                  htmltools::tags$div(
-                    htmltools::tags$div(
-                      style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;",
-                      "Server Action"
-                    ),
-                    uiOutput("showcase_select_reactive_code")
-                  )
-                )
+      style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+      htmltools::div(
+        style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+        
+        # Left Column: Preview & Reactive Output Code Blocks
+        htmltools::div(
+          style = "flex: 1.2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+          
+          # Interactive Preview Canvas
+          htmltools::tags$div(
+            style = paste(
+              "position: relative; display: flex; align-items: center; justify-content: center;",
+              "padding: 3rem 2rem 2.5rem 2rem; background: var(--muted)/10;",
+              "border: 1px dashed var(--border); border-radius: 0.75rem;",
+              "min-height: 160px; box-sizing: border-box;"
+            ),
+            htmltools::tags$span(
+              style = "position: absolute; top: 0.75rem; left: 0.75rem; font-size: 0.7rem; font-weight: 600; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em;",
+              "Preview Canvas"
+            ),
+            uiOutput("showcase_select_preview_ui")
+          ),
+          
+          # Reactive Value Readout Indicator
+          uiOutput("showcase_select_preview_value"),
+          
+          # Code Blocks Panel
+          htmltools::tags$div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$div(
+              htmltools::tags$div(
+                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                "UI Code (R)"
               ),
-              htmltools::div(
-                style = paste(
-                  "flex: 2; display: grid;",
-                  "grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));",
-                  "gap: 1.5rem; background: var(--muted); padding: 1.5rem;",
-                  "border-radius: 0.5rem;"
-                ),
-                htmltools::div(
-                  style = "display: flex; flex-direction: column; gap: 1rem;",
-                  htmltools::tags$h3(
-                    style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);",
-                    "Content"
-                  ),
-                  block_field(
-                    block_field_label("choices", `for` = "showcase_select_doc_choices"),
-                    block_select(
-                      "showcase_select_doc_choices",
-                      choices = c("Plans" = "plans", "Frameworks" = "frameworks", "Fruits" = "fruits"),
-                      selected = "plans"
-                    )
-                  ),
-                  block_field(
-                    block_field_label("selected", `for` = "showcase_select_doc_selected"),
-                    block_select(
-                      "showcase_select_doc_selected",
-                      choices = c(Free = "free", Pro = "pro", Team = "team"),
-                      selected = "free"
-                    )
-                  ),
-                  block_field(
-                    block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
-                    block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1)
-                  )
-                ),
-                htmltools::div(
-                  style = "display: flex; flex-direction: column; gap: 2rem;",
-                  htmltools::div(
-                    style = "display: flex; flex-direction: column; gap: 1rem;",
-                    htmltools::tags$h3(
-                      style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);",
-                      "State"
-                    ),
-                    block_field(
-                      block_field_label("disabled", `for` = "showcase_select_doc_disabled"),
-                      block_checkbox("showcase_select_doc_disabled", "Disabled", value = FALSE)
-                    ),
-                    block_field(
-                      block_field_label("invalid", `for` = "showcase_select_doc_invalid"),
-                      block_checkbox("showcase_select_doc_invalid", "Invalid", value = FALSE)
-                    )
-                  ),
-                  htmltools::div(
-                    style = "display: flex; flex-direction: column; gap: 1rem;",
-                    htmltools::tags$h3(
-                      style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);",
-                      "Actions (Server Update)"
-                    ),
-                    htmltools::div(
-                      style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
-                      showcase_action_button("showcase_select_set_pro", "Set Pro"),
-                      showcase_action_button("showcase_select_clear", "Clear"),
-                      showcase_action_button("showcase_select_disable", "Disable"),
-                      showcase_action_button("showcase_select_enable", "Enable"),
-                      showcase_action_button("showcase_select_replace_choices", "Replace choices")
-                    )
-                  )
-                ),
-                htmltools::div(
-                  style = "display: flex; flex-direction: column; gap: 1rem;",
-                  htmltools::tags$h3(
-                    style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);",
-                    "Styling"
-                  ),
-                  block_field(
-                    block_field_label("size", `for` = "showcase_select_doc_size"),
-                    block_select(
-                      "showcase_select_doc_size",
-                      choices = c("default", "sm", "lg"),
-                      selected = "default"
-                    )
-                  ),
-                  block_field(
-                    block_field_label("width", `for` = "showcase_select_doc_width"),
-                    block_textarea("showcase_select_doc_width", value = "100%", rows = 1)
-                  ),
-                  block_field(
-                    block_field_label("style", `for` = "showcase_select_doc_style"),
-                    block_textarea(
-                      "showcase_select_doc_style",
-                      value = "",
-                      rows = 1,
-                      placeholder = "e.g., border: 2px dashed red;"
-                    )
-                  ),
-                  block_field(
-                    block_field_label("class", `for` = "showcase_select_doc_class"),
-                    block_checkbox(
-                      "showcase_select_doc_class",
-                      "Use custom dashed-border class",
-                      value = FALSE
-                    )
-                  )
-                )
+              uiOutput("showcase_select_preview_code")
+            ),
+            htmltools::tags$div(
+              htmltools::tags$div(
+                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                "Server Action (R)"
+              ),
+              uiOutput("showcase_select_reactive_code")
+            )
+          )
+        ),
+        
+        # Right Column: Controls Panel
+        htmltools::div(
+          style = paste(
+            "flex: 1; min-width: 300px; max-width: 480px;",
+            "border: 1px solid var(--border); border-radius: 0.75rem;",
+            "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
+            "background: var(--card); box-shadow: var(--shadow-sm);"
+          ),
+          
+          # Header for Controls Panel
+          htmltools::tags$div(
+            style = "border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.25rem;",
+            htmltools::tags$h3(
+              style = "font-size: 0.875rem; font-weight: 700; color: var(--foreground); margin: 0; display: flex; align-items: center; gap: 0.5rem;",
+              "Configuration Controls"
+            )
+          ),
+          
+          # Content Controls Group
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 0.75rem;",
+            htmltools::tags$h4(
+              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              "Content"
+            ),
+            block_field(
+              block_field_label("choices", `for` = "showcase_select_doc_choices"),
+              block_select(
+                "showcase_select_doc_choices",
+                choices = c("Plans" = "plans", "Frameworks" = "frameworks", "Fruits" = "fruits"),
+                selected = "plans",
+                size = "sm"
               )
+            ),
+            block_field(
+              block_field_label("selected", `for` = "showcase_select_doc_selected"),
+              block_select(
+                "showcase_select_doc_selected",
+                choices = c(Free = "free", Pro = "pro", Team = "team"),
+                selected = "free",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
+              block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1, size = "sm")
+            )
+          ),
+          
+          # State Controls Group
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+            htmltools::tags$h4(
+              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              "State"
+            ),
+            block_field(
+              block_field_label("disabled", `for` = "showcase_select_doc_disabled"),
+              block_checkbox("showcase_select_doc_disabled", "Disabled", value = FALSE)
+            ),
+            block_field(
+              block_field_label("invalid", `for` = "showcase_select_doc_invalid"),
+              block_checkbox("showcase_select_doc_invalid", "Invalid", value = FALSE)
+            )
+          ),
+          
+          # Styling Controls Group
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+            htmltools::tags$h4(
+              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              "Styling"
+            ),
+            block_field(
+              block_field_label("size", `for` = "showcase_select_doc_size"),
+              block_select(
+                "showcase_select_doc_size",
+                choices = c("default", "sm", "lg"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("width", `for` = "showcase_select_doc_width"),
+              block_textarea("showcase_select_doc_width", value = "100%", rows = 1, size = "sm")
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_select_doc_style"),
+              block_textarea(
+                "showcase_select_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., border: 2px dashed red;",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_select_doc_class"),
+              block_checkbox(
+                "showcase_select_doc_class",
+                "Use custom dashed-border class",
+                value = FALSE
+              )
+            )
+          ),
+          
+          # Actions (Server Update) Group
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+            htmltools::tags$h4(
+              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              "Actions (Server Update)"
+            ),
+            htmltools::tags$div(
+              style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+              showcase_action_button("showcase_select_set_pro", "Set Pro"),
+              showcase_action_button("showcase_select_clear", "Clear"),
+              showcase_action_button("showcase_select_disable", "Disable"),
+              showcase_action_button("showcase_select_enable", "Enable"),
+              showcase_action_button("showcase_select_replace_choices", "Replace choices")
             )
           )
         )
