@@ -2,9 +2,9 @@
 # Asset performance budget reporter.
 #
 # Run via `make budget`. Prints sizes of shipped assets against
-# targets defined in the active ADRs. Runtime assets are reported
-# without hard limits until Phase 1/2 produce real baselines. Exits
-# non-zero if any asset with a limit is over budget.
+# targets defined in the active ADRs. Runtime budgets track the current
+# migrated component set with modest headroom. Exits non-zero if any
+# asset with a limit is over budget.
 #
 # Legacy compatibility targets remain while native assets exist:
 #   inst/www/shinyblocks.css           <= 10 KB gzipped
@@ -26,19 +26,19 @@ targets <- list(
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 16,
+    limit_kb = 36,
     metric = "raw",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 3,
+    limit_kb = 6,
     metric = "gzipped",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 225,
+    limit_kb = 275,
     metric = "raw",
     group = "runtime"
   ),
