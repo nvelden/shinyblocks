@@ -2,8 +2,6 @@
 
 Static docs site for the `shinyblocks` R package. Next.js 15 + Tailwind v4, static export to GitHub Pages.
 
-> **Picking up work on this site?** Read [`HANDOFF.md`](./HANDOFF.md) first. It tells you exactly what to do, in order, with tests.
-
 ## Local dev
 
 ```bash

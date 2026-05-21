@@ -36,8 +36,8 @@ skills-lock.json
 AGENTS.md
 CLAUDE.md
 HANDOFF.md
-# The docs-site handoff is a real artifact, not a private workspace note.
-!docs-site/HANDOFF.md
+docs-site/HANDOFF.md
+docs-site/HANDOFF-PROMPT.md
 
 # Compiled package docs
 inst/doc/
