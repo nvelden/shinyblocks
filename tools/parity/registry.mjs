@@ -43,8 +43,7 @@ export const BADGE_PROPS = [
   "paddingRight",
   "paddingBottom",
   "paddingLeft",
-  "whiteSpace",
-  "width"
+  "whiteSpace"
 ];
 
 export const ALERT_ROOT_PROPS = [

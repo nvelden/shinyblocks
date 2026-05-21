@@ -40,6 +40,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - uses: r-lib/actions/setup-r-dependencies@v2
+        env:
+          PKG_SYSREQS: "false"
         with:
           extra-packages: |
             any::devtools
@@ -50,7 +52,6 @@ jobs:
             any::urlchecker
             any::withr
           needs: check
-          install-system-dependencies: false
 
       - name: Quality gate
         run: make gate
