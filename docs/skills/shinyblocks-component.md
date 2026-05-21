@@ -187,6 +187,51 @@ make legacy-audit
 Playwright and Shiny port-binding checks may need to run outside the
 Codex command sandbox.
 
+## Step 7 - Interactive Shinylive Playground Integration
+
+Every component page in the documentation site (`docs-site`) features an **Interactive Shinylive Playground** rendered directly inside a clean `<iframe>` that matches the showcase app's behavior. 
+
+Follow these conventions for rendering and deploying playgrounds:
+
+### 1. Iframe Embed Pattern
+The detail page `docs-site/app/components/[slug]/page.tsx` embeds the playground dynamically when `hasPlayground` is enabled in `preview-manifest.json`:
+```tsx
+<div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+  <iframe
+    src={`/shinyblocks/playgrounds/${slug}/`}
+    title={`${component.name} playground`}
+    loading="lazy"
+    className="w-full block bg-background"
+    style={{ height: `${component.playgroundHeight ?? 720}px`, border: 0 }}
+  />
+</div>
+```
+
+### 2. Premium UI/UX for Embeds (scroll-free & unboxed)
+To keep the embedded app looking native to the documentation site, follow these layout rules in `docs-site/playgrounds/<slug>/app.R`:
+- **No nested borders**: Never use `block_field_set` or `block_field_legend` double boxes. The playground should blend seamlessly with the parent iframe card.
+- **2-Column Responsive Layout**: Layout using standard flexboxes:
+  - **Left Panel (`flex: 1.2; min-width: 320px;`)**: Displays the live **Preview Canvas** and code snippets directly stacked. Place the preview inside a dashed border (`border: 1px dashed var(--border)`) and subtle background canvas (`bg-muted/10` or similar).
+  - **Right Panel (`flex: 1; min-width: 300px; max-width: 480px;`)**: Houses the configuration controls (Content, State, Styling, Actions) within a standard card background (`bg-card`).
+- **Compact Densities**: Use `size = "sm"` on select dropdowns, checkboxes, and textareas inside the controls panel to fit within the `720px` height and prevent vertical scrollbars.
+- **Scrollbar-free execution**: Set specific column dimensions and margins to eliminate horizontal scrollbars on desktop viewports.
+
+### 3. Static WASM Asset Compilation & Mounting (webR Integration)
+Because `shinyblocks` is not on the default webR repository (`repo.r-wasm.org`), the package must be precompiled for WebAssembly in CI and hosted alongside the playgrounds:
+1. **CI pre-compilation**: A GitHub Action compiles the R package for WebAssembly, attaching `library.data.gz` and `library.js.metadata` filesystem images to release tags (e.g., `v0.0.0.9000`).
+2. **Static Asset Hosting**: The build script `generate-playgrounds.R` runs `shinylive::export()` and **explicitly copies** `library.data.gz` and `library.js.metadata` into the static export folder `docs-site/public/playgrounds/<slug>/` where they are served statically by Next.js.
+3. **Relative Worker Mounting in `app.R`**: Inside each playground's `app.R`, before loading `library(shinyblocks)`, we mount the packages relative to the **webR WebWorker script context** (`shinylive/webr/webr-worker.js`), which is two levels deep. Use the relative path `../../library.data.gz`:
+   ```r
+   if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
+     dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
+     webr::mount("/packages", "../../library.data.gz")
+     .libPaths(c("/packages", .libPaths()))
+   }
+   library(shiny)
+   library(shinyblocks)
+   ```
+   *Warning*: Never use root-relative paths like `/wasm_binaries/...` or hardcoded URLs, as they will break when hosted under custom subpaths on GitHub Pages or during local Next.js development.
+
 ## Commit shape
 
 One vertical commit per component or cleanup slice. Suggested message:
