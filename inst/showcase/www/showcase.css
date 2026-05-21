@@ -1,107 +1,23 @@
 /* Custom styles for the API Reference table */
-#showcase_select_api_table table,
-#showcase_button_api_table table,
-#showcase_dialog_api_table table,
-#showcase_popover_api_table table,
-#showcase_checkbox_api_table table,
-#showcase_textarea_api_table table,
-#showcase_input_api_table table,
-#showcase_radio_group_api_table table,
-#showcase_switch_api_table table,
-#showcase_slider_api_table table,
-#showcase_input_group_api_table table,
-#showcase_code_api_table table,
-#showcase_tooltip_api_table table {
+[id$="_api_table"] table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
 }
-#showcase_select_api_table th,
-#showcase_select_api_table td,
-#showcase_button_api_table th,
-#showcase_button_api_table td,
-#showcase_dialog_api_table th,
-#showcase_dialog_api_table td,
-#showcase_popover_api_table th,
-#showcase_popover_api_table td,
-#showcase_checkbox_api_table th,
-#showcase_checkbox_api_table td,
-#showcase_textarea_api_table th,
-#showcase_textarea_api_table td,
-#showcase_input_api_table th,
-#showcase_input_api_table td,
-#showcase_radio_group_api_table th,
-#showcase_radio_group_api_table td,
-#showcase_switch_api_table th,
-#showcase_switch_api_table td,
-#showcase_slider_api_table th,
-#showcase_slider_api_table td,
-#showcase_input_group_api_table th,
-#showcase_input_group_api_table td,
-#showcase_code_api_table th,
-#showcase_code_api_table td,
-#showcase_tooltip_api_table th,
-#showcase_tooltip_api_table td {
+[id$="_api_table"] th,
+[id$="_api_table"] td {
   border-bottom: 1px solid var(--border);
   padding: 0.75rem;
   text-align: left;
   vertical-align: top;
 }
-#showcase_select_api_table th,
-#showcase_button_api_table th,
-#showcase_dialog_api_table th,
-#showcase_popover_api_table th,
-#showcase_checkbox_api_table th,
-#showcase_textarea_api_table th,
-#showcase_input_api_table th,
-#showcase_radio_group_api_table th,
-#showcase_switch_api_table th,
-#showcase_slider_api_table th,
-#showcase_input_group_api_table th,
-#showcase_code_api_table th,
-#showcase_tooltip_api_table th {
+[id$="_api_table"] th {
   color: var(--muted-foreground);
   font-weight: 600;
 }
-#showcase_select_api_table td:nth-child(1),
-#showcase_select_api_table td:nth-child(2),
-#showcase_select_api_table td:nth-child(3),
-#showcase_button_api_table td:nth-child(1),
-#showcase_button_api_table td:nth-child(2),
-#showcase_button_api_table td:nth-child(3),
-#showcase_dialog_api_table td:nth-child(1),
-#showcase_dialog_api_table td:nth-child(2),
-#showcase_dialog_api_table td:nth-child(3),
-#showcase_popover_api_table td:nth-child(1),
-#showcase_popover_api_table td:nth-child(2),
-#showcase_popover_api_table td:nth-child(3),
-#showcase_checkbox_api_table td:nth-child(1),
-#showcase_checkbox_api_table td:nth-child(2),
-#showcase_checkbox_api_table td:nth-child(3),
-#showcase_textarea_api_table td:nth-child(1),
-#showcase_textarea_api_table td:nth-child(2),
-#showcase_textarea_api_table td:nth-child(3),
-#showcase_input_api_table td:nth-child(1),
-#showcase_input_api_table td:nth-child(2),
-#showcase_input_api_table td:nth-child(3),
-#showcase_radio_group_api_table td:nth-child(1),
-#showcase_radio_group_api_table td:nth-child(2),
-#showcase_radio_group_api_table td:nth-child(3),
-#showcase_switch_api_table td:nth-child(1),
-#showcase_switch_api_table td:nth-child(2),
-#showcase_switch_api_table td:nth-child(3),
-#showcase_slider_api_table td:nth-child(1),
-#showcase_slider_api_table td:nth-child(2),
-#showcase_slider_api_table td:nth-child(3),
-#showcase_input_group_api_table td:nth-child(1),
-#showcase_input_group_api_table td:nth-child(2),
-#showcase_input_group_api_table td:nth-child(3),
-#showcase_code_api_table td:nth-child(1),
-#showcase_code_api_table td:nth-child(2),
-#showcase_code_api_table td:nth-child(3),
-#showcase_tooltip_api_table td:nth-child(1),
-#showcase_tooltip_api_table td:nth-child(2),
-#showcase_tooltip_api_table td:nth-child(3) {
+[id$="_api_table"] td:nth-child(1),
+[id$="_api_table"] td:nth-child(2),
+[id$="_api_table"] td:nth-child(3) {
   white-space: nowrap;
   width: 1%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -240,3 +156,41 @@ pre.shiny-text-output {
   line-height: 1.5;
   border: none;
 }
+
+/* Premium Playground layout override for modern visual balance */
+.sb-field-set div[style*="flex-wrap"] > div:first-child {
+  flex: 2.5 !important; /* Spaciously display preview and code recipes */
+}
+.sb-field-set div[style*="flex-wrap"] > div:nth-child(2) {
+  flex: 1 !important; /* Compact control sidebar */
+  max-width: 360px !important; /* Prevent empty-space stretch */
+  min-width: 280px !important;
+}
+
+/* Framed preview canvas styling */
+[id$="_preview_ui"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 0.5rem;
+}
+
+/* Make sure fluid elements span full width of the framed preview canvas */
+#showcase_slider_preview_ui > *,
+#showcase_separator_preview_ui > *,
+#showcase_tabs_preview_ui > *,
+#showcase_layout_preview_ui > *,
+#showcase_alert_preview_ui > *,
+#showcase_textarea_preview_ui > *,
+#showcase_input_preview_ui > *,
+#showcase_input_group_preview_ui > *,
+#showcase_progress_preview_ui > * {
+  width: 100%;
+}
+

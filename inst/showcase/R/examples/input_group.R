@@ -1,75 +1,151 @@
 htmltools::tagList(
   block_field_set(
-    block_field_legend("Common patterns"),
+    block_field_legend("Interactive Playground"),
     htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;",
-      block_field(
-        block_field_label("Leading icon", `for` = "showcase_input_group_search"),
-        block_input_group(
-          block_input_group_addon(block_icon("search")),
-          block_input(
-            "showcase_input_group_search",
-            placeholder = "Search workspace"
+      style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
+      # Left Column: Live Preview & Code Recipes
+      htmltools::div(
+        style = "flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
+        # Centered Live Preview
+        htmltools::div(
+          style = "display: flex; align-items: center; justify-content: center; min-height: 150px; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; padding: 2rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);",
+          shiny::uiOutput("showcase_input_group_preview_ui")
+        ),
+        # Reactive binding value display
+        shiny::uiOutput("showcase_input_group_preview_value"),
+        # Code snippets
+        htmltools::tags$div(
+          style = "display: flex; flex-direction: column; gap: 1rem;",
+          htmltools::tags$div(
+            htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
+            shiny::uiOutput("showcase_input_group_preview_code")
+          ),
+          htmltools::tags$div(
+            htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "Server Action"),
+            shiny::uiOutput("showcase_input_group_reactive_code")
+          )
+        )
+      ),
+      # Right Column: Controls
+      htmltools::div(
+        style = "flex: 1; min-width: 280px; max-width: 360px; background: var(--muted); border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; gap: 1.25rem;",
+        
+        # Content controls
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 1rem;",
+          htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
+          block_field(
+            block_field_label("pattern", `for` = "showcase_input_group_doc_pattern"),
+            block_select(
+              "showcase_input_group_doc_pattern",
+              choices = c(
+                "Leading Icon" = "leading_icon",
+                "Trailing Icon" = "trailing_icon",
+                "Both Addons" = "both_addons",
+                "Workspace Slug" = "workspace_slug"
+              ),
+              selected = "leading_icon"
+            )
+          ),
+          block_field(
+            block_field_label("placeholder", `for` = "showcase_input_group_doc_placeholder"),
+            block_textarea("showcase_input_group_doc_placeholder", value = "Search workspace...", rows = 1)
+          ),
+          block_field(
+            block_field_label("value", `for` = "showcase_input_group_doc_value"),
+            block_textarea("showcase_input_group_doc_value", value = "", rows = 1)
           )
         ),
-        block_field_description("Single leading addon with an icon.")
-      ),
-      block_field(
-        block_field_label("Trailing icon", `for` = "showcase_input_group_email"),
-        block_input_group(
-          block_input(
-            "showcase_input_group_email",
-            placeholder = "name@company.com"
-          ),
-          block_input_group_addon(block_icon("mail"))
+        
+        # State controls
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+          htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "State"),
+          block_checkbox("showcase_input_group_doc_disabled", label = "Disabled"),
+          block_checkbox("showcase_input_group_doc_invalid", label = "Invalid")
         ),
-        block_field_description("Trailing addon by placing the icon after the input.")
-      ),
-      block_field(
-        block_field_label("Both addons", `for` = "showcase_input_group_amount"),
-        block_input_group(
-          block_input_group_addon("$"),
-          block_input(
-            "showcase_input_group_amount",
-            type = "number",
-            value = 0,
-            placeholder = "0"
-          ),
-          block_input_group_addon("USD")
-        ),
-        block_field_description("Leading and trailing text addons.")
-      ),
-      block_field(
-        block_field_label("Workspace slug", `for` = "showcase_input_group_slug"),
-        block_input_group(
-          block_input_group_addon("acme.app/"),
-          block_input(
-            "showcase_input_group_slug",
-            placeholder = "your-team"
+        
+        # Actions (Server update)
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 1rem;",
+          htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Actions (Server Update)"),
+          htmltools::div(
+            style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+            showcase_action_button("showcase_input_group_set_value", "Set value", variant = "default"),
+            showcase_action_button("showcase_input_group_clear", "Reset", variant = "outline"),
+            showcase_action_button("showcase_input_group_disable", "Disable", variant = "outline"),
+            showcase_action_button("showcase_input_group_enable", "Enable", variant = "outline")
           )
         ),
-        block_field_description("Text prefix without an icon.")
+        
+        # Styling controls
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 1rem;",
+          htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
+          block_checkbox("showcase_input_group_doc_class", label = "Use custom dashed-border class")
+        )
       )
     )
   ),
-  block_field_set(
-    block_field_legend("Invalid state"),
-    block_field_invalid(
-      block_field(
-        block_field_label("API key", `for` = "showcase_input_group_api"),
-        block_input_group(
-          block_input_group_addon(block_icon("lock")),
-          block_input(
-            "showcase_input_group_api",
-            value = "sk-test",
-            invalid = TRUE
-          )
+  
+  # Stable baseline patterns as parity fixtures
+  htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "Common Patterns (Parity Fixtures)"),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 1rem 0; font-size: 0.875rem;",
+    "Stable instances used by tools/parity/ and visual regression checkers. Do not remove."
+  ),
+  htmltools::div(
+    class = "sb-parity-input-group-fixtures",
+    style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem; background: var(--background);",
+    block_field(
+      block_field_label("Leading icon", `for` = "sb-parity-input-group-search"),
+      block_input_group(
+        class = "sb-parity-input-group-leading",
+        block_input_group_addon(block_icon("search")),
+        block_input(
+          "sb-parity-input-group-search",
+          placeholder = "Search workspace"
+        )
+      )
+    ),
+    block_field(
+      block_field_label("Trailing icon", `for` = "sb-parity-input-group-email"),
+      block_input_group(
+        class = "sb-parity-input-group-trailing",
+        block_input(
+          "sb-parity-input-group-email",
+          placeholder = "name@company.com"
         ),
-        block_field_description("Production keys must start with sk-live-.")
-      ),
-      "API keys must start with sk-live-."
+        block_input_group_addon(block_icon("mail"))
+      )
+    ),
+    block_field(
+      block_field_label("Both addons", `for` = "sb-parity-input-group-amount"),
+      block_input_group(
+        class = "sb-parity-input-group-both",
+        block_input_group_addon("$"),
+        block_input(
+          "sb-parity-input-group-amount",
+          type = "number",
+          value = 0,
+          placeholder = "0"
+        ),
+        block_input_group_addon("USD")
+      )
+    ),
+    block_field(
+      block_field_label("Workspace slug", `for` = "sb-parity-input-group-slug"),
+      block_input_group(
+        class = "sb-parity-input-group-slug",
+        block_input_group_addon("acme.app/"),
+        block_input(
+          "sb-parity-input-group-slug",
+          placeholder = "your-team"
+        )
+      )
     )
   ),
+  
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::tableOutput("showcase_input_group_api_table")
 )
