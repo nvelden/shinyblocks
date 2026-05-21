@@ -35,6 +35,7 @@ block_page <- function(
     htmltools::tagList(
       htmltools::tags$head(
         htmltools::tags$title(title %||% "shinyblocks"),
+        block_favicon_link(),
         block_theme_script(theme_mode),
         theme
       ),

@@ -71,3 +71,24 @@ shinyblocks_asset_version <- function() {
 
   paste0(version, ".", as.integer(stamp))
 }
+
+block_favicon_link <- local({
+  cache <- NULL
+  function() {
+    if (is.null(cache)) {
+      path <- system.file("www", "favicon.svg", package = "shinyblocks")
+      if (!nzchar(path) && file.exists("inst/www/favicon.svg")) {
+        path <- "inst/www/favicon.svg"
+      }
+      if (!nzchar(path) || !file.exists(path)) {
+        return(NULL)
+      }
+      svg <- paste(readLines(path, warn = FALSE), collapse = "")
+      cache <<- paste0(
+        "data:image/svg+xml;utf8,",
+        utils::URLencode(svg, reserved = TRUE)
+      )
+    }
+    htmltools::tags$link(rel = "icon", type = "image/svg+xml", href = cache)
+  }
+})
