@@ -9,7 +9,7 @@ name: Build and deploy wasm R package image
 
 jobs:
   release-file-system-image:
-    uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v2
+    uses: r-wasm/actions/.github/workflows/release-file-system-image.yml@v3
     with:
       strip: "demo, doc, examples, help, html, include, tests, vignette"
     permissions:
