@@ -1,6 +1,7 @@
 # shinyblocks (development version)
 
 * Phase 8 final-gate dry run cleared. `devtools::check(remote = TRUE)` now reports 0 errors / 0 warnings / 2 benign notes (new-submission CRAN feasibility + "unable to verify current time"). `lintr::lint_package()` reports 0 lints. `devtools::spell_check()`, `devtools::test()`, the runtime/Shiny/showcase browser suites, and `make parity-ci` are all green.
+* Fixed alignment of the light/dark mode icon inside `block_dark_mode_toggle()` under light and dark mode: enforced inline-flex display, row layout, a 0.5rem gap, and `white-space: nowrap` on the inner span wrapper to prevent the icon and text from wrapping and stacking vertically under narrow parent containers.
 * Fixed a parity regression in `block_button()`: restored the `shadow-sm` box-shadow that was dropped during the Phase 6 legacy `.sb-button*` CSS cleanup, and confirmed it does not leak into the `ghost` / `link` variants.
 * Tightened the slider thumb transform normaliser in `tools/parity/normalise.mjs`: scoped to the slider/thumb context only (a `context` parameter is now threaded through `normaliseValue` / `normaliseStyles` / `captureRoles`) so a future component using `translateX` as a visual primitive is not silently masked, and the `ty` offset is rounded to handle Chromium float drift.
 * Removed `vignettes/articles/*.Rmd`. These were leftover pkgdown article copies, superseded first by the `gallery/` move and then by the custom docs site (ADR 0018). R CMD check no longer WARNs on `vignettes/` without a registered builder.
