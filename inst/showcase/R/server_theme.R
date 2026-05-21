@@ -27,8 +27,18 @@ register_theme_showcase <- function(input, output, session) {
         htmltools::div(
           style = "display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;",
           block_button("Primary Button", variant = "default"),
-          block_button("Accent Button", variant = "secondary"),
+          block_button("Secondary Button", variant = "secondary"),
           block_button("Outline Button", variant = "outline")
+        ),
+        htmltools::div(
+          style = paste(
+            "display: inline-flex; align-items: center; gap: 0.5rem;",
+            "padding: 0.5rem 0.75rem;",
+            "background: var(--accent); color: var(--accent-foreground);",
+            "border-radius: calc(var(--radius) * 0.8);",
+            "font-size: 0.875rem; font-weight: 500; width: fit-content;"
+          ),
+          "Accent surface (uses --accent token)"
         ),
         block_card(
           title = "Dynamic Card",

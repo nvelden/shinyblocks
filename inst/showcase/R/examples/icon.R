@@ -29,10 +29,7 @@ htmltools::tagList(
               block_field_label("name", `for` = "showcase_icon_doc_name"),
               block_select(
                 "showcase_icon_doc_name",
-                choices = c(
-                  "home", "bell", "settings", "search", "alert-triangle", "user",
-                  "layout-dashboard", "trending-up", "download", "check", "code", "database"
-                ),
+                choices = sort(shinyblocks:::shinyblocks_icon_names()),
                 selected = "home"
               )
             )
@@ -53,6 +50,41 @@ htmltools::tagList(
         )
       )
     )
+  ),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    paste0("All icons (", length(shinyblocks:::shinyblocks_icon_names()), ")")
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.75rem 0; font-size: 0.875rem;",
+    "Hover an icon to see its name. Pass the name to ", htmltools::tags$code("block_icon()"), "."
+  ),
+  htmltools::div(
+    style = paste(
+      "display: grid;",
+      "grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));",
+      "gap: 0.5rem;",
+      "padding: 1rem;",
+      "background: var(--muted);",
+      "border-radius: 0.5rem;"
+    ),
+    lapply(sort(shinyblocks:::shinyblocks_icon_names()), function(nm) {
+      htmltools::tags$div(
+        title = nm,
+        style = paste(
+          "display: flex; flex-direction: column; align-items: center; gap: 0.25rem;",
+          "padding: 0.5rem; border-radius: calc(var(--radius) * 0.8);",
+          "background: var(--background); color: var(--foreground);",
+          "font-size: 0.625rem; color: var(--muted-foreground);",
+          "overflow: hidden; text-overflow: ellipsis;"
+        ),
+        block_icon(nm, style = "width: 1.25rem; height: 1.25rem;"),
+        htmltools::tags$span(
+          style = "max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+          nm
+        )
+      )
+    })
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::tableOutput("showcase_icon_api_table"),

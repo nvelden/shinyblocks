@@ -36,11 +36,8 @@ scope_showcase_theme <- function(tag, scope_id) {
         identical(tag$attribs[["class"]] %||% "", "sb-theme-overrides")
     ) {
       css <- as.character(tag$children[[1]])
-      scoped <- sub(
-        "^\\.sb-app\\{",
-        paste0('[data-sb-preview="', scope_id, '"]{'),
-        css
-      )
+      prefix <- paste0('[data-sb-preview="', scope_id, '"]')
+      scoped <- gsub("\\.sb-app", prefix, css, perl = TRUE)
       tag$children[[1]] <- htmltools::HTML(scoped)
       return(tag)
     }

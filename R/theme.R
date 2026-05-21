@@ -28,10 +28,11 @@ block_theme <- function(...) {
   declarations <- vapply(names, function(name) {
     sprintf("--%s: %s;", name, overrides[[name]])
   }, character(1))
+  decls <- paste(declarations, collapse = "")
   theme_css <- paste0(
-    ".sb-app{",
-    paste(declarations, collapse = ""),
-    "}"
+    ".sb-app{", decls, "}",
+    ".sb-app [data-shinyblocks-root],",
+    ".sb-app [data-shinyblocks-portal-root]{", decls, "}"
   )
 
   attach_shinyblocks_deps(
