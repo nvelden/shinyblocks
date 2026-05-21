@@ -102,21 +102,3 @@ The current prerelease assets are attached to
 <https://github.com/nvelden/shinyblocks/releases/tag/v0.0.0.9000>.
 The first Shinylive load can take a little longer while webR downloads
 and caches the package image.
-
-## Development Status
-
-`shinyblocks` is in active development. The current focus is hardening
-the runtime-backed component set, the documentation site, and the
-Shinylive gallery path before a broader public release.
-
-Run tests with:
-
-```r
-devtools::test()
-```
-
-Check the package with:
-
-```r
-devtools::check()
-```
