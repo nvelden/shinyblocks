@@ -40,6 +40,8 @@ for (file in roots) {
       target <- trimws(target)
       # Skip http(s), mailto, and anchor-only links.
       if (grepl("^(https?:|mailto:|#)", target)) next
+      # Skip untracked/ignored planning files for the public repo.
+      if (grepl("(agent-plans/|dev-notes/|PLAN\\.md)", target)) next
       if (
         startsWith(file, "docs/component-specs/") &&
           grepl("^_screenshots/.+\\.(png|jpg|jpeg|webp)$", target)
