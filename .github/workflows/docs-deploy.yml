@@ -54,7 +54,17 @@ jobs:
           extra-packages: |
             any::htmltools
             any::shinylive
+            local::.
           working-directory: .
+
+      # `webr` is the R interface used inside the webR runtime. Installed
+      # locally only so `shinylive::export()`'s static analysis of each
+      # app.R can resolve `webr::mount(...)`. It is published via
+      # r-wasm's r-universe.
+      - name: Install webr (build-time dep for shinylive::export)
+        run: |
+          Rscript -e 'install.packages("webr",
+            repos = c("https://r-wasm.r-universe.dev", getOption("repos")))'
 
       - uses: actions/setup-node@v4
         with:
