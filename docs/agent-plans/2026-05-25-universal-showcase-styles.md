@@ -97,8 +97,8 @@ Add the following scoped preview rules to `frontend/src/styles/runtime.css`:
 ```
 
 ## Files to Edit
-1. **MODIFY** [runtime.css](file:///Users/nielsvandervelden/Documents/2026%20github/shinyblocks/frontend/src/styles/runtime.css): Append the custom showcase styles at the end of the file.
-2. **MODIFY** [app.R](file:///Users/nielsvandervelden/Documents/2026%20github/shinyblocks/docs-site/playgrounds/select/app.R): Remove the inline `htmltools::tags$head(...)` tag block setting custom border styling.
+1. **MODIFY** [runtime.css](../../frontend/src/styles/runtime.css): Append the custom showcase styles at the end of the file.
+2. **MODIFY** [app.R](../../docs-site/playgrounds/select/app.R): Remove the inline `htmltools::tags$head(...)` tag block setting custom border styling.
 
 ## Build and Compilation
 Run `npm run build` from the workspace root directory to compile `frontend/src/styles/runtime.css` into `inst/www/shinyblocks-runtime.css`.
