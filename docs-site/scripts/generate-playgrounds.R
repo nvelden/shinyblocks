@@ -124,6 +124,13 @@ for (asset in c("library.data.gz", "library.js.metadata")) {
   }
 }
 
+# Copy latest local runtime CSS to a static path so playgrounds inside iframes can override/load HEAD styles
+local_css <- "../inst/www/shinyblocks-runtime.css"
+if (file.exists(local_css)) {
+  file.copy(local_css, "public/shinyblocks-runtime-override.css", overwrite = TRUE)
+  cat("Staged local runtime CSS override in public/\n")
+}
+
 # Merge playground metadata into preview-manifest.json
 if (!file.exists(manifest_path)) {
   stop(

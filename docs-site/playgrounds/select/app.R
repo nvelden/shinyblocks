@@ -34,15 +34,10 @@ showcase_action_button <- function(input_id, label) {
 
 ui <- block_page(
   title = "shinyblocks · Select playground",
-  htmltools::tags$head(
-    htmltools::tags$style("
-      .showcase-select-preview-custom .sb-select-trigger {
-        border: 2px dashed var(--ring) !important;
-      }
-    ")
-  ),
+  theme = htmltools::tags$link(rel = "stylesheet", href = "../../shinyblocks-runtime-override.css"),
   block_body(
     htmltools::tags$div(
+      `data-shinyblocks-root` = "",
       style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
       htmltools::div(
         style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
@@ -53,7 +48,7 @@ ui <- block_page(
             "flex: 1; min-width: 280px; max-width: 320px;",
             "border: 1px solid var(--border); border-radius: 0.75rem;",
             "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
-            "background: var(--muted)/40;"
+            "background: color-mix(in oklab, var(--muted) 40%, transparent);"
           ),
           
           # Content Controls Group

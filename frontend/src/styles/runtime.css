@@ -1551,3 +1551,144 @@
 [data-shinyblocks-root] .sb-code-token-number {
   color: var(--sb-code-token-function);
 }
+
+/*
+ * Custom showcase preview classes for high fidelity demonstrations.
+ * Built into the core runtime to ensure visual parity in all Shiny and Shinylive apps.
+ */
+[data-shinyblocks-root].showcase-select-preview-custom .sb-select-trigger,
+[data-shinyblocks-root] .sb-select.showcase-select-preview-custom .sb-select-trigger {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-button-preview-custom .sb-button,
+[data-shinyblocks-root] .sb-button.showcase-button-preview-custom,
+[data-shinyblocks-root].showcase-button-preview-custom,
+[data-shinyblocks-root] .showcase-button-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-portal-root] .showcase-dialog-preview-custom,
+[data-shinyblocks-root].showcase-dialog-preview-custom .sb-dialog-content,
+[data-shinyblocks-root] .sb-dialog-content.showcase-dialog-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-portal-root] .showcase-popover-preview-custom,
+[data-shinyblocks-root].showcase-popover-preview-custom .sb-popover-content,
+[data-shinyblocks-root] .sb-popover-content.showcase-popover-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-portal-root] .showcase-tooltip-preview-custom,
+[data-shinyblocks-root].showcase-tooltip-preview-custom .sb-tooltip-content,
+[data-shinyblocks-root] .sb-tooltip-content.showcase-tooltip-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-checkbox-preview-custom .sb-checkbox-button,
+[data-shinyblocks-root] .sb-checkbox.showcase-checkbox-preview-custom .sb-checkbox-button {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-textarea-preview-custom .sb-textarea-control,
+[data-shinyblocks-root] .sb-textarea.showcase-textarea-preview-custom .sb-textarea-control {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-input-preview-custom .sb-input-control,
+[data-shinyblocks-root] .sb-input.showcase-input-preview-custom .sb-input-control {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-input-group-preview-custom,
+[data-shinyblocks-root] .showcase-input-group-preview-custom {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].showcase-switch-preview-custom .sb-switch-button,
+[data-shinyblocks-root] .sb-switch.showcase-switch-preview-custom .sb-switch-button {
+  outline: 2px dashed var(--ring) !important;
+  outline-offset: 2px;
+}
+
+[data-shinyblocks-root].showcase-radio-group-preview-custom .sb-radio-group-control,
+[data-shinyblocks-root] .sb-radio-group.showcase-radio-group-preview-custom .sb-radio-group-control {
+  border: 2px dashed var(--ring) !important;
+  padding: 0.75rem !important;
+  border-radius: 0.5rem !important;
+}
+
+[data-shinyblocks-root].showcase-slider-preview-custom .sb-slider-thumb,
+[data-shinyblocks-root] .sb-slider.showcase-slider-preview-custom .sb-slider-thumb {
+  border: 2px dashed var(--ring) !important;
+}
+
+[data-shinyblocks-root].sb-code-custom,
+[data-shinyblocks-root] .sb-code-custom {
+  border: 2px dashed var(--ring) !important;
+  background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;
+}
+
+/* Scoped action button styles for interactive playgrounds */
+[data-shinyblocks-root] .showcase-action-button {
+  appearance: none;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  outline: none;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+[data-shinyblocks-root] .showcase-action-button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+[data-shinyblocks-root] .showcase-action-button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+[data-shinyblocks-root] .showcase-action-button-default {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-shinyblocks-root] .showcase-action-button-default:hover {
+  background-color: color-mix(in oklab, var(--primary) 90%, transparent);
+}
+
+[data-shinyblocks-root] .showcase-action-button-outline {
+  border-color: var(--border);
+  background-color: var(--background);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+[data-shinyblocks-root] .showcase-action-button-outline:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-shinyblocks-root] .showcase-action-button-size-default {
+  height: 2.25rem;
+  padding: 0.5rem 1rem;
+}
+
+[data-shinyblocks-root] .showcase-action-button-size-sm {
+  height: 2rem;
+  padding: 0.375rem 0.75rem;
+}
