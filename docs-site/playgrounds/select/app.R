@@ -34,6 +34,13 @@ showcase_action_button <- function(input_id, label) {
 
 ui <- block_page(
   title = "shinyblocks · Select playground",
+  htmltools::tags$head(
+    htmltools::tags$style("
+      .showcase-select-preview-custom .sb-select-trigger {
+        border: 2px dashed var(--ring) !important;
+      }
+    ")
+  ),
   block_body(
     htmltools::tags$div(
       style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
