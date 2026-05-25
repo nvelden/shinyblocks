@@ -68,9 +68,8 @@ Passing `icon = NULL` or `style = NULL` explicitly clears those props.
 - Pass `id = "..."` (via `...`) to make the button addressable from the
   server. Without an id, the button is purely presentational.
 - The runtime registers a `shinyblocks.button` input binding that is
-  **receive-only** — it never reports a value to `input$<id>`. Use
-  `shiny::actionButton()` if you need click counts; use `block_button()`
-  when you want shadcn fidelity plus server-driven updates.
+  **bidirectional** — it reports the click count to `input$<id>`, incrementing
+  by 1 on every click just like `shiny::actionButton()`.
 - `update_block_button()` routes through `sendInputMessage()` and only
   notifies on fields that change.
 
@@ -98,8 +97,7 @@ Passing `icon = NULL` or `style = NULL` explicitly clears those props.
   htmltools does not, so the type is set explicitly.
 - Hover on solid variants uses an opacity dim instead of shadcn's
   `bg-primary/90` colour-mix. Equivalent visual result, simpler CSS.
-- The runtime binding is receive-only by design — click counts stay
-  with `shiny::actionButton()`.
+- The runtime binding integrates standard Shiny input event reporting so that it behaves identically to `shiny::actionButton()` for reactive triggers.
 
 ## Reference screenshot
 

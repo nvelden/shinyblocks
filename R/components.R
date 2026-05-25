@@ -197,7 +197,7 @@ block_button <- function(
   }
 
   binding <- if (is.null(input_id)) list() else list(
-    input = FALSE,
+    input = TRUE,
     type = "shinyblocks.button"
   )
 

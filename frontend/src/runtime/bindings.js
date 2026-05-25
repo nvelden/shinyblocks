@@ -219,15 +219,37 @@ function registerButtonBinding() {
       return null;
     }
 
-    getValue() {
-      return null;
+    getValue(el) {
+      if (typeof el.__sbButtonClickCount === "undefined") {
+        el.__sbButtonClickCount = 0;
+      }
+      return el.__sbButtonClickCount;
     }
 
-    setValue() {}
+    setValue(el, value) {
+      el.__sbButtonClickCount = Number(value) || 0;
+    }
 
-    subscribe() {}
+    subscribe(el, callback) {
+      const handler = () => {
+        if (el.hasAttribute("disabled") || el.querySelector("button:disabled")) {
+          return;
+        }
+        if (typeof el.__sbButtonClickCount === "undefined") {
+          el.__sbButtonClickCount = 0;
+        }
+        el.__sbButtonClickCount += 1;
+        callback(false);
+      };
+      el.addEventListener("click", handler);
+      el.__sbButtonClickHandler = handler;
+    }
 
-    unsubscribe() {}
+    unsubscribe(el) {
+      if (!el.__sbButtonClickHandler) return;
+      el.removeEventListener("click", el.__sbButtonClickHandler);
+      delete el.__sbButtonClickHandler;
+    }
 
     receiveMessage(el, data) {
       if (typeof el.__sbButtonReceive === "function") {

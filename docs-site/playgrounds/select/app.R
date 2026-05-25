@@ -25,10 +25,11 @@ showcase_render_code <- function(expr, env = parent.frame()) {
 }
 
 showcase_action_button <- function(input_id, label) {
-  actionButton(
-    input_id,
+  block_button(
     label,
-    class = "showcase-action-button showcase-action-button-outline showcase-action-button-size-sm action-button"
+    id = input_id,
+    variant = "outline",
+    size = "sm"
   )
 }
 

@@ -128,7 +128,7 @@ test_that("block_button(id =) emits a runtime input id and shinyblocks.button bi
   expect_match(html, 'data-sb-component="button"', fixed = TRUE)
   expect_match(html, 'data-sb-input-id="confirm"', fixed = TRUE)
   expect_match(html, 'id="sb-runtime-button-confirm"', fixed = TRUE)
-  expect_match(html, '"binding":\\{"input":false,"type":"shinyblocks\\.button"\\}')
+  expect_match(html, '"binding":\\{"input":true,"type":"shinyblocks\\.button"\\}')
   # id moved into the runtime mount; it must not leak onto inner attrs
   expect_false(grepl('"attrs":\\{[^}]*"id"', html))
 })
