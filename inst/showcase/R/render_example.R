@@ -3,19 +3,14 @@ showcase_action_button <- function(
   label,
   variant = "outline",
   size = "sm",
-  class = "action-button"
+  class = NULL
 ) {
-  classes <- c(
-    "showcase-action-button",
-    paste0("showcase-action-button-", variant),
-    paste0("showcase-action-button-size-", size),
-    class
-  )
-
-  shiny::actionButton(
-    input_id,
+  block_button(
     label,
-    class = paste(stats::na.omit(classes), collapse = " ")
+    id = input_id,
+    variant = variant,
+    size = size,
+    class = class
   )
 }
 
