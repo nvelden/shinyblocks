@@ -40,64 +40,13 @@ ui <- block_page(
       htmltools::div(
         style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
         
-        # Left Column: Preview & Reactive Output Code Blocks
-        htmltools::div(
-          style = "flex: 1.2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-          
-          # Interactive Preview Canvas
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 3rem 2rem 2.5rem 2rem; background: var(--muted)/10;",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 160px; box-sizing: border-box;"
-            ),
-            htmltools::tags$span(
-              style = "position: absolute; top: 0.75rem; left: 0.75rem; font-size: 0.7rem; font-weight: 600; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em;",
-              "Preview Canvas"
-            ),
-            uiOutput("showcase_select_preview_ui")
-          ),
-          
-          # Reactive Value Readout Indicator
-          uiOutput("showcase_select_preview_value"),
-          
-          # Code Blocks Panel
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$div(
-              htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-                "UI Code (R)"
-              ),
-              uiOutput("showcase_select_preview_code")
-            ),
-            htmltools::tags$div(
-              htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-                "Server Action (R)"
-              ),
-              uiOutput("showcase_select_reactive_code")
-            )
-          )
-        ),
-        
-        # Right Column: Controls Panel
+        # Left Column: Controls Panel
         htmltools::div(
           style = paste(
-            "flex: 1; min-width: 300px; max-width: 480px;",
+            "flex: 1; min-width: 280px; max-width: 320px;",
             "border: 1px solid var(--border); border-radius: 0.75rem;",
             "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
-            "background: var(--card); box-shadow: var(--shadow-sm);"
-          ),
-          
-          # Header for Controls Panel
-          htmltools::tags$div(
-            style = "border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.25rem;",
-            htmltools::tags$h3(
-              style = "font-size: 0.875rem; font-weight: 700; color: var(--foreground); margin: 0; display: flex; align-items: center; gap: 0.5rem;",
-              "Configuration Controls"
-            )
+            "background: var(--muted)/40;"
           ),
           
           # Content Controls Group
@@ -201,6 +150,53 @@ ui <- block_page(
               showcase_action_button("showcase_select_disable", "Disable"),
               showcase_action_button("showcase_select_enable", "Enable"),
               showcase_action_button("showcase_select_replace_choices", "Replace choices")
+            )
+          )
+        ),
+        
+        # Right Column: Preview & Reactive Output Code Blocks
+        htmltools::div(
+          style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+          
+          # Preview Section
+          htmltools::tags$div(
+            style = "display: flex; flex-direction: column; gap: 0.5rem;",
+            htmltools::tags$div(
+              style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
+              "Preview"
+            ),
+            # Interactive Preview Canvas
+            htmltools::tags$div(
+              style = paste(
+                "position: relative; display: flex; align-items: center; justify-content: center;",
+                "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
+                "border: 1px solid var(--border); border-radius: 0.75rem;",
+                "min-height: 160px; box-sizing: border-box;",
+                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+              ),
+              uiOutput("showcase_select_preview_ui")
+            )
+          ),
+          
+          # Reactive Value Readout Indicator
+          uiOutput("showcase_select_preview_value"),
+          
+          # Code Blocks Panel
+          htmltools::tags$div(
+            style = "display: flex; flex-direction: column; gap: 1rem;",
+            htmltools::tags$div(
+              htmltools::tags$div(
+                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                "UI Definition"
+              ),
+              uiOutput("showcase_select_preview_code")
+            ),
+            htmltools::tags$div(
+              htmltools::tags$div(
+                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                "Server Action"
+              ),
+              uiOutput("showcase_select_reactive_code")
             )
           )
         )
