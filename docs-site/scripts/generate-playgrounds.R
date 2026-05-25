@@ -43,6 +43,9 @@ if (!length(slugs)) {
   cat("No app.R files found under playgrounds/.\n")
   quit(save = "no", status = 0)
 }
+shared_shinylive_dir <- file.path(playgrounds_out, "shinylive")
+shared_sw_path <- file.path(playgrounds_out, "shinylive-sw.js")
+shared_assets_copied <- FALSE
 
 for (slug in slugs) {
   app_dir <- file.path(playgrounds_src, slug)
@@ -77,15 +80,47 @@ for (slug in slugs) {
   shinylive::export(app_dir, out_dir)
   unlink(staged)
 
-  # Copy the WASM assets directly into the export's output directory so they are
-  # served as static files on the web server.
-  for (asset in c("library.data.gz", "library.js.metadata")) {
-    src <- file.path(wasm_src_dir, asset)
-    if (file.exists(src)) {
-      dest <- file.path(out_dir, asset)
-      file.copy(src, dest, overwrite = TRUE)
-      cat(sprintf("  Static WASM asset copied: %s → %s\n", src, dest))
-    }
+  local_shinylive_dir <- file.path(out_dir, "shinylive")
+  local_sw_path <- file.path(out_dir, "shinylive-sw.js")
+
+  if (!shared_assets_copied) {
+    if (dir.exists(shared_shinylive_dir)) unlink(shared_shinylive_dir, recursive = TRUE, force = TRUE)
+    if (file.exists(shared_sw_path)) unlink(shared_sw_path, force = TRUE)
+    
+    file.rename(local_shinylive_dir, shared_shinylive_dir)
+    file.rename(local_sw_path, shared_sw_path)
+    shared_assets_copied <- TRUE
+    cat("  Created shared Shinylive assets at public/playgrounds/shinylive/\n")
+  } else {
+    if (dir.exists(local_shinylive_dir)) unlink(local_shinylive_dir, recursive = TRUE, force = TRUE)
+    if (file.exists(local_sw_path)) unlink(local_sw_path, force = TRUE)
+  }
+
+  html_path <- file.path(out_dir, "index.html")
+  if (file.exists(html_path)) {
+    html_lines <- readLines(html_path, warn = FALSE)
+    html_content <- paste(html_lines, collapse = "\n")
+    
+    meta_tag <- '    <meta name="shinylive:serviceworker_dir" content="../" />'
+    html_content <- sub("</head>", paste0(meta_tag, "\n  </head>"), html_content, fixed = TRUE)
+    
+    html_content <- gsub('src="./shinylive/', 'src="../shinylive/', html_content, fixed = TRUE)
+    html_content <- gsub('href="./shinylive/', 'href="../shinylive/', html_content, fixed = TRUE)
+    html_content <- gsub('import { runExportedApp } from "./shinylive/', 'import { runExportedApp } from "../shinylive/', html_content, fixed = TRUE)
+    
+    writeLines(html_content, html_path)
+    cat("  Rewrote index.html to use shared Shinylive assets\n")
+  }
+}
+
+# Copy the WASM assets directly into the parent shared directory so they are
+# served as static files on the web server at a single location.
+for (asset in c("library.data.gz", "library.js.metadata")) {
+  src <- file.path(wasm_src_dir, asset)
+  if (file.exists(src)) {
+    dest <- file.path(playgrounds_out, asset)
+    file.copy(src, dest, overwrite = TRUE)
+    cat(sprintf("Static WASM asset copied to parent: %s → %s\n", src, dest))
   }
 }
 
