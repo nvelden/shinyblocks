@@ -34,6 +34,7 @@ playground_heights <- list(
   icon = 600L,
   input = 760L,
   select = 760L,
+  separator = 600L,
   textarea = 800L
 )
 
