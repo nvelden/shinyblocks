@@ -99,7 +99,8 @@
     "code": "shinyblocks::block_checkbox(\n  \"terms\",\n  label = \"Accept terms and conditions\",\n  value = FALSE\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-24\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_checkbox(\\n  \\\"terms\\\",\\n  label = \\\"Accept terms and conditions\\\",\\n  value = FALSE\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-checkbox-terms\" class=\"sb-runtime-mount sb-checkbox\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"checkbox\" data-sb-input-id=\"terms\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"checkbox\",\"id\":\"terms\",\"props\":{\"labelHtml\":\"Accept terms and conditions\",\"disabled\":false,\"style\":null},\"slots\":[],\"children\":[],\"state\":{\"value\":false},\"binding\":{\"input\":true,\"type\":\"shinyblocks.checkbox\"},\"className\":\"sb-checkbox\"}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\">\n    <input id=\"terms\" type=\"checkbox\" class=\"sb-checkbox-native\" tabindex=\"-1\" aria-hidden=\"true\" data-shiny-no-bind-input=\"\"/>\n  <\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 760
   },
   {
     "name": "Textarea",
@@ -119,7 +120,8 @@
     "code": "shinyblocks::block_input(\n  \"email\",\n  type = \"email\",\n  placeholder = \"name@example.com\"\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-26\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_input(\\n  \\\"email\\\",\\n  type = \\\"email\\\",\\n  placeholder = \\\"name@example.com\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-input-email\" class=\"sb-runtime-mount sb-input\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"input\" data-sb-input-id=\"email\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"input\",\"id\":\"email\",\"props\":{\"placeholder\":\"name@example.com\",\"type\":\"email\",\"disabled\":false,\"invalid\":false,\"style\":null},\"slots\":[],\"children\":[],\"state\":{\"value\":\"\"},\"binding\":{\"input\":true,\"type\":\"shinyblocks.input\"},\"className\":\"sb-input\"}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\">\n    <input id=\"email\" type=\"email\" class=\"sb-input-native\" tabindex=\"-1\" aria-hidden=\"true\" data-shiny-no-bind-input=\"\" style=\"display:none\" value=\"\"/>\n  <\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 760
   },
   {
     "name": "Radio Group",

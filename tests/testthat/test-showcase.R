@@ -93,6 +93,22 @@ test_that("showcase declares a sections list and renders each one", {
   }
 })
 
+test_that("showcase owns its theme in the page head and renders one body landmark", {
+  env <- source_showcase()
+  rendered <- htmltools::renderTags(env$ui)
+  head <- paste(rendered$head, collapse = "\n")
+  html <- paste(rendered$html, collapse = "\n")
+
+  expect_match(head, 'href="showcase.css?v=20260521_09"', fixed = TRUE)
+  body_matches <- regmatches(
+    html,
+    gregexpr('<main class="sb-body">', html, fixed = TRUE)
+  )[[1L]]
+
+  expect_length(body_matches, 1L)
+  expect_false(grepl("<head>", html, fixed = TRUE))
+})
+
 test_that("every exported block_*() renders into the showcase UI", {
   env <- source_showcase()
   rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")

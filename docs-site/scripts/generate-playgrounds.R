@@ -30,6 +30,8 @@ wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
 # needs more vertical room (icons gallery, layouts, etc).
 playground_heights <- list(
   button = 760L,
+  checkbox = 760L,
+  input = 760L,
   select = 760L
 )
 

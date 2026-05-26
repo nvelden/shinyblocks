@@ -326,7 +326,7 @@ sections <- list(
 
 ui <- block_page(
   title = "shinyblocks — component gallery",
-  htmltools::tags$head(
+  theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260521_09")
   ),
   sidebar = block_sidebar(

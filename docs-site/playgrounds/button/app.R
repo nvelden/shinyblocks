@@ -78,8 +78,7 @@ ui <- block_page(
       "
     ))
   ),
-  block_body(
-    htmltools::tags$div(
+  htmltools::tags$div(
       `data-shinyblocks-root` = "",
       style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
       htmltools::div(
@@ -235,7 +234,6 @@ ui <- block_page(
         )
       )
     )
-  )
 )
 
 server <- function(input, output, session) {
