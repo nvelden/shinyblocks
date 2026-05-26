@@ -31,6 +31,7 @@ wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
 playground_heights <- list(
   button = 760L,
   checkbox = 760L,
+  icon = 600L,
   input = 760L,
   select = 760L,
   textarea = 800L
