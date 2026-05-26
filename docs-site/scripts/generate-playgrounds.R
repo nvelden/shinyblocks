@@ -32,7 +32,8 @@ playground_heights <- list(
   button = 760L,
   checkbox = 760L,
   input = 760L,
-  select = 760L
+  select = 760L,
+  textarea = 800L
 )
 
 if (!dir.exists(playgrounds_src)) {

@@ -110,7 +110,8 @@
     "code": "shinyblocks::block_textarea(\n  \"bio\",\n  placeholder = \"Tell us a little bit about yourself...\",\n  rows = 3\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-25\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_textarea(\\n  \\\"bio\\\",\\n  placeholder = \\\"Tell us a little bit about yourself...\\\",\\n  rows = 3\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-textarea-bio\" class=\"sb-runtime-mount sb-textarea\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"textarea\" data-sb-input-id=\"bio\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"textarea\",\"id\":\"bio\",\"props\":{\"placeholder\":\"Tell us a little bit about yourself...\",\"rows\":3,\"disabled\":false,\"invalid\":false,\"style\":null},\"slots\":[],\"children\":[],\"state\":{\"value\":\"\"},\"binding\":{\"input\":true,\"type\":\"shinyblocks.textarea\"},\"className\":\"sb-textarea\"}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\">\n    <textarea id=\"bio\" class=\"sb-textarea-native\" tabindex=\"-1\" aria-hidden=\"true\" data-shiny-no-bind-input=\"\" style=\"display:none\"><\/textarea>\n  <\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 800
   },
   {
     "name": "Input",
