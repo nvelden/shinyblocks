@@ -32,6 +32,7 @@ playground_heights <- list(
   alert = 700L,
   badge = 600L,
   button = 760L,
+  card = 760L,
   checkbox = 760L,
   code = 760L,
   icon = 600L,

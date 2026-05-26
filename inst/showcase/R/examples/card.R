@@ -1,62 +1,51 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 1.5rem;",
-      htmltools::div(
-        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
-        htmltools::div(
-          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
-          block_field(
-            block_field_label("Preview", `for` = "showcase_card_preview"),
-            shiny::uiOutput("showcase_card_preview_ui")
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$div(
-              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::uiOutput("showcase_card_preview_code")
-            )
-          )
+  showcase_playground_layout(
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Header", first = TRUE,
+        block_field(
+          block_field_label("title", `for` = "showcase_card_doc_title"),
+          block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1)
         ),
-        htmltools::div(
-          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
-          # Content controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Header"),
-            block_field(
-              block_field_label("title", `for` = "showcase_card_doc_title"),
-              block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1)
-            ),
-            block_field(
-              block_field_label("description", `for` = "showcase_card_doc_desc"),
-              block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1)
-            )
-          ),
-          # Body & Settings controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Body & Settings"),
-            block_field(
-              block_field_label("value", `for` = "showcase_card_doc_value"),
-              block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1)
-            ),
-            block_field(
-              block_field_label("body content", `for` = "showcase_card_doc_body"),
-              block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 1)
-            ),
-            block_field(
-              block_field_label("footer", `for` = "showcase_card_doc_footer"),
-              block_checkbox("showcase_card_doc_footer", label = "Include footer button", value = TRUE)
-            ),
-            block_field(
-              block_field_label("class", `for` = "showcase_card_doc_class"),
-              block_select("showcase_card_doc_class", choices = c("none", "shadow-lg", "border-dashed"), selected = "none")
-            )
+        block_field(
+          block_field_label("description", `for` = "showcase_card_doc_desc"),
+          block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1)
+        )
+      ),
+      showcase_controls_group(
+        "Content",
+        block_field(
+          block_field_label("value", `for` = "showcase_card_doc_value"),
+          block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1)
+        ),
+        block_field(
+          block_field_label("body content", `for` = "showcase_card_doc_body"),
+          block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 2)
+        ),
+        block_field(
+          block_field_label("footer", `for` = "showcase_card_doc_footer"),
+          block_checkbox("showcase_card_doc_footer", label = "Include footer button", value = TRUE)
+        )
+      ),
+      showcase_controls_group(
+        "Styling",
+        block_field(
+          block_field_label("class", `for` = "showcase_card_doc_class"),
+          block_select(
+            "showcase_card_doc_class",
+            choices = c("none", "shadow-lg", "border-dashed"),
+            selected = "none",
+            size = "sm"
           )
         )
       )
+    ),
+    preview_output_id = "showcase_card_preview_ui",
+    code_output_id = "showcase_card_preview_code",
+    preview_canvas_style = paste(
+      "position: relative; display: flex; align-items: center; justify-content: center;",
+      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
+      "border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
