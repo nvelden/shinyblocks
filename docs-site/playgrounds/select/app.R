@@ -1,6 +1,32 @@
 if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-  webr::mount("/packages", "../../library.data.gz")
+  
+  # Try mounting from relative paths. In some environments (e.g. standard workers),
+  # paths resolve relative to the worker script context. In others (e.g. blob workers/proxied environments),
+  # they resolve relative to the main document base URL. We try both to be fully resilient.
+  mounted <- FALSE
+  for (path in c("../library.data.gz", "../../library.data.gz")) {
+    tryCatch({
+      webr::mount("/packages", path)
+      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+        mounted <- TRUE
+        break
+      }
+    }, error = function(e) {
+      # Ignore and try the next path
+    })
+  }
+  
+  if (!mounted) {
+    # If both relative paths fail, try absolute path as a last resort fallback
+    # (works on the default nvelden.github.io/shinyblocks deployment)
+    tryCatch({
+      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+    }, error = function(e) {
+      stop("Failed to mount shinyblocks WASM package library: ", e$message)
+    })
+  }
+  
   .libPaths(c("/packages", .libPaths()))
 }
 

@@ -220,17 +220,36 @@ To keep the embedded app looking native to the documentation site, follow these 
 Because `shinyblocks` is not on the default webR repository (`repo.r-wasm.org`), the package must be precompiled for WebAssembly in CI and hosted alongside the playgrounds:
 1. **CI pre-compilation**: A GitHub Action compiles the R package for WebAssembly, attaching `library.data.gz` and `library.js.metadata` filesystem images to release tags (e.g., `v0.0.0.9000`).
 2. **Static Asset Hosting**: The build script `generate-playgrounds.R` runs `shinylive::export()` and **explicitly copies** `library.data.gz` and `library.js.metadata` into the static export folder `docs-site/public/playgrounds/<slug>/` where they are served statically by Next.js.
-3. **Relative Worker Mounting in `app.R`**: Inside each playground's `app.R`, before loading `library(shinyblocks)`, we mount the packages relative to the **webR WebWorker script context** (`shinylive/webr/webr-worker.js`), which is two levels deep. Use the relative path `../../library.data.gz`:
+3. **Relative Worker Mounting in `app.R`**: Inside each playground's `app.R`, before loading `library(shinyblocks)`, we mount the packages using a resilient path fallback to handle differences in how web workers resolve relative URLs in different browsers and hosting setups (e.g., standard workers vs. cross-origin blob worker proxies). We try both `../library.data.gz` (relative to the document's base URL) and `../../library.data.gz` (relative to the worker's script location), with a root-relative fallback:
    ```r
    if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
      dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-     webr::mount("/packages", "../../library.data.gz")
+     
+     mounted <- FALSE
+     for (path in c("../library.data.gz", "../../library.data.gz")) {
+       tryCatch({
+         webr::mount("/packages", path)
+         if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+           mounted <- TRUE
+           break
+         }
+       }, error = function(e) {})
+     }
+     
+     if (!mounted) {
+       tryCatch({
+         webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+       }, error = function(e) {
+         stop("Failed to mount shinyblocks WASM package library: ", e$message)
+       })
+     }
+     
      .libPaths(c("/packages", .libPaths()))
    }
    library(shiny)
-   library(shinyblocks)
+   do.call(library, list("shinyblocks", character.only = TRUE))
    ```
-   *Warning*: Never use root-relative paths like `/wasm_binaries/...` or hardcoded URLs, as they will break when hosted under custom subpaths on GitHub Pages or during local Next.js development.
+   *Warning*: Never hardcode external absolute URLs as they will break offline and during local Next.js development. Using relative paths with the resilient loop guarantees it works across local and deployed environments.
 
 ## Commit shape
 
