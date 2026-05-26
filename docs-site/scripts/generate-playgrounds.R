@@ -29,13 +29,17 @@ wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
 # Per-slug iframe height. Default 720; override here when a component
 # needs more vertical room (icons gallery, layouts, etc).
 playground_heights <- list(
+  alert = 700L,
   badge = 600L,
   button = 760L,
   checkbox = 760L,
+  code = 760L,
   icon = 600L,
   input = 760L,
   select = 760L,
   separator = 600L,
+  skeleton = 600L,
+  spinner = 600L,
   textarea = 800L
 )
 
