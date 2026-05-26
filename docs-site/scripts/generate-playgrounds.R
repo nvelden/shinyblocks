@@ -2,8 +2,11 @@
 #
 # For each subdir under docs-site/playgrounds/, run shinylive::export() to
 # produce a self-contained Shinylive site under public/playgrounds/<slug>/.
-# The local shinyblocks source must be installed in the R library before
-# this runs so that library(shinyblocks) inside each app.R resolves.
+# `shinyblocks` is loaded from the bundled WASM filesystem image, not
+# Shinylive's public webR package repo. Playground app.R files should
+# mount `library.data.gz` before loading shinyblocks, and
+# shinylive::export() must run with `wasm_packages = FALSE` so its
+# dependency scanner does not try `webr::install("shinyblocks")`.
 #
 # Then merge the playground metadata (hasPlayground, playgroundHeight)
 # into lib/preview-manifest.json so the detail page knows which slugs
@@ -26,6 +29,7 @@ wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
 # Per-slug iframe height. Default 720; override here when a component
 # needs more vertical room (icons gallery, layouts, etc).
 playground_heights <- list(
+  button = 760L,
   select = 760L
 )
 
@@ -55,11 +59,10 @@ for (slug in slugs) {
     unlink(out_dir, recursive = TRUE, force = TRUE)
   }
 
-  # Stage the wasm filesystem image *inside* the app source directory
-  # before exporting. shinylive::export() bundles every file next to
-  # app.R into app.json; webR mounts them at the app's working
-  # directory inside its virtual filesystem, so the bootstrap snippet's
-  # relative `webr::mount("library.data.gz")` resolves correctly.
+  # Stage the wasm filesystem image inside the app source directory so
+  # app.json remains self-contained for local Shinylive app inspection.
+  # The exported site also copies these files to public/playgrounds/,
+  # which is the path the app.R bootstrap mounts at runtime.
   staged <- c()
   for (asset in c("library.data.gz", "library.js.metadata")) {
     src <- file.path(wasm_src_dir, asset)
