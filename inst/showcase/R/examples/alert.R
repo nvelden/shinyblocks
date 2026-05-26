@@ -1,7 +1,5 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    showcase_playground_layout(
+  showcase_playground_layout(
       controls = htmltools::tagList(
         showcase_controls_group(
           "Content", first = TRUE,
@@ -62,7 +60,6 @@ htmltools::tagList(
         "border: 1px solid var(--border); border-radius: 0.75rem;",
         "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
       )
-    )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::tableOutput("showcase_alert_api_table"),

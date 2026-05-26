@@ -1,7 +1,5 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    showcase_playground_layout(
+  showcase_playground_layout(
       controls = htmltools::tagList(
         showcase_controls_group(
           "Accessibility", first = TRUE,
@@ -34,7 +32,6 @@ htmltools::tagList(
       ),
       preview_output_id = "showcase_spinner_preview_ui",
       code_output_id = "showcase_spinner_preview_code"
-    )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::tableOutput("showcase_spinner_api_table"),
