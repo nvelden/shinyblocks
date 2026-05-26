@@ -1,44 +1,46 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    showcase_playground_layout(
-      controls = htmltools::tagList(
-        showcase_controls_group(
-          "Shape", first = TRUE,
-          block_field(
-            block_field_label("shape", `for` = "showcase_skeleton_doc_shape"),
-            block_select(
-              "showcase_skeleton_doc_shape",
-              choices = c("block", "rounded", "circle"),
-              selected = "block",
-              size = "sm"
-            )
-          )
-        ),
-        showcase_controls_group(
-          "Dimensions",
-          block_field(
-            block_field_label("width", `for` = "showcase_skeleton_doc_width"),
-            block_select(
-              "showcase_skeleton_doc_width",
-              choices = c("100%", "8rem", "4rem", "2rem"),
-              selected = "100%",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("height", `for` = "showcase_skeleton_doc_height"),
-            block_select(
-              "showcase_skeleton_doc_height",
-              choices = c("1rem", "2rem", "4rem", "6rem"),
-              selected = "1rem",
-              size = "sm"
-            )
+  showcase_playground_layout(
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Shape", first = TRUE,
+        block_field(
+          block_field_label("shape", `for` = "showcase_skeleton_doc_shape"),
+          block_select(
+            "showcase_skeleton_doc_shape",
+            choices = c("sharp", "rounded", "circle"),
+            selected = "rounded",
+            size = "sm"
           )
         )
       ),
-      preview_output_id = "showcase_skeleton_preview_ui",
-      code_output_id = "showcase_skeleton_preview_code"
+      showcase_controls_group(
+        "Dimensions",
+        block_field(
+          block_field_label("width", `for` = "showcase_skeleton_doc_width"),
+          block_select(
+            "showcase_skeleton_doc_width",
+            choices = c("12rem", "8rem", "4rem", "100%"),
+            selected = "12rem",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("height", `for` = "showcase_skeleton_doc_height"),
+          block_select(
+            "showcase_skeleton_doc_height",
+            choices = c("1rem", "2rem", "4rem", "6rem"),
+            selected = "1rem",
+            size = "sm"
+          )
+        )
+      )
+    ),
+    preview_output_id = "showcase_skeleton_preview_ui",
+    code_output_id = "showcase_skeleton_preview_code",
+    preview_canvas_style = paste(
+      "position: relative; display: flex; align-items: center; justify-content: center;",
+      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
+      "border: 0; border-radius: 0.75rem; min-height: 260px; box-sizing: border-box;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
