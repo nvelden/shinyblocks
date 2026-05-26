@@ -1,50 +1,39 @@
 htmltools::tagList(
   block_field_set(
     block_field_legend("Interactive Playground"),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 1.5rem;",
-      htmltools::div(
-        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
-        htmltools::div(
-          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
+    showcase_playground_layout(
+      controls = htmltools::tagList(
+        showcase_controls_group(
+          "Accessibility", first = TRUE,
           block_field(
-            block_field_label("Preview", `for` = "showcase_spinner_preview"),
-            shiny::uiOutput("showcase_spinner_preview_ui")
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$div(
-              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::uiOutput("showcase_spinner_preview_code")
-            )
+            block_field_label("label", `for` = "showcase_spinner_doc_label"),
+            block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1)
           )
         ),
-        htmltools::div(
-          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
-          # Content controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Accessibility"),
-            block_field(
-              block_field_label("label", `for` = "showcase_spinner_doc_label"),
-              block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1)
+        showcase_controls_group(
+          "Styling",
+          block_field(
+            block_field_label("size", `for` = "showcase_spinner_doc_size"),
+            block_select(
+              "showcase_spinner_doc_size",
+              choices = c("small", "medium", "large"),
+              selected = "medium",
+              size = "sm"
             )
           ),
-          # Styling controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
-            block_field(
-              block_field_label("Size", `for` = "showcase_spinner_doc_size"),
-              block_select("showcase_spinner_doc_size", choices = c("small", "medium", "large"), selected = "medium")
-            ),
-            block_field(
-              block_field_label("Color", `for` = "showcase_spinner_doc_color"),
-              block_select("showcase_spinner_doc_color", choices = c("primary", "destructive", "muted"), selected = "primary")
+          block_field(
+            block_field_label("color", `for` = "showcase_spinner_doc_color"),
+            block_select(
+              "showcase_spinner_doc_color",
+              choices = c("primary", "destructive", "muted"),
+              selected = "primary",
+              size = "sm"
             )
           )
         )
-      )
+      ),
+      preview_output_id = "showcase_spinner_preview_ui",
+      code_output_id = "showcase_spinner_preview_code"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
