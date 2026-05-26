@@ -77,7 +77,7 @@ for (slug in slugs) {
 
   cat(sprintf("Exporting %s → %s\n", app_dir, out_dir))
   on.exit(unlink(staged), add = TRUE)
-  shinylive::export(app_dir, out_dir)
+  shinylive::export(app_dir, out_dir, wasm_packages = FALSE)
   unlink(staged)
 
   local_shinylive_dir <- file.path(out_dir, "shinylive")
