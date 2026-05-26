@@ -5,7 +5,7 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   # paths resolve relative to the worker script context. In others (e.g. blob workers/proxied environments),
   # they resolve relative to the main document base URL. We try both to be fully resilient.
   mounted <- FALSE
-  for (path in c("../library.data.gz", "../../library.data.gz")) {
+  for (path in c("../../library.data.gz", "../library.data.gz")) {
     tryCatch({
       webr::mount("/packages", path)
       if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
