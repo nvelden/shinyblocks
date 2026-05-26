@@ -57,6 +57,21 @@ register_button_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
+  output$showcase_button_preview_value <- showcase_render_code({
+    value <- input$showcase_button_preview
+    val_str <- if (is.null(value)) {
+      "<NULL>"
+    } else {
+      as.character(value)
+    }
+    paste0("input$showcase_button_preview = ", val_str)
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_button_preview_value",
+    suspendWhenHidden = FALSE
+  )
+
   output$showcase_button_preview_code <- showcase_render_code({
     string_literal <- function(value) {
       paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
@@ -209,7 +224,7 @@ register_button_showcase <- function(input, output, session) {
         "Button size. One of default, sm, lg, or icon.",
         "Optional leading/trailing icon name or tag.",
         "Controls icon placement when an icon is present.",
-        "Additional button attributes. Pass id = \"...\" to address the button from update_block_button().",
+        "Additional button attributes. Pass id = \"...\" to expose input$<id> as a click count and address the button from update_block_button().",
         "Additional class merged onto the runtime button element."
       )
     )

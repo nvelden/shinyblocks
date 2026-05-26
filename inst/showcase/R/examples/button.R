@@ -9,7 +9,11 @@ htmltools::tagList(
           style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
           block_field(
             block_field_label("Preview", `for` = "showcase_button_preview"),
-            shiny::uiOutput("showcase_button_preview_ui")
+            shiny::uiOutput("showcase_button_preview_ui"),
+            htmltools::tags$div(
+              style = "margin-top: 1rem;",
+              shiny::uiOutput("showcase_button_preview_value")
+            )
           ),
           htmltools::tags$div(
             style = "display: flex; flex-direction: column; gap: 1rem;",

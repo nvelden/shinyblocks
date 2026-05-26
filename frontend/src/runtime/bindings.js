@@ -11,6 +11,7 @@ import {
 } from "./native-inputs.js";
 
 const RUNTIME_INPUT_COMPONENTS = new Set([
+  "button",
   "select",
   "dialog",
   "popover",
@@ -216,7 +217,7 @@ function registerButtonBinding() {
     }
 
     getType() {
-      return null;
+      return "shinyblocks.button";
     }
 
     getValue(el) {
@@ -231,8 +232,14 @@ function registerButtonBinding() {
     }
 
     subscribe(el, callback) {
-      const handler = () => {
-        if (el.hasAttribute("disabled") || el.querySelector("button:disabled")) {
+      const handler = (event) => {
+        const button = event.target && event.target.closest
+          ? event.target.closest("[data-slot='button']")
+          : null;
+        if (!button || !el.contains(button)) {
+          return;
+        }
+        if (button.disabled) {
           return;
         }
         if (typeof el.__sbButtonClickCount === "undefined") {
@@ -267,6 +274,16 @@ function registerButtonBinding() {
     "shinyblocks.button"
   );
   window.shinyblocksButtonBindingRegistered = true;
+}
+
+function bindButtonRoot(root) {
+  if (!window.Shiny || !window.Shiny.bindAll) return;
+  window.Shiny.bindAll(root);
+}
+
+function unbindButtonRoot(root) {
+  if (!window.Shiny || !window.Shiny.unbindAll) return;
+  window.Shiny.unbindAll(root);
 }
 
 function bindDialogRoot(root) {
@@ -874,6 +891,7 @@ export function registerRuntimeInputBindings() {
 export function bindRuntimeInputRoot(root, payload) {
   if (!isRuntimeInputPayload(payload)) return false;
 
+  if (payload.component === "button") bindButtonRoot(root);
   if (payload.component === "select") bindSelectRoot(root);
   if (payload.component === "dialog") bindDialogRoot(root);
   if (payload.component === "popover") bindPopoverRoot(root);
@@ -890,6 +908,7 @@ export function bindRuntimeInputRoot(root, payload) {
 export function unbindRuntimeInputRoot(root, payload) {
   if (!isRuntimeInputPayload(payload)) return false;
 
+  if (payload.component === "button") unbindButtonRoot(root);
   if (payload.component === "select") unbindSelectRoot(root);
   if (payload.component === "dialog") unbindDialogRoot(root);
   if (payload.component === "popover") unbindPopoverRoot(root);

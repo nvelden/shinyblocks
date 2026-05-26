@@ -1,6 +1,6 @@
 if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-  webr::mount("/packages", "../../library.data.gz")
+  webr::mount("/packages", "library.data.gz")
   .libPaths(c("/packages", .libPaths()))
 }
 
@@ -35,7 +35,17 @@ showcase_action_button <- function(input_id, label) {
 
 ui <- block_page(
   title = "shinyblocks · Select playground",
-  theme = htmltools::tags$link(rel = "stylesheet", href = "../../shinyblocks-runtime-override.css"),
+  theme = htmltools::tagList(
+    htmltools::tags$link(rel = "stylesheet", href = "../../shinyblocks-runtime-override.css"),
+    htmltools::tags$style(htmltools::HTML(
+      "
+      [data-shinyblocks-root] .showcase-select-preview-custom .sb-select-trigger,
+      [data-shinyblocks-root].showcase-select-preview-custom .sb-select-trigger {
+        border: 2px dashed red;
+      }
+      "
+    ))
+  ),
   block_body(
     htmltools::tags$div(
       `data-shinyblocks-root` = "",

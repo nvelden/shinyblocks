@@ -149,6 +149,11 @@ ui <- shiny::fluidPage(
     step = 5,
     class = "runtime-slider-fixture"
   ),
+  block_button(
+    "Runtime button",
+    id = "runtime_button",
+    class = "runtime-button-fixture"
+  ),
   block_popover(
     id = "runtime_popover",
     trigger = "Open popover",
@@ -167,6 +172,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_checkbox_value"),
   shiny::verbatimTextOutput("runtime_switch_value"),
   shiny::verbatimTextOutput("runtime_slider_value"),
+  shiny::verbatimTextOutput("runtime_button_value"),
+  shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_popover_value"),
   shiny::actionButton("set_b", "Set B"),
   shiny::actionButton("clear_choice", "Clear"),
@@ -183,6 +190,8 @@ ui <- shiny::fluidPage(
   shiny::actionButton("set_slider_75", "Set slider 75"),
   shiny::actionButton("disable_slider", "Disable slider"),
   shiny::actionButton("enable_slider", "Enable slider"),
+  shiny::actionButton("disable_button", "Disable button"),
+  shiny::actionButton("enable_button", "Enable button"),
   shiny::actionButton("open_popover", "Open popover"),
   shiny::actionButton("close_popover", "Close popover"),
   shiny::actionButton("update_popover_body", "Update popover body"),
@@ -245,6 +254,20 @@ server <- function(input, output, session) {
       return("<NULL>")
     }
     paste(value, collapse = ",")
+  })
+  output$runtime_button_value <- shiny::renderText({
+    value <- input$runtime_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    as.character(value)
+  })
+  output$runtime_button_class <- shiny::renderText({
+    value <- input$runtime_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(class(value), collapse = ",")
   })
   output$runtime_popover_value <- shiny::renderText({
     value <- input$runtime_popover
@@ -388,6 +411,22 @@ server <- function(input, output, session) {
     update_block_slider(
       session = session,
       input_id = "runtime_slider",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$disable_button, {
+    update_block_button(
+      session = session,
+      input_id = "runtime_button",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_button, {
+    update_block_button(
+      session = session,
+      input_id = "runtime_button",
       disabled = FALSE
     )
   })

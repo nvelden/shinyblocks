@@ -135,7 +135,7 @@ register_layout_showcase <- function(input, output, session) {
         "Central page landmark wrapper for nested sections/grids."
       )
     )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+  }, width = "100%", align = "lll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
   shiny::outputOptions(
     output,
     "showcase_layout_api_table",

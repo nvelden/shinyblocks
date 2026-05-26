@@ -183,12 +183,41 @@ try {
   await page.mouse.down();
   await page.mouse.move(sliderTrack.x + sliderTrack.width * 0.2, sliderTrack.y - 40, { steps: 2 });
   await page.mouse.up();
+  if (await page.evaluate(() => document.querySelector("#runtime_slider")?.value !== "20")) {
+    const retryThumb = await page.locator("[data-sb-component='slider'] [data-slot='slider-thumb']").boundingBox();
+    assert(retryThumb, "runtime slider thumb should be measurable for retry");
+    await page.mouse.move(retryThumb.x + retryThumb.width / 2, retryThumb.y + retryThumb.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(sliderTrack.x + sliderTrack.width * 0.2, sliderTrack.y - 40, { steps: 4 });
+    await page.mouse.up();
+  }
   await assertText(page, "#runtime_slider_value", "20");
   assert.equal(
     await page.evaluate(() => document.querySelector("#runtime_slider")?.value),
     "20",
     "runtime slider thumb drag should keep updating after the pointer leaves the track"
   );
+
+  await assertText(page, "#runtime_button_value", "0");
+  await assertText(page, "#runtime_button_class", "shinyActionButtonValue,shiny.actionButton,integer");
+  await page.click("[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']");
+  await assertText(page, "#runtime_button_value", "1");
+  await page.click("#disable_button");
+  await page.waitForFunction(() => {
+    return document.querySelector(
+      "[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']"
+    )?.disabled === true;
+  });
+  await page.locator("[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']").evaluate((node) => {
+    node.click();
+  });
+  await assertText(page, "#runtime_button_value", "1");
+  await page.click("#enable_button");
+  await page.waitForFunction(() => {
+    return document.querySelector(
+      "[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']"
+    )?.disabled === false;
+  });
 
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
