@@ -345,3 +345,4 @@
   them running so the maintainer can eyeball them. `make gate` now
   ends with `verify`, so a phase exit cannot tag without both servers
   responding. Quality Gate item 14 documents this rule.
+* Added an interactive Shinylive playground to the docs site for the Theme component page (issue #21), and aligned the local Theme showcase tab with the same unboxed controls and preview layout.

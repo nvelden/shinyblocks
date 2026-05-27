@@ -74,6 +74,21 @@ register_theme_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
+  output$showcase_theme_action_code <- showcase_render_code({
+    paste(
+      "update_block_theme(",
+      "  session = session,",
+      "  mode = \"dark\"",
+      ")",
+      sep = "\n"
+    )
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_theme_action_code",
+    suspendWhenHidden = FALSE
+  )
+
   # API Reference table
   output$showcase_theme_api_table <- shiny::renderTable({
     data.frame(
