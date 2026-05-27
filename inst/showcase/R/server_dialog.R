@@ -154,6 +154,10 @@ register_dialog_showcase <- function(input, output, session) {
   )
 
   output$showcase_dialog_preview_code <- showcase_render_code({
+    string_literal <- function(value) {
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+    }
+
     title_val <- input$showcase_dialog_doc_title %||% "Confirm action"
     desc_val <- input$showcase_dialog_doc_description %||% ""
     trigger_val <- input$showcase_dialog_doc_trigger %||% ""
@@ -164,10 +168,10 @@ register_dialog_showcase <- function(input, output, session) {
 
     args <- c(
       'id = "showcase_dialog_preview"',
-      paste0('title = "', title_val, '"')
+      paste0("title = ", string_literal(title_val))
     )
     if (nzchar(desc_val)) {
-      args <- c(args, paste0('description = "', desc_val, '"'))
+      args <- c(args, paste0("description = ", string_literal(desc_val)))
     }
     if (footer_val) {
       footer_str <- if (identical(footer_kind_val, "custom")) {
@@ -178,17 +182,17 @@ register_dialog_showcase <- function(input, output, session) {
       args <- c(args, footer_str)
     }
     if (nzchar(trigger_val)) {
-      args <- c(args, paste0('trigger = "', trigger_val, '"'))
+      args <- c(args, paste0("trigger = ", string_literal(trigger_val)))
     }
     if (!identical(size_val, "default")) {
-      args <- c(args, paste0('size = "', size_val, '"'))
+      args <- c(args, paste0("size = ", string_literal(size_val)))
     }
     if (hide_title_val) {
       args <- c(args, "hide_title = TRUE")
     }
     style_val <- input$showcase_dialog_doc_style %||% ""
     if (nzchar(style_val)) {
-      args <- c(args, paste0('style = "', style_val, '"'))
+      args <- c(args, paste0("style = ", string_literal(style_val)))
     }
     if (isTRUE(input$showcase_dialog_doc_class)) {
       args <- c(args, 'class = "showcase-dialog-preview-custom"')

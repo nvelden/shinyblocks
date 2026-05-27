@@ -52,6 +52,7 @@ playground_heights <- list(
   layout = 800L,
   tooltip = 820L,
   popover = 980L,
+  dialog = 1040L,
   textarea = 800L,
   `value-box` = 760L
 )
