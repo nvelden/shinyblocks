@@ -1940,7 +1940,7 @@ function Slider({ payload, root }) {
   }
 
   function handlePointerMove(event, thumbIndex = null) {
-    if (disabled || !draggingRef.current || event.buttons !== 1) return;
+    if (disabled || !draggingRef.current) return;
     updateThumb(thumbIndex == null ? activeThumbRef.current : thumbIndex, valueFromPointer(event), true);
   }
 

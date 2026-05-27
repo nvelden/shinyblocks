@@ -89,7 +89,7 @@ ui <- block_page(
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
           htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Styling"),
-          block_field(block_field_label("width", `for` = "showcase_slider_doc_width"), block_input("showcase_slider_doc_width", value = "100%", placeholder = "100% or 20rem")),
+          block_field(block_field_label("width", `for` = "showcase_slider_doc_width"), block_input("showcase_slider_doc_width", value = "20rem", placeholder = "100% or 20rem")),
           block_field(
             block_field_label("style", `for` = "showcase_slider_doc_style"),
             block_textarea("showcase_slider_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 20rem;")
@@ -144,7 +144,7 @@ server <- function(input, output, session) {
     if (length(value) == 2 && value[[1]] > value[[2]]) value <- sort(value)
     step <- slider_number(input$showcase_slider_doc_step, 1)
     if (step <= 0) step <- 1
-    width <- input$showcase_slider_doc_width %||% "100%"
+    width <- input$showcase_slider_doc_width %||% "20rem"
     if (!nzchar(width)) width <- NULL
     style <- input$showcase_slider_doc_style %||% ""
     if (!nzchar(style)) style <- NULL

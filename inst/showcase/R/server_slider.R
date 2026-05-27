@@ -33,7 +33,7 @@ register_slider_showcase <- function(input, output, session) {
     if (step_val <= 0) step_val <- 1
     disabled <- isTRUE(input$showcase_slider_doc_disabled)
     invalid <- isTRUE(input$showcase_slider_doc_invalid)
-    width_val <- input$showcase_slider_doc_width %||% "100%"
+    width_val <- input$showcase_slider_doc_width %||% "20rem"
     if (!nzchar(width_val)) width_val <- NULL
     style_val <- input$showcase_slider_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
@@ -81,7 +81,7 @@ register_slider_showcase <- function(input, output, session) {
     step_val <- slider_number(input$showcase_slider_doc_step, 1)
     disabled <- isTRUE(input$showcase_slider_doc_disabled)
     invalid <- isTRUE(input$showcase_slider_doc_invalid)
-    width_val <- input$showcase_slider_doc_width %||% "100%"
+    width_val <- input$showcase_slider_doc_width %||% "20rem"
     style_val <- input$showcase_slider_doc_style %||% ""
     custom_class <- isTRUE(input$showcase_slider_doc_class)
 

@@ -46,7 +46,7 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("width", `for` = "showcase_slider_doc_width"),
-          block_input("showcase_slider_doc_width", value = "100%", placeholder = "100% or 20rem")
+          block_input("showcase_slider_doc_width", value = "20rem", placeholder = "100% or 20rem")
         ),
         block_field(
           block_field_label("style", `for` = "showcase_slider_doc_style"),
