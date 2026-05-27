@@ -44,12 +44,24 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 4-Column High-Fidelity Dashboard Layout from pre-rendered R HTML */}
+        {/* Live R dashboard with the generated HTML retained as a build fallback. */}
         {gallery && (
-          <div 
-            className="w-full"
-            dangerouslySetInnerHTML={{ __html: gallery.html }} 
-          />
+          gallery.hasPlayground ? (
+            <div className="overflow-hidden rounded-lg border border-border bg-card">
+              <iframe
+                src="/shinyblocks/playgrounds/gallery/"
+                title="Interactive components gallery"
+                loading="lazy"
+                className="block w-full bg-background"
+                style={{ height: `${gallery.playgroundHeight ?? 980}px`, border: 0 }}
+              />
+            </div>
+          ) : (
+            <div
+              className="w-full"
+              dangerouslySetInnerHTML={{ __html: gallery.html }}
+            />
+          )
         )}
       </section>
     </div>

@@ -351,3 +351,4 @@
 * Added an interactive Shinylive playground to the docs site for the Tooltip component page (issue #21), and aligned the local Tooltip showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Popover component page (issue #21), and aligned the local Popover showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Dialog component page (issue #21), and aligned the local Dialog showcase tab with the same unboxed controls and preview layout.
+* Replaced the docs home page's static Gallery preview with a live Shinylive dashboard playground composed from shinyblocks inputs, cards, tabs, alerts, and reactive server actions (issue #21).
