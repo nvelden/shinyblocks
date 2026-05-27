@@ -50,6 +50,7 @@ playground_heights <- list(
   theme = 880L,
   `nav-item` = 700L,
   layout = 800L,
+  tooltip = 820L,
   textarea = 800L,
   `value-box` = 760L
 )

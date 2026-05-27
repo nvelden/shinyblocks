@@ -280,7 +280,8 @@
     "code": "shinyblocks::block_tooltip(\n  trigger = \"Hover me\",\n  \"Clicking is not required to view this hint.\"\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-53\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_tooltip(\\n  trigger = \\\"Hover me\\\",\\n  \\\"Clicking is not required to view this hint.\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-tooltip-tooltip-52\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"tooltip\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"tooltip\",\"id\":null,\"props\":{\"triggerLabel\":\"Hover me\",\"bodyHtml\":\"Clicking is not required to view this hint.\",\"side\":\"top\",\"align\":\"center\",\"delayDuration\":700,\"contentStyle\":null,\"contentClass\":null},\"slots\":[],\"children\":[],\"state\":[],\"binding\":{\"input\":false},\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 820
   },
   {
     "name": "Gallery",

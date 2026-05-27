@@ -28,6 +28,10 @@ register_tooltip_showcase <- function(input, output, session) {
   shiny::outputOptions(output, "showcase_tooltip_preview_ui", suspendWhenHidden = FALSE)
   
   output$showcase_tooltip_preview_code <- showcase_render_code({
+    string_literal <- function(value) {
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+    }
+
     trigger <- input$showcase_tooltip_doc_trigger %||% "Hover me"
     content <- input$showcase_tooltip_doc_content %||% "Tooltip details go here."
     side <- input$showcase_tooltip_doc_side %||% "top"
@@ -37,14 +41,14 @@ register_tooltip_showcase <- function(input, output, session) {
     style_val <- input$showcase_tooltip_doc_style %||% ""
     
     args <- c(
-      paste0('trigger = "', trigger, '"'),
-      paste0('"', content, '"')
+      paste0("trigger = ", string_literal(trigger)),
+      string_literal(content)
     )
-    if (side != "top") args <- c(args, paste0('side = "', side, '"'))
-    if (align != "center") args <- c(args, paste0('align = "', align, '"'))
+    if (side != "top") args <- c(args, paste0("side = ", string_literal(side)))
+    if (align != "center") args <- c(args, paste0("align = ", string_literal(align)))
     if (delay != 700) args <- c(args, paste0('delay_duration = ', delay))
     if (custom_class) args <- c(args, 'class = "showcase-tooltip-preview-custom"')
-    if (nzchar(style_val)) args <- c(args, paste0('style = "', style_val, '"'))
+    if (nzchar(style_val)) args <- c(args, paste0("style = ", string_literal(style_val)))
     
     paste0("block_tooltip(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
