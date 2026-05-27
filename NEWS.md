@@ -347,3 +347,4 @@
   responding. Quality Gate item 14 documents this rule.
 * Added an interactive Shinylive playground to the docs site for the Theme component page (issue #21), and aligned the local Theme showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Nav Item component page (issue #21), and aligned the local Nav Item showcase tab with the same unboxed controls and preview layout.
+* Added an interactive Shinylive playground to the docs site for the Layout component page (issue #21), and aligned the local Layout showcase tab with the same unboxed controls and preview layout.

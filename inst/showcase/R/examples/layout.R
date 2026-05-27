@@ -1,49 +1,35 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 1.5rem;",
-      htmltools::div(
-        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
-        htmltools::div(
-          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
-          block_field(
-            block_field_label("Mini Mock Layout Preview", `for` = "showcase_layout_preview"),
-            shiny::uiOutput("showcase_layout_preview_ui")
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$div(
-              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::uiOutput("showcase_layout_preview_code")
-            )
-          )
+  showcase_playground_layout(
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Header & Sidebar", first = TRUE,
+        block_field(
+          block_field_label("header title", `for` = "showcase_layout_doc_title"),
+          block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1)
         ),
-        htmltools::div(
-          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
-          # Controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Header & Sidebar Settings"),
-            block_field(
-              block_field_label("header title", `for` = "showcase_layout_doc_title"),
-              block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1)
-            ),
-            block_field(
-              block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
-              block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1)
-            ),
-            block_field(
-              block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
-              block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
-            ),
-            block_field(
-              block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
-              block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
-            )
-          )
+        block_field(
+          block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
+          block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1)
+        )
+      ),
+      showcase_controls_group(
+        "Sidebar State",
+        block_field(
+          block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
+          block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
+        ),
+        block_field(
+          block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
+          block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
         )
       )
+    ),
+    preview_output_id = "showcase_layout_preview_ui",
+    code_output_id = "showcase_layout_preview_code",
+    preview_canvas_style = paste(
+      "position: relative; display: flex; align-items: stretch; justify-content: stretch;",
+      "padding: 1rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
+      "border: 0; border-radius: 0.75rem; min-height: 332px; box-sizing: border-box;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

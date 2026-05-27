@@ -5,28 +5,26 @@ register_layout_showcase <- function(input, output, session) {
     collapsible <- isTRUE(input$showcase_layout_doc_collapsible)
     collapsed <- isTRUE(input$showcase_layout_doc_collapsed)
     
-    # Render a beautiful miniature mock-up of the layout structure
     htmltools::div(
-      class = "sb-layout-mockup border rounded-lg overflow-hidden bg-background shadow-md",
-      style = "display: flex; height: 300px; width: 100%; position: relative;",
+      style = "display: flex; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
       
-      # Mock Sidebar
       htmltools::div(
-        class = paste0("sb-sidebar-mock border-r bg-muted ", if (collapsed) "collapsed-mock" else ""),
-        style = paste0("width: ", if (collapsed) "60px" else "200px", "; transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem; position: relative; overflow: hidden;"),
+        style = paste0(
+          "width: ", if (collapsed) "60px" else "200px", ";",
+          "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
+          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
+        ),
         
-        # Sidebar Header
         htmltools::div(
           style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; white-space: nowrap;",
           if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
           if (collapsible) {
             htmltools::tags$div(
-              style = "opacity: 0.7; font-size: 0.75rem; cursor: pointer; padding: 0.25rem; border-radius: 0.25rem;",
+              style = "opacity: 0.7; font-size: 0.75rem; padding: 0.25rem; border-radius: 0.25rem;",
               block_icon("panel-left")
             )
           }
         ),
-        # Sidebar items mockup
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.5rem;",
           htmltools::div(style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
@@ -40,14 +38,11 @@ register_layout_showcase <- function(input, output, session) {
         )
       ),
       
-      # Mock Main Area
       htmltools::div(
         style = "flex: 1; display: flex; flex-direction: column;",
         
-        # Mock Header
         htmltools::div(
-          class = "border-b bg-background",
-          style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between;",
+          style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--background);",
           htmltools::div(
             style = "display: flex; align-items: center; gap: 0.5rem;",
             block_icon("menu"),
@@ -58,7 +53,6 @@ register_layout_showcase <- function(input, output, session) {
           )
         ),
         
-        # Mock Body
         htmltools::div(
           style = "flex: 1; padding: 1rem; background: var(--background); overflow-y: auto;",
           htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Overview Metrics"),
@@ -86,6 +80,10 @@ register_layout_showcase <- function(input, output, session) {
   )
 
   output$showcase_layout_preview_code <- showcase_render_code({
+    string_literal <- function(value) {
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+    }
+
     title_val <- input$showcase_layout_doc_title %||% "Admin Dashboard"
     sidebar_title_val <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
     collapsible_val <- isTRUE(input$showcase_layout_doc_collapsible)
@@ -93,18 +91,18 @@ register_layout_showcase <- function(input, output, session) {
 
     paste0(
       "block_page(\n",
-      "  title = \"", title_val, "\",\n",
+      "  title = ", string_literal(title_val), ",\n",
       "  sidebar = block_sidebar(\n",
-      "    title = \"", sidebar_title_val, "\",\n",
-      "    collapsible = ", tolower(as.character(collapsible_val)), ",\n",
-      "    collapsed = ", tolower(as.character(collapsed_val)), ",\n",
+      "    title = ", string_literal(sidebar_title_val), ",\n",
+      "    collapsible = ", as.character(collapsible_val), ",\n",
+      "    collapsed = ", as.character(collapsed_val), ",\n",
       "    block_nav(\n",
       "      block_nav_item(\"Dashboard\", icon = \"layout-dashboard\"),\n",
       "      block_nav_item(\"Users\", icon = \"users\")\n",
       "    )\n",
       "  ),\n",
       "  header = block_header(\n",
-      "    \"", title_val, "\"\n",
+      "    ", string_literal(title_val), "\n",
       "  ),\n",
       "  block_body(\n",
       "    # Main content here\n",
