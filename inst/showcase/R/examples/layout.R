@@ -10,6 +10,14 @@ htmltools::tagList(
         block_field(
           block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
           block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1)
+        ),
+        block_field(
+          block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
+          block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
+        ),
+        block_field(
+          block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
+          block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1)
         )
       ),
       showcase_controls_group(

@@ -71,6 +71,14 @@ ui <- block_page(
           block_field(
             block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
             block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1)
+          ),
+          block_field(
+            block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
+            block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
+          ),
+          block_field(
+            block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
+            block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1)
           )
         ),
         htmltools::div(
@@ -116,11 +124,27 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
+  collapsed_state <- reactiveVal(FALSE)
+
+  observeEvent(input$showcase_layout_doc_collapsed, {
+    collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
+  }, ignoreInit = FALSE)
+
+  observeEvent(input$showcase_layout_preview_toggle, {
+    if (isTRUE(input$showcase_layout_doc_collapsible)) {
+      collapsed_state(!isTRUE(collapsed_state()))
+    }
+  })
+
   output$showcase_layout_preview_ui <- renderUI({
     title <- input$showcase_layout_doc_title %||% "Admin Dashboard"
     sidebar_title <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
     collapsible <- isTRUE(input$showcase_layout_doc_collapsible)
-    collapsed <- isTRUE(input$showcase_layout_doc_collapsed)
+    collapsed <- if (collapsible) isTRUE(collapsed_state()) else FALSE
+    show_profile <- isTRUE(input$showcase_layout_doc_profile)
+    profile_label <- input$showcase_layout_doc_profile_label %||% "NV"
+    profile_label <- trimws(profile_label)
+    if (!nzchar(profile_label)) profile_label <- "NV"
 
     htmltools::div(
       style = "display: flex; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
@@ -134,9 +158,14 @@ server <- function(input, output, session) {
           style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; white-space: nowrap;",
           if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
           if (collapsible) {
-            htmltools::div(
-              style = "opacity: 0.7; font-size: 0.75rem; padding: 0.25rem; border-radius: 0.25rem;",
-              block_icon("panel-left")
+            block_button(
+              "",
+              id = "showcase_layout_preview_toggle",
+              variant = "ghost",
+              size = "icon",
+              icon = "panel-left",
+              style = "width: 1.75rem; height: 1.75rem;",
+              `aria-label` = "Toggle sidebar"
             )
           }
         ),
@@ -163,7 +192,18 @@ server <- function(input, output, session) {
             block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
-          htmltools::div(style = "width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--muted);")
+          if (show_profile) {
+            htmltools::div(
+              title = "Profile area",
+              style = paste(
+                "width: 1.75rem; height: 1.75rem; border-radius: 9999px;",
+                "display: inline-flex; align-items: center; justify-content: center;",
+                "background: var(--muted); color: var(--muted-foreground);",
+                "font-size: 0.6875rem; font-weight: 700;"
+              ),
+              substr(profile_label, 1, 2)
+            )
+          }
         ),
         htmltools::div(
           style = "flex: 1; padding: 1rem; background: var(--background); overflow-y: auto;",
@@ -191,6 +231,18 @@ server <- function(input, output, session) {
     sidebar_title <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
     collapsible <- as.character(isTRUE(input$showcase_layout_doc_collapsible))
     collapsed <- as.character(isTRUE(input$showcase_layout_doc_collapsed))
+    show_profile <- isTRUE(input$showcase_layout_doc_profile)
+    profile_code <- if (show_profile) {
+      paste0(
+        ",\n",
+        "    htmltools::div(\n",
+        "      class = \"profile-avatar\",\n",
+        "      ", string_literal(substr(input$showcase_layout_doc_profile_label %||% "NV", 1, 2)), "\n",
+        "    )"
+      )
+    } else {
+      ""
+    }
     paste0(
       "block_page(\n",
       "  title = ", string_literal(title), ",\n",
@@ -203,7 +255,9 @@ server <- function(input, output, session) {
       "      block_nav_item(\"Users\", icon = \"users\")\n",
       "    )\n",
       "  ),\n",
-      "  header = block_header(", string_literal(title), "),\n",
+      "  header = block_header(\n",
+      "    ", string_literal(title), profile_code, "\n",
+      "  ),\n",
       "  block_body(...)\n",
       ")"
     )

@@ -1,9 +1,25 @@
 register_layout_showcase <- function(input, output, session) {
+  collapsed_state <- shiny::reactiveVal(FALSE)
+
+  shiny::observeEvent(input$showcase_layout_doc_collapsed, {
+    collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
+  }, ignoreInit = FALSE)
+
+  shiny::observeEvent(input$showcase_layout_preview_toggle, {
+    if (isTRUE(input$showcase_layout_doc_collapsible)) {
+      collapsed_state(!isTRUE(collapsed_state()))
+    }
+  })
+
   output$showcase_layout_preview_ui <- shiny::renderUI({
     title <- input$showcase_layout_doc_title %||% "Admin Dashboard"
     sidebar_title <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
     collapsible <- isTRUE(input$showcase_layout_doc_collapsible)
-    collapsed <- isTRUE(input$showcase_layout_doc_collapsed)
+    collapsed <- if (collapsible) isTRUE(collapsed_state()) else FALSE
+    show_profile <- isTRUE(input$showcase_layout_doc_profile)
+    profile_label <- input$showcase_layout_doc_profile_label %||% "NV"
+    profile_label <- trimws(profile_label)
+    if (!nzchar(profile_label)) profile_label <- "NV"
     
     htmltools::div(
       style = "display: flex; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
@@ -19,9 +35,14 @@ register_layout_showcase <- function(input, output, session) {
           style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; white-space: nowrap;",
           if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
           if (collapsible) {
-            htmltools::tags$div(
-              style = "opacity: 0.7; font-size: 0.75rem; padding: 0.25rem; border-radius: 0.25rem;",
-              block_icon("panel-left")
+            block_button(
+              "",
+              id = "showcase_layout_preview_toggle",
+              variant = "ghost",
+              size = "icon",
+              icon = "panel-left",
+              style = "width: 1.75rem; height: 1.75rem;",
+              `aria-label` = "Toggle sidebar"
             )
           }
         ),
@@ -48,9 +69,18 @@ register_layout_showcase <- function(input, output, session) {
             block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
-          htmltools::tags$div(
-            style = "width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--muted);"
-          )
+          if (show_profile) {
+            htmltools::tags$div(
+              title = "Profile area",
+              style = paste(
+                "width: 1.75rem; height: 1.75rem; border-radius: 9999px;",
+                "display: inline-flex; align-items: center; justify-content: center;",
+                "background: var(--muted); color: var(--muted-foreground);",
+                "font-size: 0.6875rem; font-weight: 700;"
+              ),
+              substr(profile_label, 1, 2)
+            )
+          }
         ),
         
         htmltools::div(
@@ -88,6 +118,19 @@ register_layout_showcase <- function(input, output, session) {
     sidebar_title_val <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
     collapsible_val <- isTRUE(input$showcase_layout_doc_collapsible)
     collapsed_val <- isTRUE(input$showcase_layout_doc_collapsed)
+    show_profile_val <- isTRUE(input$showcase_layout_doc_profile)
+    profile_label_val <- substr(input$showcase_layout_doc_profile_label %||% "NV", 1, 2)
+    profile_code <- if (show_profile_val) {
+      paste0(
+        ",\n",
+        "    htmltools::div(\n",
+        "      class = \"profile-avatar\",\n",
+        "      ", string_literal(profile_label_val), "\n",
+        "    )"
+      )
+    } else {
+      ""
+    }
 
     paste0(
       "block_page(\n",
@@ -102,7 +145,7 @@ register_layout_showcase <- function(input, output, session) {
       "    )\n",
       "  ),\n",
       "  header = block_header(\n",
-      "    ", string_literal(title_val), "\n",
+      "    ", string_literal(title_val), profile_code, "\n",
       "  ),\n",
       "  block_body(\n",
       "    # Main content here\n",
