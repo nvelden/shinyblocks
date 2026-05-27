@@ -35,6 +35,15 @@ htmltools::tagList(
             selected = "none",
             size = "sm"
           )
+        ),
+        block_field(
+          block_field_label("style", `for` = "showcase_value_box_doc_style"),
+          block_textarea(
+            "showcase_value_box_doc_style",
+            value = "",
+            rows = 1,
+            placeholder = "e.g., min-width: 18rem;"
+          )
         )
       )
     ),

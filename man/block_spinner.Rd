@@ -4,12 +4,24 @@
 \alias{block_spinner}
 \title{Create a spinner}
 \usage{
-block_spinner(label = "Loading", class = NULL)
+block_spinner(
+  label = "Loading",
+  size = c("default", "sm", "lg"),
+  color = c("default", "muted", "destructive"),
+  class = NULL,
+  style = NULL
+)
 }
 \arguments{
 \item{label}{Accessible label.}
 
+\item{size}{Visual size.}
+
+\item{color}{Semantic color.}
+
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

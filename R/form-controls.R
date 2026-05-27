@@ -8,6 +8,8 @@
 #' @param disabled Whether the control is disabled.
 #' @param invalid Whether the control should show invalid styling
 #'   (sets `aria-invalid="true"`).
+#' @param resize Textarea resize behavior. One of `"vertical"`,
+#'   `"none"`, `"both"`, or `"horizontal"`.
 #' @param style Inline CSS styles for the textarea element.
 #' @param class Additional classes for the wrapper.
 #'
@@ -22,10 +24,12 @@ block_textarea <- function(
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
+  resize = c("vertical", "none", "both", "horizontal"),
   style = NULL,
   class = NULL
 ) {
   validate_input_id(input_id)
+  resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
   if (!is.numeric(rows) || length(rows) != 1 || is.na(rows) || rows < 1) {
     stop("`rows` must be a positive number.", call. = FALSE)
   }
@@ -40,7 +44,6 @@ block_textarea <- function(
     if (is.null(value)) "" else as.character(value)
   )
 
-  wrapper_class <- merge_classes("sb-textarea", class)
   wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
 
   runtime_component(
@@ -50,13 +53,15 @@ block_textarea <- function(
       rows = as.integer(rows),
       disabled = isTRUE(disabled),
       invalid = isTRUE(invalid),
+      resize = resize,
       style = normalize_runtime_style(style)
     ),
     input_id = input_id,
     state = list(value = if (is.null(value)) "" else as.character(value)),
     binding = list(input = TRUE, type = "shinyblocks.textarea"),
-    class = wrapper_class,
+    class = class,
     style = wrapper_style,
+    root_class = "sb-textarea",
     children = list(hidden_native)
   )
 }
@@ -70,6 +75,8 @@ block_textarea <- function(
 #' @param rows Optional number of visible rows.
 #' @param disabled Optional disabled state.
 #' @param invalid Optional invalid flag.
+#' @param resize Optional textarea resize behavior. One of `"vertical"`,
+#'   `"none"`, `"both"`, or `"horizontal"`.
 #' @param style Optional replacement inline CSS styles for the textarea.
 #' @param class Optional replacement classes for the wrapper.
 #' @param notify Whether Shiny should receive an input event when `value`
@@ -86,6 +93,7 @@ update_block_textarea <- function(
   rows,
   disabled,
   invalid,
+  resize,
   style,
   class,
   notify = TRUE
@@ -120,6 +128,9 @@ update_block_textarea <- function(
   }
   if (!missing(invalid)) {
     payload$invalid <- isTRUE(invalid)
+  }
+  if (!missing(resize)) {
+    payload$resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
   }
   if (!missing(style)) {
     payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
@@ -177,7 +188,6 @@ block_input <- function(
     value = if (is.null(value)) "" else as.character(value)
   )
 
-  wrapper_class <- merge_classes("sb-input", class)
   wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
 
   runtime_component(
@@ -192,8 +202,9 @@ block_input <- function(
     input_id = input_id,
     state = list(value = if (is.null(value)) "" else as.character(value)),
     binding = list(input = TRUE, type = "shinyblocks.input"),
-    class = wrapper_class,
+    class = class,
     style = wrapper_style,
+    root_class = "sb-input",
     children = list(hidden_native)
   )
 }
@@ -312,7 +323,8 @@ block_checkbox <- function(
     input_id = input_id,
     state = list(value = isTRUE(value)),
     binding = list(input = TRUE, type = "shinyblocks.checkbox"),
-    class = merge_classes("sb-checkbox", class),
+    class = class,
+    root_class = "sb-checkbox",
     children = list(hidden_native)
   )
 }
@@ -416,7 +428,8 @@ block_switch <- function(
     input_id = input_id,
     state = list(value = isTRUE(value)),
     binding = list(input = TRUE, type = "shinyblocks.switch"),
-    class = merge_classes("sb-switch", class),
+    class = class,
+    root_class = "sb-switch",
     children = list(hidden_native)
   )
 }
@@ -559,8 +572,9 @@ block_slider <- function(
     input_id = input_id,
     state = list(value = as.numeric(value)),
     binding = list(input = TRUE, type = "shinyblocks.slider"),
-    class = merge_classes("sb-slider", class),
+    class = class,
     style = wrapper_style,
+    root_class = "sb-slider",
     children = list(hidden_native)
   )
 }

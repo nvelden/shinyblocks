@@ -11,6 +11,7 @@ runtime_component <- function(
   binding = list(),
   class = NULL,
   style = NULL,
+  root_class = NULL,
   mount_id = NULL
 ) {
   payload <- runtime_payload(
@@ -21,14 +22,15 @@ runtime_component <- function(
     input_id = input_id,
     state = state,
     binding = binding,
-    class = class
+    class = class,
+    style = if (is.null(style)) NULL else normalize_runtime_style(style)
   )
   mount_id <- mount_id %||% runtime_mount_id(component, input_id)
 
   attach_shinyblocks_deps(
     htmltools::tags$div(
       id = mount_id,
-      class = merge_classes("sb-runtime-mount", class),
+      class = merge_classes("sb-runtime-mount", root_class),
       style = style,
       `data-shinyblocks-root` = "",
       `data-shinyblocks-runtime` = "true",

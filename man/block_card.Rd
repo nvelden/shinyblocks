@@ -10,7 +10,8 @@ block_card(
   description = NULL,
   value = NULL,
   footer = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ block_card(
 \item{footer}{Optional card footer content.}
 
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

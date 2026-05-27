@@ -10,7 +10,8 @@ block_alert(
   description = NULL,
   icon = "info",
   variant = c("default", "destructive"),
-  class = NULL
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ block_alert(
 \item{variant}{Visual variant.}
 
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

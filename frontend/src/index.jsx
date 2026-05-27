@@ -282,16 +282,21 @@ function Button({ payload, root }) {
 
 function Badge({ payload }) {
   const props = payload.props || {};
+  const variant = props.variant || "default";
+  const size = props.size || "default";
 
   return (
     <span
       data-slot="badge"
-      data-variant={props.variant || "default"}
+      data-variant={variant}
+      data-size={size}
       className={classNames(
         "sb-badge",
-        `sb-badge-${props.variant || "default"}`,
+        `sb-badge-${variant}`,
+        `sb-badge-size-${size}`,
         payload.className
       )}
+      style={payload.style}
     >
       <HtmlSlot html={props.labelHtml} />
     </span>
@@ -551,13 +556,23 @@ function Separator({ payload }) {
 
 function Spinner({ payload }) {
   const props = payload.props || {};
+  const size = props.size || "default";
+  const color = props.color || "default";
 
   return (
     <span
       data-slot="spinner"
-      className={classNames("sb-spinner", payload.className)}
+      data-size={size}
+      data-color={color}
+      className={classNames(
+        "sb-spinner",
+        `sb-spinner-size-${size}`,
+        `sb-spinner-color-${color}`,
+        payload.className
+      )}
       role="status"
       aria-label={props.label || "Loading"}
+      style={payload.style}
     />
   );
 }
@@ -584,6 +599,7 @@ function Empty({ payload }) {
     <section
       data-slot="empty"
       className={classNames("sb-empty", payload.className)}
+      style={payload.style}
     >
       {props.iconHtml && (
         <div className="sb-empty-icon">
@@ -624,6 +640,7 @@ function ValueBox({ payload }) {
     <section
       data-slot="value-box"
       className={classNames("sb-value-box", payload.className)}
+      style={payload.style}
     >
       {props.iconHtml && (
         <div className="sb-value-box-icon">
@@ -670,6 +687,7 @@ function Alert({ payload }) {
         `sb-alert-${variant}`,
         payload.className
       )}
+      style={payload.style}
     >
       {props.iconHtml && (
         <div className="sb-alert-icon">
@@ -1562,6 +1580,7 @@ function Textarea({ payload, root }) {
   const [rows, setRows] = useState(Number(props.rows || 3));
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
+  const [resize, setResize] = useState(props.resize || "vertical");
   const [style, setStyle] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
   const labelledBy = inputId ? labelIdForInput(inputId) : null;
@@ -1620,6 +1639,9 @@ function Textarea({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "invalid")) {
         setInvalid(Boolean(nextData.invalid));
       }
+      if (Object.prototype.hasOwnProperty.call(nextData, "resize")) {
+        setResize(nextData.resize || "vertical");
+      }
       if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
         setClassName(nextData.class || "");
       }
@@ -1655,7 +1677,8 @@ function Textarea({ payload, root }) {
       aria-invalid={isInvalid || undefined}
       aria-labelledby={labelledBy || undefined}
       aria-describedby={describedBy}
-      style={style}
+      data-resize={resize}
+      style={{ ...style, resize }}
       onChange={handleChange}
     />
   );

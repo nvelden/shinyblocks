@@ -128,6 +128,15 @@ ui <- block_page(
           block_field(
             block_field_label("invalid", `for` = "showcase_textarea_doc_invalid"),
             block_checkbox("showcase_textarea_doc_invalid", "Invalid", value = FALSE)
+          ),
+          block_field(
+            block_field_label("resize", `for` = "showcase_textarea_doc_resize"),
+            block_select(
+              "showcase_textarea_doc_resize",
+              choices = c("vertical", "none", "both", "horizontal"),
+              selected = "vertical",
+              size = "sm"
+            )
           )
         ),
         htmltools::div(
@@ -227,6 +236,7 @@ server <- function(input, output, session) {
       rows = parse_rows(input$showcase_textarea_doc_rows),
       disabled = isTRUE(input$showcase_textarea_doc_disabled),
       invalid = isTRUE(input$showcase_textarea_doc_invalid),
+      resize = input$showcase_textarea_doc_resize %||% "vertical",
       style = style,
       class = if (isTRUE(input$showcase_textarea_doc_class)) "showcase-textarea-preview-custom" else NULL
     )
@@ -243,6 +253,7 @@ server <- function(input, output, session) {
         rows = args$rows,
         disabled = args$disabled,
         invalid = args$invalid,
+        resize = args$resize,
         style = args$style,
         class = args$class
       )
@@ -273,6 +284,7 @@ server <- function(input, output, session) {
     )
     if (args$disabled) code_args <- c(code_args, "disabled = TRUE")
     if (args$invalid) code_args <- c(code_args, "invalid = TRUE")
+    if (!identical(args$resize, "vertical")) code_args <- c(code_args, paste0("resize = ", string_literal(args$resize)))
     if (!is.null(args$style)) code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     if (!is.null(args$class)) code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
 

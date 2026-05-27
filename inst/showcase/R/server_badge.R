@@ -5,15 +5,22 @@ register_badge_showcase <- function(input, output, session) {
       label <- "Deploying"
     }
     variant <- input$showcase_badge_doc_variant %||% "default"
+    size <- input$showcase_badge_doc_size %||% "default"
     class <- input$showcase_badge_doc_class %||% ""
     if (!nzchar(class)) {
       class <- NULL
+    }
+    style <- input$showcase_badge_doc_style %||% ""
+    if (!nzchar(style)) {
+      style <- NULL
     }
 
     block_badge(
       label = label,
       variant = variant,
-      class = class
+      size = size,
+      class = class,
+      style = style
     )
   })
   shiny::outputOptions(
@@ -32,7 +39,9 @@ register_badge_showcase <- function(input, output, session) {
       label_val <- "Deploying"
     }
     variant_val <- input$showcase_badge_doc_variant %||% "default"
+    size_val <- input$showcase_badge_doc_size %||% "default"
     class_val <- input$showcase_badge_doc_class %||% ""
+    style_val <- input$showcase_badge_doc_style %||% ""
 
     args <- c(
       paste0("label = ", string_literal(label_val))
@@ -41,8 +50,14 @@ register_badge_showcase <- function(input, output, session) {
     if (variant_val != "default") {
       args <- c(args, paste0('variant = "', variant_val, '"'))
     }
+    if (size_val != "default") {
+      args <- c(args, paste0('size = "', size_val, '"'))
+    }
     if (nzchar(class_val)) {
       args <- c(args, paste0('class = "', class_val, '"'))
+    }
+    if (nzchar(style_val)) {
+      args <- c(args, paste0("style = ", string_literal(style_val)))
     }
 
     paste0("block_badge(\n  ", paste(args, collapse = ",\n  "), "\n)")
@@ -55,13 +70,15 @@ register_badge_showcase <- function(input, output, session) {
 
   output$showcase_badge_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("label", "variant", "class"),
-      Type = c("character | tag", "character", "character"),
-      Default = c("required", "\"default\"", "NULL"),
+      Argument = c("label", "variant", "size", "class", "style"),
+      Type = c("character | tag", "character", "character", "character", "character | named list"),
+      Default = c("required", "\"default\"", "\"default\"", "NULL", "NULL"),
       Description = c(
         "Content rendered inside the badge.",
-        "Visual variant. One of default, secondary, outline, or destructive.",
-        "Additional CSS class merged onto the badge element."
+        "Visual variant. One of default, secondary, outline, destructive, ghost, or link.",
+        "Visual size. One of sm, default, or lg.",
+        "Additional CSS class merged onto the badge element.",
+        "Optional inline styles applied to the badge element."
       )
     )
   }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)

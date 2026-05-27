@@ -50,6 +50,15 @@ htmltools::tagList(
               rows = 1,
               placeholder = "e.g., shadow-sm"
             )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_alert_doc_style"),
+            block_textarea(
+              "showcase_alert_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., border-style: dashed;"
+            )
           )
         )
       ),

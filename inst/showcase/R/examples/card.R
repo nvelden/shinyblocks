@@ -37,6 +37,15 @@ htmltools::tagList(
             selected = "none",
             size = "sm"
           )
+        ),
+        block_field(
+          block_field_label("style", `for` = "showcase_card_doc_style"),
+          block_textarea(
+            "showcase_card_doc_style",
+            value = "",
+            rows = 1,
+            placeholder = "e.g., max-width: 24rem;"
+          )
         )
       )
     ),

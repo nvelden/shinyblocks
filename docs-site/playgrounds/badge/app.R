@@ -88,7 +88,16 @@ ui <- block_page(
             block_field_label("variant", `for` = "showcase_badge_doc_variant"),
             block_select(
               "showcase_badge_doc_variant",
-              choices = c("default", "secondary", "outline", "destructive"),
+              choices = c("default", "secondary", "outline", "destructive", "ghost", "link"),
+              selected = "default",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("size", `for` = "showcase_badge_doc_size"),
+            block_select(
+              "showcase_badge_doc_size",
+              choices = c("sm", "default", "lg"),
               selected = "default",
               size = "sm"
             )
@@ -107,6 +116,15 @@ ui <- block_page(
               value = "",
               rows = 1,
               placeholder = "showcase-badge-preview-custom"
+            )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_badge_doc_style"),
+            block_textarea(
+              "showcase_badge_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., letter-spacing: 0.04em;"
             )
           )
         )
@@ -148,11 +166,15 @@ server <- function(input, output, session) {
     if (!nzchar(label)) label <- "Deploying"
     class <- input$showcase_badge_doc_class %||% ""
     if (!nzchar(class)) class <- NULL
+    style <- input$showcase_badge_doc_style %||% ""
+    if (!nzchar(style)) style <- NULL
 
     list(
       label = label,
       variant = input$showcase_badge_doc_variant %||% "default",
-      class = class
+      size = input$showcase_badge_doc_size %||% "default",
+      class = class,
+      style = style
     )
   })
 
@@ -161,7 +183,9 @@ server <- function(input, output, session) {
     block_badge(
       label = args$label,
       variant = args$variant,
-      class = args$class
+      size = args$size,
+      class = args$class,
+      style = args$style
     )
   })
   outputOptions(output, "showcase_badge_preview_ui", suspendWhenHidden = FALSE)
@@ -172,8 +196,14 @@ server <- function(input, output, session) {
     if (!identical(args$variant, "default")) {
       code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
     }
+    if (!identical(args$size, "default")) {
+      code_args <- c(code_args, paste0("size = ", string_literal(args$size)))
+    }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     }
     paste0("block_badge(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
   })

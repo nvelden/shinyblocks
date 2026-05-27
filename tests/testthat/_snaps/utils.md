@@ -44,7 +44,7 @@
       block_badge("New", variant = "primary")
     Condition
       Error:
-      ! `variant` must be one of "default", "secondary", "outline", "destructive".
+      ! `variant` must be one of "default", "secondary", "outline", "destructive", "ghost", "link".
 
 # block_alert validates required title and variant
 

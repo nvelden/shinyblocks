@@ -47,8 +47,6 @@ block_radio_group <- function(
     value = selected_value
   )
 
-  wrapper_class <- merge_classes("sb-radio-group", class)
-
   runtime_component(
     component = "radio-group",
     props = list(
@@ -61,7 +59,8 @@ block_radio_group <- function(
     input_id = input_id,
     state = list(value = selected_value),
     binding = list(input = TRUE, type = "shinyblocks.radio-group"),
-    class = wrapper_class,
+    class = class,
+    root_class = "sb-radio-group",
     children = list(hidden_native)
   )
 }

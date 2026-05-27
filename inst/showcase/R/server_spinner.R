@@ -4,29 +4,13 @@ register_spinner_showcase <- function(input, output, session) {
     if (!nzchar(label)) {
       label <- "Loading"
     }
-    size <- input$showcase_spinner_doc_size %||% "medium"
-    color <- input$showcase_spinner_doc_color %||% "primary"
-    
-    class_str <- ""
-    if (size == "small") {
-      class_str <- paste0(class_str, "w-4 h-4")
-    } else if (size == "medium") {
-      class_str <- paste0(class_str, "w-6 h-6")
-    } else if (size == "large") {
-      class_str <- paste0(class_str, "w-10 h-10")
-    }
-    
-    if (color == "primary") {
-      class_str <- paste0(class_str, " text-primary")
-    } else if (color == "destructive") {
-      class_str <- paste0(class_str, " text-destructive")
-    } else if (color == "muted") {
-      class_str <- paste0(class_str, " text-muted-foreground")
-    }
+    size <- input$showcase_spinner_doc_size %||% "default"
+    color <- input$showcase_spinner_doc_color %||% "default"
 
     block_spinner(
       label = label,
-      class = if (nzchar(class_str)) class_str else NULL
+      size = size,
+      color = color
     )
   })
   shiny::outputOptions(
@@ -40,33 +24,18 @@ register_spinner_showcase <- function(input, output, session) {
     if (!nzchar(label_val)) {
       label_val <- "Loading"
     }
-    size_val <- input$showcase_spinner_doc_size %||% "medium"
-    color_val <- input$showcase_spinner_doc_color %||% "primary"
-
-    class_parts <- c()
-    if (size_val == "small") {
-      class_parts <- c(class_parts, "w-4 h-4")
-    } else if (size_val == "medium") {
-      class_parts <- c(class_parts, "w-6 h-6")
-    } else if (size_val == "large") {
-      class_parts <- c(class_parts, "w-10 h-10")
-    }
-    
-    if (color_val == "primary") {
-      class_parts <- c(class_parts, "text-primary")
-    } else if (color_val == "destructive") {
-      class_parts <- c(class_parts, "text-destructive")
-    } else if (color_val == "muted") {
-      class_parts <- c(class_parts, "text-muted-foreground")
-    }
+    size_val <- input$showcase_spinner_doc_size %||% "default"
+    color_val <- input$showcase_spinner_doc_color %||% "default"
 
     args <- c()
     if (label_val != "Loading") {
       args <- c(args, paste0('label = "', label_val, '"'))
     }
-    if (length(class_parts) > 0) {
-      class_str <- paste(class_parts, collapse = " ")
-      args <- c(args, paste0('class = "', class_str, '"'))
+    if (size_val != "default") {
+      args <- c(args, paste0('size = "', size_val, '"'))
+    }
+    if (color_val != "default") {
+      args <- c(args, paste0('color = "', color_val, '"'))
     }
 
     if (length(args) == 0) {
@@ -83,12 +52,15 @@ register_spinner_showcase <- function(input, output, session) {
 
   output$showcase_spinner_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("label", "class"),
-      Type = c("character", "character"),
-      Default = c("\"Loading\"", "NULL"),
+      Argument = c("label", "size", "color", "class", "style"),
+      Type = c("character", "character", "character", "character", "character | named list"),
+      Default = c("\"Loading\"", "\"default\"", "\"default\"", "NULL", "NULL"),
       Description = c(
         "Accessible screen-reader label for the spinner.",
-        "Additional CSS class merged onto the spinner element (useful for sizing and custom colors)."
+        "Visual size. One of sm, default, or lg.",
+        "Semantic color. One of default, muted, or destructive.",
+        "Additional CSS class merged onto the spinner element.",
+        "Optional inline styles applied to the spinner element."
       )
     )
   }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)

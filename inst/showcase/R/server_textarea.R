@@ -11,6 +11,7 @@ register_textarea_showcase <- function(input, output, session) {
 
     disabled <- isTRUE(input$showcase_textarea_doc_disabled)
     invalid <- isTRUE(input$showcase_textarea_doc_invalid)
+    resize <- input$showcase_textarea_doc_resize %||% "vertical"
     style_val <- input$showcase_textarea_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
     class_val <- if (isTRUE(input$showcase_textarea_doc_class)) {
@@ -28,6 +29,7 @@ register_textarea_showcase <- function(input, output, session) {
         rows = rows_val,
         disabled = disabled,
         invalid = invalid,
+        resize = resize,
         style = style_val,
         class = class_val
       )
@@ -57,6 +59,7 @@ register_textarea_showcase <- function(input, output, session) {
 
     disabled <- isTRUE(input$showcase_textarea_doc_disabled)
     invalid <- isTRUE(input$showcase_textarea_doc_invalid)
+    resize <- input$showcase_textarea_doc_resize %||% "vertical"
     style_val <- input$showcase_textarea_doc_style %||% ""
     custom_class <- isTRUE(input$showcase_textarea_doc_class)
 
@@ -68,6 +71,7 @@ register_textarea_showcase <- function(input, output, session) {
     )
     if (disabled) args <- c(args, "disabled = TRUE")
     if (invalid) args <- c(args, "invalid = TRUE")
+    if (resize != "vertical") args <- c(args, paste0('resize = "', resize, '"'))
     if (nzchar(style_val)) args <- c(args, paste0('style = "', style_val, '"'))
     if (custom_class) args <- c(args, 'class = "showcase-textarea-preview-custom"')
 
@@ -91,9 +95,9 @@ register_textarea_showcase <- function(input, output, session) {
 
   output$showcase_textarea_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("input_id", "value", "placeholder", "rows", "width", "disabled", "invalid", "style", "class"),
-      Type = c("character", "character", "character", "integer", "character", "logical", "logical", "character | list", "character"),
-      Default = c("required", "\"\"", "NULL", "3", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
+      Argument = c("input_id", "value", "placeholder", "rows", "width", "disabled", "invalid", "resize", "style", "class"),
+      Type = c("character", "character", "character", "integer", "character", "logical", "logical", "character", "character | list", "character"),
+      Default = c("required", "\"\"", "NULL", "3", "NULL", "FALSE", "FALSE", "\"vertical\"", "NULL", "NULL"),
       Description = c(
         "Input id for the textarea value.",
         "Initial textarea value.",
@@ -102,6 +106,7 @@ register_textarea_showcase <- function(input, output, session) {
         "Optional CSS width applied to the wrapper.",
         "Disables user interaction while preserving server updates.",
         "Sets aria-invalid='true' to surface destructive styling.",
+        "Textarea resize behavior: vertical, none, both, or horizontal.",
         "Inline CSS styles applied to the textarea element.",
         "Additional class merged onto the runtime textarea wrapper."
       )

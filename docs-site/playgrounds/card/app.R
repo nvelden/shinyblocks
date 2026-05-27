@@ -114,6 +114,15 @@ ui <- block_page(
               selected = "none",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_card_doc_style"),
+            block_textarea(
+              "showcase_card_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., max-width: 24rem;"
+            )
           )
         )
       ),
@@ -163,13 +172,17 @@ server <- function(input, output, session) {
     class <- input$showcase_card_doc_class %||% ""
     if (!nzchar(class) || identical(class, "none")) class <- NULL
 
+    style <- input$showcase_card_doc_style %||% ""
+    if (!nzchar(style)) style <- NULL
+
     list(
       title = title,
       description = desc,
       value = value,
       body = body,
       footer = isTRUE(input$showcase_card_doc_footer),
-      class = class
+      class = class,
+      style = style
     )
   })
 
@@ -186,6 +199,7 @@ server <- function(input, output, session) {
       value = args$value,
       footer = footer_tag,
       class = args$class,
+      style = args$style,
       args$body
     )
   })
@@ -208,6 +222,9 @@ server <- function(input, output, session) {
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     }
     if (!is.null(args$body)) {
       code_args <- c(code_args, string_literal(args$body))

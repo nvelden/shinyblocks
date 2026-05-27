@@ -6,6 +6,7 @@
 #' @param value Optional primary value.
 #' @param footer Optional card footer content.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -16,7 +17,8 @@ block_card <- function(
   description = NULL,
   value = NULL,
   footer = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 ) {
   title_tag <- as_component_child(title, "card-title", block_card_title)
   description_tag <- as_component_child(
@@ -40,7 +42,9 @@ block_card <- function(
   runtime_component(
     component = "card",
     children = list(header_tag, content_tag, footer_tag),
-    class = merge_classes("sb-card", class)
+    class = class,
+    style = style,
+    root_class = merge_classes("sb-card", class)
   )
 }
 
@@ -322,28 +326,35 @@ update_block_button <- function(
 #'
 #' @param label Badge label.
 #' @param variant Visual variant.
+#' @param size Visual size.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
 #' @export
 block_badge <- function(
   label,
-  variant = c("default", "secondary", "outline", "destructive"),
-  class = NULL
+  variant = c("default", "secondary", "outline", "destructive", "ghost", "link"),
+  size = c("default", "sm", "lg"),
+  class = NULL,
+  style = NULL
 ) {
   variant <- match_arg(
     variant,
-    c("default", "secondary", "outline", "destructive")
+    c("default", "secondary", "outline", "destructive", "ghost", "link")
   )
+  size <- match_arg(size, c("default", "sm", "lg"))
 
   runtime_component(
     component = "badge",
     props = list(
       labelHtml = html_fragment(label),
-      variant = variant
+      variant = variant,
+      size = size
     ),
-    class = class
+    class = class,
+    style = style
   )
 }
 
@@ -457,6 +468,7 @@ block_alert_description <- function(..., class = NULL) {
 #' @param icon Optional icon tag or vendored icon name.
 #' @param variant Visual variant.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -467,7 +479,8 @@ block_alert <- function(
   description = NULL,
   icon = "info",
   variant = c("default", "destructive"),
-  class = NULL
+  class = NULL,
+  style = NULL
 ) {
   if (missing(title) || is.null(title)) {
     stop("`title` is required.", call. = FALSE)
@@ -495,7 +508,8 @@ block_alert <- function(
       contentHtml = html_fragment(...),
       iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
     ),
-    class = class
+    class = class,
+    style = style
   )
 }
 
@@ -862,6 +876,7 @@ block_tooltip <- function(
 #' @param description Optional value box description.
 #' @param icon Optional icon tag or vendored icon name.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -872,7 +887,8 @@ block_value_box <- function(
   ...,
   description = NULL,
   icon = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 ) {
   icon_tag <- set_icon_position(icon, "inline-start")
 
@@ -885,7 +901,8 @@ block_value_box <- function(
       contentHtml = html_fragment(...),
       iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
     ),
-    class = class
+    class = class,
+    style = style
   )
 }
 
@@ -952,18 +969,33 @@ block_skeleton <- function(class = NULL, ...) {
 #' Create a spinner
 #'
 #' @param label Accessible label.
+#' @param size Visual size.
+#' @param color Semantic color.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
 #' @export
-block_spinner <- function(label = "Loading", class = NULL) {
+block_spinner <- function(
+  label = "Loading",
+  size = c("default", "sm", "lg"),
+  color = c("default", "muted", "destructive"),
+  class = NULL,
+  style = NULL
+) {
+  size <- match_arg(size, c("default", "sm", "lg"))
+  color <- match_arg(color, c("default", "muted", "destructive"))
+
   runtime_component(
     component = "spinner",
     props = list(
-      label = label
+      label = label,
+      size = size,
+      color = color
     ),
-    class = class
+    class = class,
+    style = style
   )
 }
 
@@ -975,6 +1007,7 @@ block_spinner <- function(label = "Loading", class = NULL) {
 #' @param icon Optional icon tag or vendored icon name.
 #' @param action Optional action content.
 #' @param class Additional classes.
+#' @param style Optional inline custom styles.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -985,7 +1018,8 @@ block_empty <- function(
   description = NULL,
   icon = NULL,
   action = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 ) {
   icon_tag <- set_icon_position(icon, "inline-start")
 
@@ -998,6 +1032,7 @@ block_empty <- function(
       iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
       actionHtml = if (!is.null(action)) html_fragment(action) else NULL
     ),
-    class = class
+    class = class,
+    style = style
   )
 }

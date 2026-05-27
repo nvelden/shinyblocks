@@ -13,13 +13,16 @@ register_value_box_showcase <- function(input, output, session) {
     
     class <- input$showcase_value_box_doc_class %||% ""
     if (!nzchar(class) || class == "none") class <- NULL
+    style <- input$showcase_value_box_doc_style %||% ""
+    if (!nzchar(style)) style <- NULL
 
     block_value_box(
       title = title,
       value = value,
       description = desc,
       icon = icon_tag,
-      class = class
+      class = class,
+      style = style
     )
   })
   shiny::outputOptions(
@@ -38,6 +41,7 @@ register_value_box_showcase <- function(input, output, session) {
     desc_val <- input$showcase_value_box_doc_desc %||% "Up 12% month over month."
     icon_val <- input$showcase_value_box_doc_icon %||% "trending-up"
     class_val <- input$showcase_value_box_doc_class %||% ""
+    style_val <- input$showcase_value_box_doc_style %||% ""
 
     args <- c(
       paste0("title = ", string_literal(title_val)),
@@ -52,6 +56,9 @@ register_value_box_showcase <- function(input, output, session) {
     if (nzchar(class_val) && class_val != "none") {
       args <- c(args, paste0('class = "', class_val, '"'))
     }
+    if (nzchar(style_val)) {
+      args <- c(args, paste0("style = ", string_literal(style_val)))
+    }
 
     paste0("block_value_box(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
@@ -63,16 +70,17 @@ register_value_box_showcase <- function(input, output, session) {
 
   output$showcase_value_box_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("title", "value", "...", "description", "icon", "class"),
-      Type = c("character | tag", "character | tag", "named/unnamed elements", "character | tag", "character | tag", "character"),
-      Default = c("required", "required", "none", "NULL", "NULL", "NULL"),
+      Argument = c("title", "value", "...", "description", "icon", "class", "style"),
+      Type = c("character | tag", "character | tag", "named/unnamed elements", "character | tag", "character | tag", "character", "character | named list"),
+      Default = c("required", "required", "none", "NULL", "NULL", "NULL", "NULL"),
       Description = c(
         "Header title string or tag.",
         "Primary large metric/value highlight.",
         "Additional value box body content.",
         "Optional descriptive supporting text.",
         "Lucide leading icon name or tag.",
-        "Additional CSS class merged onto the value box container."
+        "Additional CSS class merged onto the value box container.",
+        "Optional inline styles applied to the value box container."
       )
     )
   }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)

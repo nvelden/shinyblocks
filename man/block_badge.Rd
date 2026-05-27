@@ -6,8 +6,10 @@
 \usage{
 block_badge(
   label,
-  variant = c("default", "secondary", "outline", "destructive"),
-  class = NULL
+  variant = c("default", "secondary", "outline", "destructive", "ghost", "link"),
+  size = c("default", "sm", "lg"),
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -15,7 +17,11 @@ block_badge(
 
 \item{variant}{Visual variant.}
 
+\item{size}{Visual size.}
+
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

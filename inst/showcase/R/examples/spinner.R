@@ -14,8 +14,8 @@ htmltools::tagList(
             block_field_label("size", `for` = "showcase_spinner_doc_size"),
             block_select(
               "showcase_spinner_doc_size",
-              choices = c("small", "medium", "large"),
-              selected = "medium",
+              choices = c("sm", "default", "lg"),
+              selected = "default",
               size = "sm"
             )
           ),
@@ -23,8 +23,8 @@ htmltools::tagList(
             block_field_label("color", `for` = "showcase_spinner_doc_color"),
             block_select(
               "showcase_spinner_doc_color",
-              choices = c("primary", "destructive", "muted"),
-              selected = "primary",
+              choices = c("default", "destructive", "muted"),
+              selected = "default",
               size = "sm"
             )
           )

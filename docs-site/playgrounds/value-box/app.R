@@ -108,6 +108,15 @@ ui <- block_page(
               selected = "none",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_value_box_doc_style"),
+            block_textarea(
+              "showcase_value_box_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., min-width: 18rem;"
+            )
           )
         )
       ),
@@ -150,13 +159,16 @@ server <- function(input, output, session) {
 
     class <- input$showcase_value_box_doc_class %||% ""
     if (!nzchar(class) || identical(class, "none")) class <- NULL
+    style <- input$showcase_value_box_doc_style %||% ""
+    if (!nzchar(style)) style <- NULL
 
     list(
       title = input$showcase_value_box_doc_title %||% "Net Revenue",
       value = input$showcase_value_box_doc_value %||% "$45,231.89",
       description = desc,
       icon = icon,
-      class = class
+      class = class,
+      style = style
     )
   })
 
@@ -167,7 +179,8 @@ server <- function(input, output, session) {
       value = args$value,
       description = args$description,
       icon = args$icon,
-      class = args$class
+      class = args$class,
+      style = args$style
     )
   })
   outputOptions(output, "showcase_value_box_preview_ui", suspendWhenHidden = FALSE)
@@ -186,6 +199,9 @@ server <- function(input, output, session) {
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     }
 
     paste0("block_value_box(\n  ", paste(code_args, collapse = ",\n  "), "\n)")

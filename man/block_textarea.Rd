@@ -12,6 +12,7 @@ block_textarea(
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
+  resize = c("vertical", "none", "both", "horizontal"),
   style = NULL,
   class = NULL
 )
@@ -31,6 +32,9 @@ block_textarea(
 
 \item{invalid}{Whether the control should show invalid styling
 (sets \code{aria-invalid="true"}).}
+
+\item{resize}{Textarea resize behavior. One of \code{"vertical"},
+\code{"none"}, \code{"both"}, or \code{"horizontal"}.}
 
 \item{style}{Inline CSS styles for the textarea element.}
 

@@ -7,6 +7,7 @@ runtime_payload <- function(
   state = list(),
   binding = list(),
   class = NULL,
+  style = NULL,
   schema_version = 1L
 ) {
   validate_runtime_component(component)
@@ -24,7 +25,8 @@ runtime_payload <- function(
     children = children,
     state = state,
     binding = binding,
-    className = class
+    className = class,
+    style = style
   )
 
   validate_runtime_json(payload)

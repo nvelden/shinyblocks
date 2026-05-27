@@ -123,6 +123,15 @@ ui <- block_page(
               rows = 1,
               placeholder = "e.g., shadow-sm"
             )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_alert_doc_style"),
+            block_textarea(
+              "showcase_alert_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., border-style: dashed;"
+            )
           )
         )
       ),
@@ -165,12 +174,15 @@ server <- function(input, output, session) {
     if (identical(icon, "none") || !nzchar(icon)) icon <- NULL
     class <- input$showcase_alert_doc_class %||% ""
     if (!nzchar(class)) class <- NULL
+    style <- input$showcase_alert_doc_style %||% ""
+    if (!nzchar(style)) style <- NULL
     list(
       title = title,
       description = description,
       icon = icon,
       variant = input$showcase_alert_doc_variant %||% "default",
-      class = class
+      class = class,
+      style = style
     )
   })
 
@@ -181,7 +193,8 @@ server <- function(input, output, session) {
       description = args$description,
       icon = args$icon,
       variant = args$variant,
-      class = args$class
+      class = args$class,
+      style = args$style
     )
   })
   outputOptions(output, "showcase_alert_preview_ui", suspendWhenHidden = FALSE)
@@ -200,6 +213,9 @@ server <- function(input, output, session) {
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     }
     paste0("block_alert(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
   })

@@ -10,7 +10,8 @@ block_empty(
   description = NULL,
   icon = NULL,
   action = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ block_empty(
 \item{action}{Optional action content.}
 
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

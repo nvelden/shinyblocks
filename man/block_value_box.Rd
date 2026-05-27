@@ -10,7 +10,8 @@ block_value_box(
   ...,
   description = NULL,
   icon = NULL,
-  class = NULL
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ block_value_box(
 \item{icon}{Optional icon tag or vendored icon name.}
 
 \item{class}{Additional classes.}
+
+\item{style}{Optional inline custom styles.}
 }
 \value{
 An \code{htmltools} tag.

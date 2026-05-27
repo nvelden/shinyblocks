@@ -236,7 +236,7 @@ test_that("dark mode toggle renders expected button attrs", {
 
   expect_identical(
     tag_attr(toggle, "class"),
-    "sb-runtime-mount sb-dark-mode-toggle custom"
+    "sb-runtime-mount"
   )
   expect_match(html, 'data-sb-component="button"', fixed = TRUE)
   expect_identical(payload$className, "sb-dark-mode-toggle custom")
@@ -281,8 +281,9 @@ test_that("block_radio_group emits a runtime payload with choice records", {
 
   expect_identical(
     tag_attr(rg, "class"),
-    "sb-runtime-mount sb-radio-group custom"
+    "sb-runtime-mount sb-radio-group"
   )
+  expect_identical(payload$className, "custom")
   expect_match(html, 'data-sb-component="radio-group"', fixed = TRUE)
   expect_match(
     html,
@@ -321,8 +322,9 @@ test_that("block_input emits a runtime payload and hidden native input", {
 
   expect_identical(
     tag_attr(input, "class"),
-    "sb-runtime-mount sb-input custom"
+    "sb-runtime-mount sb-input"
   )
+  expect_identical(payload$className, "custom")
   expect_match(html, 'data-sb-component="input"', fixed = TRUE)
   expect_match(
     html,
@@ -346,6 +348,7 @@ test_that("textarea emits a runtime payload and hidden native textarea", {
     placeholder = "Write a note",
     rows = 5,
     invalid = TRUE,
+    resize = "none",
     style = "color: red;",
     class = "custom"
   )
@@ -354,8 +357,9 @@ test_that("textarea emits a runtime payload and hidden native textarea", {
 
   expect_identical(
     tag_attr(textarea, "class"),
-    "sb-runtime-mount sb-textarea custom"
+    "sb-runtime-mount sb-textarea"
   )
+  expect_identical(payload$className, "custom")
   expect_match(html, 'data-sb-component="textarea"', fixed = TRUE)
   expect_match(
     html,
@@ -368,6 +372,7 @@ test_that("textarea emits a runtime payload and hidden native textarea", {
   expect_identical(payload$props$placeholder, "Write a note")
   expect_identical(payload$props$rows, 5L)
   expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$props$resize, "none")
   expect_identical(payload$props$style$color, "red")
   expect_identical(payload$binding$type, "shinyblocks.textarea")
 })
@@ -398,8 +403,9 @@ test_that("slider emits runtime payload and binding metadata", {
   slider_html <- render_html(slider)
   expect_identical(
     tag_attr(slider, "class"),
-    "sb-runtime-mount sb-slider custom"
+    "sb-runtime-mount sb-slider"
   )
+  expect_identical(payload$className, "custom")
   expect_match(slider_html, 'data-sb-component="slider"', fixed = TRUE)
   expect_match(slider_html, '<input id="volume" type="hidden" class="sb-slider-native"', fixed = TRUE)
   expect_match(slider_html, "data-shiny-no-bind-input", fixed = TRUE)
@@ -466,7 +472,7 @@ test_that("checkbox and switch emit runtime payloads", {
 
   expect_identical(
     tag_attr(checkbox, "class"),
-    "sb-runtime-mount sb-checkbox custom"
+    "sb-runtime-mount sb-checkbox"
   )
   expect_match(checkbox_html, 'data-sb-component="checkbox"', fixed = TRUE)
   expect_match(
@@ -480,11 +486,12 @@ test_that("checkbox and switch emit runtime payloads", {
   expect_identical(checkbox_payload$state$value, TRUE)
   expect_identical(checkbox_payload$props$labelHtml, "Email me updates")
   expect_identical(checkbox_payload$props$style$padding, "0.5rem")
+  expect_identical(checkbox_payload$className, "custom")
   expect_identical(checkbox_payload$binding$type, "shinyblocks.checkbox")
 
   expect_identical(
     tag_attr(switch, "class"),
-    "sb-runtime-mount sb-switch custom"
+    "sb-runtime-mount sb-switch"
   )
   expect_match(switch_html, 'data-sb-component="switch"', fixed = TRUE)
   expect_match(
@@ -497,6 +504,7 @@ test_that("checkbox and switch emit runtime payloads", {
   expect_identical(switch_payload$id, "alerts")
   expect_identical(switch_payload$state$value, TRUE)
   expect_identical(switch_payload$props$labelHtml, "Send incident alerts")
+  expect_identical(switch_payload$className, "custom")
   expect_identical(switch_payload$binding$type, "shinyblocks.switch")
 })
 
@@ -610,7 +618,7 @@ test_that("block_select emits a runtime select payload", {
   html <- render_html(select)
   payload <- runtime_payload_from(select)
 
-  expect_identical(tag_attr(select, "class"), "sb-runtime-mount custom")
+  expect_identical(tag_attr(select, "class"), "sb-runtime-mount")
   expect_match(html, 'data-sb-component="select"', fixed = TRUE)
   expect_match(html, '<select id="plan" class="sb-select-native"', fixed = TRUE)
   expect_match(html, "data-shiny-no-bind-input", fixed = TRUE)
@@ -642,9 +650,14 @@ test_that("badge variants map to runtime props", {
     block_badge("Blocked", variant = "destructive")
   )
   outline <- runtime_payload_from(block_badge("Draft", variant = "outline"))
+  ghost <- runtime_payload_from(block_badge("Quiet", variant = "ghost"))
+  link <- runtime_payload_from(block_badge("Docs", variant = "link", size = "lg"))
 
   expect_identical(destructive$props$variant, "destructive")
   expect_identical(outline$props$variant, "outline")
+  expect_identical(ghost$props$variant, "ghost")
+  expect_identical(link$props$variant, "link")
+  expect_identical(link$props$size, "lg")
 })
 
 test_that("badge classes pass through the runtime payload", {
@@ -652,6 +665,7 @@ test_that("badge classes pass through the runtime payload", {
 
   expect_identical(badge$className, "custom")
   expect_identical(badge$props$variant, "default")
+  expect_identical(badge$props$size, "default")
 })
 
 test_that("card flat arguments compose into card regions", {
@@ -686,9 +700,12 @@ test_that("card composition helpers render expected child markers", {
   expect_identical(tag_attr(content, "data-sb-child"), "card-content")
   expect_identical(tag_attr(footer, "data-sb-child"), "card-footer")
 
+  styled_card <- block_card("Body", class = "custom", style = "max-width: 20rem;")
   card_html <- render_html(card)
   expect_match(card_html, 'data-sb-component="card"', fixed = TRUE)
   expect_match(card_html, 'class="sb-runtime-mount sb-card custom"', fixed = TRUE)
+  expect_identical(tag_attr(styled_card, "style"), "max-width: 20rem;")
+  expect_identical(runtime_payload_from(styled_card)$className, "custom")
 })
 
 test_that("card helper classes merge with user classes", {
@@ -829,8 +846,8 @@ test_that("skeletons and spinners expose expected attributes", {
       style = "width: 4rem; height: 1rem;"
     )
   )
-  spinner <- runtime_payload_from(block_spinner(label = "Loading table", class = "custom"))
-  spinner_html <- render_html(block_spinner(label = "Loading table", class = "custom"))
+  spinner <- runtime_payload_from(block_spinner(label = "Loading table", size = "lg", color = "muted", class = "custom", style = "margin: 1rem;"))
+  spinner_html <- render_html(block_spinner(label = "Loading table", size = "lg", color = "muted", class = "custom", style = "margin: 1rem;"))
 
   expect_identical(skeleton$className, "custom")
   expect_identical(skeleton$props$attrs$id, "loading-skeleton")
@@ -839,7 +856,10 @@ test_that("skeletons and spinners expose expected attributes", {
   expect_identical(skeleton$props$attrs$style$height, "1rem")
   expect_match(skeleton_html, 'data-sb-component="skeleton"', fixed = TRUE)
   expect_identical(spinner$props$label, "Loading table")
+  expect_identical(spinner$props$size, "lg")
+  expect_identical(spinner$props$color, "muted")
   expect_identical(spinner$className, "custom")
+  expect_identical(spinner$style$margin, "1rem")
   expect_match(spinner_html, 'data-sb-component="spinner"', fixed = TRUE)
 })
 
@@ -934,7 +954,7 @@ test_that("block_code emits runtime payload with all props and custom styling", 
   expect_identical(tag_attr(code_block, "style"), "margin-bottom: 2rem;")
 
   expect_match(html, 'data-sb-component="code"', fixed = TRUE)
-  expect_match(html, 'class="sb-runtime-mount custom-class"', fixed = TRUE)
+  expect_match(html, 'class="sb-runtime-mount"', fixed = TRUE)
 })
 
 test_that("block_code handles defaults correctly", {

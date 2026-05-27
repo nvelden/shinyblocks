@@ -12,6 +12,7 @@ update_block_textarea(
   rows,
   disabled,
   invalid,
+  resize,
   style,
   class,
   notify = TRUE
@@ -31,6 +32,9 @@ update_block_textarea(
 \item{disabled}{Optional disabled state.}
 
 \item{invalid}{Optional invalid flag.}
+
+\item{resize}{Optional textarea resize behavior. One of \code{"vertical"},
+\code{"none"}, \code{"both"}, or \code{"horizontal"}.}
 
 \item{style}{Optional replacement inline CSS styles for the textarea.}
 

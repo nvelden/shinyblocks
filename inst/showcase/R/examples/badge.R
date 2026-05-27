@@ -31,7 +31,11 @@ htmltools::tagList(
             ),
             block_field(
               block_field_label("variant", `for` = "showcase_badge_doc_variant"),
-              block_select("showcase_badge_doc_variant", choices = c("default", "secondary", "outline", "destructive"), selected = "default")
+              block_select("showcase_badge_doc_variant", choices = c("default", "secondary", "outline", "destructive", "ghost", "link"), selected = "default")
+            ),
+            block_field(
+              block_field_label("size", `for` = "showcase_badge_doc_size"),
+              block_select("showcase_badge_doc_size", choices = c("sm", "default", "lg"), selected = "default")
             )
           ),
           # Styling controls
@@ -41,6 +45,10 @@ htmltools::tagList(
             block_field(
               block_field_label("class", `for` = "showcase_badge_doc_class"),
               block_textarea("showcase_badge_doc_class", value = "", rows = 1, placeholder = "e.g., shadow-sm")
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_badge_doc_style"),
+              block_textarea("showcase_badge_doc_style", value = "", rows = 1, placeholder = "e.g., letter-spacing: 0.04em;")
             )
           )
         )
@@ -62,6 +70,8 @@ htmltools::tagList(
     block_badge("Default", class = "sb-parity-badge-default"),
     block_badge("Secondary", variant = "secondary", class = "sb-parity-badge-secondary"),
     block_badge("Outline", variant = "outline", class = "sb-parity-badge-outline"),
-    block_badge("Destructive", variant = "destructive", class = "sb-parity-badge-destructive")
+    block_badge("Destructive", variant = "destructive", class = "sb-parity-badge-destructive"),
+    block_badge("Ghost", variant = "ghost", class = "sb-parity-badge-ghost"),
+    block_badge("Link", variant = "link", class = "sb-parity-badge-link")
   )
 )

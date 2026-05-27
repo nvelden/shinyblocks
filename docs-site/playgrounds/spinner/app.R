@@ -49,24 +49,6 @@ string_literal <- function(value) {
   paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
 }
 
-size_class <- function(size) {
-  switch(
-    size %||% "medium",
-    small = "w-4 h-4",
-    large = "w-10 h-10",
-    "w-6 h-6"
-  )
-}
-
-color_class <- function(color) {
-  switch(
-    color %||% "primary",
-    destructive = "text-destructive",
-    muted = "text-muted-foreground",
-    "text-primary"
-  )
-}
-
 ui <- block_page(
   title = "shinyblocks - Spinner playground",
   theme = htmltools::tagList(
@@ -105,8 +87,8 @@ ui <- block_page(
             block_field_label("size", `for` = "showcase_spinner_doc_size"),
             block_select(
               "showcase_spinner_doc_size",
-              choices = c("small", "medium", "large"),
-              selected = "medium",
+              choices = c("sm", "default", "lg"),
+              selected = "default",
               size = "sm"
             )
           ),
@@ -114,8 +96,8 @@ ui <- block_page(
             block_field_label("color", `for` = "showcase_spinner_doc_color"),
             block_select(
               "showcase_spinner_doc_color",
-              choices = c("primary", "destructive", "muted"),
-              selected = "primary",
+              choices = c("default", "destructive", "muted"),
+              selected = "default",
               size = "sm"
             )
           )
@@ -156,15 +138,14 @@ server <- function(input, output, session) {
   preview_args <- reactive({
     label <- input$showcase_spinner_doc_label %||% "Loading"
     if (!nzchar(label)) label <- "Loading"
-    size <- input$showcase_spinner_doc_size %||% "medium"
-    color <- input$showcase_spinner_doc_color %||% "primary"
-    class <- paste(size_class(size), color_class(color))
-    list(label = label, size = size, color = color, class = class)
+    size <- input$showcase_spinner_doc_size %||% "default"
+    color <- input$showcase_spinner_doc_color %||% "default"
+    list(label = label, size = size, color = color)
   })
 
   output$showcase_spinner_preview_ui <- renderUI({
     args <- preview_args()
-    block_spinner(label = args$label, class = args$class)
+    block_spinner(label = args$label, size = args$size, color = args$color)
   })
   outputOptions(output, "showcase_spinner_preview_ui", suspendWhenHidden = FALSE)
 
@@ -174,8 +155,11 @@ server <- function(input, output, session) {
     if (!identical(args$label, "Loading")) {
       code_args <- c(code_args, paste0("label = ", string_literal(args$label)))
     }
-    if (!identical(args$size, "medium") || !identical(args$color, "primary")) {
-      code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    if (!identical(args$size, "default")) {
+      code_args <- c(code_args, paste0("size = ", string_literal(args$size)))
+    }
+    if (!identical(args$color, "default")) {
+      code_args <- c(code_args, paste0("color = ", string_literal(args$color)))
     }
     if (length(code_args) == 0) {
       "block_spinner()"

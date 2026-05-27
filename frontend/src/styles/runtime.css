@@ -67,6 +67,35 @@
   opacity: 0.5;
 }
 
+[data-shinyblocks-root].border-dashed,
+[data-shinyblocks-root] .border-dashed {
+  border-style: dashed !important;
+}
+
+[data-shinyblocks-root].bg-transparent,
+[data-shinyblocks-root] .bg-transparent {
+  background-color: transparent !important;
+}
+
+[data-shinyblocks-root].shadow-sm,
+[data-shinyblocks-root] .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+[data-shinyblocks-root].shadow-md,
+[data-shinyblocks-root] .shadow-md {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+[data-shinyblocks-root].shadow-lg,
+[data-shinyblocks-root] .shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.15),
+    0 4px 6px -4px rgb(0 0 0 / 0.15) !important;
+}
+
 [data-shinyblocks-root] > [data-shinyblocks-react]:empty,
 [data-shinyblocks-root] > [data-shinyblocks-children]:empty {
   display: none;
@@ -330,6 +359,20 @@
     box-shadow 0.15s;
 }
 
+[data-shinyblocks-root] .sb-badge-size-sm {
+  padding-inline: 0.375rem;
+  padding-block: 0.0625rem;
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+}
+
+[data-shinyblocks-root] .sb-badge-size-lg {
+  padding-inline: 0.75rem;
+  padding-block: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}
+
 [data-shinyblocks-root] .sb-badge-default {
   background-color: var(--primary);
   color: var(--primary-foreground);
@@ -352,6 +395,18 @@
 [data-shinyblocks-root] .sb-badge-outline {
   border-color: var(--border);
   color: var(--foreground);
+}
+
+[data-shinyblocks-root] .sb-badge-ghost {
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+[data-shinyblocks-root] .sb-badge-link {
+  background-color: transparent;
+  color: var(--primary);
+  text-decoration-line: underline;
+  text-underline-offset: 0.1875rem;
 }
 
 [data-shinyblocks-root] .sb-separator {
@@ -384,6 +439,28 @@
   border-top-color: var(--foreground);
   border-radius: 9999px;
   animation: shinyblocks-spin 1s linear infinite;
+}
+
+[data-shinyblocks-root] .sb-spinner-size-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 1.5px;
+}
+
+[data-shinyblocks-root] .sb-spinner-size-lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+[data-shinyblocks-root] .sb-spinner-color-muted {
+  border-color: color-mix(in oklab, var(--muted-foreground) 25%, transparent);
+  border-top-color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-spinner-color-destructive {
+  border-color: color-mix(in oklab, var(--destructive) 25%, transparent);
+  border-top-color: var(--destructive);
 }
 
 [data-shinyblocks-root] .sb-skeleton {
@@ -1556,15 +1633,12 @@
  * Custom showcase preview classes for high fidelity demonstrations.
  * Built into the core runtime to ensure visual parity in all Shiny and Shinylive apps.
  */
-[data-shinyblocks-root].showcase-select-preview-custom .sb-select-trigger,
+[data-shinyblocks-root] .sb-select.showcase-select-preview-custom > .sb-select-trigger,
 [data-shinyblocks-root] .sb-select.showcase-select-preview-custom .sb-select-trigger {
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].showcase-button-preview-custom .sb-button,
-[data-shinyblocks-root] .sb-button.showcase-button-preview-custom,
-[data-shinyblocks-root].showcase-button-preview-custom,
-[data-shinyblocks-root] .showcase-button-preview-custom {
+[data-shinyblocks-root] .sb-button.showcase-button-preview-custom {
   border: 2px dashed var(--ring) !important;
 }
 
@@ -1586,17 +1660,16 @@
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].showcase-checkbox-preview-custom .sb-checkbox-button,
 [data-shinyblocks-root] .sb-checkbox.showcase-checkbox-preview-custom .sb-checkbox-button {
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].showcase-textarea-preview-custom .sb-textarea-control,
+[data-shinyblocks-root] .sb-textarea-control.showcase-textarea-preview-custom,
 [data-shinyblocks-root] .sb-textarea.showcase-textarea-preview-custom .sb-textarea-control {
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].showcase-input-preview-custom .sb-input-control,
+[data-shinyblocks-root] .sb-input-control.showcase-input-preview-custom,
 [data-shinyblocks-root] .sb-input.showcase-input-preview-custom .sb-input-control {
   border: 2px dashed var(--ring) !important;
 }
@@ -1606,25 +1679,21 @@
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].showcase-switch-preview-custom .sb-switch-button,
 [data-shinyblocks-root] .sb-switch.showcase-switch-preview-custom .sb-switch-button {
   outline: 2px dashed var(--ring) !important;
   outline-offset: 2px;
 }
 
-[data-shinyblocks-root].showcase-radio-group-preview-custom .sb-radio-group-control,
-[data-shinyblocks-root] .sb-radio-group.showcase-radio-group-preview-custom .sb-radio-group-control {
+[data-shinyblocks-root] .sb-radio-group-control.showcase-radio-group-preview-custom {
   border: 2px dashed var(--ring) !important;
   padding: 0.75rem !important;
   border-radius: 0.5rem !important;
 }
 
-[data-shinyblocks-root].showcase-slider-preview-custom .sb-slider-thumb,
 [data-shinyblocks-root] .sb-slider.showcase-slider-preview-custom .sb-slider-thumb {
   border: 2px dashed var(--ring) !important;
 }
 
-[data-shinyblocks-root].sb-code-custom,
 [data-shinyblocks-root] .sb-code-custom {
   border: 2px dashed var(--ring) !important;
   background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;

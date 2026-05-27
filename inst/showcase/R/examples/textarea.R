@@ -80,6 +80,15 @@ htmltools::tagList(
               block_field(
                 block_field_label("invalid", `for` = "showcase_textarea_doc_invalid"),
                 block_checkbox("showcase_textarea_doc_invalid", "Invalid", value = FALSE)
+              ),
+              block_field(
+                block_field_label("resize", `for` = "showcase_textarea_doc_resize"),
+                block_select(
+                  "showcase_textarea_doc_resize",
+                  choices = c("vertical", "none", "both", "horizontal"),
+                  selected = "vertical",
+                  size = "sm"
+                )
               )
             ),
             htmltools::div(
