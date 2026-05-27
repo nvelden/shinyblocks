@@ -38,6 +38,7 @@ playground_heights <- list(
   empty = 760L,
   icon = 600L,
   input = 760L,
+  `input-group` = 800L,
   `radio-group` = 820L,
   select = 760L,
   separator = 600L,

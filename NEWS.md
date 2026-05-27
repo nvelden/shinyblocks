@@ -1,5 +1,6 @@
 # shinyblocks (development version)
 
+* Added an interactive Shinylive playground to the docs site for the Input Group component page (issue #21), and aligned the local Input Group showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Radio Group component page (issue #21), and aligned the local Radio Group showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Switch component page (issue #21), and aligned the local Switch showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Empty component page (issue #21), and aligned the local Empty showcase tab with the same unboxed controls and preview layout.
