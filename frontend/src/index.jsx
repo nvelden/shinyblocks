@@ -2287,7 +2287,7 @@ function Select({ payload, root }) {
       top: side === "top" ? rect.top - gap : rect.bottom + gap,
       left,
       minWidth,
-      maxHeight: Math.max(96, availableHeight)
+      maxHeight: Math.max(1, Math.min(estimatedContentHeight, availableHeight))
     });
   }
 
