@@ -1,5 +1,6 @@
 # shinyblocks (development version)
 
+* Added an interactive Shinylive playground to the docs site for the Empty component page (issue #21), and aligned the local Empty showcase tab with the same unboxed controls and preview layout.
 * Fixed `block_select()` dropdown positioning in short embedded viewports. Select popovers now flip upward when there is not enough room below the trigger, preventing docs/playground iframes from clipping controls near the bottom edge.
 * Added an interactive Shinylive playground to the docs site for the Value Box component page (issue #21), and aligned the local Value Box showcase tab with the same controls, preview canvas, and generated UI definition.
 * Added an interactive Shinylive playground to the docs site for the Card component page (issue #21), and aligned the local Card showcase tab with the current unboxed playground layout.

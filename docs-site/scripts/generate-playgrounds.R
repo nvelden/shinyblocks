@@ -35,6 +35,7 @@ playground_heights <- list(
   card = 760L,
   checkbox = 760L,
   code = 760L,
+  empty = 760L,
   icon = 600L,
   input = 760L,
   select = 760L,
