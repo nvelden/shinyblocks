@@ -19,6 +19,9 @@ on:
     branches: [main]
     paths:
       - "docs-site/**"
+      - "R/**"
+      - "DESCRIPTION"
+      - "NAMESPACE"
       - "NEWS.md"
       - "inst/www/**"
       - ".github/workflows/docs-deploy.yml"
@@ -36,9 +39,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: docs-site
     steps:
       - uses: actions/checkout@v4
 
@@ -55,13 +55,14 @@ jobs:
             any::htmltools
             any::shinylive
             local::.
-          working-directory: .
+          working-directory: "."
 
       # `webr` is the R interface used inside the webR runtime. Installed
       # locally only so `shinylive::export()`'s static analysis of each
       # app.R can resolve `webr::mount(...)`. It is published via
       # r-wasm's r-universe.
       - name: Install webr (build-time dep for shinylive::export)
+        working-directory: docs-site
         run: |
           Rscript -e 'install.packages("webr",
             repos = c("https://r-wasm.r-universe.dev", getOption("repos")))'
@@ -73,38 +74,56 @@ jobs:
           cache-dependency-path: docs-site/package-lock.json
 
       - run: npm ci
+        working-directory: docs-site
 
-      # Fetch the wasm filesystem image (library.data.gz +
-      # library.js.metadata) from the latest GitHub release.
-      # Docs-site playgrounds reflect the most recent tagged release,
-      # not HEAD. See docs/agent-plans/2026-05-21-shinylive-playground-integration.md.
-      - name: Download wasm filesystem image from latest release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Build the wasm filesystem image (library.data.gz +
+      # library.js.metadata) from the checked-out package commit. The
+      # playground R source and the browser-loaded shinyblocks package must
+      # stay in lockstep; otherwise new component arguments can be exported
+      # before webR has a package image that supports them.
+      - name: Checkout r-wasm/actions
+        uses: actions/checkout@v4
+        with:
+          ref: v3
+          repository: r-wasm/actions
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: .r-wasm-actions
+
+      - name: Find Config/Needs/wasm in DESCRIPTION
+        id: wasm-needs
+        shell: Rscript {0}
         run: |
-          mkdir -p playgrounds/_wasm
-          # Most recent release tag, including prereleases.
-          TAG=$(gh release list --repo "${{ github.repository }}" \
-                --limit 1 --json tagName --jq '.[0].tagName')
-          if [ -n "$TAG" ]; then
-            gh release download "$TAG" --repo "${{ github.repository }}" \
-              --pattern 'library.data.gz' \
-              --pattern 'library.js.metadata' \
-              --dir playgrounds/_wasm
-          else
-            echo "::warning::No release found; playgrounds will be skipped."
-          fi
+          has_wasm_need <-
+            file.exists("DESCRIPTION") &&
+            "Config/Needs/wasm" %in% names(as.list(read.dcf("DESCRIPTION")[1,]))
+          pkg <- if (has_wasm_need) as.list(read.dcf("DESCRIPTION")[1,])$`Config/Needs/wasm` else ""
+          pkg <- paste0(strsplit(pkg, "[[:space:],]+")[[1]], collapse = ",")
+          cat("pkg=", pkg, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+
+      - name: Build wasm filesystem image from this commit
+        uses: ./.r-wasm-actions/build-rwasm
+        with:
+          packages: |
+            .
+            ${{ steps.wasm-needs.outputs.pkg }}
+          strip: "demo, doc, examples, help, html, include, tests, vignette"
+          image-path: docs-site/playgrounds/_wasm
+          compress: true
 
       # 1. Static previews + initial manifest.
       # 2. Shinylive exports + merge hasPlayground into the manifest.
       # 3. Next build consumes the merged manifest + exported assets.
       - run: npm run prebuild
+        working-directory: docs-site
       - run: Rscript scripts/generate-playgrounds.R
+        working-directory: docs-site
       - run: npx next build
+        working-directory: docs-site
 
       # GitHub Pages would otherwise run Jekyll over `out/` and discard
       # the `_next/` folder.
       - run: touch out/.nojekyll
+        working-directory: docs-site
 
       # `enablement: true` lets the action turn on Pages (source = GitHub
       # Actions) on first run so the deploy does not 404 on a fresh repo.

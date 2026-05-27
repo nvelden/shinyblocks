@@ -64,13 +64,17 @@ library(shinyblocks)
 - **`release-file-system-image.yml`** workflow (already in the repo) — produces the wasm image and attaches it to each GitHub release.
 - A future per-commit rebuild using `rwasm::build()` in CI.
 
-**v1 pivot**: use the **latest release asset**. Docs will reflect the most recent tagged release, not HEAD. Trade-off documented; revisit when the package stabilizes or when contributor workflow demands HEAD-tracking docs.
+**Current approach**: build the **checked-out package commit** into a WASM
+filesystem image inside the docs deployment workflow, then export the
+playgrounds against that image. The playground source and webR-loaded
+`shinyblocks` package must stay in lockstep; otherwise new component arguments
+can appear in docs before the browser-side package supports them.
 
 1. **CI step (in `docs-deploy.yml`)** — before `npx next build`:
    ```bash
-   # Fetch the wasm image from the latest GitHub release.
-   gh release download --pattern 'library.data.gz' --pattern 'library.js.metadata' \
-     --dir docs-site/playgrounds/_wasm/
+   # Build the wasm image from the checked-out repository commit.
+   # Output: docs-site/playgrounds/_wasm/library.data.gz
+   #         docs-site/playgrounds/_wasm/library.js.metadata
 
    Rscript -e 'install.packages("shinylive")'
    npm run prebuild
@@ -130,6 +134,10 @@ Concrete steps:
 
 - **Iframe height**: per-component `playgroundHeight` field in `preview-manifest.json`. Default `720px`; bump per component as needed. No `postMessage` handshake for v1 — revisit only if a specific component needs it.
 - **First-load latency**: `loading="lazy"` on the iframe + skeleton placeholder ("Loading interactive playground…"). No click-to-load — scroll-triggered lazy load + a visible loading state is enough.
+- **WASM image source**: docs deploy builds the image from HEAD using
+  `r-wasm/actions` rather than downloading the latest release asset. Public
+  user guidance can still point at release assets, but the development docs
+  must not mix `main` playground code with an older package binary.
 
 ## Out of scope for this iteration
 
