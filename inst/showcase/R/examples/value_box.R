@@ -1,58 +1,49 @@
 htmltools::tagList(
-  block_field_set(
-    block_field_legend("Interactive Playground"),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 1.5rem;",
-      htmltools::div(
-        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
-        htmltools::div(
-          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
-          block_field(
-            block_field_label("Preview", `for` = "showcase_value_box_preview"),
-            shiny::uiOutput("showcase_value_box_preview_ui")
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$div(
-              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
-              shiny::uiOutput("showcase_value_box_preview_code")
-            )
+  showcase_playground_layout(
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Content", first = TRUE,
+        block_field(
+          block_field_label("title", `for` = "showcase_value_box_doc_title"),
+          block_textarea("showcase_value_box_doc_title", value = "Net Revenue", rows = 1)
+        ),
+        block_field(
+          block_field_label("value", `for` = "showcase_value_box_doc_value"),
+          block_textarea("showcase_value_box_doc_value", value = "$45,231.89", rows = 1)
+        ),
+        block_field(
+          block_field_label("description", `for` = "showcase_value_box_doc_desc"),
+          block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 2)
+        )
+      ),
+      showcase_controls_group(
+        "Styling",
+        block_field(
+          block_field_label("icon", `for` = "showcase_value_box_doc_icon"),
+          block_select(
+            "showcase_value_box_doc_icon",
+            choices = c("trending-up", "alert-triangle", "users", "dollar-sign", "none"),
+            selected = "trending-up",
+            size = "sm"
           )
         ),
-        htmltools::div(
-          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
-          # Content controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
-            block_field(
-              block_field_label("title", `for` = "showcase_value_box_doc_title"),
-              block_textarea("showcase_value_box_doc_title", value = "Net Revenue", rows = 1)
-            ),
-            block_field(
-              block_field_label("value", `for` = "showcase_value_box_doc_value"),
-              block_textarea("showcase_value_box_doc_value", value = "$45,231.89", rows = 1)
-            ),
-            block_field(
-              block_field_label("description", `for` = "showcase_value_box_doc_desc"),
-              block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 1)
-            )
-          ),
-          # Settings controls
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
-            htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Settings"),
-            block_field(
-              block_field_label("icon", `for` = "showcase_value_box_doc_icon"),
-              block_select("showcase_value_box_doc_icon", choices = c("trending-up", "alert-triangle", "users", "dollar-sign", "none"), selected = "trending-up")
-            ),
-            block_field(
-              block_field_label("class", `for` = "showcase_value_box_doc_class"),
-              block_select("showcase_value_box_doc_class", choices = c("none", "shadow-md", "border-dashed"), selected = "none")
-            )
+        block_field(
+          block_field_label("class", `for` = "showcase_value_box_doc_class"),
+          block_select(
+            "showcase_value_box_doc_class",
+            choices = c("none", "shadow-md", "border-dashed"),
+            selected = "none",
+            size = "sm"
           )
         )
       )
+    ),
+    preview_output_id = "showcase_value_box_preview_ui",
+    code_output_id = "showcase_value_box_preview_code",
+    preview_canvas_style = paste(
+      "position: relative; display: flex; align-items: center; justify-content: center;",
+      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
+      "border: 0; border-radius: 0.75rem; min-height: 240px; box-sizing: border-box;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

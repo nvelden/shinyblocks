@@ -38,7 +38,8 @@
     "code": "shinyblocks::block_value_box(\n  title = \"Active Sessions\",\n  value = \"1,284\",\n  description = \"+8% from last week\",\n  icon = \"database\"\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-8\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_value_box(\\n  title = \\\"Active Sessions\\\",\\n  value = \\\"1,284\\\",\\n  description = \\\"+8% from last week\\\",\\n  icon = \\\"database\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-value-box-value-box-7\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"value-box\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"value-box\",\"id\":null,\"props\":{\"titleHtml\":\"Active Sessions\",\"valueHtml\":\"1,284\",\"descriptionHtml\":\"+8% from last week\",\"contentHtml\":\"\",\"iconHtml\":\"<svg class=\\\"sb-icon\\\" aria-hidden=\\\"true\\\" focusable=\\\"false\\\" data-icon=\\\"inline-start\\\">\\n  <use href=\\\"/shinyblocks/runtime/shinyblocks-0.0.0.9001.1779816136/icons/sprite.svg#sb-icon-database\\\"><\\/use>\\n<\\/svg>\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 760
   },
   {
     "name": "Badge",

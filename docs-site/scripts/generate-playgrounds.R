@@ -41,7 +41,8 @@ playground_heights <- list(
   separator = 600L,
   skeleton = 600L,
   spinner = 600L,
-  textarea = 800L
+  textarea = 800L,
+  `value-box` = 760L
 )
 
 if (!dir.exists(playgrounds_src)) {

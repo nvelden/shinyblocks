@@ -1,0 +1,196 @@
+if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
+  dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
+
+  mounted <- FALSE
+  for (path in c("../../library.data.gz", "../library.data.gz")) {
+    tryCatch({
+      webr::mount("/packages", path)
+      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+        mounted <- TRUE
+        break
+      }
+    }, error = function(e) {
+      # Try the next path; Shinylive resolves mount URLs differently by host.
+    })
+  }
+
+  if (!mounted) {
+    tryCatch({
+      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+    }, error = function(e) {
+      stop("Failed to mount shinyblocks WASM package library: ", e$message)
+    })
+  }
+
+  .libPaths(c("/packages", .libPaths()))
+}
+
+library(shiny)
+do.call(library, list("shinyblocks", character.only = TRUE))
+
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
+showcase_render_code <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  renderUI({
+    value <- eval(quoted, envir = env)
+    if (is.null(value) || !length(value)) value <- ""
+    block_code(
+      code = paste(as.character(value), collapse = "\n"),
+      language = "r",
+      copyable = TRUE,
+      line_numbers = TRUE
+    )
+  })
+}
+
+string_literal <- function(value) {
+  paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+}
+
+ui <- block_page(
+  title = "shinyblocks - Value Box playground",
+  theme = htmltools::tagList(
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
+  ),
+  htmltools::tags$div(
+    `data-shinyblocks-root` = "",
+    style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+    htmltools::div(
+      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      htmltools::div(
+        style = paste(
+          "flex: 1; min-width: 280px; max-width: 320px;",
+          "border: 1px solid var(--border); border-radius: 0.75rem;",
+          "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
+          "background: color-mix(in oklab, var(--muted) 40%, transparent);"
+        ),
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+          htmltools::tags$h4(
+            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+            "Content"
+          ),
+          block_field(
+            block_field_label("title", `for` = "showcase_value_box_doc_title"),
+            block_textarea("showcase_value_box_doc_title", value = "Net Revenue", rows = 1)
+          ),
+          block_field(
+            block_field_label("value", `for` = "showcase_value_box_doc_value"),
+            block_textarea("showcase_value_box_doc_value", value = "$45,231.89", rows = 1)
+          ),
+          block_field(
+            block_field_label("description", `for` = "showcase_value_box_doc_desc"),
+            block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 2)
+          )
+        ),
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          htmltools::tags$h4(
+            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+            "Styling"
+          ),
+          block_field(
+            block_field_label("icon", `for` = "showcase_value_box_doc_icon"),
+            block_select(
+              "showcase_value_box_doc_icon",
+              choices = c("trending-up", "alert-triangle", "users", "dollar-sign", "none"),
+              selected = "trending-up",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("class", `for` = "showcase_value_box_doc_class"),
+            block_select(
+              "showcase_value_box_doc_class",
+              choices = c("none", "shadow-md", "border-dashed"),
+              selected = "none",
+              size = "sm"
+            )
+          )
+        )
+      ),
+      htmltools::div(
+        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+        htmltools::tags$div(
+          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+          htmltools::tags$div(
+            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
+            "Preview"
+          ),
+          htmltools::tags$div(
+            style = paste(
+              "position: relative; display: flex; align-items: center; justify-content: center;",
+              "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
+              "border: 0; border-radius: 0.75rem; min-height: 240px; box-sizing: border-box;"
+            ),
+            uiOutput("showcase_value_box_preview_ui")
+          )
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "UI Definition"
+          ),
+          uiOutput("showcase_value_box_preview_code")
+        )
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  preview_args <- reactive({
+    desc <- input$showcase_value_box_doc_desc %||% "Up 12% month over month."
+    if (!nzchar(desc)) desc <- NULL
+
+    icon <- input$showcase_value_box_doc_icon %||% "trending-up"
+    if (identical(icon, "none")) icon <- NULL
+
+    class <- input$showcase_value_box_doc_class %||% ""
+    if (!nzchar(class) || identical(class, "none")) class <- NULL
+
+    list(
+      title = input$showcase_value_box_doc_title %||% "Net Revenue",
+      value = input$showcase_value_box_doc_value %||% "$45,231.89",
+      description = desc,
+      icon = icon,
+      class = class
+    )
+  })
+
+  output$showcase_value_box_preview_ui <- renderUI({
+    args <- preview_args()
+    block_value_box(
+      title = args$title,
+      value = args$value,
+      description = args$description,
+      icon = args$icon,
+      class = args$class
+    )
+  })
+  outputOptions(output, "showcase_value_box_preview_ui", suspendWhenHidden = FALSE)
+
+  output$showcase_value_box_preview_code <- showcase_render_code({
+    args <- preview_args()
+    code_args <- c(
+      paste0("title = ", string_literal(args$title)),
+      paste0("value = ", string_literal(args$value))
+    )
+    if (!is.null(args$description)) {
+      code_args <- c(code_args, paste0("description = ", string_literal(args$description)))
+    }
+    if (!is.null(args$icon)) {
+      code_args <- c(code_args, paste0("icon = ", string_literal(args$icon)))
+    }
+    if (!is.null(args$class)) {
+      code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
+
+    paste0("block_value_box(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
+  })
+  outputOptions(output, "showcase_value_box_preview_code", suspendWhenHidden = FALSE)
+}
+
+shinyApp(ui, server)

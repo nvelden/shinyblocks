@@ -1,5 +1,6 @@
 # shinyblocks (development version)
 
+* Added an interactive Shinylive playground to the docs site for the Value Box component page (issue #21), and aligned the local Value Box showcase tab with the same controls, preview canvas, and generated UI definition.
 * Added an interactive Shinylive playground to the docs site for the Card component page (issue #21), and aligned the local Card showcase tab with the current unboxed playground layout.
 * Added interactive Shinylive playgrounds to the docs site for the Skeleton, Spinner, Code, and Alert component pages (issue #21). Each playground mirrors its showcase example/server pair behind the established bundled-WASM mount + `do.call(library, ...)` pattern so Shinylive's static dependency scanner does not request a non-existent `shinyblocks` webR binary.
 * Phase 8 final-gate dry run cleared. `devtools::check(remote = TRUE)` now reports 0 errors / 0 warnings / 2 benign notes (new-submission CRAN feasibility + "unable to verify current time"). `lintr::lint_package()` reports 0 lints. `devtools::spell_check()`, `devtools::test()`, the runtime/Shiny/showcase browser suites, and `make parity-ci` are all green.
