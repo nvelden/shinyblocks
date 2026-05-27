@@ -5,17 +5,21 @@ register_nav_item_showcase <- function(input, output, session) {
     icon_tag <- if (icon_name != "none") icon_name else NULL
     selected <- isTRUE(input$showcase_nav_item_doc_selected)
     href <- input$showcase_nav_item_doc_href %||% "#"
+    class <- if (isTRUE(input$showcase_nav_item_doc_class)) "sb-nav-demo-highlight" else NULL
     
-    # Place it inside a sidebar-styled container for perfect layout rendering
-    htmltools::div(
-      style = "background: var(--sidebar); color: var(--sidebar-foreground); padding: 0.75rem; border-radius: 0.5rem; max-width: 18rem; width: 100%; border: 1px solid var(--border);",
-      block_nav(
-        class = "sb-sidebar-nav",
-        block_nav_item(
-          label = label,
-          href = href,
-          icon = icon_tag,
-          selected = selected
+    htmltools::tagList(
+      htmltools::tags$style(".sb-nav-demo-highlight { outline: 2px solid var(--ring); outline-offset: 2px; }"),
+      htmltools::div(
+        style = "background: var(--sidebar); color: var(--sidebar-foreground); padding: 0.75rem; border-radius: 0.5rem; max-width: 18rem; width: 100%; border: 1px solid var(--border);",
+        block_nav(
+          class = "sb-sidebar-nav",
+          block_nav_item(
+            label = label,
+            href = href,
+            icon = icon_tag,
+            selected = selected,
+            class = class
+          )
         )
       )
     )
@@ -35,6 +39,7 @@ register_nav_item_showcase <- function(input, output, session) {
     icon_val <- input$showcase_nav_item_doc_icon %||% "home"
     selected_val <- isTRUE(input$showcase_nav_item_doc_selected)
     href_val <- input$showcase_nav_item_doc_href %||% "#"
+    class_val <- isTRUE(input$showcase_nav_item_doc_class)
 
     args <- c(
       paste0("label = ", string_literal(label_val))
@@ -47,6 +52,9 @@ register_nav_item_showcase <- function(input, output, session) {
     }
     if (selected_val) {
       args <- c(args, "selected = TRUE")
+    }
+    if (class_val) {
+      args <- c(args, 'class = "sb-nav-demo-highlight"')
     }
 
     paste0("block_nav_item(\n  ", paste(args, collapse = ",\n  "), "\n)")

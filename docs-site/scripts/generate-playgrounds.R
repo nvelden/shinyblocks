@@ -48,6 +48,7 @@ playground_heights <- list(
   switch = 760L,
   tabs = 760L,
   theme = 880L,
+  `nav-item` = 700L,
   textarea = 800L,
   `value-box` = 760L
 )
