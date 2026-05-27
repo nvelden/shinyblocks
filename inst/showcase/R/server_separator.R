@@ -2,10 +2,7 @@ register_separator_showcase <- function(input, output, session) {
   output$showcase_separator_preview_ui <- shiny::renderUI({
     orientation <- input$showcase_separator_doc_orientation %||% "horizontal"
     decorative <- isTRUE(input$showcase_separator_doc_decorative)
-    class <- input$showcase_separator_doc_class %||% ""
-    if (!nzchar(class)) {
-      class <- NULL
-    }
+    class <- if (isTRUE(input$showcase_separator_doc_class)) "showcase-separator-preview-custom" else NULL
     
     # We embed it inside a flex container to show the vertical vs horizontal correctly
     if (orientation == "horizontal") {
@@ -32,7 +29,7 @@ register_separator_showcase <- function(input, output, session) {
   output$showcase_separator_preview_code <- showcase_render_code({
     orientation_val <- input$showcase_separator_doc_orientation %||% "horizontal"
     decorative_val <- isTRUE(input$showcase_separator_doc_decorative)
-    class_val <- input$showcase_separator_doc_class %||% ""
+    class_val <- if (isTRUE(input$showcase_separator_doc_class)) "showcase-separator-preview-custom" else NULL
 
     args <- c()
     if (orientation_val != "horizontal") {
@@ -41,7 +38,7 @@ register_separator_showcase <- function(input, output, session) {
     if (!decorative_val) {
       args <- c(args, "decorative = FALSE")
     }
-    if (nzchar(class_val)) {
+    if (!is.null(class_val)) {
       args <- c(args, paste0('class = "', class_val, '"'))
     }
 
@@ -54,6 +51,26 @@ register_separator_showcase <- function(input, output, session) {
   shiny::outputOptions(
     output,
     "showcase_separator_preview_code",
+    suspendWhenHidden = FALSE
+  )
+
+  output$showcase_separator_accessibility_code <- showcase_render_code({
+    orientation_val <- input$showcase_separator_doc_orientation %||% "horizontal"
+    decorative_val <- isTRUE(input$showcase_separator_doc_decorative)
+
+    if (decorative_val) {
+      '<div data-slot="separator" aria-hidden="true">'
+    } else {
+      paste0(
+        '<div data-slot="separator" role="separator" aria-orientation="',
+        orientation_val,
+        '">'
+      )
+    }
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_separator_accessibility_code",
     suspendWhenHidden = FALSE
   )
 

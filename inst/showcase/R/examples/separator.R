@@ -16,6 +16,10 @@ htmltools::tagList(
             htmltools::tags$div(
               htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "UI Definition"),
               shiny::uiOutput("showcase_separator_preview_code")
+            ),
+            htmltools::tags$div(
+              htmltools::tags$div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.5rem;", "Rendered accessibility attributes"),
+              shiny::uiOutput("showcase_separator_accessibility_code")
             )
           )
         ),
@@ -40,7 +44,7 @@ htmltools::tagList(
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
             block_field(
               block_field_label("class", `for` = "showcase_separator_doc_class"),
-              block_textarea("showcase_separator_doc_class", value = "", rows = 1, placeholder = "e.g., my-4")
+              block_checkbox("showcase_separator_doc_class", "Use primary separator class", value = FALSE)
             )
           )
         )

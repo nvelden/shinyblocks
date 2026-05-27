@@ -139,6 +139,13 @@ ui <- block_page(
             "UI Definition"
           ),
           uiOutput("showcase_separator_preview_code")
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "Rendered accessibility attributes"
+          ),
+          uiOutput("showcase_separator_accessibility_code")
         )
       )
     )
@@ -203,6 +210,20 @@ server <- function(input, output, session) {
     }
   })
   outputOptions(output, "showcase_separator_preview_code", suspendWhenHidden = FALSE)
+
+  output$showcase_separator_accessibility_code <- showcase_render_code({
+    args <- preview_args()
+    if (isTRUE(args$decorative)) {
+      '<div data-slot="separator" aria-hidden="true">'
+    } else {
+      paste0(
+        '<div data-slot="separator" role="separator" aria-orientation="',
+        args$orientation,
+        '">'
+      )
+    }
+  })
+  outputOptions(output, "showcase_separator_accessibility_code", suspendWhenHidden = FALSE)
 }
 
 shinyApp(ui, server)

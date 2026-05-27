@@ -153,6 +153,11 @@
   border: 2px dashed var(--ring) !important;
 }
 
+.showcase-separator-preview-custom .sb-separator,
+.sb-separator.showcase-separator-preview-custom {
+  background-color: var(--primary) !important;
+}
+
 .sb-code-custom {
   border: 2px dashed var(--ring) !important;
   background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;
@@ -270,4 +275,3 @@ pre.shiny-text-output {
 #showcase_progress_preview_ui > * {
   width: 100%;
 }
-
