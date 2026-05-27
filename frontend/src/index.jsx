@@ -2236,10 +2236,35 @@ function Select({ payload, root }) {
     if (!trigger) return;
 
     const rect = trigger.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const gap = 4;
+    const viewportPadding = 8;
+    const estimatedItemHeight = 32;
+    const estimatedContentHeight = Math.min(
+      Math.max(choicesRef.current.length * estimatedItemHeight + 16, estimatedItemHeight + 16),
+      384
+    );
+    const availableBelow = Math.max(0, viewportHeight - rect.bottom - gap - viewportPadding);
+    const availableAbove = Math.max(0, rect.top - gap - viewportPadding);
+    const side = availableBelow < estimatedContentHeight && availableAbove > availableBelow
+      ? "top"
+      : "bottom";
+    const availableHeight = side === "top" ? availableAbove : availableBelow;
+    const minWidth = rect.width;
+    const left = viewportWidth > 0
+      ? Math.min(
+        Math.max(viewportPadding, rect.left),
+        Math.max(viewportPadding, viewportWidth - minWidth - viewportPadding)
+      )
+      : rect.left;
+
     setPosition({
-      top: rect.bottom + 4,
-      left: rect.left,
-      minWidth: rect.width
+      side,
+      top: side === "top" ? rect.top - gap : rect.bottom + gap,
+      left,
+      minWidth,
+      maxHeight: Math.max(96, availableHeight)
     });
   }
 
@@ -2516,8 +2541,11 @@ function Select({ payload, root }) {
             position: "fixed",
             top: `${position.top}px`,
             left: `${position.left}px`,
-            minWidth: `${position.minWidth}px`
+            minWidth: `${position.minWidth}px`,
+            maxHeight: `${position.maxHeight}px`,
+            transform: position.side === "top" ? "translateY(-100%)" : undefined
           } : undefined}
+          data-side={position?.side}
         >
           <div className="sb-select-viewport" data-slot="select-viewport">
             {choices.map((choice, index) => {

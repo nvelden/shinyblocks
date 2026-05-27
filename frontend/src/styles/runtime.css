@@ -1296,7 +1296,7 @@
 }
 
 [data-shinyblocks-portal-root] .sb-select-viewport {
-  max-height: 24rem;
+  max-height: min(24rem, calc(100vh - 1rem), calc(100% - 0.5rem));
   overflow-y: auto;
   padding-block: 0.25rem;
 }

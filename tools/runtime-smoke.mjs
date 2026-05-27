@@ -53,9 +53,33 @@ const badgePayload = JSON.stringify({
   binding: {},
   className: "custom-badge"
 });
+const selectPayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "select",
+  id: "runtime_select",
+  props: {
+    choices: [
+      { label: "None", value: "none" },
+      { label: "Shadow large", value: "shadow-lg" },
+      { label: "Border dashed", value: "border-dashed" }
+    ],
+    placeholder: "Choose a class",
+    disabled: false,
+    invalid: false,
+    size: "sm",
+    width: "280px",
+    style: {},
+    spriteHref: "shinyblocks-0.0.0.9000/icons/sprite.svg"
+  },
+  slots: {},
+  children: [],
+  state: { value: "shadow-lg" },
+  binding: { input: true },
+  className: null
+});
 
 const browser = await chromium.launch();
-const page = await browser.newPage();
+const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
 
 try {
   await page.setContent(`
@@ -94,6 +118,12 @@ try {
         </div>
         <div id="runtime-badge" data-shinyblocks-root data-shinyblocks-runtime="true">
           <script type="application/json" data-shinyblocks-payload>${badgePayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
+        </div>
+        <div style="height: 120px;"></div>
+        <div id="runtime-select" data-shinyblocks-root data-shinyblocks-runtime="true">
+          <script type="application/json" data-shinyblocks-payload>${selectPayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children></div>
         </div>
@@ -150,6 +180,27 @@ try {
     "Runtime badge",
     "badge runtime should render its label"
   );
+  await page.locator("#runtime-select [data-slot='select-trigger']").click();
+  await page.waitForSelector("[data-slot='select-content'][data-state='open']");
+  const selectPosition = await page.locator("[data-slot='select-content'][data-state='open']").evaluate((node) => {
+    const rect = node.getBoundingClientRect();
+    return {
+      side: node.getAttribute("data-side"),
+      top: rect.top,
+      bottom: rect.bottom,
+      viewportHeight: window.innerHeight
+    };
+  });
+  assert.equal(
+    selectPosition.side,
+    "top",
+    "select content should flip upward when the trigger is near the viewport bottom"
+  );
+  assert.ok(
+    selectPosition.top >= 0 && selectPosition.bottom <= selectPosition.viewportHeight,
+    "select content should stay visible inside a short embedded viewport"
+  );
+  await page.keyboard.press("Escape");
 
   await page.evaluate(() => {
     window.__handler({
