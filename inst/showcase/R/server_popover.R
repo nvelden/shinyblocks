@@ -66,6 +66,10 @@ register_popover_showcase <- function(input, output, session) {
   )
 
   output$showcase_popover_preview_code <- showcase_render_code({
+    string_literal <- function(value) {
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+    }
+
     trigger <- input$showcase_popover_doc_trigger %||% "Open popover"
     body <- if (isTRUE(swapped_body())) {
       "Body updated from the server."
@@ -78,23 +82,23 @@ register_popover_showcase <- function(input, output, session) {
 
     args <- c(
       'id = "showcase_popover_preview"',
-      paste0('trigger = "', trigger, '"')
+      paste0("trigger = ", string_literal(trigger))
     )
     if (nzchar(body)) {
-      args <- c(args, paste0('htmltools::tags$p("', body, '")'))
+      args <- c(args, paste0("htmltools::tags$p(", string_literal(body), ")"))
     }
     if (!identical(side, "bottom")) {
-      args <- c(args, paste0('side = "', side, '"'))
+      args <- c(args, paste0("side = ", string_literal(side)))
     }
     if (!identical(align, "center")) {
-      args <- c(args, paste0('align = "', align, '"'))
+      args <- c(args, paste0("align = ", string_literal(align)))
     }
     if (is_open) {
       args <- c(args, "open = TRUE")
     }
     style_val <- input$showcase_popover_doc_style %||% ""
     if (nzchar(style_val)) {
-      args <- c(args, paste0('style = "', style_val, '"'))
+      args <- c(args, paste0("style = ", string_literal(style_val)))
     }
     if (isTRUE(input$showcase_popover_doc_class)) {
       args <- c(args, 'class = "showcase-popover-preview-custom"')
@@ -195,6 +199,10 @@ register_popover_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_popover_swap_body, {
+    string_literal <- function(value) {
+      paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+    }
+
     open_state(TRUE)
     swapped_body(!isTRUE(swapped_body()))
     next_body <- if (isTRUE(swapped_body())) {
@@ -213,9 +221,9 @@ register_popover_showcase <- function(input, output, session) {
       "  session = session,\n",
       "  input_id = \"showcase_popover_preview\",\n",
       "  open = TRUE,\n",
-      "  body = htmltools::tags$p(\"",
-      next_body,
-      "\")\n",
+      "  body = htmltools::tags$p(",
+      string_literal(next_body),
+      ")\n",
       ")"
     ))
   })

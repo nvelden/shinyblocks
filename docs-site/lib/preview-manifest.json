@@ -270,7 +270,8 @@
     "code": "shinyblocks::block_popover(\n  trigger = \"View Details\",\n  id = \"preview_popover\",\n  \"This is a premium, portal-rendered popover content styled with shadcn presets.\"\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-51\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_popover(\\n  trigger = \\\"View Details\\\",\\n  id = \\\"preview_popover\\\",\\n  \\\"This is a premium, portal-rendered popover content styled with shadcn presets.\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-popover-preview_popover\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"popover\" data-sb-input-id=\"preview_popover\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"popover\",\"id\":\"preview_popover\",\"props\":{\"triggerLabel\":\"View Details\",\"bodyHtml\":\"This is a premium, portal-rendered popover content styled with shadcn presets.\",\"side\":\"bottom\",\"align\":\"center\",\"contentStyle\":null,\"contentClass\":null},\"slots\":[],\"children\":[],\"state\":{\"value\":false,\"open\":false},\"binding\":{\"input\":true,\"type\":\"shinyblocks.popover\"},\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 980
   },
   {
     "name": "Tooltip",
