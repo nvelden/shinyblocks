@@ -147,7 +147,8 @@
     "code": "shinyblocks::block_switch(\n  \"airplane\",\n  label = \"Airplane Mode\"\n)",
     "codeHtml": "<div id=\"sb-runtime-code-code-28\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_switch(\\n  \\\"airplane\\\",\\n  label = \\\"Airplane Mode\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
     "html": "<div id=\"sb-runtime-switch-airplane\" class=\"sb-runtime-mount sb-switch\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"switch\" data-sb-input-id=\"airplane\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"switch\",\"id\":\"airplane\",\"props\":{\"labelHtml\":\"Airplane Mode\",\"disabled\":false,\"style\":null},\"slots\":[],\"children\":[],\"state\":{\"value\":false},\"binding\":{\"input\":true,\"type\":\"shinyblocks.switch\"},\"className\":\"sb-switch\"}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\">\n    <input id=\"airplane\" type=\"checkbox\" class=\"sb-switch-native\" tabindex=\"-1\" aria-hidden=\"true\" data-shiny-no-bind-input=\"\"/>\n  <\/div>\n<\/div>",
-    "hasPlayground": false
+    "hasPlayground": true,
+    "playgroundHeight": 760
   },
   {
     "name": "Input Group",
