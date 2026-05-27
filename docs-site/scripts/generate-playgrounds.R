@@ -46,6 +46,7 @@ playground_heights <- list(
   slider = 800L,
   spinner = 600L,
   switch = 760L,
+  tabs = 760L,
   textarea = 800L,
   `value-box` = 760L
 )
