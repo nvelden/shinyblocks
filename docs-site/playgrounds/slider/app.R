@@ -30,6 +30,25 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   })
 }
 
+# Lightweight live-value renderer used for the drag-rate `input$<slider>`
+# readout. block_code() is a runtime React mount; re-rendering it on every
+# 100ms throttle tick during a drag adds visible lag in Shinylive (webR)
+# because each tick triggers a worker round-trip + a React re-mount of the
+# code widget. A plain <pre><code> avoids the React mount entirely while
+# matching block_code()'s visual weight closely enough for a one-line value.
+showcase_render_value <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  renderUI({
+    value <- eval(quoted, envir = env)
+    htmltools::tags$pre(
+      class = "sb-code-block sb-code-block-default",
+      style = "margin: 0; padding: 0.75rem 1rem; font-size: 0.8125rem;",
+      htmltools::tags$code(paste(as.character(value), collapse = "\n"))
+    )
+  })
+}
+
 showcase_action_button <- function(input_id, label) {
   block_button(label, id = input_id, variant = "outline", size = "sm")
 }
@@ -169,7 +188,7 @@ server <- function(input, output, session) {
     )
   })
 
-  output$showcase_slider_preview_value <- showcase_render_code({
+  output$showcase_slider_preview_value <- showcase_render_value({
     value <- input$showcase_slider_preview
     paste0("input$showcase_slider_preview = ", if (is.null(value)) "<NULL>" else paste(value, collapse = ", "))
   })
