@@ -38,6 +38,14 @@
       Error:
       ! `size` must be one of "default", "sm", "lg", "icon".
 
+# block_switch validates size
+
+    Code
+      block_switch("alerts", "Alerts", size = "xl")
+    Condition
+      Error:
+      ! `size` must be one of "default", "sm", "lg".
+
 # block_badge validates variant
 
     Code

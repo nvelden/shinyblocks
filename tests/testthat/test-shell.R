@@ -463,6 +463,7 @@ test_that("checkbox and switch emit runtime payloads", {
     "alerts",
     "Send incident alerts",
     value = TRUE,
+    size = "lg",
     class = "custom"
   )
   checkbox_html <- render_html(checkbox)
@@ -504,6 +505,7 @@ test_that("checkbox and switch emit runtime payloads", {
   expect_identical(switch_payload$id, "alerts")
   expect_identical(switch_payload$state$value, TRUE)
   expect_identical(switch_payload$props$labelHtml, "Send incident alerts")
+  expect_identical(switch_payload$props$size, "lg")
   expect_identical(switch_payload$className, "custom")
   expect_identical(switch_payload$binding$type, "shinyblocks.switch")
 })

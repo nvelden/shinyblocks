@@ -16,8 +16,10 @@
 - **disabled** — reduced opacity for both track and label.
 - **invalid** — destructive-tinted border/ring when a parent field
   marks the control invalid.
+- **size** — `sm`, `default`, and `lg` sizes keep the same horizontal
+  switch pattern with scaled track, thumb, gap, and label text.
 - **server-updated** — server can replace checked state, disabled
-  state, style, and class without remounting.
+  state, size, style, and class without remounting.
 
 ## Runtime Mapping
 
@@ -27,6 +29,7 @@
 | `label` | `props$labelHtml` | Inline label HTML. |
 | `value` | `state$value` | Initial on/off state. |
 | `disabled` | `props$disabled` | Disables rendered switch. |
+| `size` | `props$size` | One of `default`, `sm`, or `lg`. |
 | `style` | `props$style` | Inline style on visible switch shell. |
 | `class` | `className` | Extra class on wrapper. |
 
@@ -36,8 +39,8 @@
   `shinyblocks.switch` binding.
 - A hidden native `<input type="checkbox">` remains in the runtime
   mount as a form bridge, but Shiny reads the package binding.
-- `update_block_switch()` accepts `checked`, `disabled`, `style`, and
-  `class`.
+- `update_block_switch()` accepts `checked`, `disabled`, `size`,
+  `style`, and `class`.
 - Cosmetic updates do not notify. Checked-state updates notify only
   when `notify = TRUE`.
 - Passing `style = NULL` or `class = NULL` clears that field.
@@ -60,6 +63,9 @@
 - Hidden native checkbox markup is retained for form submission and
   assistive technology compatibility, while the visible control is
   owned by the runtime.
+- Shadcn's canonical Switch does not provide a vertical switch API.
+  `shinyblocks` follows that horizontal contract and adds only package
+  size presets for dashboard density.
 - Invalid styling is field-driven today; `block_switch()` itself does
   not expose an `invalid` argument.
 

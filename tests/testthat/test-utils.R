@@ -51,6 +51,12 @@ test_that("block_button validates variant and size", {
   })
 })
 
+test_that("block_switch validates size", {
+  expect_snapshot(error = TRUE, {
+    block_switch("alerts", "Alerts", size = "xl")
+  })
+})
+
 test_that("block_badge validates variant", {
   expect_snapshot(error = TRUE, {
     block_badge("New", variant = "primary")
@@ -290,6 +296,7 @@ test_that("update_block_switch sends input binding messages", {
       "alerts",
       checked = TRUE,
       disabled = TRUE,
+      size = "lg",
       style = "border: 2px dashed red;",
       class = "custom-switch",
       notify = TRUE
@@ -299,6 +306,7 @@ test_that("update_block_switch sends input binding messages", {
   expect_identical(message$input_id, "sb-runtime-switch-alerts")
   expect_identical(message$payload$checked, TRUE)
   expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$size, "lg")
   expect_identical(message$payload$style$border, "2px dashed red")
   expect_identical(message$payload$class, "custom-switch")
   expect_identical(message$payload$notify, TRUE)

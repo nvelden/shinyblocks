@@ -64,8 +64,8 @@ ui <- block_page(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
       "
-      [data-shinyblocks-root] .showcase-switch-preview-custom .sb-switch-control,
-      [data-shinyblocks-root].showcase-switch-preview-custom .sb-switch-control {
+      [data-shinyblocks-root] .showcase-switch-preview-custom .sb-switch-button,
+      [data-shinyblocks-root].showcase-switch-preview-custom .sb-switch-button {
         outline: 2px dashed red;
         outline-offset: 3px;
       }
@@ -117,6 +117,15 @@ ui <- block_page(
             "Styling"
           ),
           block_field(
+            block_field_label("size", `for` = "showcase_switch_doc_size"),
+            block_select(
+              "showcase_switch_doc_size",
+              choices = c("default", "sm", "lg"),
+              selected = "default",
+              size = "sm"
+            )
+          ),
+          block_field(
             block_field_label("style", `for` = "showcase_switch_doc_style"),
             block_textarea(
               "showcase_switch_doc_style",
@@ -146,6 +155,7 @@ ui <- block_page(
             showcase_action_button("showcase_switch_turn_off", "Turn off"),
             showcase_action_button("showcase_switch_disable", "Disable"),
             showcase_action_button("showcase_switch_enable", "Enable"),
+            showcase_action_button("showcase_switch_large", "Set large"),
             showcase_action_button("showcase_switch_rename", "Rename label")
           )
         )
@@ -201,11 +211,13 @@ server <- function(input, output, session) {
 
     style <- input$showcase_switch_doc_style %||% ""
     if (!nzchar(style)) style <- NULL
+    size <- input$showcase_switch_doc_size %||% "default"
 
     list(
       label = label,
       value = isTRUE(input$showcase_switch_doc_value),
       disabled = isTRUE(input$showcase_switch_doc_disabled),
+      size = size,
       style = style,
       class = if (isTRUE(input$showcase_switch_doc_class)) "showcase-switch-preview-custom" else NULL
     )
@@ -219,6 +231,7 @@ server <- function(input, output, session) {
         args$label,
         value = args$value,
         disabled = args$disabled,
+        size = args$size,
         style = args$style,
         class = args$class
       )
@@ -239,6 +252,7 @@ server <- function(input, output, session) {
     )
     if (args$value) switch_args <- c(switch_args, "value = TRUE")
     if (args$disabled) switch_args <- c(switch_args, "disabled = TRUE")
+    if (!identical(args$size, "default")) switch_args <- c(switch_args, paste0("size = ", string_literal(args$size)))
     if (!is.null(args$style)) switch_args <- c(switch_args, paste0("style = ", string_literal(args$style)))
     if (!is.null(args$class)) switch_args <- c(switch_args, paste0("class = ", string_literal(args$class)))
 
@@ -300,6 +314,18 @@ server <- function(input, output, session) {
       "  session = session,\n",
       "  input_id = \"showcase_switch_preview\",\n",
       "  disabled = FALSE\n",
+      ")"
+    ))
+  })
+
+  observeEvent(input$showcase_switch_large, {
+    update_block_switch(session, "showcase_switch_preview", size = "lg")
+    update_block_select(session, "showcase_switch_doc_size", selected = "lg")
+    reactive_code(paste0(
+      "update_block_switch(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_switch_preview\",\n",
+      "  size = \"lg\"\n",
       ")"
     ))
   })

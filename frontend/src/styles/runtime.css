@@ -958,6 +958,26 @@
   transform: translateX(calc(100% - 2px));
 }
 
+[data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-button {
+  width: 1.75rem;
+  height: 1rem;
+}
+
+[data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+[data-shinyblocks-root] .sb-switch[data-size="lg"] .sb-switch-button {
+  width: 2.25rem;
+  height: 1.3rem;
+}
+
+[data-shinyblocks-root] .sb-switch[data-size="lg"] .sb-switch-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
 [data-theme="dark"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] .sb-switch-thumb {
   background-color: var(--primary-foreground);
 }

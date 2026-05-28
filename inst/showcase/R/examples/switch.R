@@ -27,11 +27,21 @@ htmltools::tagList(
           showcase_action_button("showcase_switch_turn_off", "Turn off"),
           showcase_action_button("showcase_switch_disable", "Disable"),
           showcase_action_button("showcase_switch_enable", "Enable"),
+          showcase_action_button("showcase_switch_large", "Set large"),
           showcase_action_button("showcase_switch_rename", "Rename label")
         )
       ),
       showcase_controls_group(
         "Styling",
+        block_field(
+          block_field_label("size", `for` = "showcase_switch_doc_size"),
+          block_select(
+            "showcase_switch_doc_size",
+            choices = c("default", "sm", "lg"),
+            selected = "default",
+            size = "sm"
+          )
+        ),
         block_field(
           block_field_label("style", `for` = "showcase_switch_doc_style"),
           block_textarea(

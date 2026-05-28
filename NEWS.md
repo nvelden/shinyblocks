@@ -1,5 +1,6 @@
 # shinyblocks (development version)
 
+* Added `size = c("default", "sm", "lg")` support to `block_switch()` and `update_block_switch()`, and aligned the Switch docs/showcase playgrounds with the real component API.
 * Added an interactive Shinylive playground to the docs site for the Tabs component page (issue #21), and aligned the local Tabs showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Slider component page (issue #21), and aligned the local Slider showcase tab with the same unboxed controls and preview layout.
 * Added an interactive Shinylive playground to the docs site for the Input Group component page (issue #21), and aligned the local Input Group showcase tab with the same unboxed controls and preview layout.

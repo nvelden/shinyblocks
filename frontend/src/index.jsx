@@ -1450,6 +1450,7 @@ function Switch({ payload, root }) {
   const inputId = payload.id;
   const [checked, setCheckedState] = useState(Boolean(state.value));
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
+  const [size, setSize] = useState(props.size || "default");
   const [style, setStyle] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
@@ -1495,6 +1496,9 @@ function Switch({ payload, root }) {
         root.toggleAttribute("data-disabled", nextDisabled);
         const native = nativeSwitch(root);
         if (native) native.disabled = nextDisabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
+        setSize(nextData.size || "default");
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
         setClassName(nextData.class || "");
@@ -1542,6 +1546,7 @@ function Switch({ payload, root }) {
       data-slot="switch"
       className={classNames("sb-switch", className)}
       data-state={checked ? "checked" : "unchecked"}
+      data-size={size === "default" ? undefined : size}
       data-disabled={disabled ? "true" : undefined}
     >
       <button

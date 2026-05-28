@@ -8,6 +8,7 @@ register_switch_showcase <- function(input, output, session) {
 
     value <- isTRUE(input$showcase_switch_doc_value)
     disabled <- isTRUE(input$showcase_switch_doc_disabled)
+    size <- input$showcase_switch_doc_size %||% "default"
     style_val <- input$showcase_switch_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
     class_val <- if (isTRUE(input$showcase_switch_doc_class)) {
@@ -22,6 +23,7 @@ register_switch_showcase <- function(input, output, session) {
         label,
         value = value,
         disabled = disabled,
+        size = size,
         style = style_val,
         class = class_val
       )
@@ -40,6 +42,7 @@ register_switch_showcase <- function(input, output, session) {
     label <- input$showcase_switch_doc_label %||% preview_label()
     value <- isTRUE(input$showcase_switch_doc_value)
     disabled <- isTRUE(input$showcase_switch_doc_disabled)
+    size <- input$showcase_switch_doc_size %||% "default"
     style_val <- input$showcase_switch_doc_style %||% ""
     custom_class <- isTRUE(input$showcase_switch_doc_class)
 
@@ -49,6 +52,7 @@ register_switch_showcase <- function(input, output, session) {
     )
     if (value) args <- c(args, "value = TRUE")
     if (disabled) args <- c(args, "disabled = TRUE")
+    if (!identical(size, "default")) args <- c(args, paste0('size = "', size, '"'))
     if (nzchar(style_val)) args <- c(args, paste0('style = "', style_val, '"'))
     if (custom_class) args <- c(args, 'class = "showcase-switch-preview-custom"')
 
@@ -72,14 +76,15 @@ register_switch_showcase <- function(input, output, session) {
 
   output$showcase_switch_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("input_id", "label", "value", "disabled", "style", "class"),
-      Type = c("character", "character", "logical", "logical", "character | list", "character"),
-      Default = c("required", "required", "FALSE", "FALSE", "NULL", "NULL"),
+      Argument = c("input_id", "label", "value", "disabled", "size", "style", "class"),
+      Type = c("character", "character", "logical", "logical", "character", "character | list", "character"),
+      Default = c("required", "required", "FALSE", "FALSE", "\"default\"", "NULL", "NULL"),
       Description = c(
         "Input id reported back to Shiny as input$<id>.",
         "Visible label rendered next to the toggle.",
         "Initial checked state (TRUE/FALSE).",
         "Disables the switch while preserving server updates.",
+        "Visual size: default, sm, or lg.",
         "Inline CSS styles applied to the switch wrapper.",
         "Additional class merged onto the runtime switch wrapper."
       )
@@ -131,9 +136,21 @@ register_switch_showcase <- function(input, output, session) {
     ))
   })
 
+  shiny::observeEvent(input$showcase_switch_large, {
+    update_block_switch(session, "showcase_switch_preview", size = "lg")
+    update_block_select(session, "showcase_switch_doc_size", selected = "lg")
+    reactive_code(paste0(
+      "update_block_switch(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_switch_preview\",\n",
+      "  size = \"lg\"\n",
+      ")"
+    ))
+  })
+
   shiny::observeEvent(input$showcase_switch_rename, {
     new_label <- "Auto-resolve pages"
-    shiny::updateTextInput(session, "showcase_switch_doc_label", value = new_label)
+    update_block_input(session, "showcase_switch_doc_label", value = new_label)
     reactive_code(paste0(
       "# `label` is a constructor arg, not an update_block_switch() arg.\n",
       "# Re-render with the new label via the constructor's `label`.\n",

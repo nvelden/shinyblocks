@@ -391,6 +391,7 @@ update_block_checkbox <- function(
 #' @param label Switch label.
 #' @param value Whether the switch starts on.
 #' @param disabled Whether the control is disabled.
+#' @param size Switch size. One of `"default"`, `"sm"`, or `"lg"`.
 #' @param style Inline CSS styles.
 #' @param class Additional classes.
 #'
@@ -402,10 +403,12 @@ block_switch <- function(
   label,
   value = FALSE,
   disabled = FALSE,
+  size = c("default", "sm", "lg"),
   style = NULL,
   class = NULL
 ) {
   validate_input_id(input_id)
+  size <- match_arg(size, c("default", "sm", "lg"))
 
   hidden_native <- htmltools::tags$input(
     id = input_id,
@@ -423,6 +426,7 @@ block_switch <- function(
     props = list(
       labelHtml = html_fragment(label),
       disabled = isTRUE(disabled),
+      size = size,
       style = normalize_runtime_style(style)
     ),
     input_id = input_id,
@@ -440,6 +444,7 @@ block_switch <- function(
 #' @param input_id Input id passed to `block_switch()`.
 #' @param checked Optional checked state.
 #' @param disabled Optional disabled state.
+#' @param size Optional replacement size. One of `"default"`, `"sm"`, or `"lg"`.
 #' @param style Optional replacement inline CSS styles.
 #' @param class Optional replacement classes.
 #' @param notify Whether Shiny should receive an input event when `checked`
@@ -453,6 +458,7 @@ update_block_switch <- function(
   input_id,
   checked,
   disabled,
+  size,
   style,
   class,
   notify = TRUE
@@ -475,6 +481,9 @@ update_block_switch <- function(
   }
   if (!missing(disabled)) {
     payload$disabled <- isTRUE(disabled)
+  }
+  if (!missing(size)) {
+    payload$size <- match_arg(size, c("default", "sm", "lg"))
   }
   if (!missing(style)) {
     payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))

@@ -9,6 +9,7 @@ block_switch(
   label,
   value = FALSE,
   disabled = FALSE,
+  size = c("default", "sm", "lg"),
   style = NULL,
   class = NULL
 )
@@ -21,6 +22,8 @@ block_switch(
 \item{value}{Whether the switch starts on.}
 
 \item{disabled}{Whether the control is disabled.}
+
+\item{size}{Switch size. One of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
 
 \item{style}{Inline CSS styles.}
 

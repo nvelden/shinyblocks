@@ -9,6 +9,7 @@ update_block_switch(
   input_id,
   checked,
   disabled,
+  size,
   style,
   class,
   notify = TRUE
@@ -22,6 +23,8 @@ update_block_switch(
 \item{checked}{Optional checked state.}
 
 \item{disabled}{Optional disabled state.}
+
+\item{size}{Optional replacement size. One of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
 
 \item{style}{Optional replacement inline CSS styles.}
 
