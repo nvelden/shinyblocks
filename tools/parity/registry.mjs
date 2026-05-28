@@ -406,9 +406,9 @@ export const REGISTRY = {
             '[data-parity-component="slider"] [data-parity-state="disabled"][data-parity-role="root"]'
         },
         showcaseSelectors: {
-          default: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider"]',
-          hover: '[data-sb-section="slider"] .sb-parity-slider-default [data-slot="slider"]',
-          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled [data-slot="slider"]'
+          default: '[data-sb-section="slider"] .sb-parity-slider-default[data-slot="slider"]',
+          hover: '[data-sb-section="slider"] .sb-parity-slider-default[data-slot="slider"]',
+          disabled: '[data-sb-section="slider"] .sb-parity-slider-disabled[data-slot="slider"]'
         }
       },
       rail: {
