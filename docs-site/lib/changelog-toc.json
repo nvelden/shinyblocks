@@ -4,6 +4,14 @@
     "slug": "shinyblocks-development-version"
   },
   {
+    "title": "Internal",
+    "slug": "internal"
+  },
+  {
+    "title": "Other changes",
+    "slug": "other-changes"
+  },
+  {
     "title": "0.0.0.9000",
     "slug": "0009000"
   }
