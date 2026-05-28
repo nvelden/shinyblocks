@@ -536,15 +536,6 @@
     0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
-[data-shinyblocks-root] .sb-value-box-accent {
-  background-color: var(--accent);
-  border-color: var(--accent-foreground);
-}
-
-[data-shinyblocks-root] .sb-value-box-destructive {
-  border-color: var(--destructive);
-}
-
 [data-shinyblocks-root] .sb-value-box-icon {
   display: flex;
   align-items: flex-start;

@@ -636,12 +636,20 @@ function Empty({ payload }) {
 function ValueBox({ payload }) {
   const props = payload.props || {};
   const variant = props.variant || "default";
+  const variantStyle = variant === "accent"
+    ? {
+      backgroundColor: "var(--accent)",
+      borderLeft: "4px solid var(--accent-foreground)",
+    }
+    : variant === "destructive"
+      ? { borderLeft: "4px solid var(--destructive)" }
+      : {};
 
   return (
     <section
       data-slot="value-box"
       className={classNames("sb-value-box", `sb-value-box-${variant}`, payload.className)}
-      style={payload.style}
+      style={{ ...variantStyle, ...(payload.style || {}) }}
     >
       {props.iconHtml && (
         <div className="sb-value-box-icon">
