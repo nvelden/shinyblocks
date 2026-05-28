@@ -407,7 +407,7 @@ test_that("slider emits runtime payload and binding metadata", {
   slider_html <- render_html(slider)
   expect_identical(
     tag_attr(slider, "class"),
-    "sb-runtime-mount sb-slider"
+    "sb-runtime-mount sb-slider-root"
   )
   expect_identical(payload$className, "custom")
   expect_match(slider_html, 'data-sb-component="slider"', fixed = TRUE)

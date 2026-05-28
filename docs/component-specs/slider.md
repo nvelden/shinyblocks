@@ -44,7 +44,7 @@
 | `orientation` | `"horizontal"` or `"vertical"` rail orientation. |
 | `show_value` | Shows the current scalar value or range near the rail. |
 | `min_label` / `max_label` | Optional labels rendered at the rail bounds. |
-| `width` | CSS width applied to the runtime wrapper. |
+| `width` | CSS width applied to the runtime wrapper for horizontal sliders. Vertical sliders shrink-wrap the rail/label group; use `style` for custom vertical sizing. |
 | `disabled` | Disables pointer/keyboard interaction. |
 | `invalid` | Applies `aria-invalid` and destructive border/ring. |
 | `style` / `class` | Inline style / extra class on the wrapper. |
@@ -69,7 +69,7 @@ matching single vs range mode.
 | `min_label` / `max_label` | `props$minLabel` / `props$maxLabel` | Display-only bound labels. |
 | `disabled` | `props$disabled` | |
 | `invalid` | `props$invalid` | |
-| `width` | mount `style.width` | |
+| `width` | mount `style.width` | Horizontal only. |
 
 A hidden native `<input>` lives in the runtime mount as a
 form-submission bridge, but Shiny reads the dedicated

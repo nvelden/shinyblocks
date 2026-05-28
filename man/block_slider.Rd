@@ -45,7 +45,7 @@ length 2 for a range slider.}
 
 \item{max_label}{Optional label displayed at the maximum end of the rail.}
 
-\item{width}{Optional CSS width value.}
+\item{width}{Optional CSS width value for horizontal sliders.}
 
 \item{disabled}{Whether the control is disabled.}
 

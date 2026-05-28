@@ -52,25 +52,35 @@ register_slider_showcase <- function(input, output, session) {
       NULL
     }
 
-    block_field(
-      block_field_label("Volume", `for` = "showcase_slider_preview"),
-      block_slider(
-        "showcase_slider_preview",
-        value = value,
-        min = min_val,
-        max = max_val,
-        step = step_val,
-        orientation = orientation_val,
-        show_value = show_value,
-        min_label = min_label,
-        max_label = max_label,
-        width = width_val,
-        disabled = disabled,
-        invalid = invalid,
-        style = style_val,
-        class = class_val
-      )
+    slider <- block_slider(
+      "showcase_slider_preview",
+      value = value,
+      min = min_val,
+      max = max_val,
+      step = step_val,
+      orientation = orientation_val,
+      show_value = show_value,
+      min_label = min_label,
+      max_label = max_label,
+      width = width_val,
+      disabled = disabled,
+      invalid = invalid,
+      style = style_val,
+      class = class_val
     )
+    if (identical(orientation_val, "vertical")) {
+      htmltools::div(
+        style = "display: inline-flex; flex-direction: column; align-items: center; gap: 0.75rem;",
+        htmltools::tags$label(
+          `for` = "showcase_slider_preview",
+          style = "font-size: 0.875rem; font-weight: 500; line-height: 1;",
+          "Volume"
+        ),
+        slider
+      )
+    } else {
+      block_field(block_field_label("Volume", `for` = "showcase_slider_preview"), slider)
+    }
   })
   shiny::outputOptions(output, "showcase_slider_preview_ui", suspendWhenHidden = FALSE)
 
@@ -158,7 +168,7 @@ register_slider_showcase <- function(input, output, session) {
         "Shows the current scalar or range value near the rail.",
         "Optional label at the minimum end of the rail.",
         "Optional label at the maximum end of the rail.",
-        "Optional CSS width applied to the wrapper.",
+        "Optional CSS width applied to the wrapper for horizontal sliders.",
         "Disables user interaction while preserving server updates.",
         "Sets aria-invalid='true' to surface destructive styling.",
         "Inline CSS styles applied to the slider element.",
@@ -234,6 +244,10 @@ register_slider_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_slider_vertical, {
+    update_block_select(session, "showcase_slider_doc_orientation", selected = "vertical")
+    update_block_checkbox(session, "showcase_slider_doc_show_value", checked = TRUE)
+    update_block_input(session, "showcase_slider_doc_min_label", value = "Low")
+    update_block_input(session, "showcase_slider_doc_max_label", value = "High")
     update_block_slider(
       session,
       "showcase_slider_preview",

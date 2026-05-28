@@ -2082,6 +2082,13 @@ function Slider({ payload, root }) {
   const hasBounds = minLabel != null || maxLabel != null;
   const shellStyle = {
     display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "0.5rem",
+    width: isVertical ? "auto" : "100%"
+  };
+  const bodyStyle = {
+    display: "inline-flex",
     flexDirection: isVertical ? "row" : "column",
     alignItems: isVertical ? "stretch" : "center",
     gap: "0.5rem",
@@ -2106,72 +2113,74 @@ function Slider({ payload, root }) {
   return (
     <div className="sb-slider-shell" data-orientation={orientation} style={shellStyle}>
       {showValue ? <div className="sb-slider-value" style={labelStyle}>{valueLabel}</div> : null}
-      <div
-        className={classNames("sb-slider", className)}
-        data-slot="slider"
-        data-disabled={disabled ? "true" : undefined}
-        data-invalid={isInvalid ? "true" : undefined}
-        data-orientation={orientation}
-        style={sliderStyle}
-      >
+      <div className="sb-slider-body" style={bodyStyle}>
         <div
-          ref={trackRef}
-          className="sb-slider-track"
-          data-slot="slider-track"
-          style={trackStyle}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerEnd}
-          onPointerCancel={handlePointerEnd}
+          className={classNames("sb-slider", className)}
+          data-slot="slider"
+          data-disabled={disabled ? "true" : undefined}
+          data-invalid={isInvalid ? "true" : undefined}
+          data-orientation={orientation}
+          style={sliderStyle}
         >
           <div
-            className="sb-slider-range"
-            data-slot="slider-range"
-            style={rangeStyle}
-          />
-        </div>
-        {values.map((item, index) => (
-          <button
-            key={index}
-            type="button"
-            className="sb-slider-thumb"
-            data-slot="slider-thumb"
-            role="slider"
-            aria-orientation={orientation}
-            aria-valuemin={min}
-            aria-valuemax={max}
-            aria-valuenow={item}
-            aria-labelledby={labelledBy || undefined}
-            aria-describedby={describedBy}
-            aria-invalid={isInvalid || undefined}
-            disabled={disabled}
-            style={isVertical
-              ? { left: "50%", top: "auto", bottom: `${percentFor(item)}%`, transform: "translate(-50%, 50%)" }
-              : { left: `${percentFor(item)}%` }}
-            onPointerDown={(event) => handlePointerDown(event, index)}
-            onPointerMove={(event) => handlePointerMove(event, index)}
+            ref={trackRef}
+            className="sb-slider-track"
+            data-slot="slider-track"
+            style={trackStyle}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
             onPointerUp={handlePointerEnd}
             onPointerCancel={handlePointerEnd}
-            onFocus={() => setCurrentThumb(index)}
-            onKeyDown={(event) => handleKeyDown(event, index)}
-          />
-        ))}
-      </div>
-      {hasBounds ? (
-        <div className="sb-slider-bounds" style={boundsStyle}>
-          {isVertical ? (
-            <>
-              <span>{maxLabel == null ? "" : maxLabel}</span>
-              <span>{minLabel == null ? "" : minLabel}</span>
-            </>
-          ) : (
-            <>
-              <span>{minLabel == null ? "" : minLabel}</span>
-              <span>{maxLabel == null ? "" : maxLabel}</span>
-            </>
-          )}
+          >
+            <div
+              className="sb-slider-range"
+              data-slot="slider-range"
+              style={rangeStyle}
+            />
+          </div>
+          {values.map((item, index) => (
+            <button
+              key={index}
+              type="button"
+              className="sb-slider-thumb"
+              data-slot="slider-thumb"
+              role="slider"
+              aria-orientation={orientation}
+              aria-valuemin={min}
+              aria-valuemax={max}
+              aria-valuenow={item}
+              aria-labelledby={labelledBy || undefined}
+              aria-describedby={describedBy}
+              aria-invalid={isInvalid || undefined}
+              disabled={disabled}
+              style={isVertical
+                ? { left: "50%", top: "auto", bottom: `${percentFor(item)}%`, transform: "translate(-50%, 50%)" }
+                : { left: `${percentFor(item)}%` }}
+              onPointerDown={(event) => handlePointerDown(event, index)}
+              onPointerMove={(event) => handlePointerMove(event, index)}
+              onPointerUp={handlePointerEnd}
+              onPointerCancel={handlePointerEnd}
+              onFocus={() => setCurrentThumb(index)}
+              onKeyDown={(event) => handleKeyDown(event, index)}
+            />
+          ))}
         </div>
-      ) : null}
+        {hasBounds ? (
+          <div className="sb-slider-bounds" style={boundsStyle}>
+            {isVertical ? (
+              <>
+                <span>{maxLabel == null ? "" : maxLabel}</span>
+                <span>{minLabel == null ? "" : minLabel}</span>
+              </>
+            ) : (
+              <>
+                <span>{minLabel == null ? "" : minLabel}</span>
+                <span>{maxLabel == null ? "" : maxLabel}</span>
+              </>
+            )}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

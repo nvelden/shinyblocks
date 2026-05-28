@@ -1110,7 +1110,6 @@
   opacity: 0.5;
 }
 
-[data-shinyblocks-root].sb-slider,
 [data-shinyblocks-root] .sb-slider {
   position: relative;
   display: flex;

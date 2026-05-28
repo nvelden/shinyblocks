@@ -462,7 +462,7 @@ update_block_switch <- function(
 #' @param show_value Whether to render the current value above the slider.
 #' @param min_label Optional label displayed at the minimum end of the rail.
 #' @param max_label Optional label displayed at the maximum end of the rail.
-#' @param width Optional CSS width value.
+#' @param width Optional CSS width value for horizontal sliders.
 #' @param disabled Whether the control is disabled.
 #' @param invalid Whether the control should show invalid styling
 #'   (sets `aria-invalid="true"`).
@@ -521,7 +521,13 @@ block_slider <- function(
     value = paste(value, collapse = ",")
   )
 
-  wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
+  wrapper_style <- if (orientation == "vertical") {
+    "display:inline-flex;"
+  } else if (!is.null(width)) {
+    paste0("width:", htmltools::validateCssUnit(width), ";")
+  } else {
+    NULL
+  }
 
   runtime_component(
     component = "slider",
@@ -543,7 +549,7 @@ block_slider <- function(
     binding = list(input = TRUE, type = "shinyblocks.slider"),
     class = class,
     style = wrapper_style,
-    root_class = "sb-slider",
+    root_class = "sb-slider-root",
     children = list(hidden_native)
   )
 }

@@ -200,16 +200,26 @@ server <- function(input, output, session) {
 
   output$showcase_slider_preview_ui <- renderUI({
     args <- preview_args()
-    block_field(
-      block_field_label("Volume", `for` = "showcase_slider_preview"),
-      block_slider(
-        "showcase_slider_preview", value = args$value, min = args$min, max = args$max,
-        step = args$step, orientation = args$orientation, show_value = args$show_value,
-        min_label = args$min_label, max_label = args$max_label,
-        width = args$width, disabled = args$disabled, invalid = args$invalid,
-        style = args$style, class = args$class
-      )
+    slider <- block_slider(
+      "showcase_slider_preview", value = args$value, min = args$min, max = args$max,
+      step = args$step, orientation = args$orientation, show_value = args$show_value,
+      min_label = args$min_label, max_label = args$max_label,
+      width = args$width, disabled = args$disabled, invalid = args$invalid,
+      style = args$style, class = args$class
     )
+    if (identical(args$orientation, "vertical")) {
+      htmltools::div(
+        style = "display: inline-flex; flex-direction: column; align-items: center; gap: 0.75rem;",
+        htmltools::tags$label(
+          `for` = "showcase_slider_preview",
+          style = "font-size: 0.875rem; font-weight: 500; line-height: 1;",
+          "Volume"
+        ),
+        slider
+      )
+    } else {
+      block_field(block_field_label("Volume", `for` = "showcase_slider_preview"), slider)
+    }
   })
 
   output$showcase_slider_preview_value <- showcase_render_value({
@@ -262,6 +272,10 @@ server <- function(input, output, session) {
     reactive_code("update_block_slider(\n  session,\n  \"showcase_slider_preview\",\n  min = -50, max = 150,\n  value = 40, step = 5\n)")
   })
   observeEvent(input$showcase_slider_vertical, {
+    update_block_select(session, "showcase_slider_doc_orientation", selected = "vertical")
+    update_block_checkbox(session, "showcase_slider_doc_show_value", checked = TRUE)
+    update_block_input(session, "showcase_slider_doc_min_label", value = "Low")
+    update_block_input(session, "showcase_slider_doc_max_label", value = "High")
     update_block_slider(
       session,
       "showcase_slider_preview",

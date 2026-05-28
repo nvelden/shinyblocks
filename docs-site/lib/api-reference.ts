@@ -403,7 +403,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "show_value", type: "logical", defaultVal: "FALSE", description: "Show the current value or range next to the rail." },
         { argument: "min_label", type: "character", defaultVal: "NULL", description: "Optional label at the minimum end of the rail." },
         { argument: "max_label", type: "character", defaultVal: "NULL", description: "Optional label at the maximum end of the rail." },
-        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width applied to the runtime wrapper." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width applied to horizontal slider wrappers." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user drag interaction." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Show validation warning colors." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Custom inline stylesheet styling." },
