@@ -2,6 +2,7 @@
 
 ## Internal
 
+* Eliminated the `requestAnimationFrame` value-deferral pattern across `Checkbox`, `Switch`, `Textarea`, `Input`, `RadioGroup`, `Dialog`, and `Popover` runtime components (issue #24). The DOM expandos (`root.__sbXxxValue`), dataset attributes, and hidden native inputs are now written synchronously from a single set of paths — the mount effect, the user-action setter, and the `__sbXxxReceive` handler — so the Shiny binding's `getValue(el)` returns the new value immediately when the `sb:<component>-change` event fires. See [ADR 0019](docs/decisions/0019-single-writer-runtime-inputs.md).
 * Fold the JSON-serialisability check into `runtime_payload_json()` so every runtime component render runs `jsonlite::toJSON()` once instead of three times (issue #28). `validate_runtime_json()` is removed.
 * Collapsed the ten copy-pasted Shiny input bindings in `frontend/src/runtime/bindings.js` into a single `makeRuntimeBinding()` factory driven by a config array (issue #26). Adding a new runtime input component is now a config entry rather than ~70 lines of boilerplate; the per-component `register*Binding`, `bind*Root`, and `unbind*Root` helpers are gone, and the dispatcher if-ladders collapse to a single `Shiny.bindAll` / `unbindAll` call.
 * Extracted the session validation, `runtime_mount_id()` lookup, and `sendInputMessage()` boilerplate from every `update_block_*()` into a shared `runtime_input_update()` helper (issue #27). Each updater now only assembles its own payload fields.

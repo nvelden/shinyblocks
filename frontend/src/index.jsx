@@ -754,31 +754,26 @@ function Dialog({ payload, root }) {
   const contentRef = useRef(null);
   const returnFocusRef = useRef(null);
 
-  useEffect(() => {
-    if (root) {
-      root.__sbDialogValue = open;
-      root.dataset.sbDialogOpen = open ? "true" : "false";
-    }
-  }, [open, root]);
-
-  function notifyChange() {
-    if (!root) return;
-    root.dispatchEvent(new CustomEvent("sb:dialog-change"));
-  }
-
   function setOpen(next, notify) {
     const nextOpen = Boolean(next);
     if (nextOpen && !open) {
       returnFocusRef.current = document.activeElement;
     }
     setOpenState(nextOpen);
-    if (notify !== false) {
-      requestAnimationFrame(notifyChange);
+    if (root) {
+      root.__sbDialogValue = nextOpen;
+      root.dataset.sbDialogOpen = nextOpen ? "true" : "false";
+    }
+    if (notify !== false && root) {
+      root.dispatchEvent(new CustomEvent("sb:dialog-change"));
     }
   }
 
   useEffect(() => {
     if (!root) return undefined;
+
+    root.__sbDialogValue = open;
+    root.dataset.sbDialogOpen = open ? "true" : "false";
 
     root.__sbDialogReceive = (data) => {
       const nextData = data || {};
@@ -974,31 +969,26 @@ function Popover({ payload, root }) {
   const returnFocusRef = useRef(null);
   const contentId = `${payload.id || "popover"}-content`;
 
-  useEffect(() => {
-    if (root) {
-      root.__sbPopoverValue = open;
-      root.dataset.sbPopoverOpen = open ? "true" : "false";
-    }
-  }, [open, root]);
-
-  function notifyChange() {
-    if (!root) return;
-    root.dispatchEvent(new CustomEvent("sb:popover-change"));
-  }
-
   function setOpen(next, notify) {
     const nextOpen = Boolean(next);
     if (nextOpen && !open) {
       returnFocusRef.current = document.activeElement;
     }
     setOpenState(nextOpen);
-    if (notify !== false) {
-      requestAnimationFrame(notifyChange);
+    if (root) {
+      root.__sbPopoverValue = nextOpen;
+      root.dataset.sbPopoverOpen = nextOpen ? "true" : "false";
+    }
+    if (notify !== false && root) {
+      root.dispatchEvent(new CustomEvent("sb:popover-change"));
     }
   }
 
   useEffect(() => {
     if (!root) return undefined;
+
+    root.__sbPopoverValue = open;
+    root.dataset.sbPopoverOpen = open ? "true" : "false";
 
     root.__sbPopoverReceive = (data) => {
       const nextData = data || {};
@@ -1324,21 +1314,13 @@ function Checkbox({ payload, root }) {
   const inlineLabelId = inputId ? `${inputId}__label` : undefined;
 
   useEffect(() => {
-    if (root) {
-      root.__sbCheckboxValue = checked;
-      root.dataset.sbCheckboxChecked = checked ? "true" : "false";
-    }
-  }, [checked, root]);
-
-  useEffect(() => {
-    if (!root) return;
-    setNativeCheckboxValue(root, checked, false);
-  }, [checked, root]);
-
-  useEffect(() => {
     if (!root) return undefined;
 
     setLabelledBy(labelIdForInput(inputId));
+
+    root.__sbCheckboxValue = checked;
+    root.dataset.sbCheckboxChecked = checked ? "true" : "false";
+    setNativeCheckboxValue(root, checked, false);
 
     root.__sbCheckboxReceive = (data) => {
       const nextData = data || {};
@@ -1346,12 +1328,11 @@ function Checkbox({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "checked")) {
         const nextChecked = Boolean(nextData.checked);
         setCheckedState(nextChecked);
+        root.__sbCheckboxValue = nextChecked;
+        root.dataset.sbCheckboxChecked = nextChecked ? "true" : "false";
         setNativeCheckboxValue(root, nextChecked, Boolean(nextData.notify));
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbCheckboxValue = nextChecked;
-            root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
-          });
+          root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
@@ -1381,20 +1362,14 @@ function Checkbox({ payload, root }) {
     if (native) native.disabled = disabled;
   }, [disabled, root]);
 
-  function notifyChange(nextChecked) {
-    if (!root) return;
-    root.__sbCheckboxValue = nextChecked;
-    root.dataset.sbCheckboxChecked = nextChecked ? "true" : "false";
-    setNativeCheckboxValue(root, nextChecked, true);
-    root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
-  }
-
   function setChecked(nextChecked, notify = false) {
     const next = Boolean(nextChecked);
     setCheckedState(next);
-    if (notify) {
-      requestAnimationFrame(() => notifyChange(next));
-    }
+    if (!root) return;
+    root.__sbCheckboxValue = next;
+    root.dataset.sbCheckboxChecked = next ? "true" : "false";
+    setNativeCheckboxValue(root, next, notify);
+    if (notify) root.dispatchEvent(new CustomEvent("sb:checkbox-change"));
   }
 
   function toggle() {
@@ -1469,21 +1444,13 @@ function Switch({ payload, root }) {
   const inlineLabelId = inputId ? `${inputId}__label` : undefined;
 
   useEffect(() => {
-    if (root) {
-      root.__sbSwitchValue = checked;
-      root.dataset.sbSwitchChecked = checked ? "true" : "false";
-    }
-  }, [checked, root]);
-
-  useEffect(() => {
-    if (!root) return;
-    setNativeSwitchValue(root, checked, false);
-  }, [checked, root]);
-
-  useEffect(() => {
     if (!root) return undefined;
 
     setLabelledBy(labelIdForInput(inputId));
+
+    root.__sbSwitchValue = checked;
+    root.dataset.sbSwitchChecked = checked ? "true" : "false";
+    setNativeSwitchValue(root, checked, false);
 
     root.__sbSwitchReceive = (data) => {
       const nextData = data || {};
@@ -1491,12 +1458,11 @@ function Switch({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "checked")) {
         const nextChecked = Boolean(nextData.checked);
         setCheckedState(nextChecked);
+        root.__sbSwitchValue = nextChecked;
+        root.dataset.sbSwitchChecked = nextChecked ? "true" : "false";
         setNativeSwitchValue(root, nextChecked, Boolean(nextData.notify));
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbSwitchValue = nextChecked;
-            root.dispatchEvent(new CustomEvent("sb:switch-change"));
-          });
+          root.dispatchEvent(new CustomEvent("sb:switch-change"));
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
@@ -1529,20 +1495,14 @@ function Switch({ payload, root }) {
     if (native) native.disabled = disabled;
   }, [disabled, root]);
 
-  function notifyChange(nextChecked) {
-    if (!root) return;
-    root.__sbSwitchValue = nextChecked;
-    root.dataset.sbSwitchChecked = nextChecked ? "true" : "false";
-    setNativeSwitchValue(root, nextChecked, true);
-    root.dispatchEvent(new CustomEvent("sb:switch-change"));
-  }
-
   function setChecked(nextChecked, notify = false) {
     const next = Boolean(nextChecked);
     setCheckedState(next);
-    if (notify) {
-      requestAnimationFrame(() => notifyChange(next));
-    }
+    if (!root) return;
+    root.__sbSwitchValue = next;
+    root.dataset.sbSwitchChecked = next ? "true" : "false";
+    setNativeSwitchValue(root, next, notify);
+    if (notify) root.dispatchEvent(new CustomEvent("sb:switch-change"));
   }
 
   function toggle() {
@@ -1615,19 +1575,11 @@ function Textarea({ payload, root }) {
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    if (root) {
-      root.__sbTextareaValue = value;
-      root.dataset.sbTextareaValue = value;
-    }
-  }, [value, root]);
-
-  useEffect(() => {
-    if (!root) return;
-    setNativeTextareaValue(root, value, false);
-  }, [value, root]);
-
-  useEffect(() => {
     if (!root) return undefined;
+
+    root.__sbTextareaValue = value;
+    root.dataset.sbTextareaValue = value;
+    setNativeTextareaValue(root, value, false);
 
     root.__sbTextareaReceive = (data) => {
       const nextData = data || {};
@@ -1635,13 +1587,12 @@ function Textarea({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "value")) {
         const nextValue = nextData.value == null ? "" : String(nextData.value);
         setValueState(nextValue);
+        root.__sbTextareaValue = nextValue;
+        root.dataset.sbTextareaValue = nextValue;
         setNativeTextareaValue(root, nextValue, Boolean(nextData.notify));
         if (textareaRef.current) textareaRef.current.style.height = "";
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbTextareaValue = nextValue;
-            root.dispatchEvent(new CustomEvent("sb:textarea-change"));
-          });
+          root.dispatchEvent(new CustomEvent("sb:textarea-change"));
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "placeholder")) {
@@ -1685,6 +1636,7 @@ function Textarea({ payload, root }) {
     setValueState(next);
     if (root) {
       root.__sbTextareaValue = next;
+      root.dataset.sbTextareaValue = next;
       setNativeTextareaValue(root, next, true);
       root.dispatchEvent(new CustomEvent("sb:textarea-change"));
     }
@@ -1727,15 +1679,11 @@ function RadioGroup({ payload, root }) {
   const itemRefs = useRef(new Map());
 
   useEffect(() => {
-    if (root) {
-      root.__sbRadioGroupValue = value == null ? null : String(value);
-      root.dataset.sbRadioGroupValue = value == null ? "" : String(value);
-      setNativeRadioGroupValue(root, value);
-    }
-  }, [value, root]);
-
-  useEffect(() => {
     if (!root) return undefined;
+
+    root.__sbRadioGroupValue = value == null ? null : String(value);
+    root.dataset.sbRadioGroupValue = value == null ? "" : String(value);
+    setNativeRadioGroupValue(root, value);
 
     root.__sbRadioGroupReceive = (data) => {
       const nextData = data || {};
@@ -1743,11 +1691,11 @@ function RadioGroup({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "selected")) {
         const nextValue = nextData.selected == null ? null : String(nextData.selected);
         setValueState(nextValue);
+        root.__sbRadioGroupValue = nextValue;
+        root.dataset.sbRadioGroupValue = nextValue == null ? "" : nextValue;
+        setNativeRadioGroupValue(root, nextValue);
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbRadioGroupValue = nextValue;
-            root.dispatchEvent(new CustomEvent("sb:radio-group-change"));
-          });
+          root.dispatchEvent(new CustomEvent("sb:radio-group-change"));
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "choices")) {
@@ -1783,6 +1731,7 @@ function RadioGroup({ payload, root }) {
     setValueState(next);
     if (root) {
       root.__sbRadioGroupValue = next;
+      root.dataset.sbRadioGroupValue = next == null ? "" : next;
       setNativeRadioGroupValue(root, next);
       root.dispatchEvent(new CustomEvent("sb:radio-group-change"));
     }
@@ -2164,19 +2113,11 @@ function Input({ payload, root }) {
   const isInvalid = invalid || wrapperInvalid;
 
   useEffect(() => {
-    if (root) {
-      root.__sbInputValue = value;
-      root.dataset.sbInputValue = value;
-    }
-  }, [value, root]);
-
-  useEffect(() => {
-    if (!root) return;
-    setNativeInputValue(root, value, false);
-  }, [value, root]);
-
-  useEffect(() => {
     if (!root) return undefined;
+
+    root.__sbInputValue = value;
+    root.dataset.sbInputValue = value;
+    setNativeInputValue(root, value, false);
 
     root.__sbInputReceive = (data) => {
       const nextData = data || {};
@@ -2184,12 +2125,11 @@ function Input({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "value")) {
         const nextValue = nextData.value == null ? "" : String(nextData.value);
         setValueState(nextValue);
+        root.__sbInputValue = nextValue;
+        root.dataset.sbInputValue = nextValue;
         setNativeInputValue(root, nextValue, Boolean(nextData.notify));
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbInputValue = nextValue;
-            root.dispatchEvent(new CustomEvent("sb:input-change"));
-          });
+          root.dispatchEvent(new CustomEvent("sb:input-change"));
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "placeholder")) {
@@ -2226,6 +2166,7 @@ function Input({ payload, root }) {
     setValueState(next);
     if (root) {
       root.__sbInputValue = next;
+      root.dataset.sbInputValue = next;
       setNativeInputValue(root, next, true);
       root.dispatchEvent(new CustomEvent("sb:input-change"));
     }

@@ -63,6 +63,23 @@ test_that("checkbox and switch bindings fall back to native initial values", {
   expect_match(js, "const native = nativeSwitch(el);", fixed = TRUE)
 })
 
+test_that("runtime components do not defer value writes through requestAnimationFrame", {
+  js <- runtime_source()
+
+  # See issue #24. Each interactive component used to mirror React state into
+  # `root.__sbXxxValue` from a useEffect, then defer the change-event dispatch
+  # to a requestAnimationFrame so the deferred write would win the race. We now
+  # have a single writer per path (mount effect, user action, server receive)
+  # and dispatch synchronously. Guard against regressions.
+  expect_no_match(js, "requestAnimationFrame(notifyChange)", fixed = TRUE)
+  expect_no_match(js, "requestAnimationFrame(() => notifyChange", fixed = TRUE)
+  expect_no_match(js, "root.__sbCheckboxValue = nextChecked;\n            root.dispatchEvent", fixed = TRUE)
+  expect_no_match(js, "root.__sbSwitchValue = nextChecked;\n            root.dispatchEvent", fixed = TRUE)
+  expect_no_match(js, "root.__sbTextareaValue = nextValue;\n            root.dispatchEvent", fixed = TRUE)
+  expect_no_match(js, "root.__sbInputValue = nextValue;\n            root.dispatchEvent", fixed = TRUE)
+  expect_no_match(js, "root.__sbRadioGroupValue = nextValue;\n            root.dispatchEvent", fixed = TRUE)
+})
+
 test_that("slider change notifications are animation-frame coalesced", {
   js <- runtime_source()
 
