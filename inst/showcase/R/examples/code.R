@@ -13,7 +13,22 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("language", `for` = "showcase_code_doc_language"),
-            block_textarea("showcase_code_doc_language", value = "r", rows = 1)
+            block_select(
+              "showcase_code_doc_language",
+              choices = c(
+                "r",
+                "python",
+                "javascript",
+                "typescript",
+                "html",
+                "css",
+                "json",
+                "sql",
+                "bash"
+              ),
+              selected = "r",
+              size = "sm"
+            )
           )
         ),
         showcase_controls_group(

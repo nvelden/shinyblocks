@@ -59,6 +59,18 @@ default_code <- paste(
   sep = "\n"
 )
 
+language_choices <- c(
+  "r",
+  "python",
+  "javascript",
+  "typescript",
+  "html",
+  "css",
+  "json",
+  "sql",
+  "bash"
+)
+
 ui <- block_page(
   title = "shinyblocks - Code playground",
   theme = htmltools::tagList(
@@ -96,7 +108,12 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("language", `for` = "showcase_code_doc_language"),
-            block_textarea("showcase_code_doc_language", value = "r", rows = 1)
+            block_select(
+              "showcase_code_doc_language",
+              choices = language_choices,
+              selected = "r",
+              size = "sm"
+            )
           )
         ),
         htmltools::div(
@@ -132,6 +149,10 @@ ui <- block_page(
               selected = "default",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_code_doc_style"),
+            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_code_doc_class"),
@@ -178,6 +199,7 @@ server <- function(input, output, session) {
     if (!nzchar(code)) code <- default_code
     language <- input$showcase_code_doc_language %||% "r"
     if (!nzchar(language)) language <- "r"
+    style <- input$showcase_code_doc_style %||% ""
     list(
       code = code,
       language = language,
@@ -185,7 +207,8 @@ server <- function(input, output, session) {
       line_numbers = isTRUE(input$showcase_code_doc_line_numbers %||% TRUE),
       copyable = isTRUE(input$showcase_code_doc_copyable %||% TRUE),
       variant = input$showcase_code_doc_variant %||% "default",
-      class = if (isTRUE(input$showcase_code_doc_class)) "sb-code-custom" else NULL
+      class = if (isTRUE(input$showcase_code_doc_class)) "sb-code-custom" else NULL,
+      style = if (nzchar(style)) style else NULL
     )
   })
 
@@ -198,7 +221,8 @@ server <- function(input, output, session) {
       header = args$header,
       line_numbers = args$line_numbers,
       variant = args$variant,
-      class = args$class
+      class = args$class,
+      style = args$style
     )
   })
   outputOptions(output, "showcase_code_preview_ui", suspendWhenHidden = FALSE)
@@ -214,6 +238,9 @@ server <- function(input, output, session) {
     if (!isTRUE(args$line_numbers)) code_args <- c(code_args, "line_numbers = FALSE")
     if (!identical(args$variant, "default")) {
       code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
