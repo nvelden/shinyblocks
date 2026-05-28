@@ -71,8 +71,7 @@ synchronously inside event handlers — no frame deferral, no race.
 - One frame of latency removed from every `update_block_*()` echo path
   for these components.
 - New `frontend/src/runtime/<component>` contributors must remember to
-  hit all three write paths. The
-  [shinyblocks-component](../../.claude/skills/shinyblocks-component/SKILL.md)
-  recipe should reference this ADR.
+  hit all three write paths. The local `shinyblocks-component` agent
+  skill recipe references this ADR.
 - `test-runtime-js.R` includes a regression test that greps `index.jsx`
   for the old `requestAnimationFrame(...)` patterns.
