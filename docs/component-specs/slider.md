@@ -32,7 +32,7 @@
 
 ## R API
 
-### `block_slider(input_id, value, min, max, step, ticks, width, disabled, invalid, style, class)`
+### `block_slider(input_id, value, min, max, step, ticks, orientation, show_value, min_label, max_label, width, disabled, invalid, style, class)`
 
 | Argument | Purpose |
 | --- | --- |
@@ -41,6 +41,9 @@
 | `min` / `max` | Numeric bounds. `min` must be strictly less than `max`. |
 | `step` | Optional positive numeric step. |
 | `ticks` | Accepted for API compatibility — tick labels are not currently rendered. |
+| `orientation` | `"horizontal"` or `"vertical"` rail orientation. |
+| `show_value` | Shows the current scalar value or range near the rail. |
+| `min_label` / `max_label` | Optional labels rendered at the rail bounds. |
 | `width` | CSS width applied to the runtime wrapper. |
 | `disabled` | Disables pointer/keyboard interaction. |
 | `invalid` | Applies `aria-invalid` and destructive border/ring. |
@@ -48,9 +51,10 @@
 
 ### `update_block_slider(session, input_id, ...)`
 
-Accepts `value`, `min`, `max`, `step`, `disabled`, `invalid`, `style`,
-`class`, with optional `notify` semantics. `value` accepts one or two
-numerics matching single vs range mode.
+Accepts `value`, `min`, `max`, `step`, `orientation`, `show_value`,
+`min_label`, `max_label`, `disabled`, `invalid`, `style`, `class`, with
+optional `notify` semantics. `value` accepts one or two numerics
+matching single vs range mode.
 
 ## Runtime mapping
 
@@ -60,6 +64,9 @@ numerics matching single vs range mode.
 | `value` | `state$value` | Numeric scalar or two-number array. |
 | `min`/`max`/`step` | `props$min` / `props$max` / `props$step` | |
 | `ticks` | (ignored) | Accepted for API compatibility; the runtime does not render tick labels yet. |
+| `orientation` | `props$orientation` | Horizontal by default; vertical uses the same Shiny value contract. |
+| `show_value` | `props$showValue` | Renders the current scalar/range text in the runtime. |
+| `min_label` / `max_label` | `props$minLabel` / `props$maxLabel` | Display-only bound labels. |
 | `disabled` | `props$disabled` | |
 | `invalid` | `props$invalid` | |
 | `width` | mount `style.width` | |
@@ -73,7 +80,8 @@ form-submission bridge, but Shiny reads the dedicated
 - Single-value sliders report a numeric scalar to Shiny; range sliders
   report a two-number array.
 - Pointer dragging, click-to-position, Home/End, ArrowLeft/Right,
-  ArrowUp/Down, and PageUp/PageDown are handled by the runtime.
+  ArrowUp/Down, and PageUp/PageDown are handled by the runtime in both
+  orientations.
 - Server-driven value updates can notify Shiny (`notify = TRUE`,
   default) or remain cosmetic/state-only (`notify = FALSE`).
 
@@ -92,7 +100,7 @@ form-submission bridge, but Shiny reads the dedicated
 | Rail / range / thumb radius | `9999px` (fully rounded) | same |
 | Rail / range height | `0.375rem` (6px) | same |
 | Thumb size | `1rem` (16px) | same |
-| Standalone minimum width | `min(12rem, 100%)` | same |
+| Standalone minimum width | `min(12rem, 100%)` for horizontal; vertical uses a narrow rail with an 8rem default height | same |
 
 ## Deliberate divergences from shadcn
 
@@ -107,8 +115,10 @@ form-submission bridge, but Shiny reads the dedicated
 - Thumb surface is a literal `#ffffff` (matches shadcn's `bg-white`)
   rather than `--background`, so the thumb stays light in dark mode
   exactly as shadcn does it.
-- No vertical orientation today; shinyblocks only supports horizontal
-  sliders for now.
+- Radix supports more than two thumbs and `minStepsBetweenThumbs`.
+  shinyblocks intentionally keeps the public Shiny value contract to one
+  scalar or a two-value range for now. A stricter minimum-distance API can
+  be added later without changing the current value shape.
 - **Dark-mode colour refinement.** In dark mode, the default token
   mapping produces a near-invisible track (`--muted` = `oklch(0.269)`
   on `oklch(0.145)` background). shinyblocks overrides the slider track

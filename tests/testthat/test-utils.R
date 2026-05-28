@@ -349,6 +349,10 @@ test_that("update_block_slider sends input binding messages", {
       min = 0,
       max = 100,
       step = 5,
+      orientation = "vertical",
+      show_value = TRUE,
+      min_label = "Quiet",
+      max_label = "Loud",
       disabled = TRUE,
       invalid = TRUE,
       style = "max-width: 20rem;",
@@ -362,6 +366,10 @@ test_that("update_block_slider sends input binding messages", {
   expect_identical(message$payload$min, 0)
   expect_identical(message$payload$max, 100)
   expect_identical(message$payload$step, 5)
+  expect_identical(message$payload$orientation, "vertical")
+  expect_identical(message$payload$showValue, TRUE)
+  expect_identical(message$payload$minLabel, "Quiet")
+  expect_identical(message$payload$maxLabel, "Loud")
   expect_identical(message$payload$disabled, TRUE)
   expect_identical(message$payload$invalid, TRUE)
   expect_identical(message$payload$style$maxWidth, "20rem")

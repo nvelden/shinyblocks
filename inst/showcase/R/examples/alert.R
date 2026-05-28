@@ -91,6 +91,12 @@ htmltools::tagList(
   htmltools::div(
     style = "display: flex; flex-direction: column; gap: 0.75rem;",
     block_alert("Heads up", description = "shinyblocks alerts surface important inline messages.", class = "sb-parity-alert-default"),
+    block_alert(
+      "Review requested",
+      description = "Action slots compose buttons or links inside the alert.",
+      action = block_alert_action(block_button("Review", variant = "outline", size = "sm")),
+      class = "sb-parity-alert-action"
+    ),
     block_alert("Build failed", description = "Three components failed to render.", variant = "destructive", icon = "alert-triangle", class = "sb-parity-alert-destructive")
   )
 )

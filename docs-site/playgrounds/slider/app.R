@@ -97,13 +97,24 @@ ui <- block_page(
           block_field(block_field_label("value", `for` = "showcase_slider_doc_value"), block_input("showcase_slider_doc_value", value = "50", placeholder = "50 or 25,75")),
           block_field(block_field_label("min", `for` = "showcase_slider_doc_min"), block_input("showcase_slider_doc_min", value = "0", type = "number")),
           block_field(block_field_label("max", `for` = "showcase_slider_doc_max"), block_input("showcase_slider_doc_max", value = "100", type = "number")),
-          block_field(block_field_label("step", `for` = "showcase_slider_doc_step"), block_input("showcase_slider_doc_step", value = "1", type = "number"))
+          block_field(block_field_label("step", `for` = "showcase_slider_doc_step"), block_input("showcase_slider_doc_step", value = "1", type = "number")),
+          block_field(
+            block_field_label("orientation", `for` = "showcase_slider_doc_orientation"),
+            block_select("showcase_slider_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal")
+          )
         ),
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
           htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "State"),
           block_field(block_field_label("disabled", `for` = "showcase_slider_doc_disabled"), block_checkbox("showcase_slider_doc_disabled", "Disabled")),
           block_field(block_field_label("invalid", `for` = "showcase_slider_doc_invalid"), block_checkbox("showcase_slider_doc_invalid", "Invalid"))
+        ),
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Labels"),
+          block_field(block_field_label("show value", `for` = "showcase_slider_doc_show_value"), block_checkbox("showcase_slider_doc_show_value", "Show current value")),
+          block_field(block_field_label("min label", `for` = "showcase_slider_doc_min_label"), block_input("showcase_slider_doc_min_label", value = "Quiet", placeholder = "Optional minimum label")),
+          block_field(block_field_label("max label", `for` = "showcase_slider_doc_max_label"), block_input("showcase_slider_doc_max_label", value = "Loud", placeholder = "Optional maximum label"))
         ),
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
@@ -124,7 +135,8 @@ ui <- block_page(
             showcase_action_button("showcase_slider_set_range", "Set range"),
             showcase_action_button("showcase_slider_disable", "Disable"),
             showcase_action_button("showcase_slider_enable", "Enable"),
-            showcase_action_button("showcase_slider_resize", "Change bounds")
+            showcase_action_button("showcase_slider_resize", "Change bounds"),
+            showcase_action_button("showcase_slider_vertical", "Show vertical")
           )
         )
       ),
@@ -163,12 +175,22 @@ server <- function(input, output, session) {
     if (length(value) == 2 && value[[1]] > value[[2]]) value <- sort(value)
     step <- slider_number(input$showcase_slider_doc_step, 1)
     if (step <= 0) step <- 1
+    orientation <- input$showcase_slider_doc_orientation %||% "horizontal"
+    if (!orientation %in% c("horizontal", "vertical")) orientation <- "horizontal"
+    min_label <- input$showcase_slider_doc_min_label %||% ""
+    if (!nzchar(min_label)) min_label <- NULL
+    max_label <- input$showcase_slider_doc_max_label %||% ""
+    if (!nzchar(max_label)) max_label <- NULL
     width <- input$showcase_slider_doc_width %||% "20rem"
     if (!nzchar(width)) width <- NULL
     style <- input$showcase_slider_doc_style %||% ""
     if (!nzchar(style)) style <- NULL
     list(
       value = value, min = min, max = max, step = step, width = width,
+      orientation = orientation,
+      show_value = isTRUE(input$showcase_slider_doc_show_value),
+      min_label = min_label,
+      max_label = max_label,
       disabled = isTRUE(input$showcase_slider_doc_disabled),
       invalid = isTRUE(input$showcase_slider_doc_invalid),
       style = style,
@@ -182,7 +204,9 @@ server <- function(input, output, session) {
       block_field_label("Volume", `for` = "showcase_slider_preview"),
       block_slider(
         "showcase_slider_preview", value = args$value, min = args$min, max = args$max,
-        step = args$step, width = args$width, disabled = args$disabled, invalid = args$invalid,
+        step = args$step, orientation = args$orientation, show_value = args$show_value,
+        min_label = args$min_label, max_label = args$max_label,
+        width = args$width, disabled = args$disabled, invalid = args$invalid,
         style = args$style, class = args$class
       )
     )
@@ -202,6 +226,10 @@ server <- function(input, output, session) {
       paste0("max = ", args$max),
       paste0("step = ", args$step)
     )
+    if (args$orientation != "horizontal") code <- c(code, paste0('orientation = "', args$orientation, '"'))
+    if (args$show_value) code <- c(code, "show_value = TRUE")
+    if (!is.null(args$min_label)) code <- c(code, paste0('min_label = "', args$min_label, '"'))
+    if (!is.null(args$max_label)) code <- c(code, paste0('max_label = "', args$max_label, '"'))
     if (!is.null(args$width)) code <- c(code, paste0('width = "', args$width, '"'))
     if (args$disabled) code <- c(code, "disabled = TRUE")
     if (args$invalid) code <- c(code, "invalid = TRUE")
@@ -232,6 +260,17 @@ server <- function(input, output, session) {
   observeEvent(input$showcase_slider_resize, {
     update_block_slider(session, "showcase_slider_preview", min = -50, max = 150, value = 40, step = 5)
     reactive_code("update_block_slider(\n  session,\n  \"showcase_slider_preview\",\n  min = -50, max = 150,\n  value = 40, step = 5\n)")
+  })
+  observeEvent(input$showcase_slider_vertical, {
+    update_block_slider(
+      session,
+      "showcase_slider_preview",
+      orientation = "vertical",
+      show_value = TRUE,
+      min_label = "Low",
+      max_label = "High"
+    )
+    reactive_code("update_block_slider(\n  session,\n  \"showcase_slider_preview\",\n  orientation = \"vertical\",\n  show_value = TRUE,\n  min_label = \"Low\",\n  max_label = \"High\"\n)")
   })
 }
 

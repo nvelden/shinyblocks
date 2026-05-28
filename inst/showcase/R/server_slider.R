@@ -31,6 +31,15 @@ register_slider_showcase <- function(input, output, session) {
     if (length(value) == 2 && value[[1]] > value[[2]]) value <- sort(value)
     step_val <- slider_number(input$showcase_slider_doc_step, 1)
     if (step_val <= 0) step_val <- 1
+    orientation_val <- input$showcase_slider_doc_orientation %||% "horizontal"
+    if (!orientation_val %in% c("horizontal", "vertical")) {
+      orientation_val <- "horizontal"
+    }
+    show_value <- isTRUE(input$showcase_slider_doc_show_value)
+    min_label <- input$showcase_slider_doc_min_label %||% ""
+    if (!nzchar(min_label)) min_label <- NULL
+    max_label <- input$showcase_slider_doc_max_label %||% ""
+    if (!nzchar(max_label)) max_label <- NULL
     disabled <- isTRUE(input$showcase_slider_doc_disabled)
     invalid <- isTRUE(input$showcase_slider_doc_invalid)
     width_val <- input$showcase_slider_doc_width %||% "20rem"
@@ -51,6 +60,10 @@ register_slider_showcase <- function(input, output, session) {
         min = min_val,
         max = max_val,
         step = step_val,
+        orientation = orientation_val,
+        show_value = show_value,
+        min_label = min_label,
+        max_label = max_label,
         width = width_val,
         disabled = disabled,
         invalid = invalid,
@@ -79,6 +92,15 @@ register_slider_showcase <- function(input, output, session) {
     max_val <- slider_number(input$showcase_slider_doc_max, 100)
     value <- parse_slider_value(input$showcase_slider_doc_value, 50)
     step_val <- slider_number(input$showcase_slider_doc_step, 1)
+    orientation_val <- input$showcase_slider_doc_orientation %||% "horizontal"
+    if (!orientation_val %in% c("horizontal", "vertical")) {
+      orientation_val <- "horizontal"
+    }
+    show_value <- isTRUE(input$showcase_slider_doc_show_value)
+    min_label <- input$showcase_slider_doc_min_label %||% ""
+    if (!nzchar(min_label)) min_label <- NULL
+    max_label <- input$showcase_slider_doc_max_label %||% ""
+    if (!nzchar(max_label)) max_label <- NULL
     disabled <- isTRUE(input$showcase_slider_doc_disabled)
     invalid <- isTRUE(input$showcase_slider_doc_invalid)
     width_val <- input$showcase_slider_doc_width %||% "20rem"
@@ -92,6 +114,10 @@ register_slider_showcase <- function(input, output, session) {
       paste0("max = ", max_val),
       paste0("step = ", step_val)
     )
+    if (orientation_val != "horizontal") args <- c(args, paste0('orientation = "', orientation_val, '"'))
+    if (show_value) args <- c(args, "show_value = TRUE")
+    if (!is.null(min_label)) args <- c(args, paste0('min_label = "', min_label, '"'))
+    if (!is.null(max_label)) args <- c(args, paste0('max_label = "', max_label, '"'))
     if (nzchar(width_val)) args <- c(args, paste0('width = "', width_val, '"'))
     if (disabled) args <- c(args, "disabled = TRUE")
     if (invalid) args <- c(args, "invalid = TRUE")
@@ -118,9 +144,9 @@ register_slider_showcase <- function(input, output, session) {
 
   output$showcase_slider_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("input_id", "value", "min", "max", "step", "ticks", "width", "disabled", "invalid", "style", "class"),
-      Type = c("character", "numeric", "numeric", "numeric", "numeric | NULL", "logical", "character", "logical", "logical", "character | list", "character"),
-      Default = c("required", "required", "required", "required", "NULL", "FALSE", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
+      Argument = c("input_id", "value", "min", "max", "step", "ticks", "orientation", "show_value", "min_label", "max_label", "width", "disabled", "invalid", "style", "class"),
+      Type = c("character", "numeric", "numeric", "numeric", "numeric | NULL", "logical", "character", "logical", "character", "character", "character", "logical", "logical", "character | list", "character"),
+      Default = c("required", "required", "required", "required", "NULL", "FALSE", "\"horizontal\"", "FALSE", "NULL", "NULL", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
       Description = c(
         "Input id for the slider value.",
         "Initial slider value. Use one number for a single thumb or two numbers for a range.",
@@ -128,6 +154,10 @@ register_slider_showcase <- function(input, output, session) {
         "Maximum slider value.",
         "Optional step size for pointer and keyboard updates.",
         "Accepted for API compatibility; tick labels are not rendered yet.",
+        "Slider rail orientation.",
+        "Shows the current scalar or range value near the rail.",
+        "Optional label at the minimum end of the rail.",
+        "Optional label at the maximum end of the rail.",
         "Optional CSS width applied to the wrapper.",
         "Disables user interaction while preserving server updates.",
         "Sets aria-invalid='true' to surface destructive styling.",
@@ -199,6 +229,27 @@ register_slider_showcase <- function(input, output, session) {
       "  max = 150,\n",
       "  value = 40,\n",
       "  step = 5\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_slider_vertical, {
+    update_block_slider(
+      session,
+      "showcase_slider_preview",
+      orientation = "vertical",
+      show_value = TRUE,
+      min_label = "Low",
+      max_label = "High"
+    )
+    reactive_code(paste0(
+      "update_block_slider(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_slider_preview\",\n",
+      "  orientation = \"vertical\",\n",
+      "  show_value = TRUE,\n",
+      "  min_label = \"Low\",\n",
+      "  max_label = \"High\"\n",
       ")"
     ))
   })

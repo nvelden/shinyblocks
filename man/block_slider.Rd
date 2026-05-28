@@ -11,6 +11,10 @@ block_slider(
   max,
   step = NULL,
   ticks = FALSE,
+  orientation = c("horizontal", "vertical"),
+  show_value = FALSE,
+  min_label = NULL,
+  max_label = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -31,6 +35,15 @@ length 2 for a range slider.}
 \item{step}{Step size. Defaults to \code{NULL} (Shiny's auto-step).}
 
 \item{ticks}{Whether to show tick marks on the rail.}
+
+\item{orientation}{Slider orientation. One of \code{"horizontal"} or
+\code{"vertical"}.}
+
+\item{show_value}{Whether to render the current value above the slider.}
+
+\item{min_label}{Optional label displayed at the minimum end of the rail.}
+
+\item{max_label}{Optional label displayed at the maximum end of the rail.}
 
 \item{width}{Optional CSS width value.}
 

@@ -384,6 +384,10 @@ test_that("slider emits runtime payload and binding metadata", {
     min = 0,
     max = 100,
     step = 5,
+    orientation = "vertical",
+    show_value = TRUE,
+    min_label = "Quiet",
+    max_label = "Loud",
     invalid = TRUE,
     style = "max-width: 20rem;",
     class = "custom"
@@ -417,6 +421,10 @@ test_that("slider emits runtime payload and binding metadata", {
   expect_equal(payload$props$min, 0)
   expect_equal(payload$props$max, 100)
   expect_equal(payload$props$step, 5)
+  expect_identical(payload$props$orientation, "vertical")
+  expect_identical(payload$props$showValue, TRUE)
+  expect_identical(payload$props$minLabel, "Quiet")
+  expect_identical(payload$props$maxLabel, "Loud")
   expect_identical(payload$props$invalid, TRUE)
   expect_identical(payload$props$style$maxWidth, "20rem")
   expect_identical(payload$binding$type, "shinyblocks.slider")
@@ -442,6 +450,11 @@ test_that("block_slider validates its arguments", {
   expect_error(
     block_slider("x", value = 50, min = 0, max = 100, step = 0),
     "positive numeric",
+    fixed = TRUE
+  )
+  expect_error(
+    block_slider("x", value = 50, min = 0, max = 100, orientation = "diagonal"),
+    "must be one of",
     fixed = TRUE
   )
   expect_error(

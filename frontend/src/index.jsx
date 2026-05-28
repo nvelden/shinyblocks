@@ -1843,6 +1843,10 @@ function Slider({ payload, root }) {
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
   const [style, setStyle] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
+  const [orientation, setOrientation] = useState(props.orientation === "vertical" ? "vertical" : "horizontal");
+  const [showValue, setShowValue] = useState(Boolean(props.showValue));
+  const [minLabel, setMinLabel] = useState(props.minLabel == null ? null : String(props.minLabel));
+  const [maxLabel, setMaxLabel] = useState(props.maxLabel == null ? null : String(props.maxLabel));
   const rangeMode = Array.isArray(state.value) && state.value.length > 1;
   const [value, setValueState] = useState(
     normalizeSliderValue(rangeMode ? state.value.slice(0, 2) : state.value, min, max)
@@ -1892,7 +1896,9 @@ function Slider({ payload, root }) {
     const track = trackRef.current;
     if (!track) return min;
     const rect = track.getBoundingClientRect();
-    const ratio = rect.width <= 0 ? 0 : (event.clientX - rect.left) / rect.width;
+    const ratio = orientation === "vertical"
+      ? (rect.height <= 0 ? 0 : 1 - (event.clientY - rect.top) / rect.height)
+      : (rect.width <= 0 ? 0 : (event.clientX - rect.left) / rect.width);
     return quantize(min + Math.min(1, Math.max(0, ratio)) * (max - min));
   }
 
@@ -1995,6 +2001,18 @@ function Slider({ payload, root }) {
         nextStep = parsedStep > 0 ? parsedStep : 1;
         setStep(nextStep);
       }
+      if (Object.prototype.hasOwnProperty.call(nextData, "orientation")) {
+        setOrientation(nextData.orientation === "vertical" ? "vertical" : "horizontal");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "showValue")) {
+        setShowValue(Boolean(nextData.showValue));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "minLabel")) {
+        setMinLabel(nextData.minLabel == null ? null : String(nextData.minLabel));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "maxLabel")) {
+        setMaxLabel(nextData.maxLabel == null ? null : String(nextData.maxLabel));
+      }
       if (Object.prototype.hasOwnProperty.call(nextData, "value")) {
         const nextValue = normalizeSliderValue(nextData.value, nextMin, nextMax);
         const next = Array.isArray(nextValue)
@@ -2043,53 +2061,117 @@ function Slider({ payload, root }) {
   const upper = values.length > 1 ? values[1] : values[0];
   const left = Math.min(100, Math.max(0, percentFor(lower)));
   const right = Math.min(100, Math.max(0, percentFor(upper)));
+  const isVertical = orientation === "vertical";
+  const sliderStyle = isVertical
+    ? {
+        width: "1.5rem",
+        minWidth: "1.5rem",
+        height: "8rem",
+        flexDirection: "column",
+        alignItems: "center",
+        ...style
+      }
+    : style;
+  const trackStyle = isVertical
+    ? { width: "0.375rem", height: "100%" }
+    : undefined;
+  const rangeStyle = isVertical
+    ? { bottom: `${left}%`, height: `${Math.max(0, right - left)}%`, width: "100%" }
+    : { left: `${left}%`, width: `${Math.max(0, right - left)}%` };
+  const valueLabel = values.length > 1 ? `${values[0]} - ${values[1]}` : String(values[0]);
+  const hasBounds = minLabel != null || maxLabel != null;
+  const shellStyle = {
+    display: "inline-flex",
+    flexDirection: isVertical ? "row" : "column",
+    alignItems: isVertical ? "stretch" : "center",
+    gap: "0.5rem",
+    width: isVertical ? "auto" : "100%"
+  };
+  const labelStyle = {
+    fontSize: "0.75rem",
+    fontWeight: 500,
+    lineHeight: 1,
+    color: "var(--muted-foreground)"
+  };
+  const boundsStyle = {
+    ...labelStyle,
+    display: "flex",
+    flexDirection: isVertical ? "column" : "row",
+    justifyContent: "space-between",
+    alignItems: isVertical ? "flex-start" : "center",
+    minHeight: isVertical ? "8rem" : undefined,
+    width: isVertical ? "auto" : "100%"
+  };
 
   return (
-    <div
-      className={classNames("sb-slider", className)}
-      data-slot="slider"
-      data-disabled={disabled ? "true" : undefined}
-      data-invalid={isInvalid ? "true" : undefined}
-      style={style}
-    >
+    <div className="sb-slider-shell" data-orientation={orientation} style={shellStyle}>
+      {showValue ? <div className="sb-slider-value" style={labelStyle}>{valueLabel}</div> : null}
       <div
-        ref={trackRef}
-        className="sb-slider-track"
-        data-slot="slider-track"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerEnd}
-        onPointerCancel={handlePointerEnd}
+        className={classNames("sb-slider", className)}
+        data-slot="slider"
+        data-disabled={disabled ? "true" : undefined}
+        data-invalid={isInvalid ? "true" : undefined}
+        data-orientation={orientation}
+        style={sliderStyle}
       >
         <div
-          className="sb-slider-range"
-          data-slot="slider-range"
-          style={{ left: `${left}%`, width: `${Math.max(0, right - left)}%` }}
-        />
-      </div>
-      {values.map((item, index) => (
-        <button
-          key={index}
-          type="button"
-          className="sb-slider-thumb"
-          data-slot="slider-thumb"
-          role="slider"
-          aria-valuemin={min}
-          aria-valuemax={max}
-          aria-valuenow={item}
-          aria-labelledby={labelledBy || undefined}
-          aria-describedby={describedBy}
-          aria-invalid={isInvalid || undefined}
-          disabled={disabled}
-          style={{ left: `${percentFor(item)}%` }}
-          onPointerDown={(event) => handlePointerDown(event, index)}
-          onPointerMove={(event) => handlePointerMove(event, index)}
+          ref={trackRef}
+          className="sb-slider-track"
+          data-slot="slider-track"
+          style={trackStyle}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerEnd}
           onPointerCancel={handlePointerEnd}
-          onFocus={() => setCurrentThumb(index)}
-          onKeyDown={(event) => handleKeyDown(event, index)}
-        />
-      ))}
+        >
+          <div
+            className="sb-slider-range"
+            data-slot="slider-range"
+            style={rangeStyle}
+          />
+        </div>
+        {values.map((item, index) => (
+          <button
+            key={index}
+            type="button"
+            className="sb-slider-thumb"
+            data-slot="slider-thumb"
+            role="slider"
+            aria-orientation={orientation}
+            aria-valuemin={min}
+            aria-valuemax={max}
+            aria-valuenow={item}
+            aria-labelledby={labelledBy || undefined}
+            aria-describedby={describedBy}
+            aria-invalid={isInvalid || undefined}
+            disabled={disabled}
+            style={isVertical
+              ? { left: "50%", top: "auto", bottom: `${percentFor(item)}%`, transform: "translate(-50%, 50%)" }
+              : { left: `${percentFor(item)}%` }}
+            onPointerDown={(event) => handlePointerDown(event, index)}
+            onPointerMove={(event) => handlePointerMove(event, index)}
+            onPointerUp={handlePointerEnd}
+            onPointerCancel={handlePointerEnd}
+            onFocus={() => setCurrentThumb(index)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+          />
+        ))}
+      </div>
+      {hasBounds ? (
+        <div className="sb-slider-bounds" style={boundsStyle}>
+          {isVertical ? (
+            <>
+              <span>{maxLabel == null ? "" : maxLabel}</span>
+              <span>{minLabel == null ? "" : minLabel}</span>
+            </>
+          ) : (
+            <>
+              <span>{minLabel == null ? "" : minLabel}</span>
+              <span>{maxLabel == null ? "" : maxLabel}</span>
+            </>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

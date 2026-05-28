@@ -18,6 +18,14 @@ htmltools::tagList(
         block_field(
           block_field_label("step", `for` = "showcase_slider_doc_step"),
           block_input("showcase_slider_doc_step", value = "1", type = "number")
+        ),
+        block_field(
+          block_field_label("orientation", `for` = "showcase_slider_doc_orientation"),
+          block_select(
+            "showcase_slider_doc_orientation",
+            choices = c("horizontal", "vertical"),
+            selected = "horizontal"
+          )
         )
       ),
       showcase_controls_group(
@@ -32,6 +40,21 @@ htmltools::tagList(
         )
       ),
       showcase_controls_group(
+        "Labels",
+        block_field(
+          block_field_label("show value", `for` = "showcase_slider_doc_show_value"),
+          block_checkbox("showcase_slider_doc_show_value", "Show current value", value = FALSE)
+        ),
+        block_field(
+          block_field_label("min label", `for` = "showcase_slider_doc_min_label"),
+          block_input("showcase_slider_doc_min_label", value = "Quiet", placeholder = "Optional minimum label")
+        ),
+        block_field(
+          block_field_label("max label", `for` = "showcase_slider_doc_max_label"),
+          block_input("showcase_slider_doc_max_label", value = "Loud", placeholder = "Optional maximum label")
+        )
+      ),
+      showcase_controls_group(
         "Actions (Server Update)",
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
@@ -39,7 +62,8 @@ htmltools::tagList(
           showcase_action_button("showcase_slider_set_range", "Set range"),
           showcase_action_button("showcase_slider_disable", "Disable"),
           showcase_action_button("showcase_slider_enable", "Enable"),
-          showcase_action_button("showcase_slider_resize", "Change bounds")
+          showcase_action_button("showcase_slider_resize", "Change bounds"),
+          showcase_action_button("showcase_slider_vertical", "Show vertical")
         )
       ),
       showcase_controls_group(

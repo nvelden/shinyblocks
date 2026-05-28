@@ -457,6 +457,11 @@ update_block_switch <- function(
 #' @param max Numeric upper bound.
 #' @param step Step size. Defaults to `NULL` (Shiny's auto-step).
 #' @param ticks Whether to show tick marks on the rail.
+#' @param orientation Slider orientation. One of `"horizontal"` or
+#'   `"vertical"`.
+#' @param show_value Whether to render the current value above the slider.
+#' @param min_label Optional label displayed at the minimum end of the rail.
+#' @param max_label Optional label displayed at the maximum end of the rail.
 #' @param width Optional CSS width value.
 #' @param disabled Whether the control is disabled.
 #' @param invalid Whether the control should show invalid styling
@@ -474,6 +479,10 @@ block_slider <- function(
   max,
   step = NULL,
   ticks = FALSE,
+  orientation = c("horizontal", "vertical"),
+  show_value = FALSE,
+  min_label = NULL,
+  max_label = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -481,6 +490,7 @@ block_slider <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
+  orientation <- match_arg(orientation, c("horizontal", "vertical"))
   if (missing(value) || !is.numeric(value) || length(value) < 1 ||
         length(value) > 2 || any(is.na(value))) {
     stop(
@@ -520,6 +530,10 @@ block_slider <- function(
       max = max,
       step = step,
       ticks = isTRUE(ticks),
+      orientation = orientation,
+      showValue = isTRUE(show_value),
+      minLabel = if (is.null(min_label)) NULL else as.character(min_label),
+      maxLabel = if (is.null(max_label)) NULL else as.character(max_label),
       disabled = isTRUE(disabled),
       invalid = isTRUE(invalid),
       style = normalize_runtime_style(style)
@@ -542,6 +556,11 @@ block_slider <- function(
 #' @param min Optional lower bound.
 #' @param max Optional upper bound.
 #' @param step Optional step size.
+#' @param orientation Optional slider orientation. One of `"horizontal"` or
+#'   `"vertical"`.
+#' @param show_value Optional flag for rendering the current value label.
+#' @param min_label Optional replacement minimum label. Use `NULL` to clear.
+#' @param max_label Optional replacement maximum label. Use `NULL` to clear.
 #' @param disabled Optional disabled state.
 #' @param invalid Optional invalid flag.
 #' @param style Optional replacement inline CSS styles for the slider.
@@ -559,6 +578,10 @@ update_block_slider <- function(
   min,
   max,
   step,
+  orientation,
+  show_value,
+  min_label,
+  max_label,
   disabled,
   invalid,
   style,
@@ -598,6 +621,18 @@ update_block_slider <- function(
       }
       payload$step <- as.numeric(step)
     }
+  }
+  if (!missing(orientation)) {
+    payload$orientation <- match_arg(orientation, c("horizontal", "vertical"))
+  }
+  if (!missing(show_value)) {
+    payload$showValue <- isTRUE(show_value)
+  }
+  if (!missing(min_label)) {
+    payload["minLabel"] <- list(if (is.null(min_label)) NULL else as.character(min_label))
+  }
+  if (!missing(max_label)) {
+    payload["maxLabel"] <- list(if (is.null(max_label)) NULL else as.character(max_label))
   }
   if (!missing(disabled)) {
     payload$disabled <- isTRUE(disabled)

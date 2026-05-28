@@ -11,6 +11,10 @@ update_block_slider(
   min,
   max,
   step,
+  orientation,
+  show_value,
+  min_label,
+  max_label,
   disabled,
   invalid,
   style,
@@ -30,6 +34,15 @@ update_block_slider(
 \item{max}{Optional upper bound.}
 
 \item{step}{Optional step size.}
+
+\item{orientation}{Optional slider orientation. One of \code{"horizontal"} or
+\code{"vertical"}.}
+
+\item{show_value}{Optional flag for rendering the current value label.}
+
+\item{min_label}{Optional replacement minimum label. Use \code{NULL} to clear.}
+
+\item{max_label}{Optional replacement maximum label. Use \code{NULL} to clear.}
 
 \item{disabled}{Optional disabled state.}
 
