@@ -19,10 +19,11 @@ htmltools::tagList(
         block_field(
           block_field_label("accent", `for` = "showcase_theme_doc_accent"),
           block_select("showcase_theme_doc_accent", choices = c(
-            "subtle blue" = "hsl(210, 40%, 96.1%)",
-            "subtle gray" = "hsl(0, 0%, 96.1%)",
-            "subtle green" = "hsl(120, 30%, 96.1%)"
-          ), selected = "hsl(210, 40%, 96.1%)", size = "sm")
+            "blue tint" = "hsl(214, 95%, 93%)",
+            "green tint" = "hsl(142, 69%, 90%)",
+            "amber tint" = "hsl(48, 96%, 89%)",
+            "rose tint" = "hsl(351, 95%, 93%)"
+          ), selected = "hsl(214, 95%, 93%)", size = "sm")
         )
       ),
       showcase_controls_group(

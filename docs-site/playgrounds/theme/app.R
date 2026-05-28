@@ -76,10 +76,11 @@ ui <- block_page(
           block_field(
             block_field_label("accent", `for` = "showcase_theme_doc_accent"),
             block_select("showcase_theme_doc_accent", choices = c(
-              "subtle blue" = "hsl(210, 40%, 96.1%)",
-              "subtle gray" = "hsl(0, 0%, 96.1%)",
-              "subtle green" = "hsl(120, 30%, 96.1%)"
-            ), selected = "hsl(210, 40%, 96.1%)", size = "sm")
+              "blue tint" = "hsl(214, 95%, 93%)",
+              "green tint" = "hsl(142, 69%, 90%)",
+              "amber tint" = "hsl(48, 96%, 89%)",
+              "rose tint" = "hsl(351, 95%, 93%)"
+            ), selected = "hsl(214, 95%, 93%)", size = "sm")
           )
         ),
         htmltools::div(
@@ -140,7 +141,7 @@ server <- function(input, output, session) {
   output$showcase_theme_preview_ui <- renderUI({
     radius <- input$showcase_theme_doc_radius %||% "0.5rem"
     primary <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent <- input$showcase_theme_doc_accent %||% "hsl(210, 40%, 96.1%)"
+    accent <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
 
     htmltools::tagList(
       block_theme(radius = radius, primary = primary, accent = accent),
@@ -154,10 +155,13 @@ server <- function(input, output, session) {
         ),
         htmltools::div(
           style = paste(
-            "padding: 0.5rem 0.75rem; background: var(--accent); color: var(--accent-foreground);",
-            "border-radius: calc(var(--radius) * 0.8); font-size: 0.875rem; font-weight: 500; width: fit-content;"
+            "padding: 1rem; background: var(--accent); color: var(--accent-foreground);",
+            "border: 1px solid color-mix(in oklab, var(--accent) 70%, var(--foreground));",
+            "border-radius: calc(var(--radius) * 1.2); font-size: 0.875rem; font-weight: 500;",
+            "display: flex; align-items: center; justify-content: space-between; gap: 1rem;"
           ),
-          "Accent surface"
+          htmltools::span("Accent surface"),
+          block_badge("Token preview", variant = "secondary")
         ),
         block_card(
           title = "Dynamic Card",
@@ -171,7 +175,7 @@ server <- function(input, output, session) {
   output$showcase_theme_preview_code <- showcase_render_code({
     radius <- input$showcase_theme_doc_radius %||% "0.5rem"
     primary <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent <- input$showcase_theme_doc_accent %||% "hsl(210, 40%, 96.1%)"
+    accent <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
     paste0(
       "block_theme(\n",
       "  radius = \"", radius, "\",\n",

@@ -14,7 +14,7 @@ register_theme_showcase <- function(input, output, session) {
   output$showcase_theme_preview_ui <- shiny::renderUI({
     radius <- input$showcase_theme_doc_radius %||% "0.5rem"
     primary <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent <- input$showcase_theme_doc_accent %||% "hsl(210, 40%, 96.1%)"
+    accent <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
     
     htmltools::tagList(
       block_theme(
@@ -32,13 +32,15 @@ register_theme_showcase <- function(input, output, session) {
         ),
         htmltools::div(
           style = paste(
-            "display: inline-flex; align-items: center; gap: 0.5rem;",
-            "padding: 0.5rem 0.75rem;",
+            "padding: 1rem;",
             "background: var(--accent); color: var(--accent-foreground);",
-            "border-radius: calc(var(--radius) * 0.8);",
-            "font-size: 0.875rem; font-weight: 500; width: fit-content;"
+            "border: 1px solid color-mix(in oklab, var(--accent) 70%, var(--foreground));",
+            "border-radius: calc(var(--radius) * 1.2);",
+            "font-size: 0.875rem; font-weight: 500;",
+            "display: flex; align-items: center; justify-content: space-between; gap: 1rem;"
           ),
-          "Accent surface (uses --accent token)"
+          htmltools::span("Accent surface (uses --accent token)"),
+          block_badge("Token preview", variant = "secondary")
         ),
         block_card(
           title = "Dynamic Card",
@@ -58,7 +60,7 @@ register_theme_showcase <- function(input, output, session) {
   output$showcase_theme_preview_code <- showcase_render_code({
     radius_val <- input$showcase_theme_doc_radius %||% "0.5rem"
     primary_val <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent_val <- input$showcase_theme_doc_accent %||% "hsl(210, 40%, 96.1%)"
+    accent_val <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
 
     paste0(
       "block_theme(\n",
