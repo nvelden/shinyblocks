@@ -47,6 +47,9 @@
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.themeMode = mode;
     syncThemeToggles(resolved);
+  }
+
+  function exposeThemeApi() {
     window.shinyblocksTheme = window.shinyblocksTheme || {};
     window.shinyblocksTheme.apply = applyTheme;
   }
@@ -246,24 +249,6 @@
       });
     }
 
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        setMobileOpen(page, false);
-      }
-    });
-
-    document.addEventListener("click", function (event) {
-      var open = page.getAttribute("data-sidebar-mobile-open") === "true";
-      if (!open) return;
-      if (
-        event.target.closest(".sb-sidebar") ||
-        event.target.closest(".sb-sidebar-mobile-trigger")
-      ) {
-        return;
-      }
-      setMobileOpen(page, false);
-    });
-
     var backdrop = page.querySelector(".sb-sidebar-backdrop");
     if (backdrop) {
       backdrop.addEventListener("click", function () {
@@ -275,6 +260,32 @@
       page.querySelectorAll(".sb-nav, .sb-sidebar-nav"),
       wireNavKeyboard
     );
+  }
+
+  function wireGlobalSidebarHandlers() {
+    if (window.shinyblocksSidebarGlobalWired) return;
+    window.shinyblocksSidebarGlobalWired = true;
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+      sidebarPages().forEach(function (page) {
+        setMobileOpen(page, false);
+      });
+    });
+
+    document.addEventListener("click", function (event) {
+      sidebarPages().forEach(function (page) {
+        var open = page.getAttribute("data-sidebar-mobile-open") === "true";
+        if (!open) return;
+        if (
+          event.target.closest(".sb-sidebar") ||
+          event.target.closest(".sb-sidebar-mobile-trigger")
+        ) {
+          return;
+        }
+        setMobileOpen(page, false);
+      });
+    });
   }
 
   function observeDOM() {
@@ -321,8 +332,10 @@
   }
 
   function init() {
+    exposeThemeApi();
     applyTheme(currentThemeMode());
     wireThemeToggleEvents();
+    wireGlobalSidebarHandlers();
     tabs().forEach(wireTabs);
     sidebarPages().forEach(wirePage);
     observeDOM();
