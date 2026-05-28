@@ -163,7 +163,10 @@ server <- function(input, output, session) {
       ),
       "data-slot" = "dialog-content",
       "data-size" = size,
-      style = paste0("position: relative; display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: ", max_width, "; margin: 0 auto; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: var(--background); padding: 1.5rem; box-sizing: border-box; ", style),
+      # Render the inline preview at the requested size and only clamp if the
+      # canvas is too narrow (the previous `width: 100%; max-width: <size>`
+      # collapsed `sm` and `default` to identical widths in narrow iframes).
+      style = paste0("position: relative; display: flex; flex-direction: column; gap: 1rem; width: ", max_width, "; max-width: 100%; margin: 0 auto; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: var(--background); padding: 1.5rem; box-sizing: border-box; ", style),
       htmltools::div(
         htmltools::tags$h2(style = title_style, title),
         if (nzchar(description)) htmltools::tags$p(style = "margin: 0; font-size: 0.875rem; color: var(--muted-foreground);", description)

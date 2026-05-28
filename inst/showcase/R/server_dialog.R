@@ -33,10 +33,13 @@ register_dialog_showcase <- function(input, output, session) {
       "margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em;"
     }
 
+    # Render the inline preview at the requested size and only clamp if the
+    # canvas is too narrow. The previous `width: 100%; max-width: <size>`
+    # collapsed `sm` and `default` to identical widths in narrow viewports.
     base_style <- sprintf(
       paste0(
         "position: relative; display: flex; flex-direction: column; gap: 1rem;",
-        " width: 100%%; max-width: %s; margin: 0 auto; box-sizing: border-box;",
+        " width: %s; max-width: 100%%; margin: 0 auto; box-sizing: border-box;",
         " border: 1px solid var(--border);",
         " border-radius: calc(var(--radius) * 1.4); background-color: var(--background);",
         " color: var(--foreground); padding: 1.5rem;",
