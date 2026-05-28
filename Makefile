@@ -2,7 +2,7 @@
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links legacy-audit parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
-	preview-shinylive quarto-setup gallery skills-install
+	preview-shinylive quarto-setup gallery
 
 # Defaults you can override on the command line.
 R          ?= env -u LC_ALL Rscript
@@ -15,8 +15,7 @@ help:
 	@echo "shinyblocks make targets"
 	@echo ""
 	@echo "Inner loop (run constantly):"
-	@echo "  setup           - install npm deps, R dev deps, and agent skills"
-	@echo "  skills-install  - mirror docs/skills/*.md into .claude/skills + .agents/skills"
+	@echo "  setup           - install npm deps and R dev deps"
 	@echo "  watch-css       - Tailwind v4 in --watch mode"
 	@echo "  dev             - devtools::load_all() in an R session"
 	@echo "  showcase        - load_all() and run inst/showcase"
@@ -67,27 +66,6 @@ setup:
 	npm ci || npm install
 	$(R) -e 'install.packages(c("devtools", "lintr", "urlchecker", "pkgdown", "shinytest2", "withr", "spelling"), repos = "https://cloud.r-project.org")'
 	$(R) -e 'devtools::install_dev_deps(".")'
-	@$(MAKE) skills-install
-
-# Project-authored agent skills live under docs/skills/ (tracked).
-# This target mirrors each one into the local .claude/skills/ and
-# .agents/skills/ directories so Claude Code / Codex pick them up.
-# Re-run after editing any file under docs/skills/.
-skills-install:
-	@for skill in docs/skills/*.md; do \
-		name=$$(basename $$skill .md); \
-		if [ "$$name" = "README" ]; then continue; fi; \
-		echo "Installing skill: $$name"; \
-		mkdir -p .claude/skills/$$name; \
-		cp $$skill .claude/skills/$$name/SKILL.md; \
-		if mkdir -p .agents/skills/$$name 2>/dev/null && \
-			cp $$skill .agents/skills/$$name/SKILL.md 2>/dev/null; then \
-			echo "  - mirrored to .agents/skills/$$name"; \
-		else \
-			echo "  - warning: could not mirror to .agents/skills/$$name"; \
-		fi; \
-	done
-	@echo "Local skills installed under .claude/skills/."
 
 watch-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --watch
@@ -151,9 +129,8 @@ doc-links:
 legacy-audit:
 	$(R) tools/check-legacy-audit.R
 
-# Quality Gate runs the same sequence as docs/ROADMAP.md. CI runs this.
+# Quality Gate runs the full release-readiness check sequence. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.
-# See docs/phase-exits/TEMPLATE.md.
 gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check budget doc-links legacy-audit parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."

@@ -1,20 +1,16 @@
 #!/usr/bin/env Rscript
-# Cross-link validator for docs/.
+# Cross-link validator for public markdown files.
 #
-# Walks every .md file under docs/, PLAN.md, CONTRIBUTING.md,
-# HANDOFF.md, README.md, NEWS.md, and verifies that every relative
+# Walks tracked public markdown files and verifies that every relative
 # markdown link `[label](path.md...)` points at a file that exists.
 # Anchors (#section) are not validated for existence — only the file.
 #
 # Run via `make doc-links`. Exits non-zero on broken links.
 
 roots <- c(
-  "PLAN.md",
   "CONTRIBUTING.md",
-  "HANDOFF.md",
   "README.md",
-  "NEWS.md",
-  list.files("docs", recursive = TRUE, pattern = "\\.md$", full.names = TRUE)
+  "NEWS.md"
 )
 roots <- roots[file.exists(roots)]
 
@@ -40,8 +36,6 @@ for (file in roots) {
       target <- trimws(target)
       # Skip http(s), mailto, and anchor-only links.
       if (grepl("^(https?:|mailto:|#)", target)) next
-      # Skip untracked/ignored planning files for the public repo.
-      if (grepl("(agent-plans/|dev-notes/|PLAN\\.md)", target)) next
       if (
         startsWith(file, "docs/component-specs/") &&
           grepl("^_screenshots/.+\\.(png|jpg|jpeg|webp)$", target)

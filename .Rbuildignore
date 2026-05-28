@@ -6,7 +6,7 @@
 ^.*\.Rproj$
 ^.*\.Rcheck$
 
-# Dev-only docs and planning (in git, not in the package tarball)
+# Local/internal docs and planning (not in git, not in the package tarball)
 ^docs$
 ^PLAN\.md$
 ^CONTRIBUTING\.md$
@@ -36,7 +36,7 @@
 # Tailwind source — only the compiled output ships
 ^inst/www/src$
 
-# Docs site (Next.js — see docs-site/ and docs/agent-plans/2026-05-19-docs-site-*)
+# Docs site (Next.js)
 ^docs-site$
 ^site$
 

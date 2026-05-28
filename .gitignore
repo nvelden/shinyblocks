@@ -45,12 +45,12 @@ docs-site/HANDOFF-PROMPT.md
 # Compiled package docs
 inst/doc/
 
+# Local planning, ADRs, agent notes, and internal component specs
+docs/
+
 # Local generated Shinylive/package smoke-test artifacts
 site/
 test_wasm_app/
-
-# Local agent scratch plans
-docs/agent-plans/2026-05-21-initial-wasm-release.md
 
 # make verify scratch files
 .verify-pids

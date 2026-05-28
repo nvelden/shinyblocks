@@ -6,7 +6,7 @@
 
 repo <- normalizePath(getwd(), mustWork = TRUE)
 
-scan_roots <- c("R", "inst", "tests", "tools", "docs")
+scan_roots <- c("R", "inst", "tests", "tools")
 forbidden <- c(
   "selectize|Selectize|\\.selectize-",
   "ionRangeSlider|irs--shiny|\\.irs-|\\birs-",
@@ -26,34 +26,21 @@ excluded_path <- function(path) {
   grepl("^inst/www/shinyblocks-runtime\\.(js|css)$", path) |
     grepl("^inst/www/shinyblocks\\.css$", path) |
     grepl("^tools/check-legacy-audit\\.R$", path) |
-    grepl("^docs/LEGACY_AUDIT\\.md$", path) |
     grepl("^node_modules/|^site/|^parity/dist/", path)
 }
 
 allowlist <- data.frame(
   path = c(
-    "^docs/decisions/",
-    "^docs/agent-plans/",
-    "^docs/ROADMAP\\.md$",
-    "^docs/component-specs/slider\\.md$",
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
     "^tests/testthat/test-shell\\.R$"
   ),
   pattern = c(
-    ".*",
-    ".*",
-    ".*",
-    "shiny::sliderInput|ionRangeSlider",
     "selectize|irs-|nav-link|tab-pane",
     "selectize|Selectize|nav-link|shiny::textInput",
     "shiny-tab-input|nav-link|tab-pane"
   ),
   reason = c(
-    "Historical ADRs are retained for decision context.",
-    "Historical/current implementation plans intentionally name old patterns for cleanup.",
-    "Current roadmap tracks removed and pending legacy migration work.",
-    "Component specs document current slider migration state.",
     "Runtime CSS test asserts these host selectors are absent from runtime CSS.",
     "Host collision fixture intentionally creates non-shinyblocks Bootstrap/Selectize-like nodes and one nested raw Shiny text input.",
     "Shell tests assert old tab internals are absent from the rendered contract."
@@ -116,7 +103,7 @@ is_allowed <- vapply(seq_len(nrow(hits)), function(i) {
 
 unexpected <- hits[!is_allowed, , drop = FALSE]
 if (nrow(unexpected)) {
-  cat("Legacy audit failed. Remove these hits or classify them in tools/check-legacy-audit.R and docs/LEGACY_AUDIT.md.\n\n")
+  cat("Legacy audit failed. Remove these hits or classify them in tools/check-legacy-audit.R.\n\n")
   for (i in seq_len(nrow(unexpected))) {
     cat(sprintf("%s:%s: %s\n", unexpected$path[[i]], unexpected$line[[i]], trimws(unexpected$text[[i]])))
   }

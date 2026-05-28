@@ -1,8 +1,10 @@
 /*
  * Scoped shinyblocks runtime CSS.
  *
- * This file is intentionally small in Phase 1. It proves the package-local
- * runtime asset path without shipping Tailwind preflight or global resets.
+ * Runtime-rendered component internals live here under
+ * [data-shinyblocks-root]. Overlay and menu portals live under
+ * [data-shinyblocks-portal-root]. Package shell and R-side composition
+ * primitives stay in inst/www/src/shinyblocks.css.
  */
 
 [data-shinyblocks-root],

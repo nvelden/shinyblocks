@@ -5,7 +5,7 @@
 * Tidied the listener lifecycle in `inst/www/shinyblocks.js` (issue #29). The `window.shinyblocksTheme.apply` assignment moved out of `applyTheme()` (which reassigned it on every theme toggle) into a one-shot `exposeThemeApi()` called from `init()`. The global Escape + outside-click handlers that closed open mobile sidebars moved out of `wirePage()` (which attached fresh closures per page mount, stacking listeners on every dynamic re-render) into a `wireGlobalSidebarHandlers()` wired once behind a `shinyblocksSidebarGlobalWired` guard.
 * Hardened the runtime input contract (issue #30): R-side `runtime_component()` now validates the component name against a `RUNTIME_COMPONENT_NAMES` allowlist so a typo errors immediately instead of silently producing a no-op mount, and every JS-side `getValue()` reads the DOM expando first and falls back to the payload's `state.value` via a shared `initialValue(el)` helper. The previous native-input fallback paths (`nativeCheckbox(el)?.checked`, etc.) are gone — the single-writer contract from #24 already guarantees the expando is set synchronously on mount.
 * Removed the unused `runtime_update()` / `sb:update` custom-message channel and the React `applyUpdate` handler that consumed it (issue #23). All shipped components use the standard `update_block_*()` -> `sendInputMessage()` -> binding `receiveMessage` path; the parallel channel only existed to be exercised by the smoke-test fixture's synthetic `component = "fixture"`. The fixture's `runtime_update` observers and the corresponding smoke assertions are gone with it. `validate_input_id()` moved from `runtime-update.R` into `runtime.R`.
-* Eliminated the `requestAnimationFrame` value-deferral pattern across `Checkbox`, `Switch`, `Textarea`, `Input`, `RadioGroup`, `Dialog`, and `Popover` runtime components (issue #24). The DOM expandos (`root.__sbXxxValue`), dataset attributes, and hidden native inputs are now written synchronously from a single set of paths — the mount effect, the user-action setter, and the `__sbXxxReceive` handler — so the Shiny binding's `getValue(el)` returns the new value immediately when the `sb:<component>-change` event fires. See [ADR 0019](docs/decisions/0019-single-writer-runtime-inputs.md).
+* Eliminated the `requestAnimationFrame` value-deferral pattern across `Checkbox`, `Switch`, `Textarea`, `Input`, `RadioGroup`, `Dialog`, and `Popover` runtime components (issue #24). The DOM expandos (`root.__sbXxxValue`), dataset attributes, and hidden native inputs are now written synchronously from a single set of paths — the mount effect, the user-action setter, and the `__sbXxxReceive` handler — so the Shiny binding's `getValue(el)` returns the new value immediately when the `sb:<component>-change` event fires. See ADR 0019.
 * Fold the JSON-serialisability check into `runtime_payload_json()` so every runtime component render runs `jsonlite::toJSON()` once instead of three times (issue #28). `validate_runtime_json()` is removed.
 * Collapsed the ten copy-pasted Shiny input bindings in `frontend/src/runtime/bindings.js` into a single `makeRuntimeBinding()` factory driven by a config array (issue #26). Adding a new runtime input component is now a config entry rather than ~70 lines of boilerplate; the per-component `register*Binding`, `bind*Root`, and `unbind*Root` helpers are gone, and the dispatcher if-ladders collapse to a single `Shiny.bindAll` / `unbindAll` call.
 * Extracted the session validation, `runtime_mount_id()` lookup, and `sendInputMessage()` boilerplate from every `update_block_*()` into a shared `runtime_input_update()` helper (issue #27). Each updater now only assembles its own payload fields.
@@ -113,7 +113,7 @@
   screenshot backstop for everything not yet migrated).
 * `block_select()` is now migrated into the shared ADR 0016 parity
   registry. The dev-only React reference app exposes a local select
-  trigger in closed and open states, `docs/component-specs/_parity/select.json`
+  trigger in closed and open states, the select parity baseline
   is committed as the baseline, and `make parity-ci` now verifies both
   `button` and `select`. The selectize wrapper CSS was tightened at the
   same time so the visible trigger now matches the shadcn contract more
@@ -125,7 +125,7 @@
   captures and diffs `root`, `rail`, `range`, and `thumb` roles across
   light/dark, default/hover/disabled states, with extra live checks for
   thumb-vs-rail centering and hidden ion.rangeSlider labels. The local
-  baseline lives at `docs/component-specs/_parity/slider.json`, and the
+  baseline lives at the slider parity baseline, and the
   disabled thumb cursor is now forced to `not-allowed` with
   `!important` so the live widget matches the parity contract.
 * `block_checkbox()` is now migrated into the shared ADR 0016 parity
@@ -133,25 +133,25 @@
   disabled states across light/dark mode using the visible checkbox
   shell plus label-text opacity, with a new disabled checkbox fixture in
   the field showcase to anchor the live comparison. The baseline lives
-  at `docs/component-specs/_parity/checkbox.json`.
+  at the checkbox parity baseline.
 * `block_switch()` is now migrated into the shared ADR 0016 parity
   registry. The shared harness captures off, on, and disabled states
   across light/dark mode using the visible switch track plus label-text
   opacity, with a new disabled switch fixture in the field showcase to
   anchor the live comparison. The baseline lives at
-  `docs/component-specs/_parity/switch.json`.
+  the switch parity baseline.
 * `block_textarea()` is now migrated into the shared ADR 0016 parity
   registry. The shared harness captures default, focus-visible,
   disabled, and invalid textarea states across light/dark mode, with
   stable field-showcase fixtures and a new baseline at
-  `docs/component-specs/_parity/textarea.json`. The shared text-control
+  the textarea parity baseline. The shared text-control
   CSS was tightened at the same time so text inputs keep `shadow-xs`
   under focus/invalid rings, disabled controls get the shadcn
   `not-allowed` + `opacity-50` contract, and `block_textarea()`
   defaults to the 2-row shadcn baseline instead of a taller native
   shell.
 * New agent skill `shinyblocks-component` lands at
-  [`docs/skills/shinyblocks-component.md`](docs/skills/shinyblocks-component.md)
+  the local shinyblocks-component agent skill
   (the tracked canonical copy), with a `make skills-install` target
   that mirrors it into `.claude/skills/shinyblocks-component/SKILL.md`
   and `.agents/skills/shinyblocks-component/SKILL.md` so Claude Code
@@ -163,7 +163,7 @@
   bounding-rect checks the 2026-05-11 slider POC surfaced as
   necessary), common-pitfall list, and pre-commit checklist.
   Triggered by user prompts like "add a component", "port shadcn X
-  to shinyblocks", or "wrap shiny::Y as a block". `docs/ROADMAP.md`
+  to shinyblocks", or "wrap shiny::Y as a block". the internal roadmap
   Current Status and the Phase 5 hand-off doc both point at the
   skill as the canonical workflow. `make setup` now runs
   `skills-install` automatically so a fresh checkout has the skill
@@ -184,7 +184,7 @@
   so ion.rangeSlider's inline `top` rewrites cannot offset them
   again.
 * Visual-parity harness adopted per
-  [ADR 0016](docs/decisions/0016-visual-parity-harness.md). Mechanical
+  ADR 0016. Mechanical
   computed-style + DOM diff against a pinned shadcn-react reference
   replaces reviewer-only parity for the bulk of drift. An initial
   proof of concept validated the approach against `block_select()` —
@@ -196,7 +196,7 @@
   structural divergences by design), and eliminated the double-hover
   (dropdown now lights exactly one row on mouse hover instead of
   two). The full harness is Slice 6 in
-  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](docs/agent-plans/2026-05-09-phase-5-handoff.md).
+  the internal Phase 5 hand-off plan.
 * `block_select()` trigger and dropdown now match shadcn more
   closely: `rounded-lg` (was `rounded-md` — 10px vs 4px), transparent
   background (was solid), 32px height (was 34px), absolutely-
@@ -205,7 +205,7 @@
   it no longer competes with the keyboard-cursor / pointer-hover
   state.
 * Phase 5 hand-off plan landed at
-  [`docs/agent-plans/2026-05-09-phase-5-handoff.md`](docs/agent-plans/2026-05-09-phase-5-handoff.md):
+  the internal Phase 5 hand-off plan:
   six slice-sized implementation steps (focus-visible redesign,
   `aria-invalid` cross-cut, tabs refactor, reference screenshots,
   spec backfill, gallery resumption) with files to edit, concrete
@@ -213,7 +213,7 @@
   The next implementer can pick up Phase 5 finish from there without
   rereading the conversation history.
 * First shadcn-fidelity audit pass per
-  [`docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md`](docs/agent-plans/2026-05-09-shadcn-fidelity-audit.md).
+  the internal shadcn-fidelity audit plan.
   Compared against the canonical
   `apps/v4/registry/new-york-v4` source, three classes of drift were
   fixed in `inst/www/src/shinyblocks.css`: badges now use
@@ -226,9 +226,9 @@
   (focus-ring redesign to the shadcn 3px ring, `aria-invalid`
   styling, tabs data-attribute refactor) are queued as the next
   Phase 5 slices.
-* Visual-parity contract per [ADR 0015](docs/decisions/0015-component-specs.md):
+* Visual-parity contract per ADR 0015:
   every exported `block_*()` ships with a short
-  `docs/component-specs/<name>.md` capturing the shadcn reference
+  component spec docs capturing the shadcn reference
   link, visual states, token contract, deliberate divergences, and a
   reference screenshot. `tests/testthat/test-doc-coverage.R` enforces
   the rule; existing components are backfilled incrementally via a
@@ -236,7 +236,7 @@
   walks every state listed in the spec against the live showcase
   during phase exit. Seed specs land for `block_button()` and
   `block_card()`; the template lives at
-  `docs/component-specs/_template.md`.
+  the component spec template.
 * Initial R package scaffold with exported Shiny/htmltools helpers for
   pages, sidebars, headers, navigation items, cards, and buttons.
 * `block_card()` now ships with styling for its title, value, and body
@@ -249,7 +249,7 @@
   (`gallery/components/`) modelled on
   <https://shiny.posit.co/r/components/>. Each exported component has
   a page with an embedded live demo and visible source. See
-  `docs/decisions/0013-component-gallery-quarto.md`.
+  ADR 0013.
 * The dogfooded showcase under `inst/showcase/` is now a proper
   component gallery — its own UI is built entirely with shinyblocks
   primitives, the sidebar filters one component at a time, and every
@@ -321,7 +321,7 @@
 * Internal: added `tools/spec-screenshots.R` and `make spec-screenshots`
   to report which component-spec screenshots are still missing.
 * Internal: added `make spec-screenshots-md` to generate a committed
-  screenshot queue under `docs/component-specs/`.
+  screenshot queue.
 * Internal: added `make spec-screenshots-check` so stale screenshot
   queue docs fail fast.
 * Internal: `make gate` and the phase-exit checklist now include the

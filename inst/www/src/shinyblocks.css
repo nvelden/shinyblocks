@@ -8,8 +8,14 @@
  * Layer ordering: tokens import sets CSS custom properties; @theme
  * exposes them to Tailwind utilities; @layer components defines
  * package classes (sb-*) using @apply. User markup never references
- * Tailwind utilities directly. New runtime-rendered components should
- * style themselves through frontend/src/styles/runtime.css instead.
+ * Tailwind utilities directly.
+ *
+ * Ownership split:
+ * - this file owns the package shell and R-side composition primitives
+ *   (page, sidebar, nav, tabs, fields, input groups, icons);
+ * - frontend/src/styles/runtime.css owns runtime-rendered component
+ *   internals under [data-shinyblocks-root] and portal content under
+ *   [data-shinyblocks-portal-root].
  *
  * See ADR 0006 (styling foundation) and ADR 0009 (upstream sync).
  */
@@ -180,6 +186,8 @@
     @apply size-4 shrink-0;
   }
 
+  /* R-side tabs primitive. */
+
   .sb-tabs {
     @apply flex flex-col gap-2;
   }
@@ -291,6 +299,8 @@
     display: none !important;
   }
 
+  /* R-side field primitives. */
+
   .sb-field-group {
     @apply flex flex-col gap-6;
   }
@@ -312,6 +322,9 @@
     @apply flex flex-col gap-4 rounded-lg border border-border p-4;
   }
 
+  /* R-side input-group primitive. These rules compose with nested
+   * runtime inputs by flattening their control border/ring inside the
+   * group chrome. */
 
   .sb-input-group {
     @apply flex min-h-9 items-stretch rounded-md border border-input bg-background;
@@ -402,9 +415,7 @@
     color: var(--destructive);
   }
 
-  /* Button, alert, value-box, separator, skeleton, spinner, and empty are
-   * runtime components; their styling lives in frontend/src/styles/
-   * runtime.css under [data-shinyblocks-root]. */
+  /* Sidebar collapse and mobile drawer behavior. */
 
   .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] {
     grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
@@ -461,9 +472,4 @@
       @apply inline-flex;
     }
   }
-
-  /* Phase 2: icons, buttons, badges, alerts. */
-  /* Phase 3: cards, value boxes, separator, skeleton, spinner, empty. */
-  /* Phase 4: nav, sidebar collapse. */
-  /* Phase 5: tabs, fields, input groups, theme runtime. */
 }

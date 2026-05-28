@@ -4,16 +4,14 @@
  * Style:   new-york
  * Base:    radix
  * Source:  https://ui.shadcn.com (Tailwind v4 default theme)
- * Synced:  TBD — first sync logged in docs/upstream/sb-sync.md
- *          when Phase 1 lands.
+ * Synced:  TBD.
  *
  * Editing rules:
  *  - Token VALUES are vendored. Do not modify them by hand.
  *  - Token NAMES are part of shinyblocks's public theming contract.
- *    Renaming a token is a major-release change (see ADR 0009).
+ *    Renaming a token is a major-release change.
  *  - On upstream sync: copy this file fresh from shadcn upstream,
- *    bump the "Synced" line above, and log the change in
- *    docs/upstream/sb-sync.md.
+ *    bump the "Synced" line above.
  */
 
 :root {

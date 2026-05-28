@@ -25,15 +25,6 @@ npm run test:e2e         # Playwright against the built site (auto-builds + serv
 npm run test:e2e:install # one-time browser install
 ```
 
-## Plan & spec
-
-Everything is documented under `../docs/agent-plans/`:
-
-- `2026-05-19-custom-docs-site.md` — architecture & wireframes
-- `2026-05-19-docs-site-build-plan.md` — the 8 phases
-- `2026-05-19-docs-site-DESIGN.md` — tokens, typography, components per surface
-- `2026-05-19-docs-site-DEVELOPMENT.md` — per-phase gates and Playwright suites
-
 ## Deploy
 
 Push to `main` triggers `.github/workflows/docs-deploy.yml`, which builds and publishes to <https://nvelden.github.io/shinyblocks/>.
