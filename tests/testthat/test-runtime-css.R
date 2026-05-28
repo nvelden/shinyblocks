@@ -153,6 +153,12 @@ test_that("runtime CSS exposes custom select selectors", {
   expect_match(css, ".sb-select-item", fixed = TRUE)
 })
 
+test_that("runtime slider keeps a usable standalone width", {
+  css <- runtime_css()
+
+  expect_match(css, "min-width:min(12rem,100%)", fixed = TRUE)
+})
+
 test_that("runtime CSS omits legacy native select selectors", {
   css <- runtime_css()
 

@@ -1,5 +1,6 @@
 # shinyblocks (development version)
 
+* Fixed `block_slider()` drag updates so Shiny notifications are coalesced to animation frames instead of emitted for every pointer move, preventing laggy `input$` displays during fast drags. Standalone sliders also keep a usable minimum width in shrink-wrapped preview/layout contexts.
 * Added `variant = c("default", "accent", "destructive")` support to `block_value_box()`, with matching docs/showcase controls for token-backed metric emphasis.
 * Added `size = c("default", "sm", "lg")` support to `block_switch()` and `update_block_switch()`, and aligned the Switch docs/showcase playgrounds with the real component API.
 * Added an interactive Shinylive playground to the docs site for the Tabs component page (issue #21), and aligned the local Tabs showcase tab with the same unboxed controls and preview layout.

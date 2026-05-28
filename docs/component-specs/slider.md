@@ -21,6 +21,9 @@
   `aria-invalid="true"`.
 - **server update** — `update_block_slider()` can update value, min,
   max, step, disabled, invalid, style, and class.
+- **standalone width** — sliders keep a small runtime minimum width in
+  shrink-wrapped containers while explicit `width` / parent constraints
+  can still size the control.
 
 ## R API
 
@@ -84,6 +87,7 @@ form-submission bridge, but Shiny reads the dedicated
 | Rail / range / thumb radius | `9999px` (fully rounded) | same |
 | Rail / range height | `0.375rem` (6px) | same |
 | Thumb size | `1rem` (16px) | same |
+| Standalone minimum width | `min(12rem, 100%)` | same |
 
 ## Deliberate divergences from shadcn
 
