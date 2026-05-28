@@ -24,6 +24,11 @@
 - **standalone width** — sliders keep a small runtime minimum width in
   shrink-wrapped containers while explicit `width` / parent constraints
   can still size the control.
+- **change-event throttling** — the `shinyblocks.slider` Shiny binding
+  declares `{ policy: "throttle", delay: 100 }`, so per-pointer-move
+  drags arrive at `input$<id>` at most every 100ms. The component
+  dispatches `sb:slider-change` synchronously; throttling lives in
+  Shiny's binding contract, not in the component.
 
 ## R API
 

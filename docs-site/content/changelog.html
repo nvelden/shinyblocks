@@ -8,7 +8,7 @@
 </ul>
 <h2 id="other-changes" class="scroll-m-20 text-2xl font-bold tracking-tight mt-10 mb-4 border-b pb-2 text-foreground">Other changes</h2>
 <ul>
-<li>Fixed <code>block_slider()</code> drag updates so Shiny notifications are coalesced to animation frames instead of emitted for every pointer move, preventing laggy <code>input$</code> displays during fast drags. Standalone sliders also keep a usable minimum width in shrink-wrapped preview/layout contexts.</li>
+<li>Replaced <code>block_slider()</code>&#39;s in-component <code>requestAnimationFrame</code> notification coalescing with a Shiny binding rate policy (<code>throttle</code>, 100ms) (issue #25). Per-pointer-move drags arrive at <code>input$&lt;id&gt;</code> at most every 100ms without holding back server-driven <code>update_block_slider()</code> echoes. Standalone sliders also keep a usable minimum width in shrink-wrapped preview/layout contexts.</li>
 <li>Added <code>variant = c(&quot;default&quot;, &quot;accent&quot;, &quot;destructive&quot;)</code> support to <code>block_value_box()</code>, with matching docs/showcase controls for token-backed metric emphasis.</li>
 <li>Added <code>size = c(&quot;default&quot;, &quot;sm&quot;, &quot;lg&quot;)</code> support to <code>block_switch()</code> and <code>update_block_switch()</code>, and aligned the Switch docs/showcase playgrounds with the real component API.</li>
 <li>Added an interactive Shinylive playground to the docs site for the Tabs component page (issue #21), and aligned the local Tabs showcase tab with the same unboxed controls and preview layout.</li>

@@ -80,13 +80,19 @@ test_that("runtime components do not defer value writes through requestAnimation
   expect_no_match(js, "root.__sbRadioGroupValue = nextValue;\n            root.dispatchEvent", fixed = TRUE)
 })
 
-test_that("slider change notifications are animation-frame coalesced", {
-  js <- runtime_source()
+test_that("slider binding uses a Shiny throttle rate policy", {
+  bindings <- runtime_bindings_source()
 
-  expect_match(js, "const notifyFrameRef = useRef(null);", fixed = TRUE)
-  expect_match(js, "function scheduleNotify()", fixed = TRUE)
-  expect_match(js, "notifyFrameRef.current = requestAnimationFrame", fixed = TRUE)
-  expect_match(js, "cancelAnimationFrame(notifyFrameRef.current)", fixed = TRUE)
+  # See issue #25. d0cc432 wrapped slider change dispatches in
+  # requestAnimationFrame to coalesce per-pointermove notifications. The
+  # proper layer for that is Shiny's binding rate policy; throttle (not
+  # debounce) keeps live-display reactives responsive while bounding load.
+  expect_match(bindings, 'component: "slider"', fixed = TRUE)
+  expect_match(bindings, 'ratePolicy: { policy: "throttle", delay: 100 }', fixed = TRUE)
+
+  jsx <- runtime_source()
+  expect_no_match(jsx, "notifyFrameRef", fixed = TRUE)
+  expect_no_match(jsx, "scheduleNotify", fixed = TRUE)
 })
 
 test_that("runtime JS includes dynamic UI lifecycle hooks", {

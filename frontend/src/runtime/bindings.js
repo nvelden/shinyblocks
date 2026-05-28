@@ -89,7 +89,7 @@ const switchEvents = rootEventListener("sb:switch-change", "__sbSwitchChangeHand
 const textareaEvents = rootEventListener("sb:textarea-change", "__sbTextareaChangeHandler", true);
 const inputEvents = rootEventListener("sb:input-change", "__sbInputChangeHandler", true);
 const radioGroupEvents = rootEventListener("sb:radio-group-change", "__sbRadioGroupChangeHandler");
-const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHandler");
+const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHandler", true);
 const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHandler");
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
 
@@ -281,7 +281,8 @@ const BINDING_CONFIGS = [
         el.__sbSliderReceive({ value, notify: false });
       }
     },
-    ...sliderEvents
+    ...sliderEvents,
+    ratePolicy: { policy: "throttle", delay: 100 }
   }
 ];
 
