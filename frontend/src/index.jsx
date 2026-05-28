@@ -10,8 +10,6 @@ import {
 } from "./runtime/dom.js";
 import {
   bindShinyChildren,
-  forgetRevision,
-  isFreshRevision,
   setInputValue,
   unbindShinyChildren
 } from "./runtime/shiny.js";
@@ -2627,7 +2625,6 @@ function unmountRoot(root) {
     unbindShinyChildren(root);
   }
   mountedRoot.reactRoot.unmount();
-  if (mountedRoot.payload.id) forgetRevision(mountedRoot.payload.id);
   mounted.delete(root);
 }
 
@@ -2677,57 +2674,6 @@ function schedulePendingInputFlush() {
   }, 50);
 }
 
-function applyUpdate(message) {
-  if (!message || !message.id) return;
-  if (message.component === "select") return;
-  if (!isFreshRevision(message.id, message.revision)) return;
-
-  runtimeRoots(document).forEach(function updateRoot(root) {
-    const mountedRoot = mounted.get(root);
-    const payload = mountedRoot && mountedRoot.payload;
-    if (!payload || payload.id !== message.id) return;
-
-    payload.state ||= {};
-    payload.props ||= {};
-
-    Object.keys(message.updates || {}).forEach(function applyField(key) {
-      const value = message.updates[key];
-      if (key === "disabled") {
-        root.toggleAttribute("data-disabled", Boolean(value));
-      }
-      if (key === "className") {
-        payload.className = value;
-        return;
-      }
-      if (
-        key === "choices" ||
-        key === "placeholder" ||
-        key === "disabled" ||
-        key === "width" ||
-        key === "size" ||
-        key === "invalid"
-      ) {
-        payload.props[key] = value;
-      }
-      payload.state[key] = value;
-    });
-
-    mountedRoot.reactRoot.render(<RuntimeMount payload={payload} root={root} />);
-
-    if (message.notify && Object.prototype.hasOwnProperty.call(message.updates || {}, "value")) {
-      setInputValue(message.id, message.updates.value, "event");
-    }
-  });
-}
-
-function registerUpdateHandler() {
-  if (!window.Shiny || !window.Shiny.addCustomMessageHandler) return;
-  if (window.shinyblocksRuntimeUpdateHandlerRegistered) return;
-
-  window.Shiny.addCustomMessageHandler("sb:update", applyUpdate);
-  window.shinyblocksRuntimeUpdateHandlerRegistered = true;
-}
-
 function observeDynamicUi() {
   if (window.shinyblocksRuntimeDynamicObserver) return;
 
@@ -2761,14 +2707,12 @@ function init() {
   registerRuntimeInputBindings();
   mountAll(document);
   observeDynamicUi();
-  registerUpdateHandler();
   flushPendingInputs(document);
 }
 
 window.shinyblocksRuntime = {
   init,
-  mountAll,
-  applyUpdate
+  mountAll
 };
 
 if (document.readyState === "loading") {

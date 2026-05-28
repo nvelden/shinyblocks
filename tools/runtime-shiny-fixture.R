@@ -39,7 +39,6 @@ module_ui <- function(id) {
       binding = list(input = TRUE),
       mount_id = ns("runtime-choice")
     ),
-    shiny::actionButton(ns("set"), "Set module"),
     shiny::verbatimTextOutput(ns("value"))
   )
 }
@@ -175,10 +174,6 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_popover_value"),
-  shiny::actionButton("set_b", "Set B"),
-  shiny::actionButton("clear_choice", "Clear"),
-  shiny::actionButton("disable_choice", "Disable"),
-  shiny::actionButton("enable_choice", "Enable"),
   shiny::actionButton("set_select_pro", "Set select Pro"),
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
@@ -281,46 +276,6 @@ server <- function(input, output, session) {
   })
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
-
-  shiny::observeEvent(input$set_b, {
-    runtime$runtime_update(
-      session = session,
-      input_id = "choice",
-      component = "fixture",
-      value = "b",
-      notify = TRUE,
-      clearable = "value"
-    )
-  })
-
-  shiny::observeEvent(input$clear_choice, {
-    runtime$runtime_update(
-      session = session,
-      input_id = "choice",
-      component = "fixture",
-      value = NULL,
-      notify = TRUE,
-      clearable = "value"
-    )
-  })
-
-  shiny::observeEvent(input$disable_choice, {
-    runtime$runtime_update(
-      session = session,
-      input_id = "choice",
-      component = "fixture",
-      disabled = TRUE
-    )
-  })
-
-  shiny::observeEvent(input$enable_choice, {
-    runtime$runtime_update(
-      session = session,
-      input_id = "choice",
-      component = "fixture",
-      disabled = FALSE
-    )
-  })
 
   shiny::observeEvent(input$set_select_pro, {
     update_block_select(
@@ -503,17 +458,6 @@ server <- function(input, output, session) {
 
   shiny::moduleServer("mod", function(input, output, session) {
     output$value <- shiny::renderText(input$choice %||% "<NULL>")
-
-    shiny::observeEvent(input$set, {
-      runtime$runtime_update(
-        session = session,
-        input_id = "choice",
-        component = "fixture",
-        value = "m1",
-        notify = TRUE,
-        clearable = "value"
-      )
-    })
   })
 }
 

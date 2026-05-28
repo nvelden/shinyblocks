@@ -89,13 +89,9 @@ try {
         <style>${runtimeCss}</style>
         <script>
           window.__inputs = [];
-          window.__handler = null;
           window.Shiny = {
             setInputValue: function(id, value, options) {
               window.__inputs.push({ id: id, value: value, priority: options.priority });
-            },
-            addCustomMessageHandler: function(type, handler) {
-              if (type === "sb:update") window.__handler = handler;
             },
             bindAll: function(root) {
               root.setAttribute("data-bound", "true");
@@ -201,43 +197,6 @@ try {
     "select content should stay visible inside a short embedded viewport"
   );
   await page.keyboard.press("Escape");
-
-  await page.evaluate(() => {
-    window.__handler({
-      id: "choice",
-      component: "fixture",
-      updates: { value: "b", disabled: true },
-      notify: true,
-      revision: 2
-    });
-  });
-
-  assert.equal(
-    await page.locator("#root").getAttribute("data-disabled"),
-    "",
-    "disabled update should mark the root"
-  );
-  assert.deepEqual(
-    await page.evaluate(() => window.__inputs.map((event) => event.value)),
-    ["a", "b"],
-    "notify=true should echo value updates to Shiny"
-  );
-
-  await page.evaluate(() => {
-    window.__handler({
-      id: "choice",
-      component: "fixture",
-      updates: { value: "stale" },
-      notify: true,
-      revision: 1
-    });
-  });
-
-  assert.deepEqual(
-    await page.evaluate(() => window.__inputs.map((event) => event.value)),
-    ["a", "b"],
-    "stale revisions should be ignored"
-  );
 
   await page.evaluate((payloadText) => {
     const inserted = document.createElement("div");

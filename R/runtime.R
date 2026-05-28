@@ -67,6 +67,19 @@ runtime_mount_id <- function(component, input_id = NULL) {
   paste0("sb-runtime-", component_slug, "-", slug, "-", runtime_mount_state$next_id)
 }
 
+validate_input_id <- function(input_id) {
+  if (
+    !is.character(input_id) ||
+      length(input_id) != 1 ||
+      is.na(input_id) ||
+      !nzchar(input_id)
+  ) {
+    stop("`input_id` must be a non-empty string.", call. = FALSE)
+  }
+
+  invisible(input_id)
+}
+
 runtime_id_slug <- function(value) {
   slug <- gsub("[^A-Za-z0-9_-]+", "-", value)
   slug <- gsub("^-|-$", "", slug)
