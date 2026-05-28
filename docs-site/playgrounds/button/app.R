@@ -45,6 +45,19 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   })
 }
 
+showcase_render_value <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  renderUI({
+    value <- eval(quoted, envir = env)
+    htmltools::tags$pre(
+      class = "sb-code-block sb-code-block-default",
+      style = "margin: 0; padding: 0.75rem 1rem; font-size: 0.8125rem;",
+      htmltools::tags$code(paste(as.character(value), collapse = "\n"))
+    )
+  })
+}
+
 showcase_action_button <- function(input_id, label) {
   block_button(
     label,
@@ -269,7 +282,7 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "showcase_button_preview_ui", suspendWhenHidden = FALSE)
 
-  output$showcase_button_preview_value <- showcase_render_code({
+  output$showcase_button_preview_value <- showcase_render_value({
     value <- input$showcase_button_preview
     val_str <- if (is.null(value)) "<NULL>" else as.character(value)
     paste0("input$showcase_button_preview = ", val_str)

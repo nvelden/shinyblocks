@@ -29,6 +29,19 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   })
 }
 
+showcase_render_value <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  renderUI({
+    value <- eval(quoted, envir = env)
+    htmltools::tags$pre(
+      class = "sb-code-block sb-code-block-default",
+      style = "margin: 0; padding: 0.75rem 1rem; font-size: 0.8125rem;",
+      htmltools::tags$code(paste(as.character(value), collapse = "\n"))
+    )
+  })
+}
+
 ui <- block_page(
   title = "shinyblocks - Popover playground",
   theme = htmltools::tagList(htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")),
@@ -118,7 +131,7 @@ server <- function(input, output, session) {
     )
   })
 
-  output$showcase_popover_preview_value <- showcase_render_code({
+  output$showcase_popover_preview_value <- showcase_render_value({
     value <- input$showcase_popover_preview
     paste0("input$showcase_popover_preview = ", if (is.null(value)) "<NULL>" else if (isTRUE(value)) "TRUE" else "FALSE")
   })
