@@ -734,6 +734,10 @@ function Dialog({ payload, root }) {
   );
   const [footerHtml, setFooterHtml] = useState(props.footerHtml || "");
   const [size, setSize] = useState(props.size || "default");
+  const [contentClassName, setContentClassName] = useState(
+    payload.className || ""
+  );
+  const [contentStyle, setContentStyle] = useState(payload.style || {});
   const hideTitle = Boolean(props.hideTitle);
   const titleId = `${inputId}-title`;
   const descriptionId = `${inputId}-description`;
@@ -781,6 +785,12 @@ function Dialog({ payload, root }) {
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
         setSize(nextData.size || "default");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "className")) {
+        setContentClassName(nextData.className || "");
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
+        setContentStyle(nextData.style || {});
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "open")) {
         setOpen(Boolean(nextData.open), Boolean(nextData.notify));
@@ -885,8 +895,9 @@ function Dialog({ payload, root }) {
               className={classNames(
                 "sb-dialog-content",
                 `sb-dialog-content-size-${size}`,
-                payload.className
+                contentClassName
               )}
+              style={contentStyle}
               data-slot="dialog-content"
               data-size={size}
             >

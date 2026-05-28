@@ -427,7 +427,9 @@ test_that("block_dialog emits a runtime payload with input id and open state", {
       description = "This cannot be undone.",
       "Body content.",
       trigger = "Delete account",
-      open = FALSE
+      open = FALSE,
+      class = "custom-dialog",
+      style = "max-width: 42rem;"
     )
   )
 
@@ -440,6 +442,8 @@ test_that("block_dialog emits a runtime payload with input id and open state", {
   expect_match(payload$props$descriptionHtml, "cannot be undone", fixed = TRUE)
   expect_match(payload$props$bodyHtml, "Body content.", fixed = TRUE)
   expect_identical(payload$props$triggerLabel, "Delete account")
+  expect_identical(payload$className, "custom-dialog")
+  expect_identical(payload$style$maxWidth, "42rem")
 })
 
 test_that("block_dialog requires id and title", {
@@ -654,6 +658,27 @@ test_that("update_block_dialog forwards size and footer", {
 
   expect_identical(message$size, "xl")
   expect_match(message$footerHtml, "OK", fixed = TRUE)
+  expect_identical(message$notify, FALSE)
+})
+
+test_that("update_block_dialog forwards class and style", {
+  message <- NULL
+  session <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      message <<- payload
+    }
+  )
+
+  update_block_dialog(
+    session,
+    "confirm",
+    class = "custom-dialog",
+    style = "border: 2px dashed red;"
+  )
+
+  expect_identical(message$className, "custom-dialog")
+  expect_identical(message$style$border, "2px dashed red")
   expect_identical(message$notify, FALSE)
 })
 

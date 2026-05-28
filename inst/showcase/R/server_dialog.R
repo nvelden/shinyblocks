@@ -53,7 +53,7 @@ register_dialog_showcase <- function(input, output, session) {
       "aria-modal" = "false",
       "data-slot" = "dialog-content",
       "data-size" = size,
-      class = extra_class,
+      class = merge_classes("sb-dialog-content", extra_class),
       style = base_style,
       htmltools::tags$div(
         style = "display: flex; flex-direction: column; gap: 0.375rem;",
@@ -105,6 +105,21 @@ register_dialog_showcase <- function(input, output, session) {
 
   shiny::observeEvent(input$showcase_dialog_trigger_click, {
     update_block_dialog(session, "showcase_dialog_preview", open = TRUE)
+  })
+
+  shiny::observe({
+    style_val <- input$showcase_dialog_doc_style %||% ""
+    update_block_dialog(
+      session,
+      "showcase_dialog_preview",
+      size = input$showcase_dialog_doc_size %||% "default",
+      class = if (isTRUE(input$showcase_dialog_doc_class)) {
+        "showcase-dialog-preview-custom"
+      } else {
+        NULL
+      },
+      style = if (nzchar(style_val)) style_val else NULL
+    )
   })
 
   output$showcase_dialog_preview_value <- showcase_render_code({
@@ -222,9 +237,9 @@ register_dialog_showcase <- function(input, output, session) {
 
   output$showcase_dialog_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("id", "title", "description", "footer", "trigger", "open", "size", "hide_title", "class"),
-      Type = c("character", "character | tag", "character | tag", "tag | tagList", "character", "logical", "character", "logical", "character"),
-      Default = c("required", "required", "NULL", "NULL", "NULL", "FALSE", "\"default\"", "FALSE", "NULL"),
+      Argument = c("id", "title", "description", "footer", "trigger", "open", "size", "hide_title", "class", "style"),
+      Type = c("character", "character | tag", "character | tag", "tag | tagList", "character", "logical", "character", "logical", "character", "character | named list"),
+      Default = c("required", "required", "NULL", "NULL", "NULL", "FALSE", "\"default\"", "FALSE", "NULL", "NULL"),
       Description = c(
         "Required input id. input$<id> reports the open state as a boolean.",
         "Required dialog title. Used as the accessible name.",
@@ -234,7 +249,8 @@ register_dialog_showcase <- function(input, output, session) {
         "Initial open state.",
         "Content max-width preset. One of sm, default, lg, xl.",
         "Visually hide the title while keeping it as the accessible name.",
-        "Additional class merged onto the dialog content container."
+        "Additional class merged onto the dialog content container.",
+        "Optional inline CSS styles for the dialog content container."
       )
     )
   }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)

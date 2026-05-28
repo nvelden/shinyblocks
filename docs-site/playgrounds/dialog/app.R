@@ -96,6 +96,7 @@ ui <- block_page(
       title = "Confirm action",
       description = "This cannot be undone.",
       footer = htmltools::tagList(block_button("Cancel", variant = "outline"), block_button("Continue")),
+      size = "default",
       htmltools::tags$p("Click the trigger or an action button to open the real dialog.")
     )
   )
@@ -120,6 +121,17 @@ server <- function(input, output, session) {
     update_block_dialog(session, "showcase_dialog_preview", open = TRUE)
   })
 
+  observe({
+    style <- input$showcase_dialog_doc_style %||% ""
+    update_block_dialog(
+      session,
+      "showcase_dialog_preview",
+      size = input$showcase_dialog_doc_size %||% "default",
+      class = if (isTRUE(input$showcase_dialog_doc_class)) "showcase-dialog-preview-custom" else NULL,
+      style = if (nzchar(style)) style else NULL
+    )
+  })
+
   output$showcase_dialog_preview_ui <- renderUI({
     title <- input$showcase_dialog_doc_title %||% "Confirm action"
     description <- input$showcase_dialog_doc_description %||% ""
@@ -132,7 +144,12 @@ server <- function(input, output, session) {
     }
     style <- input$showcase_dialog_doc_style %||% ""
     htmltools::div(
-      class = if (isTRUE(input$showcase_dialog_doc_class)) "showcase-dialog-preview-custom" else NULL,
+      class = c(
+        "sb-dialog-content",
+        if (isTRUE(input$showcase_dialog_doc_class)) "showcase-dialog-preview-custom"
+      ),
+      "data-slot" = "dialog-content",
+      "data-size" = size,
       style = paste0("position: relative; display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: ", max_width, "; margin: 0 auto; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: var(--background); padding: 1.5rem; box-sizing: border-box; ", style),
       htmltools::div(
         htmltools::tags$h2(style = title_style, title),

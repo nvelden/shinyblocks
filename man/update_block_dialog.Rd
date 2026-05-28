@@ -12,6 +12,8 @@ update_block_dialog(
   description,
   footer,
   size,
+  class,
+  style,
   notify = TRUE
 )
 }
@@ -32,6 +34,12 @@ via \code{session$ns()}).}
 remove an existing footer.}
 
 \item{size}{Optional content size: \code{"sm"}, \code{"default"}, \code{"lg"}, \code{"xl"}.}
+
+\item{class}{Optional replacement classes for the dialog content container,
+or \code{NULL} to clear.}
+
+\item{style}{Optional replacement inline CSS styles for the dialog content
+container, or \code{NULL} to clear.}
 
 \item{notify}{Whether Shiny receives an input event when \code{open}
 changes. Cosmetic-only updates never notify.}

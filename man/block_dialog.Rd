@@ -14,7 +14,8 @@ block_dialog(
   open = FALSE,
   size = c("default", "sm", "lg", "xl"),
   hide_title = FALSE,
-  class = NULL
+  class = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ it available to assistive technology as the dialog's accessible
 name. Defaults to \code{FALSE}.}
 
 \item{class}{Additional classes for the dialog content container.}
+
+\item{style}{Optional inline CSS styles for the dialog content container.}
 }
 \value{
 An \code{htmltools} tag.

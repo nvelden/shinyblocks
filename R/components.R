@@ -539,6 +539,7 @@ block_alert <- function(
 #'   it available to assistive technology as the dialog's accessible
 #'   name. Defaults to `FALSE`.
 #' @param class Additional classes for the dialog content container.
+#' @param style Optional inline CSS styles for the dialog content container.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -553,7 +554,8 @@ block_dialog <- function(
   open = FALSE,
   size = c("default", "sm", "lg", "xl"),
   hide_title = FALSE,
-  class = NULL
+  class = NULL,
+  style = NULL
 ) {
   if (missing(id) || is.null(id)) {
     stop("`id` is required.", call. = FALSE)
@@ -584,7 +586,8 @@ block_dialog <- function(
     ),
     state = list(value = isTRUE(open), open = isTRUE(open)),
     binding = list(input = TRUE),
-    class = class
+    class = class,
+    style = style
   )
 }
 
@@ -602,6 +605,10 @@ block_dialog <- function(
 #' @param footer Optional replacement footer content. Pass `NULL` to
 #'   remove an existing footer.
 #' @param size Optional content size: `"sm"`, `"default"`, `"lg"`, `"xl"`.
+#' @param class Optional replacement classes for the dialog content container,
+#'   or `NULL` to clear.
+#' @param style Optional replacement inline CSS styles for the dialog content
+#'   container, or `NULL` to clear.
 #' @param notify Whether Shiny receives an input event when `open`
 #'   changes. Cosmetic-only updates never notify.
 #'
@@ -616,6 +623,8 @@ update_block_dialog <- function(
   description,
   footer,
   size,
+  class,
+  style,
   notify = TRUE
 ) {
   if (is.null(session)) {
@@ -655,6 +664,12 @@ update_block_dialog <- function(
       )
     }
     payload$size <- size
+  }
+  if (!missing(class)) {
+    payload["className"] <- list(class)
+  }
+  if (!missing(style)) {
+    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
   }
 
   payload$notify <- isTRUE(notify) && "open" %in% names(payload)
