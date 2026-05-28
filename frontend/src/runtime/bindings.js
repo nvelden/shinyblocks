@@ -1,8 +1,6 @@
 import { currentValue, readPayload } from "./dom.js";
 import {
-  nativeCheckbox,
   nativeSelect,
-  nativeSwitch,
   setNativeChoices,
   setNativeValue
 } from "./native-inputs.js";
@@ -82,6 +80,16 @@ function rootEventListener(eventName, handlerProp, rateMode = false) {
       delete el[handlerProp];
     }
   };
+}
+
+// Bindings prefer the value the React component just produced (held on a DOM
+// expando). React commits asynchronously, but `Shiny.bindAll` may call
+// `getValue` before the mount effect runs, so every binding falls back to the
+// payload's initial `state.value` via `readPayload(el)`. After #24 the mount
+// effect installs the expando synchronously, so this fallback covers the
+// pre-mount window only.
+function initialValue(el) {
+  return currentValue(readPayload(el));
 }
 
 const checkboxEvents = rootEventListener("sb:checkbox-change", "__sbCheckboxChangeHandler");
@@ -171,7 +179,9 @@ const BINDING_CONFIGS = [
     component: "dialog",
     requireInputId: false,
     receiveProp: "__sbDialogReceive",
-    getValue(el) { return Boolean(el.__sbDialogValue); },
+    getValue(el) {
+      return Boolean(el.__sbDialogValue ?? initialValue(el));
+    },
     setValue(el, value) {
       if (typeof el.__sbDialogReceive === "function") {
         el.__sbDialogReceive({ open: Boolean(value), notify: false });
@@ -182,7 +192,9 @@ const BINDING_CONFIGS = [
   {
     component: "popover",
     receiveProp: "__sbPopoverReceive",
-    getValue(el) { return Boolean(el.__sbPopoverValue); },
+    getValue(el) {
+      return Boolean(el.__sbPopoverValue ?? initialValue(el));
+    },
     setValue(el, value) {
       if (typeof el.__sbPopoverReceive === "function") {
         el.__sbPopoverReceive({ open: Boolean(value), notify: false });
@@ -194,9 +206,7 @@ const BINDING_CONFIGS = [
     component: "checkbox",
     receiveProp: "__sbCheckboxReceive",
     getValue(el) {
-      if (typeof el.__sbCheckboxValue !== "undefined") return Boolean(el.__sbCheckboxValue);
-      const native = nativeCheckbox(el);
-      return native ? native.checked : false;
+      return Boolean(el.__sbCheckboxValue ?? initialValue(el));
     },
     setValue(el, value) {
       if (typeof el.__sbCheckboxReceive === "function") {
@@ -209,9 +219,7 @@ const BINDING_CONFIGS = [
     component: "switch",
     receiveProp: "__sbSwitchReceive",
     getValue(el) {
-      if (typeof el.__sbSwitchValue !== "undefined") return Boolean(el.__sbSwitchValue);
-      const native = nativeSwitch(el);
-      return native ? native.checked : false;
+      return Boolean(el.__sbSwitchValue ?? initialValue(el));
     },
     setValue(el, value) {
       if (typeof el.__sbSwitchReceive === "function") {
@@ -225,9 +233,7 @@ const BINDING_CONFIGS = [
     receiveProp: "__sbTextareaReceive",
     getValue(el) {
       if (typeof el.__sbTextareaValue === "string") return el.__sbTextareaValue;
-      // React mounts asynchronously; Shiny reports initial input values before
-      // the first effect runs, so fall back to the payload's state.value.
-      const initial = currentValue(readPayload(el));
+      const initial = initialValue(el);
       return typeof initial === "string" ? initial : "";
     },
     setValue(el, value) {
@@ -243,7 +249,7 @@ const BINDING_CONFIGS = [
     receiveProp: "__sbInputReceive",
     getValue(el) {
       if (typeof el.__sbInputValue === "string") return el.__sbInputValue;
-      const initial = currentValue(readPayload(el));
+      const initial = initialValue(el);
       return typeof initial === "string" ? initial : "";
     },
     setValue(el, value) {
@@ -258,7 +264,9 @@ const BINDING_CONFIGS = [
     component: "radio-group",
     receiveProp: "__sbRadioGroupReceive",
     getValue(el) {
-      return typeof el.__sbRadioGroupValue === "string" ? el.__sbRadioGroupValue : null;
+      if (typeof el.__sbRadioGroupValue === "string") return el.__sbRadioGroupValue;
+      const initial = initialValue(el);
+      return initial == null ? null : String(initial);
     },
     setValue(el, value) {
       if (typeof el.__sbRadioGroupReceive === "function") {
@@ -274,7 +282,7 @@ const BINDING_CONFIGS = [
       if (Object.prototype.hasOwnProperty.call(el, "__sbSliderValue")) {
         return el.__sbSliderValue;
       }
-      return currentValue(readPayload(el));
+      return initialValue(el);
     },
     setValue(el, value) {
       if (typeof el.__sbSliderReceive === "function") {

@@ -53,12 +53,16 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "sb:slider-change", fixed = TRUE)
 })
 
-test_that("checkbox and switch bindings fall back to native initial values", {
+test_that("runtime bindings fall back to the payload's initial state.value", {
   js <- runtime_bindings_source()
 
-  expect_match(js, "const native = nativeCheckbox(el);", fixed = TRUE)
-  expect_match(js, "return native ? native.checked : false;", fixed = TRUE)
-  expect_match(js, "const native = nativeSwitch(el);", fixed = TRUE)
+  # Issue #30. The pre-mount fallback rule is: read the DOM expando the React
+  # component writes; if it's not there yet, fall back to the payload's
+  # state.value via `initialValue(el)`. No native-input fallback paths.
+  expect_match(js, "function initialValue(el)", fixed = TRUE)
+  expect_match(js, "return currentValue(readPayload(el));", fixed = TRUE)
+  expect_no_match(js, "const native = nativeCheckbox(el);", fixed = TRUE)
+  expect_no_match(js, "const native = nativeSwitch(el);", fixed = TRUE)
 })
 
 test_that("runtime components do not defer value writes through requestAnimationFrame", {

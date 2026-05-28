@@ -1,6 +1,18 @@
 runtime_mount_state <- new.env(parent = emptyenv())
 runtime_mount_state$next_id <- 0L
 
+# Canonical list of runtime component names dispatched by the React bundle
+# (see `RuntimeMount` in frontend/src/index.jsx). The subset that also exposes
+# a Shiny input binding lives in `RUNTIME_INPUT_COMPONENTS` in
+# frontend/src/runtime/bindings.js — keep them in sync when adding a new
+# component.
+RUNTIME_COMPONENT_NAMES <- c(
+  "alert", "badge", "button", "card", "checkbox", "code", "dialog",
+  "empty", "input", "popover", "radio-group", "select", "separator",
+  "skeleton", "slider", "spinner", "switch", "textarea", "tooltip",
+  "value-box"
+)
+
 runtime_component <- function(
   component,
   props = list(),
@@ -12,8 +24,20 @@ runtime_component <- function(
   class = NULL,
   style = NULL,
   root_class = NULL,
-  mount_id = NULL
+  mount_id = NULL,
+  .validate = TRUE
 ) {
+  if (isTRUE(.validate) && !component %in% RUNTIME_COMPONENT_NAMES) {
+    stop(
+      sprintf(
+        "Unknown runtime `component`: %s. Expected one of %s.",
+        sQuote(component),
+        paste(sQuote(RUNTIME_COMPONENT_NAMES), collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
   payload <- runtime_payload(
     component = component,
     props = props,

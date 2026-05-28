@@ -33,7 +33,7 @@ module_ui <- function(id) {
   shiny::div(
     id = ns("root"),
     runtime$runtime_component(
-      component = "fixture",
+      component = "fixture", .validate = FALSE,
       input_id = ns("choice"),
       state = list(value = "m0"),
       binding = list(input = TRUE),
@@ -107,7 +107,7 @@ ui <- shiny::fluidPage(
     )
   ),
   runtime$runtime_component(
-    component = "fixture",
+    component = "fixture", .validate = FALSE,
     input_id = "choice",
     state = list(value = "a"),
     binding = list(input = TRUE),
@@ -421,7 +421,7 @@ server <- function(input, output, session) {
     }
 
     runtime$runtime_component(
-      component = "fixture",
+      component = "fixture", .validate = FALSE,
       input_id = "dynamic",
       state = list(value = "x"),
       binding = list(input = TRUE),
@@ -439,7 +439,7 @@ server <- function(input, output, session) {
       ui = shiny::div(
         id = "inserted_host",
         runtime$runtime_component(
-          component = "fixture",
+          component = "fixture", .validate = FALSE,
           input_id = "inserted",
           state = list(value = "y"),
           binding = list(input = TRUE),

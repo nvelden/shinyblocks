@@ -40,6 +40,7 @@ test_that("runtime_component() emits a scoped mount node with dependencies", {
 
   tag <- ns$runtime_component(
     component = "fixture",
+    .validate = FALSE,
     props = list(label = "Label"),
     input_id = "choice",
     children = list(htmltools::tags$span("Child"))
@@ -61,11 +62,11 @@ test_that("runtime_component() emits a scoped mount node with dependencies", {
 test_that("runtime mount ids are deterministic for inputs and unique otherwise", {
   ns <- local_internal()
 
-  first <- ns$runtime_component(component = "fixture", input_id = "choice")
-  second <- ns$runtime_component(component = "fixture", input_id = "choice")
+  first <- ns$runtime_component(component = "fixture", .validate = FALSE, input_id = "choice")
+  second <- ns$runtime_component(component = "fixture", .validate = FALSE, input_id = "choice")
   presentational <- list(
-    ns$runtime_component(component = "fixture"),
-    ns$runtime_component(component = "fixture")
+    ns$runtime_component(component = "fixture", .validate = FALSE),
+    ns$runtime_component(component = "fixture", .validate = FALSE)
   )
 
   expect_identical(tag_attr(first, "id"), "sb-runtime-fixture-choice")
@@ -83,6 +84,28 @@ test_that("runtime payload helpers validate inputs", {
   expect_snapshot(
     ns$runtime_payload(component = "fixture", props = list("unnamed")),
     error = TRUE
+  )
+})
+
+test_that("runtime_component() rejects unknown component names", {
+  ns <- local_internal()
+
+  expect_error(
+    ns$runtime_component(component = "selct"),
+    "Unknown runtime `component`"
+  )
+  # The allowlist constant must mirror the JS-side RUNTIME_INPUT_COMPONENTS
+  # plus the non-input components dispatched by RuntimeMount.
+  expect_true(all(
+    c("button", "select", "checkbox", "switch", "slider") %in% ns$RUNTIME_COMPONENT_NAMES
+  ))
+})
+
+test_that("runtime_component(.validate = FALSE) allows synthetic test names", {
+  ns <- local_internal()
+
+  expect_silent(
+    ns$runtime_component(component = "fixture", .validate = FALSE)
   )
 })
 
