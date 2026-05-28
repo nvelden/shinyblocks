@@ -447,11 +447,30 @@ block_alert_description <- function(..., class = NULL) {
   )
 }
 
+#' Create an alert action
+#'
+#' @param ... Alert action content, such as a `block_button()`.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_alert_action <- function(..., class = NULL) {
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes("sb-alert-action", class),
+      `data-sb-child` = "alert-action",
+      ...
+    )
+  )
+}
+
 #' Create an alert
 #'
 #' @param title Alert title. Required for accessibility.
 #' @param ... Additional alert body content.
 #' @param description Optional alert description.
+#' @param action Optional action content, such as a `block_button()`.
 #' @param icon Optional icon tag or vendored icon name.
 #' @param variant Visual variant.
 #' @param class Additional classes.
@@ -464,6 +483,7 @@ block_alert <- function(
   title,
   ...,
   description = NULL,
+  action = NULL,
   icon = "info",
   variant = c("default", "destructive"),
   class = NULL,
@@ -480,6 +500,7 @@ block_alert <- function(
     "alert-description",
     block_alert_description
   )
+  action_tag <- as_component_child(action, "alert-action", block_alert_action)
   icon_tag <- set_icon_position(icon, "inline-start")
 
   runtime_component(
@@ -493,7 +514,8 @@ block_alert <- function(
         NULL
       },
       contentHtml = html_fragment(...),
-      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
+      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
+      actionHtml = if (!is.null(action_tag)) html_fragment(action_tag) else NULL
     ),
     class = class,
     style = style

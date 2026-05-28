@@ -32,6 +32,7 @@ Create a badge
 \seealso{
 Other content: 
 \code{\link{block_alert}()},
+\code{\link{block_alert_action}()},
 \code{\link{block_alert_description}()},
 \code{\link{block_alert_title}()},
 \code{\link{block_card}()},

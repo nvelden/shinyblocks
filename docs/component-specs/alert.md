@@ -4,7 +4,7 @@
 > Shadcn reference: <https://ui.shadcn.com/docs/components/alert>
 > Status: Runtime composition primitive; Phase 7 spec refreshed around
 > shipped variant + slot contract and `block_alert_title()` /
-> `block_alert_description()` composition.
+> `block_alert_description()` / `block_alert_action()` composition.
 
 ## States
 
@@ -13,6 +13,8 @@
 - **destructive** — destructive-tinted border and foreground treatment.
 - **with icon** — grid shifts to icon + content layout.
 - **without icon** — content occupies the full width.
+- **with action** — optional action content is positioned in the alert's
+  top-right action slot.
 - **content** — title and description stack inside the content region.
 
 ## R API
@@ -22,9 +24,11 @@
 | `title` | Alert title. String, tag, or prebuilt `block_alert_title()`. Required for accessibility. |
 | `...` | Additional alert body content. |
 | `description` | Optional description. Same auto-wrap rules as title. |
+| `action` | Optional action content. String/tag values are wrapped in `block_alert_action()`; pass a `block_alert_action(block_button(...))` for the shadcn action pattern. |
 | `icon` | Optional icon tag or vendored icon name. Defaults to `"info"`. Forced to `inline-start` placement. Pass `NULL` to omit. |
 | `variant` | One of `default`, `destructive`. |
 | `class` | Extra classes merged onto the runtime wrapper. |
+| `style` | Inline styles applied to the alert container. Use this or `class` for custom-colour treatments rather than adding non-upstream variants. |
 
 ## Runtime mapping
 
@@ -33,13 +37,15 @@
 | `title` | `props$titleHtml` |
 | `description` | `props$descriptionHtml` |
 | `...` | `props$contentHtml` |
+| `action` | `props$actionHtml` |
 | `icon` | `props$iconHtml` |
 | `variant` | `props$variant` |
 | `class` | `className` |
+| `style` | `style` |
 
-Title and description tags carrying `data-sb-child="alert-title"` /
-`data-sb-child="alert-description"` are reused in place; bare strings
-get wrapped automatically.
+Title, description, and action tags carrying `data-sb-child="alert-title"` /
+`data-sb-child="alert-description"` / `data-sb-child="alert-action"` are
+reused in place; bare strings get wrapped automatically.
 
 ## Accessibility
 
@@ -64,6 +70,10 @@ get wrapped automatically.
 - The layout is always a two-column grid shell even when the icon is
   omitted; content still reads correctly but does not fully collapse
   to shadcn's single-column shape.
+- Upstream only ships `default` and `destructive` variants. Shinyblocks
+  follows that variant set; success/warning/info colour treatments should
+  use `class` or `style` until the package has a deliberate status-token
+  palette.
 
 ## Reference screenshot
 

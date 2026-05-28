@@ -20,6 +20,7 @@ Create an alert description
 \seealso{
 Other content: 
 \code{\link{block_alert}()},
+\code{\link{block_alert_action}()},
 \code{\link{block_alert_title}()},
 \code{\link{block_badge}()},
 \code{\link{block_card}()},

@@ -38,6 +38,14 @@ htmltools::tagList(
               selected = "default",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("action", `for` = "showcase_alert_doc_action"),
+            block_checkbox("showcase_alert_doc_action", "Include action button")
+          ),
+          block_field(
+            block_field_label("action label", `for` = "showcase_alert_doc_action_label"),
+            block_input("showcase_alert_doc_action_label", value = "Review")
           )
         ),
         showcase_controls_group(

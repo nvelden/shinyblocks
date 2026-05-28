@@ -8,6 +8,7 @@ block_alert(
   title,
   ...,
   description = NULL,
+  action = NULL,
   icon = "info",
   variant = c("default", "destructive"),
   class = NULL,
@@ -20,6 +21,8 @@ block_alert(
 \item{...}{Additional alert body content.}
 
 \item{description}{Optional alert description.}
+
+\item{action}{Optional action content, such as a \code{block_button()}.}
 
 \item{icon}{Optional icon tag or vendored icon name.}
 
@@ -37,6 +40,7 @@ Create an alert
 }
 \seealso{
 Other content: 
+\code{\link{block_alert_action}()},
 \code{\link{block_alert_description}()},
 \code{\link{block_alert_title}()},
 \code{\link{block_badge}()},

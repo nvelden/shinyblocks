@@ -759,8 +759,9 @@ test_that("alerts render role, variants, and icon markup", {
 test_that("alerts accept composed title and description tags", {
   title <- block_alert_title("Maintenance")
   description <- block_alert_description("Scheduled tonight.")
+  action <- block_alert_action(block_button("Review", variant = "outline", size = "sm"))
   payload <- runtime_payload_from(
-    block_alert(title, description = description, icon = NULL)
+    block_alert(title, description = description, action = action, icon = NULL)
   )
 
   expect_identical(tag_attr(title, "data-sb-child"), "alert-title")
@@ -768,12 +769,15 @@ test_that("alerts accept composed title and description tags", {
     tag_attr(description, "data-sb-child"),
     "alert-description"
   )
+  expect_identical(tag_attr(action, "data-sb-child"), "alert-action")
   expect_match(payload$props$titleHtml, "Maintenance", fixed = TRUE)
   expect_match(
     payload$props$descriptionHtml,
     "Scheduled tonight.",
     fixed = TRUE
   )
+  expect_match(payload$props$actionHtml, "Review", fixed = TRUE)
+  expect_match(payload$props$actionHtml, "sb-alert-action", fixed = TRUE)
   expect_null(payload$props$iconHtml)
 })
 

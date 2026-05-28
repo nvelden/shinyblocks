@@ -683,6 +683,14 @@ function ValueBox({ payload }) {
 function Alert({ payload }) {
   const props = payload.props || {};
   const variant = props.variant || "default";
+  const actionStyle = {
+    position: "absolute",
+    top: "0.75rem",
+    right: "1rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "flex-end"
+  };
 
   return (
     <div
@@ -694,7 +702,10 @@ function Alert({ payload }) {
         `sb-alert-${variant}`,
         payload.className
       )}
-      style={payload.style}
+      style={{
+        ...(props.actionHtml ? { paddingRight: "7rem" } : {}),
+        ...(payload.style || {})
+      }}
     >
       {props.iconHtml && (
         <div className="sb-alert-icon">
@@ -710,6 +721,14 @@ function Alert({ payload }) {
             (props.contentHtml || "")
         }}
       />
+      {props.actionHtml && (
+        <div
+          className="sb-alert-action"
+          data-slot="alert-action"
+          style={actionStyle}
+          dangerouslySetInnerHTML={{ __html: props.actionHtml }}
+        />
+      )}
     </div>
   );
 }

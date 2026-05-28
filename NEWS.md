@@ -12,6 +12,7 @@
 
 ## Other changes
 
+* Added `block_alert_action()` and an `action` slot to `block_alert()`, matching the current shadcn Alert composition pattern for top-right actions while keeping the built-in variant set limited to upstream `default` / `destructive`.
 * Replaced `block_slider()`'s in-component `requestAnimationFrame` notification coalescing with a Shiny binding rate policy (`throttle`, 100ms) (issue #25). Per-pointer-move drags arrive at `input$<id>` at most every 100ms without holding back server-driven `update_block_slider()` echoes. Standalone sliders also keep a usable minimum width in shrink-wrapped preview/layout contexts.
 * Added `variant = c("default", "accent", "destructive")` support to `block_value_box()`, with matching docs/showcase controls for token-backed metric emphasis.
 * Added `size = c("default", "sm", "lg")` support to `block_switch()` and `update_block_switch()`, and aligned the Switch docs/showcase playgrounds with the real component API.

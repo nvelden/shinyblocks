@@ -107,6 +107,14 @@ ui <- block_page(
               selected = "default",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("action", `for` = "showcase_alert_doc_action"),
+            block_checkbox("showcase_alert_doc_action", "Include action button")
+          ),
+          block_field(
+            block_field_label("action label", `for` = "showcase_alert_doc_action_label"),
+            block_input("showcase_alert_doc_action_label", value = "Review")
           )
         ),
         htmltools::div(
@@ -172,6 +180,13 @@ server <- function(input, output, session) {
     if (is.null(description) || !nzchar(description)) description <- NULL
     icon <- input$showcase_alert_doc_icon %||% "info"
     if (identical(icon, "none") || !nzchar(icon)) icon <- NULL
+    action_label <- input$showcase_alert_doc_action_label %||% "Review"
+    if (!nzchar(action_label)) action_label <- "Review"
+    action <- if (isTRUE(input$showcase_alert_doc_action)) {
+      block_alert_action(block_button(action_label, variant = "outline", size = "sm"))
+    } else {
+      NULL
+    }
     class <- input$showcase_alert_doc_class %||% ""
     if (!nzchar(class) || identical(class, "none")) class <- NULL
     style <- input$showcase_alert_doc_style %||% ""
@@ -179,6 +194,7 @@ server <- function(input, output, session) {
     list(
       title = title,
       description = description,
+      action = action,
       icon = icon,
       variant = input$showcase_alert_doc_variant %||% "default",
       class = class,
@@ -191,6 +207,7 @@ server <- function(input, output, session) {
     block_alert(
       title = args$title,
       description = args$description,
+      action = args$action,
       icon = args$icon,
       variant = args$variant,
       class = args$class,
@@ -210,6 +227,18 @@ server <- function(input, output, session) {
     }
     if (!identical(args$variant, "default")) {
       code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
+    }
+    if (!is.null(args$action)) {
+      action_label <- input$showcase_alert_doc_action_label %||% "Review"
+      if (!nzchar(action_label)) action_label <- "Review"
+      code_args <- c(
+        code_args,
+        paste0(
+          "action = block_alert_action(block_button(",
+          string_literal(action_label),
+          ', variant = "outline", size = "sm"))'
+        )
+      )
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
