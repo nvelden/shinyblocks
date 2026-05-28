@@ -554,10 +554,10 @@ export const REGISTRY = {
       invalid: '[data-parity-component="textarea"] [data-parity-state="invalid"]'
     },
     showcaseSelectors: {
-      default: '[data-sb-section="textarea"] .sb-parity-textarea-default textarea',
-      focus: '[data-sb-section="textarea"] .sb-parity-textarea-default textarea',
-      disabled: '[data-sb-section="textarea"] .sb-parity-textarea-disabled textarea',
-      invalid: '[data-sb-section="textarea"] .sb-parity-textarea-invalid textarea'
+      default: '[data-sb-section="textarea"] textarea.sb-parity-textarea-default',
+      focus: '[data-sb-section="textarea"] textarea.sb-parity-textarea-default',
+      disabled: '[data-sb-section="textarea"] textarea.sb-parity-textarea-disabled',
+      invalid: '[data-sb-section="textarea"] textarea.sb-parity-textarea-invalid'
     },
     props: TEXTAREA_PROPS,
     states: ["default", "focus", "disabled", "invalid"],
