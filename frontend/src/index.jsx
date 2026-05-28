@@ -1888,6 +1888,7 @@ function Slider({ payload, root }) {
   const trackRef = useRef(null);
   const activeThumbRef = useRef(0);
   const draggingRef = useRef(false);
+  const notifyFrameRef = useRef(null);
 
   function valuesArray(nextValue = value) {
     return Array.isArray(nextValue) ? nextValue : [nextValue];
@@ -1912,14 +1913,22 @@ function Slider({ payload, root }) {
     return quantize(next, nextMin, nextMax, nextStep);
   }
 
+  function scheduleNotify() {
+    if (!root || notifyFrameRef.current != null) return;
+    notifyFrameRef.current = requestAnimationFrame(() => {
+      notifyFrameRef.current = null;
+      root.dispatchEvent(new CustomEvent("sb:slider-change"));
+    });
+  }
+
   function commit(nextValue, notify = false) {
     const next = normalized(nextValue);
     setValueState(next);
     if (!root) return;
     root.__sbSliderValue = next;
     root.dataset.sbSliderValue = sliderValueToNative(next);
-    setNativeSliderValue(root, next, notify);
-    if (notify) root.dispatchEvent(new CustomEvent("sb:slider-change"));
+    setNativeSliderValue(root, next, false);
+    if (notify) scheduleNotify();
   }
 
   function valueFromPointer(event) {
@@ -2035,12 +2044,11 @@ function Slider({ payload, root }) {
           ? nextValue.map((item) => quantize(item, nextMin, nextMax, nextStep))
           : quantize(nextValue, nextMin, nextMax, nextStep);
         setValueState(next);
-        setNativeSliderValue(root, next, Boolean(nextData.notify));
+        root.__sbSliderValue = next;
+        root.dataset.sbSliderValue = sliderValueToNative(next);
+        setNativeSliderValue(root, next, false);
         if (nextData.notify) {
-          requestAnimationFrame(() => {
-            root.__sbSliderValue = next;
-            root.dispatchEvent(new CustomEvent("sb:slider-change"));
-          });
+          scheduleNotify();
         }
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
@@ -2065,6 +2073,15 @@ function Slider({ payload, root }) {
       delete root.__sbSliderReceive;
     };
   }, [max, min, root, step, value]);
+
+  useEffect(() => {
+    return () => {
+      if (notifyFrameRef.current != null) {
+        cancelAnimationFrame(notifyFrameRef.current);
+        notifyFrameRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!root) return;

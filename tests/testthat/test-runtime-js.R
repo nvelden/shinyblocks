@@ -26,6 +26,14 @@ runtime_bindings_source <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+runtime_source <- function() {
+  path <- testthat::test_path("..", "..", "frontend", "src", "index.jsx")
+  if (!file.exists(path)) {
+    testthat::skip("runtime source is repo-only and not present in R CMD check build")
+  }
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 test_that("runtime JS includes Shiny bridge hooks", {
   js <- runtime_js()
 
@@ -53,6 +61,15 @@ test_that("checkbox and switch bindings fall back to native initial values", {
   expect_match(js, "const native = nativeCheckbox(el);", fixed = TRUE)
   expect_match(js, "return native ? native.checked : false;", fixed = TRUE)
   expect_match(js, "const native = nativeSwitch(el);", fixed = TRUE)
+})
+
+test_that("slider change notifications are animation-frame coalesced", {
+  js <- runtime_source()
+
+  expect_match(js, "const notifyFrameRef = useRef(null);", fixed = TRUE)
+  expect_match(js, "function scheduleNotify()", fixed = TRUE)
+  expect_match(js, "notifyFrameRef.current = requestAnimationFrame", fixed = TRUE)
+  expect_match(js, "cancelAnimationFrame(notifyFrameRef.current)", fixed = TRUE)
 })
 
 test_that("runtime JS includes dynamic UI lifecycle hooks", {
