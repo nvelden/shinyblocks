@@ -44,11 +44,11 @@ htmltools::tagList(
           "Styling",
           block_field(
             block_field_label("class", `for` = "showcase_alert_doc_class"),
-            block_textarea(
+            block_select(
               "showcase_alert_doc_class",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., shadow-sm"
+              choices = c("none", "shadow-lg", "border-dashed", "bg-transparent"),
+              selected = "none",
+              size = "sm"
             )
           ),
           block_field(

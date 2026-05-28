@@ -14,7 +14,7 @@ register_alert_showcase <- function(input, output, session) {
     }
     variant <- input$showcase_alert_doc_variant %||% "default"
     class <- input$showcase_alert_doc_class %||% ""
-    if (!nzchar(class)) {
+    if (!nzchar(class) || identical(class, "none")) {
       class <- NULL
     }
     style <- input$showcase_alert_doc_style %||% ""
@@ -67,7 +67,7 @@ register_alert_showcase <- function(input, output, session) {
     if (variant_val != "default") {
       args <- c(args, paste0('variant = "', variant_val, '"'))
     }
-    if (nzchar(class_val)) {
+    if (nzchar(class_val) && class_val != "none") {
       args <- c(args, paste0('class = "', class_val, '"'))
     }
     if (nzchar(style_val)) {

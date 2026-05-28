@@ -117,11 +117,11 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("class", `for` = "showcase_alert_doc_class"),
-            block_textarea(
+            block_select(
               "showcase_alert_doc_class",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., shadow-sm"
+              choices = c("none", "shadow-lg", "border-dashed", "bg-transparent"),
+              selected = "none",
+              size = "sm"
             )
           ),
           block_field(
@@ -173,7 +173,7 @@ server <- function(input, output, session) {
     icon <- input$showcase_alert_doc_icon %||% "info"
     if (identical(icon, "none") || !nzchar(icon)) icon <- NULL
     class <- input$showcase_alert_doc_class %||% ""
-    if (!nzchar(class)) class <- NULL
+    if (!nzchar(class) || identical(class, "none")) class <- NULL
     style <- input$showcase_alert_doc_style %||% ""
     if (!nzchar(style)) style <- NULL
     list(
