@@ -635,11 +635,12 @@ function Empty({ payload }) {
 
 function ValueBox({ payload }) {
   const props = payload.props || {};
+  const variant = props.variant || "default";
 
   return (
     <section
       data-slot="value-box"
-      className={classNames("sb-value-box", payload.className)}
+      className={classNames("sb-value-box", `sb-value-box-${variant}`, payload.className)}
       style={payload.style}
     >
       {props.iconHtml && (

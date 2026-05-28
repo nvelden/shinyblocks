@@ -10,6 +10,7 @@ block_value_box(
   ...,
   description = NULL,
   icon = NULL,
+  variant = c("default", "accent", "destructive"),
   class = NULL,
   style = NULL
 )
@@ -24,6 +25,8 @@ block_value_box(
 \item{description}{Optional value box description.}
 
 \item{icon}{Optional icon tag or vendored icon name.}
+
+\item{variant}{Visual variant.}
 
 \item{class}{Additional classes.}
 

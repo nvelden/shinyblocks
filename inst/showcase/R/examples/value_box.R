@@ -28,6 +28,15 @@ htmltools::tagList(
           )
         ),
         block_field(
+          block_field_label("variant", `for` = "showcase_value_box_doc_variant"),
+          block_select(
+            "showcase_value_box_doc_variant",
+            choices = c("default", "accent", "destructive"),
+            selected = "default",
+            size = "sm"
+          )
+        ),
+        block_field(
           block_field_label("class", `for` = "showcase_value_box_doc_class"),
           block_select(
             "showcase_value_box_doc_class",

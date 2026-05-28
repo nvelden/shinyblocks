@@ -784,7 +784,8 @@ test_that("value boxes render expected regions", {
       "$42k",
       block_badge("Healthy", variant = "secondary"),
       description = "Up 12% month over month.",
-      icon = "trending-up"
+      icon = "trending-up",
+      variant = "accent"
     )
   )
   box_html <- render_html(
@@ -801,6 +802,7 @@ test_that("value boxes render expected regions", {
   expect_match(box$props$valueHtml, "$42k", fixed = TRUE)
   expect_match(box$props$descriptionHtml, "Up 12% month over month.", fixed = TRUE)
   expect_match(box$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
+  expect_identical(box$props$variant, "accent")
   expect_match(box$props$contentHtml, 'data-sb-component="badge"', fixed = TRUE)
   expect_match(box_html, 'data-sb-component="value-box"', fixed = TRUE)
 })

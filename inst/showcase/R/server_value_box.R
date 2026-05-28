@@ -10,6 +10,7 @@ register_value_box_showcase <- function(input, output, session) {
     if (icon_name != "none") {
       icon_tag <- icon_name
     }
+    variant <- input$showcase_value_box_doc_variant %||% "default"
     
     class <- input$showcase_value_box_doc_class %||% ""
     if (!nzchar(class) || class == "none") class <- NULL
@@ -21,6 +22,7 @@ register_value_box_showcase <- function(input, output, session) {
       value = value,
       description = desc,
       icon = icon_tag,
+      variant = variant,
       class = class,
       style = style
     )
@@ -40,6 +42,7 @@ register_value_box_showcase <- function(input, output, session) {
     value_val <- input$showcase_value_box_doc_value %||% "$45,231.89"
     desc_val <- input$showcase_value_box_doc_desc %||% "Up 12% month over month."
     icon_val <- input$showcase_value_box_doc_icon %||% "trending-up"
+    variant_val <- input$showcase_value_box_doc_variant %||% "default"
     class_val <- input$showcase_value_box_doc_class %||% ""
     style_val <- input$showcase_value_box_doc_style %||% ""
 
@@ -52,6 +55,9 @@ register_value_box_showcase <- function(input, output, session) {
     }
     if (icon_val != "none") {
       args <- c(args, paste0('icon = "', icon_val, '"'))
+    }
+    if (variant_val != "default") {
+      args <- c(args, paste0('variant = "', variant_val, '"'))
     }
     if (nzchar(class_val) && class_val != "none") {
       args <- c(args, paste0('class = "', class_val, '"'))
@@ -70,15 +76,16 @@ register_value_box_showcase <- function(input, output, session) {
 
   output$showcase_value_box_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("title", "value", "...", "description", "icon", "class", "style"),
-      Type = c("character | tag", "character | tag", "named/unnamed elements", "character | tag", "character | tag", "character", "character | named list"),
-      Default = c("required", "required", "none", "NULL", "NULL", "NULL", "NULL"),
+      Argument = c("title", "value", "...", "description", "icon", "variant", "class", "style"),
+      Type = c("character | tag", "character | tag", "named/unnamed elements", "character | tag", "character | tag", "character", "character", "character | named list"),
+      Default = c("required", "required", "none", "NULL", "NULL", "\"default\"", "NULL", "NULL"),
       Description = c(
         "Header title string or tag.",
         "Primary large metric/value highlight.",
         "Additional value box body content.",
         "Optional descriptive supporting text.",
         "Lucide leading icon name or tag.",
+        "Visual variant. One of default, accent, or destructive.",
         "Additional CSS class merged onto the value box container.",
         "Optional inline styles applied to the value box container."
       )

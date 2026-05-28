@@ -12,6 +12,9 @@
 - **with-icon** — optional leading metric icon.
 - **with-extra-body** — supplementary body content via `...` below the
   main value.
+- **variant** — `default`, `accent`, and `destructive` variants provide
+  restrained token-backed metric emphasis without inventing a broader
+  status palette.
 
 ## R API
 
@@ -22,7 +25,9 @@
 | `...` | Additional body content rendered below the value. |
 | `description` | Optional description text. |
 | `icon` | Optional icon tag or vendored icon name. Forced to `inline-start` placement. |
+| `variant` | Visual variant. One of `default`, `accent`, or `destructive`. |
 | `class` | Extra classes merged onto the runtime wrapper. |
+| `style` | Optional inline styles on the runtime wrapper. |
 
 ## Runtime mapping
 
@@ -33,13 +38,17 @@
 | `description` | `props$descriptionHtml` |
 | `...` | `props$contentHtml` |
 | `icon` | `props$iconHtml` |
+| `variant` | `props$variant` |
 | `class` | `className` |
+| `style` | `style` |
 
 ## Token contract
 
 | Visual role | Token |
 | --- | --- |
 | Surface | `--card` |
+| Accent surface | `--accent`, `--accent-foreground` |
+| Destructive state | `--destructive` |
 | Foreground | `--card-foreground` |
 | Muted text | `--muted-foreground` |
 | Border | `--border` |

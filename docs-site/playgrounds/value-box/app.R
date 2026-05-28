@@ -101,6 +101,15 @@ ui <- block_page(
             )
           ),
           block_field(
+            block_field_label("variant", `for` = "showcase_value_box_doc_variant"),
+            block_select(
+              "showcase_value_box_doc_variant",
+              choices = c("default", "accent", "destructive"),
+              selected = "default",
+              size = "sm"
+            )
+          ),
+          block_field(
             block_field_label("class", `for` = "showcase_value_box_doc_class"),
             block_select(
               "showcase_value_box_doc_class",
@@ -167,6 +176,7 @@ server <- function(input, output, session) {
       value = input$showcase_value_box_doc_value %||% "$45,231.89",
       description = desc,
       icon = icon,
+      variant = input$showcase_value_box_doc_variant %||% "default",
       class = class,
       style = style
     )
@@ -179,6 +189,7 @@ server <- function(input, output, session) {
       value = args$value,
       description = args$description,
       icon = args$icon,
+      variant = args$variant,
       class = args$class,
       style = args$style
     )
@@ -196,6 +207,9 @@ server <- function(input, output, session) {
     }
     if (!is.null(args$icon)) {
       code_args <- c(code_args, paste0("icon = ", string_literal(args$icon)))
+    }
+    if (!identical(args$variant, "default")) {
+      code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
     }
     if (!is.null(args$class)) {
       code_args <- c(code_args, paste0("class = ", string_literal(args$class)))

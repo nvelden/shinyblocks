@@ -70,6 +70,14 @@
       Error:
       ! `variant` must be one of "default", "destructive".
 
+# block_value_box validates variant
+
+    Code
+      block_value_box("Revenue", "$42k", variant = "success")
+    Condition
+      Error:
+      ! `variant` must be one of "default", "accent", "destructive".
+
 # block_separator validates orientation
 
     Code

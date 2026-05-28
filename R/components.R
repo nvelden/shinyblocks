@@ -890,6 +890,7 @@ block_tooltip <- function(
 #' @param ... Additional value box body content.
 #' @param description Optional value box description.
 #' @param icon Optional icon tag or vendored icon name.
+#' @param variant Visual variant.
 #' @param class Additional classes.
 #' @param style Optional inline custom styles.
 #'
@@ -902,9 +903,11 @@ block_value_box <- function(
   ...,
   description = NULL,
   icon = NULL,
+  variant = c("default", "accent", "destructive"),
   class = NULL,
   style = NULL
 ) {
+  variant <- match_arg(variant, c("default", "accent", "destructive"))
   icon_tag <- set_icon_position(icon, "inline-start")
 
   runtime_component(
@@ -914,7 +917,8 @@ block_value_box <- function(
       valueHtml = html_fragment(value),
       descriptionHtml = if (!is.null(description)) html_fragment(description) else NULL,
       contentHtml = html_fragment(...),
-      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL
+      iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
+      variant = variant
     ),
     class = class,
     style = style

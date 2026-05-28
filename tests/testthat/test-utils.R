@@ -73,6 +73,12 @@ test_that("block_alert validates required title and variant", {
   })
 })
 
+test_that("block_value_box validates variant", {
+  expect_snapshot(error = TRUE, {
+    block_value_box("Revenue", "$42k", variant = "success")
+  })
+})
+
 test_that("block_separator validates orientation", {
   expect_snapshot(error = TRUE, {
     block_separator(orientation = "diagonal")
