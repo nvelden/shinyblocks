@@ -56,6 +56,7 @@ jobs:
             any::shinylive
             local::.
           working-directory: "."
+          install-quarto: false
 
       # `webr` is the R interface used inside the webR runtime. Installed
       # locally only so `shinylive::export()`'s static analysis of each
