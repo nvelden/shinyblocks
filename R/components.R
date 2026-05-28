@@ -256,17 +256,6 @@ update_block_button <- function(
   style,
   class
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(label)) {
@@ -317,9 +306,7 @@ update_block_button <- function(
     payload["class"] <- list(class)
   }
 
-  message_target <- runtime_mount_id("button", session$ns(input_id))
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(session, input_id, "button", payload, notify_key = NULL)
 }
 
 #' Create a badge
@@ -627,17 +614,6 @@ update_block_dialog <- function(
   style,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(open)) {
@@ -672,11 +648,10 @@ update_block_dialog <- function(
     payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
   }
 
-  payload$notify <- isTRUE(notify) && "open" %in% names(payload)
-  message_target <- runtime_mount_id("dialog", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(
+    session, input_id, "dialog", payload,
+    notify_key = "open", notify = notify
+  )
 }
 
 #' Create a runtime popover
@@ -779,17 +754,6 @@ update_block_popover <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(open)) {
@@ -817,11 +781,10 @@ update_block_popover <- function(
     payload["contentClass"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "open" %in% names(payload)
-  message_target <- runtime_mount_id("popover", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(
+    session, input_id, "popover", payload,
+    notify_key = "open", notify = notify
+  )
 }
 
 #' Create a tooltip

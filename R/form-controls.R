@@ -98,17 +98,6 @@ update_block_textarea <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(value)) {
@@ -139,11 +128,7 @@ update_block_textarea <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "value" %in% names(payload)
-  message_target <- runtime_mount_id("textarea", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(session, input_id, "textarea", payload, notify = notify)
 }
 
 #' Create a styled single-line text input
@@ -238,17 +223,6 @@ update_block_input <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(value)) {
@@ -273,11 +247,7 @@ update_block_input <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "value" %in% names(payload)
-  message_target <- runtime_mount_id("input", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(session, input_id, "input", payload, notify = notify)
 }
 
 #' Create a styled checkbox input
@@ -352,17 +322,6 @@ update_block_checkbox <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(checked)) {
@@ -378,11 +337,10 @@ update_block_checkbox <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "checked" %in% names(payload)
-  message_target <- runtime_mount_id("checkbox", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(
+    session, input_id, "checkbox", payload,
+    notify_key = "checked", notify = notify
+  )
 }
 
 #' Create a styled switch input
@@ -463,17 +421,6 @@ update_block_switch <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(checked)) {
@@ -492,11 +439,10 @@ update_block_switch <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "checked" %in% names(payload)
-  message_target <- runtime_mount_id("switch", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(
+    session, input_id, "switch", payload,
+    notify_key = "checked", notify = notify
+  )
 }
 
 #' Create a styled slider input
@@ -619,17 +565,6 @@ update_block_slider <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(value)) {
@@ -677,9 +612,5 @@ update_block_slider <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "value" %in% names(payload)
-  message_target <- runtime_mount_id("slider", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(session, input_id, "slider", payload, notify = notify)
 }

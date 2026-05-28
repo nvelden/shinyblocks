@@ -85,3 +85,17 @@ test_that("runtime payload helpers validate inputs", {
     error = TRUE
   )
 })
+
+test_that("runtime_payload_json() reports a friendly error for unserialisable payloads", {
+  ns <- local_internal()
+
+  payload <- ns$runtime_payload(
+    component = "fixture",
+    props = list(handler = new.env())
+  )
+
+  expect_error(
+    ns$runtime_payload_json(payload),
+    "Runtime payload is not JSON serializable:"
+  )
+})

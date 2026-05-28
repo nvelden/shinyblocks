@@ -94,17 +94,6 @@ update_block_radio_group <- function(
   class,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(choices)) {
@@ -131,9 +120,8 @@ update_block_radio_group <- function(
     payload["class"] <- list(class)
   }
 
-  payload$notify <- isTRUE(notify) && "selected" %in% names(payload)
-  message_target <- runtime_mount_id("radio-group", session$ns(input_id))
-
-  session$sendInputMessage(message_target, payload)
-  invisible(NULL)
+  runtime_input_update(
+    session, input_id, "radio-group", payload,
+    notify_key = "selected", notify = notify
+  )
 }

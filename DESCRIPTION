@@ -20,6 +20,7 @@ Collate:
     'runtime-payload.R'
     'runtime-update.R'
     'runtime.R'
+    'runtime-input-update.R'
     'icon.R'
     'components.R'
     'field.R'

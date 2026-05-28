@@ -16,7 +16,7 @@ runtime_payload <- function(
   validate_named_list(state, "state")
   validate_named_list(binding, "binding")
 
-  payload <- list(
+  list(
     schemaVersion = as.integer(schema_version),
     component = component,
     id = input_id,
@@ -28,19 +28,23 @@ runtime_payload <- function(
     className = class,
     style = style
   )
-
-  validate_runtime_json(payload)
-  payload
 }
 
 runtime_payload_json <- function(payload) {
-  validate_runtime_json(payload)
-  json <- jsonlite::toJSON(
-    payload,
-    auto_unbox = TRUE,
-    null = "null",
-    na = "null",
-    digits = NA
+  json <- tryCatch(
+    jsonlite::toJSON(
+      payload,
+      auto_unbox = TRUE,
+      null = "null",
+      na = "null",
+      digits = NA
+    ),
+    error = function(e) {
+      stop(
+        sprintf("Runtime payload is not JSON serializable: %s", conditionMessage(e)),
+        call. = FALSE
+      )
+    }
   )
 
   # Keep JSON safe inside an inline script tag.
@@ -71,19 +75,4 @@ validate_named_list <- function(x, arg) {
   }
 
   invisible(x)
-}
-
-validate_runtime_json <- function(payload) {
-  tryCatch(
-    {
-      jsonlite::toJSON(payload, auto_unbox = TRUE, null = "null")
-      invisible(payload)
-    },
-    error = function(e) {
-      stop(
-        sprintf("Runtime payload is not JSON serializable: %s", conditionMessage(e)),
-        call. = FALSE
-      )
-    }
-  )
 }

@@ -1,5 +1,13 @@
 # shinyblocks (development version)
 
+## Internal
+
+* Fold the JSON-serialisability check into `runtime_payload_json()` so every runtime component render runs `jsonlite::toJSON()` once instead of three times (issue #28). `validate_runtime_json()` is removed.
+* Collapsed the ten copy-pasted Shiny input bindings in `frontend/src/runtime/bindings.js` into a single `makeRuntimeBinding()` factory driven by a config array (issue #26). Adding a new runtime input component is now a config entry rather than ~70 lines of boilerplate; the per-component `register*Binding`, `bind*Root`, and `unbind*Root` helpers are gone, and the dispatcher if-ladders collapse to a single `Shiny.bindAll` / `unbindAll` call.
+* Extracted the session validation, `runtime_mount_id()` lookup, and `sendInputMessage()` boilerplate from every `update_block_*()` into a shared `runtime_input_update()` helper (issue #27). Each updater now only assembles its own payload fields.
+
+## Other changes
+
 * Fixed `block_slider()` drag updates so Shiny notifications are coalesced to animation frames instead of emitted for every pointer move, preventing laggy `input$` displays during fast drags. Standalone sliders also keep a usable minimum width in shrink-wrapped preview/layout contexts.
 * Added `variant = c("default", "accent", "destructive")` support to `block_value_box()`, with matching docs/showcase controls for token-backed metric emphasis.
 * Added `size = c("default", "sm", "lg")` support to `block_switch()` and `update_block_switch()`, and aligned the Switch docs/showcase playgrounds with the real component API.

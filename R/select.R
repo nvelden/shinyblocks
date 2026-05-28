@@ -122,17 +122,6 @@ update_block_select <- function(
   invalid,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$ns)) {
-    stop("`session` must provide an `ns()` method.", call. = FALSE)
-  }
-  if (!is.function(session$sendInputMessage)) {
-    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
   payload <- list()
 
   if (!missing(choices)) {
@@ -170,14 +159,10 @@ update_block_select <- function(
     payload$invalid <- isTRUE(invalid)
   }
 
-  payload$notify <- isTRUE(notify) && "selected" %in% names(payload)
-  message_target <- runtime_mount_id("select", session$ns(input_id))
-
-  session$sendInputMessage(
-    message_target,
-    payload
+  runtime_input_update(
+    session, input_id, "select", payload,
+    notify_key = "selected", notify = notify
   )
-  invisible(NULL)
 }
 
 runtime_choice_records <- function(choices_df) {
