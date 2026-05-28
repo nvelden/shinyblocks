@@ -68,15 +68,7 @@ string_literal <- function(value) {
 ui <- block_page(
   title = "shinyblocks · Button playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
-    htmltools::tags$style(htmltools::HTML(
-      "
-      [data-shinyblocks-root] .showcase-button-preview-custom [data-slot='button'],
-      [data-shinyblocks-root].showcase-button-preview-custom [data-slot='button'] {
-        border: 2px dashed red;
-      }
-      "
-    ))
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
       `data-shinyblocks-root` = "",

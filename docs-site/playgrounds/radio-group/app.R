@@ -76,16 +76,7 @@ string_literal <- function(value) {
 ui <- block_page(
   title = "shinyblocks · Radio Group playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
-    htmltools::tags$style(htmltools::HTML(
-      "
-      [data-shinyblocks-root] .showcase-radio-group-preview-custom .sb-radio-group-control,
-      [data-shinyblocks-root].showcase-radio-group-preview-custom .sb-radio-group-control {
-        outline: 2px dashed red;
-        outline-offset: 3px;
-      }
-      "
-    ))
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
     `data-shinyblocks-root` = "",

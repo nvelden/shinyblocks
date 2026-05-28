@@ -92,12 +92,6 @@
   border: 2px dashed var(--ring) !important;
 }
 
-.showcase-button-preview-custom .sb-button,
-.sb-button.showcase-button-preview-custom,
-.showcase-button-preview-custom {
-  border: 2px dashed var(--ring) !important;
-}
-
 .showcase-dialog-preview-custom .sb-dialog-content,
 .sb-dialog-content.showcase-dialog-preview-custom,
 .showcase-dialog-preview-custom {
@@ -139,13 +133,6 @@
 .sb-switch.showcase-switch-preview-custom .sb-switch-button {
   outline: 2px dashed var(--ring) !important;
   outline-offset: 2px;
-}
-
-.showcase-radio-group-preview-custom .sb-radio-group-control,
-.sb-radio-group.showcase-radio-group-preview-custom .sb-radio-group-control {
-  border: 2px dashed var(--ring) !important;
-  padding: 0.75rem !important;
-  border-radius: 0.5rem !important;
 }
 
 .showcase-slider-preview-custom .sb-slider-thumb,
