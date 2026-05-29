@@ -128,10 +128,12 @@ htmltools::tagList(
   htmltools::div(
     class = "sb-parity-theme-baseline",
     style = "display: flex; gap: 1rem; align-items: center;",
+    # No explicit scope: the showcase auto-scopes static-example block_theme()
+    # overrides to [data-sb-preview="theme"] via scope_showcase_theme(), so this
+    # fixture stays confined to its preview without leaking.
     block_theme(
       accent = "oklch(0.3 0.03 260)",
-      radius = "0.5rem",
-      scope = ".sb-parity-theme-baseline"
+      radius = "0.5rem"
     ),
     block_dark_mode_toggle(),
     block_button("Primary Button (Theme)", icon = "sun"),
