@@ -54,30 +54,6 @@ test_that("every exported block_*() appears in _pkgdown.yml reference", {
   )
 })
 
-test_that("every exported block_*() has a gallery .qmd page", {
-  # The gallery is on hold pending shinyblocks publication to
-  # repo.r-wasm.org (see ADR 0013 / the path-B WASM work). Once that
-  # lands, drop the skip() and require a page per component.
-  skip("Gallery pages blocked on WASM resolution; see ADR 0013.")
-
-  exported <- block_exports()
-  gallery_dir <- file.path(repo_root(), "gallery", "components")
-  pages <- sub("\\.qmd$", "", list.files(gallery_dir, pattern = "\\.qmd$"))
-
-  expected_slugs <- gsub("_", "-", sub("^block_", "", exported))
-  missing <- setdiff(expected_slugs, pages)
-
-  expect_identical(
-    missing,
-    character(),
-    label = paste(
-      "Components exported but missing a gallery page under",
-      "gallery/components/. Missing:",
-      paste(missing, collapse = ", ")
-    )
-  )
-})
-
 spec_path <- function(fn_name) {
   slug <- gsub("_", "-", sub("^block_", "", fn_name))
   file.path(repo_root(), "docs", "component-specs", paste0(slug, ".md"))
