@@ -49,9 +49,9 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
       htmltools::div(
-        style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
+        class = "showcase-playground__controls", style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
           htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Content"),
@@ -84,7 +84,7 @@ ui <- block_page(
         )
       ),
       htmltools::div(
-        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.5rem;",
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),

@@ -4,11 +4,11 @@ htmltools::tagList(
     htmltools::div(
       style = "display: flex; flex-direction: column; gap: 1.5rem;",
       htmltools::div(
-        style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
+        class = "showcase-playground", style = "display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;",
         
         # Left Column (Live Preview + UI Code) -> matches desktop child 1
         htmltools::div(
-          style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
+          class = "showcase-playground__main", style = "flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem;",
           block_field(
             block_field_label("Preview", `for` = "showcase_field_preview"),
             shiny::uiOutput("showcase_field_preview_ui")
@@ -27,7 +27,7 @@ htmltools::tagList(
         
         # Right Column (Designer controls panel) -> matches desktop child 2
         htmltools::div(
-          style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
+          class = "showcase-playground__controls", style = "flex: 2; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: var(--muted); padding: 1.5rem; border-radius: 0.5rem;",
           
           # Category 1: Form Layout Settings
           htmltools::div(

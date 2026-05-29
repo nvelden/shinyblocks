@@ -56,9 +56,9 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
       htmltools::div(
-        style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
+        class = "showcase-playground__controls", style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
         control_group(
           "Content", first = TRUE,
           block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")),
@@ -89,7 +89,7 @@ ui <- block_page(
         )
       ),
       htmltools::div(
-        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.5rem;",
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),

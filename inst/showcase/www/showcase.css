@@ -184,9 +184,7 @@ pre.shiny-text-output {
 
 /* Premium Playground layout override for modern visual balance and equal heights */
 @media (min-width: 768px) {
-  .sb-field-set > div > div[style*="flex-wrap"],
-  .showcase-playground,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] {
+  .showcase-playground {
     display: block !important;
     position: relative !important;
     padding-left: 360px !important; /* Make room for the 330px wide sidebar + 30px gap */
@@ -194,13 +192,8 @@ pre.shiny-text-output {
     height: auto !important;
   }
 
-  /* Controls Panel (Left Column)
-   * - In legacy fieldsets: Child 2 is the controls panel.
-   * - In showcase layouts and docs playgrounds: Child 1 is the controls panel.
-   */
-  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2),
-  .showcase-playground__controls,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:first-child {
+  /* Controls Panel (Left Column) */
+  .showcase-playground__controls {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
@@ -214,13 +207,8 @@ pre.shiny-text-output {
     box-sizing: border-box !important;
   }
 
-  /* Preview and Code Stack (Right Column)
-   * - In legacy fieldsets: Child 1 is the preview/code stack.
-   * - In showcase layouts and docs playgrounds: Child 2 is the preview/code stack.
-   */
-  .sb-field-set > div > div[style*="flex-wrap"] > div:first-child,
-  .showcase-playground__main,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:nth-child(2) {
+  /* Preview and Code Stack (Right Column) */
+  .showcase-playground__main {
     display: flex !important;
     flex-direction: column !important;
     gap: 1.5rem !important;
@@ -229,26 +217,18 @@ pre.shiny-text-output {
   }
 
   /* High-fidelity thin custom scrollbars for the sidebar */
-  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar,
-  .showcase-playground__controls::-webkit-scrollbar,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:first-child::-webkit-scrollbar {
+  .showcase-playground__controls::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-track,
-  .showcase-playground__controls::-webkit-scrollbar-track,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:first-child::-webkit-scrollbar-track {
+  .showcase-playground__controls::-webkit-scrollbar-track {
     background: transparent;
   }
-  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-thumb,
-  .showcase-playground__controls::-webkit-scrollbar-thumb,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:first-child::-webkit-scrollbar-thumb {
+  .showcase-playground__controls::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 3px;
   }
-  .sb-field-set > div > div[style*="flex-wrap"] > div:nth-child(2)::-webkit-scrollbar-thumb:hover,
-  .showcase-playground__controls::-webkit-scrollbar-thumb:hover,
-  [data-shinyblocks-root] > div[style*="flex-wrap"] > div:first-child::-webkit-scrollbar-thumb:hover {
+  .showcase-playground__controls::-webkit-scrollbar-thumb:hover {
     background: var(--muted-foreground);
   }
 }

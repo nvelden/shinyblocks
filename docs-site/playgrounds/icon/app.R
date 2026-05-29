@@ -77,9 +77,9 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
       htmltools::div(
-        style = paste(
+        class = "showcase-playground__controls", style = paste(
           "flex: 1; min-width: 280px; max-width: 320px;",
           "border: 1px solid var(--border); border-radius: 0.75rem;",
           "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
@@ -128,7 +128,7 @@ ui <- block_page(
         )
       ),
       htmltools::div(
-        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
         htmltools::tags$div(
           style = "display: flex; flex-direction: column; gap: 0.5rem;",
           htmltools::tags$div(
