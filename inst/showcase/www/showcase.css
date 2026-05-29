@@ -189,7 +189,8 @@ pre.shiny-text-output {
     position: relative !important;
     padding-left: 360px !important; /* Make room for the 330px wide sidebar + 30px gap */
     min-height: 450px !important; /* Safe minimum height */
-    height: auto !important;
+    height: 680px !important; /* Fixed height for visual consistency across all playgrounds */
+    box-sizing: border-box !important;
   }
 
   /* Controls Panel (Left Column) */
@@ -213,22 +214,29 @@ pre.shiny-text-output {
     flex-direction: column !important;
     gap: 1.5rem !important;
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important; /* Fill parent height */
+    overflow-y: auto !important; /* Independent scroll bar */
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 
-  /* High-fidelity thin custom scrollbars for the sidebar */
-  .showcase-playground__controls::-webkit-scrollbar {
+  /* High-fidelity thin custom scrollbars for both columns */
+  .showcase-playground__controls::-webkit-scrollbar,
+  .showcase-playground__main::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  .showcase-playground__controls::-webkit-scrollbar-track {
+  .showcase-playground__controls::-webkit-scrollbar-track,
+  .showcase-playground__main::-webkit-scrollbar-track {
     background: transparent;
   }
-  .showcase-playground__controls::-webkit-scrollbar-thumb {
+  .showcase-playground__controls::-webkit-scrollbar-thumb,
+  .showcase-playground__main::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 3px;
   }
-  .showcase-playground__controls::-webkit-scrollbar-thumb:hover {
+  .showcase-playground__controls::-webkit-scrollbar-thumb:hover,
+  .showcase-playground__main::-webkit-scrollbar-thumb:hover {
     background: var(--muted-foreground);
   }
 }
