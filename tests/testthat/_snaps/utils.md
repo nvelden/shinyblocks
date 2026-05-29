@@ -149,7 +149,7 @@
       block_theme("bad")
     Condition
       Error:
-      ! `block_theme()` requires named token overrides.
+      ! `block_theme()` overrides must be named.
 
 ---
 

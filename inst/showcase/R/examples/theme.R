@@ -69,6 +69,31 @@ htmltools::tagList(
         )
       ),
       showcase_controls_group(
+        "Dark mode overrides",
+        block_field(
+          block_field_label("primary (dark)", `for` = "showcase_theme_doc_primary_dark"),
+          block_select("showcase_theme_doc_primary_dark", choices = c(
+            "same as light" = "inherit",
+            "blue" = "hsl(217, 91%, 60%)",
+            "green" = "hsl(142, 71%, 45%)",
+            "violet" = "hsl(263, 90%, 70%)",
+            "rose" = "hsl(347, 77%, 60%)"
+          ), selected = "inherit", size = "sm"),
+          block_field_description(
+            "Applied only in dark mode (block_theme(dark = ...)). Toggle the theme to compare."
+          )
+        ),
+        block_field(
+          block_field_label("accent (dark)", `for` = "showcase_theme_doc_accent_dark"),
+          block_select("showcase_theme_doc_accent_dark", choices = c(
+            "same as light" = "inherit",
+            "blue" = "oklch(0.3 0.07 250)",
+            "green" = "oklch(0.33 0.08 150)",
+            "violet" = "oklch(0.34 0.09 290)"
+          ), selected = "inherit", size = "sm")
+        )
+      ),
+      showcase_controls_group(
         "Actions (Server Update)",
         showcase_action_button("showcase_theme_set_light", "Force Light Mode"),
         showcase_action_button("showcase_theme_set_dark", "Force Dark Mode"),

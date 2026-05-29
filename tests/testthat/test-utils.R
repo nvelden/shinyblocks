@@ -833,6 +833,37 @@ test_that("block_theme rejects an invalid scope", {
   )
 })
 
+test_that("block_theme dark overrides emit data-theme=dark rules", {
+  css <- as.character(block_theme(
+    primary = "red",
+    dark = list(primary = "blue"),
+    scope = ".demo"
+  ))
+  # Light/base value applies in both modes.
+  expect_true(grepl(".demo{--primary: red;}", css, fixed = TRUE))
+  # Dark value applies only under [data-theme="dark"].
+  expect_true(grepl("[data-theme=\"dark\"] .demo{--primary: blue;}", css, fixed = TRUE))
+  expect_true(grepl(
+    "[data-theme=\"dark\"] .demo [data-shinyblocks-root]",
+    css,
+    fixed = TRUE
+  ))
+})
+
+test_that("block_theme accepts dark-only overrides", {
+  css <- as.character(block_theme(dark = list(primary = "blue")))
+  # No light/base rule: style content begins straight with the dark selector.
+  expect_true(grepl(">[data-theme", css, fixed = TRUE))
+  expect_false(grepl(">.sb-app", css, fixed = TRUE))
+  expect_true(grepl("[data-theme=\"dark\"] .sb-app{--primary: blue;}", css, fixed = TRUE))
+})
+
+test_that("block_theme validates dark token names and shape", {
+  expect_error(block_theme(dark = list(not_a_token = "red")), "Unknown theme token")
+  expect_error(block_theme(dark = list("red")), "non-empty named list")
+  expect_error(block_theme(dark = list()), "non-empty named list")
+})
+
 test_that("update_block_theme sends a custom message", {
   message <- NULL
   session <- list(

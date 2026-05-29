@@ -4,15 +4,19 @@
 \alias{block_theme}
 \title{Create theme overrides}
 \usage{
-block_theme(..., scope = NULL)
+block_theme(..., scope = NULL, dark = NULL)
 }
 \arguments{
 \item{...}{Named CSS token overrides, such as \code{primary},
-\code{background}, or \code{radius}.}
+\code{background}, or \code{radius}. Applied in both light and dark mode.}
 
 \item{scope}{Optional CSS selector. When supplied, overrides apply
 only to elements matching \code{scope} and the runtime roots inside it,
 instead of the whole page. Defaults to \code{NULL} (page-wide).}
+
+\item{dark}{Optional named list of token overrides applied only in
+dark mode, overriding the corresponding \code{...} value (or the package
+default) when \verb{[data-theme="dark"]} is active. Defaults to \code{NULL}.}
 }
 \value{
 An \code{htmltools} tag.
@@ -24,6 +28,14 @@ runtime root). Pass \code{scope} to confine the overrides to a single
 subtree, which is essential when several differently-themed regions
 share one page (for example a component gallery) so a local override
 does not leak into the rest of the app.
+}
+\details{
+Like shadcn, tokens have separate light and dark values. The \code{...}
+overrides apply to \strong{both} light and dark mode. Pass \code{dark} to set
+values that apply \strong{only} in dark mode (when \verb{[data-theme="dark"]} is
+active), mirroring shadcn's \verb{:root} / \code{.dark} token pairs. A token
+present only in \code{dark} keeps the package default in light mode and the
+dark value in dark mode.
 }
 \seealso{
 Other theme: 

@@ -33,10 +33,25 @@ register_theme_showcase <- function(input, output, session) {
     ov[!vapply(ov, is.null, logical(1))]
   })
 
+  # Dark-mode-only overrides. These apply only when [data-theme="dark"] is
+  # active, mirroring shadcn's separate light/dark token values.
+  theme_dark_overrides <- shiny::reactive({
+    pick <- function(id) {
+      v <- input[[id]]
+      if (is.null(v) || !nzchar(v) || identical(v, "inherit")) NULL else v
+    }
+    ov <- list(
+      primary = pick("showcase_theme_doc_primary_dark"),
+      accent = pick("showcase_theme_doc_accent_dark")
+    )
+    ov[!vapply(ov, is.null, logical(1))]
+  })
+
   # Dynamic preview UI (renders style overrides + components covering every
   # exposed token).
   output$showcase_theme_preview_ui <- shiny::renderUI({
     o <- theme_overrides()
+    d <- theme_dark_overrides()
 
     swatch_style <- function(...) paste(
       "display: flex; flex-direction: column; gap: 0.35rem;", ...
@@ -47,7 +62,10 @@ register_theme_showcase <- function(input, output, session) {
       # Scope the override to this preview only so the demo does not leak
       # its token colors into the rest of the gallery. Only user-picked tokens
       # are passed; the rest keep their adaptive light/dark defaults.
-      do.call(block_theme, c(o, list(scope = ".sb-theme-demo-scope"))),
+      do.call(block_theme, c(
+        o,
+        list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
+      )),
       htmltools::div(
         class = "sb-theme-demo-scope",
         style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
@@ -129,11 +147,22 @@ register_theme_showcase <- function(input, output, session) {
   # Dynamic code snippet rendering
   output$showcase_theme_preview_code <- showcase_render_code({
     o <- theme_overrides()
+    d <- theme_dark_overrides()
     args <- vapply(
       names(o),
       function(name) sprintf("  %s = \"%s\"", name, o[[name]]),
       character(1)
     )
+    if (length(d)) {
+      dark_args <- vapply(
+        names(d),
+        function(name) sprintf("    %s = \"%s\"", name, d[[name]]),
+        character(1)
+      )
+      args <- c(args, paste0(
+        "  dark = list(\n", paste(dark_args, collapse = ",\n"), "\n  )"
+      ))
+    }
     paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
   })
   shiny::outputOptions(
