@@ -32,11 +32,13 @@ export function ComponentPreview({
           </span>
         </div>
         
-        {/* Render R HTML fragment inside inert wrapper */}
+        {/* Render R HTML fragment inside inert wrapper. Fixed height + clip so
+            every card in a row matches, regardless of preview content length
+            (e.g. the long Code sample no longer stretches its whole row). */}
         <div
           data-component-preview={slug}
           className={cn(
-            "pointer-events-none select-none w-full flex items-center justify-center min-h-[120px] rounded-lg bg-muted/50 p-4 border border-dashed border-border/60 transition-colors duration-200 group-hover:bg-muted/70",
+            "pointer-events-none select-none w-full h-64 overflow-hidden flex items-center justify-center rounded-lg bg-muted/50 p-4 border border-dashed border-border/60 transition-colors duration-200 group-hover:bg-muted/70",
             className
           )}
           dangerouslySetInnerHTML={{ __html: html }}
