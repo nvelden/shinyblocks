@@ -10,62 +10,62 @@ htmltools::tagList(
         block_field(
           block_field_label("primary", `for` = "showcase_theme_doc_primary"),
           block_select("showcase_theme_doc_primary", choices = c(
-            "neutral (default)" = "oklch(0.205 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "blue" = "hsl(221.2, 83.2%, 53.3%)",
             "green" = "hsl(142.1, 76.2%, 36.3%)",
             "violet" = "hsl(262.1, 83.3%, 57.8%)",
             "rose" = "hsl(346.8, 77.2%, 49.8%)"
-          ), selected = "oklch(0.205 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("secondary", `for` = "showcase_theme_doc_secondary"),
           block_select("showcase_theme_doc_secondary", choices = c(
-            "neutral (default)" = "oklch(0.97 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "cool" = "oklch(0.93 0.03 250)",
             "warm" = "oklch(0.95 0.04 80)"
-          ), selected = "oklch(0.97 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("accent", `for` = "showcase_theme_doc_accent"),
           block_select("showcase_theme_doc_accent", choices = c(
-            "neutral (default)" = "oklch(0.97 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "blue tint" = "hsl(214, 95%, 93%)",
             "green tint" = "hsl(142, 69%, 90%)",
             "amber tint" = "hsl(48, 96%, 89%)",
             "rose tint" = "hsl(351, 95%, 93%)"
-          ), selected = "oklch(0.97 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("destructive", `for` = "showcase_theme_doc_destructive"),
           block_select("showcase_theme_doc_destructive", choices = c(
-            "red (default)" = "oklch(0.577 0.245 27.325)",
+            "default (adapts to light/dark)" = "inherit",
             "orange" = "oklch(0.65 0.2 40)",
             "crimson" = "hsl(346.8, 77.2%, 49.8%)"
-          ), selected = "oklch(0.577 0.245 27.325)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("muted", `for` = "showcase_theme_doc_muted"),
           block_select("showcase_theme_doc_muted", choices = c(
-            "neutral (default)" = "oklch(0.97 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "cool" = "oklch(0.95 0.02 250)",
             "warm" = "oklch(0.96 0.02 80)"
-          ), selected = "oklch(0.97 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("border", `for` = "showcase_theme_doc_border"),
           block_select("showcase_theme_doc_border", choices = c(
-            "neutral (default)" = "oklch(0.922 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "strong" = "oklch(0.8 0 0)",
             "blue" = "oklch(0.8 0.05 250)"
-          ), selected = "oklch(0.922 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         ),
         block_field(
           block_field_label("ring", `for` = "showcase_theme_doc_ring"),
           block_select("showcase_theme_doc_ring", choices = c(
-            "neutral (default)" = "oklch(0.708 0 0)",
+            "default (adapts to light/dark)" = "inherit",
             "blue" = "hsl(221.2, 83.2%, 53.3%)",
             "green" = "hsl(142.1, 76.2%, 36.3%)"
-          ), selected = "oklch(0.708 0 0)", size = "sm")
+          ), selected = "inherit", size = "sm")
         )
       ),
       showcase_controls_group(

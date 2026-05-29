@@ -10,19 +10,27 @@ register_theme_showcase <- function(input, output, session) {
     update_block_theme(session, mode = "system")
   })
 
-  # Resolve the active token overrides from the controls, falling back to the
-  # shadcn neutral defaults.
+  # Resolve the active token overrides from the controls. A `block_theme()`
+  # override applies to BOTH light and dark mode (one value), so any token left
+  # at "inherit" is intentionally NOT overridden — it keeps the package's
+  # adaptive light/dark default and stays readable in both modes. Only tokens
+  # the user explicitly picks are overridden.
   theme_overrides <- shiny::reactive({
-    list(
+    pick <- function(id) {
+      v <- input[[id]]
+      if (is.null(v) || !nzchar(v) || identical(v, "inherit")) NULL else v
+    }
+    ov <- list(
       radius = input$showcase_theme_doc_radius %||% "0.5rem",
-      primary = input$showcase_theme_doc_primary %||% "oklch(0.205 0 0)",
-      secondary = input$showcase_theme_doc_secondary %||% "oklch(0.97 0 0)",
-      accent = input$showcase_theme_doc_accent %||% "oklch(0.97 0 0)",
-      destructive = input$showcase_theme_doc_destructive %||% "oklch(0.577 0.245 27.325)",
-      muted = input$showcase_theme_doc_muted %||% "oklch(0.97 0 0)",
-      border = input$showcase_theme_doc_border %||% "oklch(0.922 0 0)",
-      ring = input$showcase_theme_doc_ring %||% "oklch(0.708 0 0)"
+      primary = pick("showcase_theme_doc_primary"),
+      secondary = pick("showcase_theme_doc_secondary"),
+      accent = pick("showcase_theme_doc_accent"),
+      destructive = pick("showcase_theme_doc_destructive"),
+      muted = pick("showcase_theme_doc_muted"),
+      border = pick("showcase_theme_doc_border"),
+      ring = pick("showcase_theme_doc_ring")
     )
+    ov[!vapply(ov, is.null, logical(1))]
   })
 
   # Dynamic preview UI (renders style overrides + components covering every
@@ -37,25 +45,16 @@ register_theme_showcase <- function(input, output, session) {
 
     htmltools::tagList(
       # Scope the override to this preview only so the demo does not leak
-      # its token colors into the rest of the gallery.
-      block_theme(
-        radius = o$radius,
-        primary = o$primary,
-        secondary = o$secondary,
-        accent = o$accent,
-        destructive = o$destructive,
-        muted = o$muted,
-        border = o$border,
-        ring = o$ring,
-        scope = ".sb-theme-demo-scope"
-      ),
+      # its token colors into the rest of the gallery. Only user-picked tokens
+      # are passed; the rest keep their adaptive light/dark defaults.
+      do.call(block_theme, c(o, list(scope = ".sb-theme-demo-scope"))),
       htmltools::div(
         class = "sb-theme-demo-scope",
         style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
         # Buttons exercise --primary, --secondary, --destructive, and --border.
         htmltools::div(
           style = swatch_style(),
-          htmltools::span(style = label_style, "Buttons — primary / secondary / destructive / outline / ghost"),
+          htmltools::span(style = label_style, "Buttons: primary / secondary / destructive / outline / ghost"),
           htmltools::div(
             style = "display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;",
             block_button("Primary", variant = "default"),
