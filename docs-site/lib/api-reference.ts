@@ -388,6 +388,66 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  field: [
+    {
+      name: "block_field",
+      description: "Layout wrapper for a single form field (label, control, description/error).",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Field contents: label, control, and optional description." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_label",
+      description: "A text label with an optional for attribute linking to its control's input ID.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Label text or inline content." },
+        { argument: "for", type: "character", defaultVal: "NULL", description: "ID of the control this label describes." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_description",
+      description: "Helper/description text placed below the control element.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Helper text content." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional id for aria-describedby wiring." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_group",
+      description: "Flex grid to position multiple fields side-by-side within a form.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Child block_field() elements." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_set",
+      description: "A fieldset surface grouping related controls under a single boundary.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Legend, field groups, and fields." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_legend",
+      description: "A legend caption detailing the purpose of the surrounding fieldset.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Legend caption content." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom stylesheet class." }
+      ]
+    },
+    {
+      name: "block_field_invalid",
+      description: "Server-reactive validator that injects data-invalid attributes, aria descriptors, and formatted red error text.",
+      arguments: [
+        { argument: "field", type: "shiny.tag", defaultVal: "required", description: "The block_field() to mark invalid." },
+        { argument: "message", type: "character", defaultVal: "required", description: "Validation error message to display." }
+      ]
+    }
+  ],
   slider: [
     {
       name: "block_slider",

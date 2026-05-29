@@ -105,6 +105,13 @@ registry <- list(
     featured = FALSE
   ),
   list(
+    name = "Field",
+    slug = "field",
+    file = "field.R",
+    description = "Form field layout: labels, descriptions, fieldsets, groups, and validation states.",
+    featured = FALSE
+  ),
+  list(
     name = "Slider",
     slug = "slider",
     file = "slider.R",

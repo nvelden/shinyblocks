@@ -36,6 +36,7 @@ playground_heights <- list(
   checkbox = 720L,
   code = 720L,
   empty = 720L,
+  field = 720L,
   icon = 720L,
   input = 720L,
   `input-group` = 720L,
