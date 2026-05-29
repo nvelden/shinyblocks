@@ -33,8 +33,10 @@ showcase_playground_layout <- function(
   )
 
   htmltools::tags$div(
+    class = "showcase-playground",
     style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
     htmltools::tags$div(
+      class = "showcase-playground__controls",
       style = paste(
         "flex: 1; min-width: 280px; max-width: 320px;",
         "border: 1px solid var(--border); border-radius: 0.75rem;",
@@ -44,6 +46,7 @@ showcase_playground_layout <- function(
       controls
     ),
     htmltools::tags$div(
+      class = "showcase-playground__main",
       style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
       htmltools::tags$div(
         style = "display: flex; flex-direction: column; gap: 0.5rem;",

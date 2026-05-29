@@ -18,7 +18,7 @@ An \code{htmltools} tag.
 Create an alert action
 }
 \seealso{
-Other content:
+Other content: 
 \code{\link{block_alert}()},
 \code{\link{block_alert_description}()},
 \code{\link{block_alert_title}()},

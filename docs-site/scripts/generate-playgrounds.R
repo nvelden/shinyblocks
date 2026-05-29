@@ -154,8 +154,19 @@ for (asset in c("library.data.gz", "library.js.metadata")) {
 
 # Copy latest local runtime CSS to a static path so playgrounds inside iframes can override/load HEAD styles
 local_css <- "../inst/www/shinyblocks-runtime.css"
+showcase_css <- "../inst/showcase/www/showcase.css"
 if (file.exists(local_css)) {
   file.copy(local_css, "public/shinyblocks-runtime-override.css", overwrite = TRUE)
+  if (file.exists(showcase_css)) {
+    write(
+      paste0(
+        "\n\n/* Showcase custom overrides appended during build */\n",
+        paste(readLines(showcase_css, warn = FALSE), collapse = "\n")
+      ),
+      file = "public/shinyblocks-runtime-override.css",
+      append = TRUE
+    )
+  }
   cat("Staged local runtime CSS override in public/\n")
 }
 

@@ -5,7 +5,7 @@
   "packageManager": "npm@11.6.2",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "Rscript scripts/generate-previews.R && tsx scripts/generate-changelog.ts",
+    "prebuild": "Rscript scripts/generate-previews.R && tsx scripts/generate-changelog.ts && Rscript scripts/generate-playgrounds.R",
     "build": "next build",
     "start": "next start",
     "preview": "npm run build && node scripts/serve-preview.mjs",
