@@ -1200,7 +1200,7 @@
   padding: 0;
   border: 1px solid var(--primary);
   border-radius: 9999px;
-  background-color: #ffffff;
+  background-color: var(--background);
   box-shadow:
     0 1px 2px 0 color-mix(in oklch, var(--foreground) 5%, transparent),
     0 1px 3px 0 color-mix(in oklch, var(--foreground) 10%, transparent);

@@ -1,0 +1,185 @@
+// Declarative theme-binding registry for the runtime theme-conformance check
+// (check-theme-response.mjs).
+//
+// For each component we declare one or more *bindings*: a stable showcase
+// selector, a computed CSS property, and the theme token that property must be
+// bound to. The runtime check overrides that token (scoped to the section) to a
+// sentinel color and asserts the rendered property changes to the sentinel —
+// proving the component is token-driven (re-colors under dark mode and
+// block_theme() overrides) rather than hardcoded.
+//
+// Every component in RUNTIME_COMPONENT_NAMES (R/runtime.R) plus the R-side
+// composition primitives below MUST have an entry, or the completeness gate
+// fails. Selectors reuse the stable `.sb-parity-*` showcase fixtures.
+//
+// `mode`:
+//   "runtime"      -> behaviourally verified by token override (default).
+//   "static-only"  -> CSS is token-driven (Layer 1 covers it) but the themed
+//                     surface only renders after interaction (overlays). Must
+//                     carry a `reason`. The completeness gate still requires the
+//                     entry so the component is never silently uncovered.
+
+export const THEME_REGISTRY = {
+  // --- Runtime components -------------------------------------------------
+  alert: {
+    section: "alert",
+    bindings: [
+      { selector: ".sb-parity-alert-destructive", property: "color", token: "--destructive" }
+    ]
+  },
+  badge: {
+    section: "badge",
+    bindings: [
+      { selector: ".sb-parity-badge-default", property: "backgroundColor", token: "--primary" },
+      { selector: ".sb-parity-badge-default", property: "color", token: "--primary-foreground" }
+    ]
+  },
+  button: {
+    section: "button",
+    bindings: [
+      { selector: ".sb-parity-button-default[data-slot='button']", property: "backgroundColor", token: "--primary" },
+      { selector: ".sb-parity-button-default[data-slot='button']", property: "color", token: "--primary-foreground" }
+    ]
+  },
+  card: {
+    section: "card",
+    bindings: [
+      { selector: ".sb-parity-card-plain", property: "backgroundColor", token: "--card" }
+    ]
+  },
+  checkbox: {
+    section: "checkbox",
+    bindings: [
+      { selector: ".sb-parity-checkbox-checked [data-slot='checkbox-control']", property: "backgroundColor", token: "--primary" }
+    ]
+  },
+  code: {
+    section: "code",
+    bindings: [
+      { selector: ".sb-parity-code-default", property: "backgroundColor", token: "--muted" }
+    ]
+  },
+  dialog: {
+    section: "dialog",
+    mode: "static-only",
+    reason: "Dialog content (bg --background, border --border) only renders when the overlay is open; CSS is token-driven and covered by the static check."
+  },
+  empty: {
+    section: "empty",
+    bindings: [
+      { selector: ".sb-parity-empty-default", property: "color", token: "--card-foreground" }
+    ]
+  },
+  input: {
+    section: "input",
+    bindings: [
+      { selector: ".sb-parity-input-default", property: "backgroundColor", token: "--background" }
+    ]
+  },
+  popover: {
+    section: "popover",
+    mode: "static-only",
+    reason: "Popover content (bg --popover, border --border) only renders when open; CSS is token-driven and covered by the static check."
+  },
+  "radio-group": {
+    section: "radio-group",
+    bindings: [
+      { selector: ".sb-parity-radio-group-checked .sb-radio-group-button[data-state='checked'] .sb-radio-group-indicator", property: "backgroundColor", token: "--primary" }
+    ]
+  },
+  select: {
+    section: "select",
+    bindings: [
+      { selector: ".sb-parity-select-default [data-slot='select-trigger']", property: "color", token: "--foreground" }
+    ]
+  },
+  separator: {
+    section: "separator",
+    bindings: [
+      { selector: ".sb-parity-separator-horizontal", property: "backgroundColor", token: "--border" }
+    ]
+  },
+  skeleton: {
+    section: "skeleton",
+    bindings: [
+      { selector: ".sb-parity-skeleton-default", property: "backgroundColor", token: "--muted" }
+    ]
+  },
+  slider: {
+    section: "slider",
+    bindings: [
+      { selector: ".sb-parity-slider-default [data-slot='slider-range']", property: "backgroundColor", token: "--primary" }
+    ]
+  },
+  spinner: {
+    section: "spinner",
+    bindings: [
+      { selector: ".sb-parity-spinner-default", property: "color", token: "--foreground" }
+    ]
+  },
+  switch: {
+    section: "switch",
+    bindings: [
+      { selector: ".sb-parity-switch-checked [data-slot='switch-control']", property: "backgroundColor", token: "--primary" }
+    ]
+  },
+  textarea: {
+    section: "textarea",
+    bindings: [
+      { selector: ".sb-parity-textarea-default", property: "backgroundColor", token: "--background" }
+    ]
+  },
+  tooltip: {
+    section: "tooltip",
+    mode: "static-only",
+    reason: "Tooltip content (bg --primary) only renders on hover/focus; CSS is token-driven and covered by the static check."
+  },
+  "value-box": {
+    section: "value-box",
+    bindings: [
+      { selector: ".sb-parity-value-box-revenue", property: "backgroundColor", token: "--card" }
+    ]
+  },
+
+  // --- R-side composition primitives -------------------------------------
+  nav: {
+    section: "nav-item",
+    bindings: [
+      { selector: ".sb-parity-nav-baseline", property: "color", token: "--sidebar-foreground" }
+    ]
+  },
+  sidebar: {
+    section: "layout",
+    bindings: [
+      { selector: ".sb-parity-layout-baseline", property: "color", token: "--foreground" }
+    ]
+  },
+  tabs: {
+    section: "tabs",
+    bindings: [
+      { selector: ".sb-parity-tabs-default", property: "color", token: "--foreground" }
+    ]
+  },
+  field: {
+    section: "field",
+    bindings: [
+      { selector: ".sb-parity-field-default", property: "color", token: "--foreground" }
+    ]
+  },
+  "input-group": {
+    section: "input-group",
+    bindings: [
+      { selector: ".sb-parity-input-group-fixtures", property: "color", token: "--foreground" }
+    ]
+  }
+};
+
+// R-side primitives that have no entry in RUNTIME_COMPONENT_NAMES but must still
+// be covered by the theme framework (and therefore present in THEME_REGISTRY).
+export const RSIDE_PRIMITIVES = [
+  "nav",
+  "sidebar",
+  "tabs",
+  "field",
+  "input-group"
+];

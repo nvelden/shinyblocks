@@ -17,12 +17,16 @@ register_theme_showcase <- function(input, output, session) {
     accent <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
     
     htmltools::tagList(
+      # Scope the override to this preview only so the demo does not leak
+      # its token colors into the rest of the gallery.
       block_theme(
         radius = radius,
         primary = primary,
-        accent = accent
+        accent = accent,
+        scope = ".sb-theme-demo-scope"
       ),
       htmltools::div(
+        class = "sb-theme-demo-scope",
         style = "display: flex; flex-direction: column; gap: 1rem; width: 100%;",
         htmltools::div(
           style = "display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;",

@@ -13,6 +13,9 @@
     "test:runtime": "node tools/runtime-smoke.mjs",
     "test:runtime-shiny": "node tools/runtime-shiny-smoke.mjs",
     "test:showcase": "node tools/showcase-smoke.mjs",
+    "test:themes": "npm run test:themes-static && npm run test:themes-runtime",
+    "test:themes-static": "node tools/theme/check-token-usage.mjs",
+    "test:themes-runtime": "node tools/theme/check-theme-response.mjs",
     "shadcn:info": "npx shadcn@latest info --json",
     "shadcn:docs": "npx shadcn@latest docs"
   },

@@ -90,5 +90,19 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_radio_group_api_table")
+  shiny::tableOutput("showcase_radio_group_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instance used by tools/parity/ and tools/theme/. Do not remove."
+  ),
+  block_radio_group(
+    "sb_parity_radio_group_checked",
+    choices = c("One" = "one", "Two" = "two"),
+    selected = "one",
+    class = "sb-parity-radio-group-checked"
+  )
 )

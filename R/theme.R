@@ -1,12 +1,22 @@
-#' Create page-scoped theme overrides
+#' Create theme overrides
+#'
+#' Emits a scoped `<style>` block that overrides shadcn token variables.
+#' By default the overrides apply to the whole page (every `.sb-app` and
+#' runtime root). Pass `scope` to confine the overrides to a single
+#' subtree, which is essential when several differently-themed regions
+#' share one page (for example a component gallery) so a local override
+#' does not leak into the rest of the app.
 #'
 #' @param ... Named CSS token overrides, such as `primary`,
 #'   `background`, or `radius`.
+#' @param scope Optional CSS selector. When supplied, overrides apply
+#'   only to elements matching `scope` and the runtime roots inside it,
+#'   instead of the whole page. Defaults to `NULL` (page-wide).
 #'
 #' @return An `htmltools` tag.
 #' @family theme
 #' @export
-block_theme <- function(...) {
+block_theme <- function(..., scope = NULL) {
   overrides <- list(...)
   names <- names(overrides)
 
@@ -25,14 +35,20 @@ block_theme <- function(...) {
     )
   }
 
+  if (!is.null(scope) && (!is.character(scope) || length(scope) != 1 || !nzchar(scope))) {
+    stop("`scope` must be NULL or a single non-empty CSS selector.", call. = FALSE)
+  }
+
   declarations <- vapply(names, function(name) {
     sprintf("--%s: %s;", name, overrides[[name]])
   }, character(1))
   decls <- paste(declarations, collapse = "")
+
+  root <- if (is.null(scope)) ".sb-app" else scope
   theme_css <- paste0(
-    ".sb-app{", decls, "}",
-    ".sb-app [data-shinyblocks-root],",
-    ".sb-app [data-shinyblocks-portal-root]{", decls, "}"
+    root, "{", decls, "}",
+    root, " [data-shinyblocks-root],",
+    root, " [data-shinyblocks-portal-root]{", decls, "}"
   )
 
   attach_shinyblocks_deps(

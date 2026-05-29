@@ -802,6 +802,37 @@ test_that("block_theme validates named and known tokens", {
   })
 })
 
+test_that("block_theme defaults to page-wide selectors", {
+  css <- as.character(block_theme(primary = "red"))
+  expect_true(grepl(".sb-app{", css, fixed = TRUE))
+  expect_true(grepl(".sb-app [data-shinyblocks-root]", css, fixed = TRUE))
+  expect_true(grepl(
+    ".sb-app [data-shinyblocks-portal-root]",
+    css,
+    fixed = TRUE
+  ))
+})
+
+test_that("block_theme confines overrides to scope when supplied", {
+  css <- as.character(block_theme(primary = "red", scope = ".demo"))
+  expect_true(grepl(".demo{--primary: red;}", css, fixed = TRUE))
+  expect_true(grepl(".demo [data-shinyblocks-root]", css, fixed = TRUE))
+  expect_true(grepl(".demo [data-shinyblocks-portal-root]", css, fixed = TRUE))
+  # The page-wide selector must NOT appear when a scope is given.
+  expect_false(grepl(".sb-app{", css, fixed = TRUE))
+})
+
+test_that("block_theme rejects an invalid scope", {
+  expect_error(
+    block_theme(primary = "red", scope = c(".a", ".b")),
+    "single non-empty CSS selector"
+  )
+  expect_error(
+    block_theme(primary = "red", scope = ""),
+    "single non-empty CSS selector"
+  )
+})
+
 test_that("update_block_theme sends a custom message", {
   message <- NULL
   session <- list(

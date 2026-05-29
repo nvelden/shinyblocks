@@ -63,7 +63,8 @@ htmltools::tagList(
     style = "display: flex; gap: 1rem; align-items: center;",
     block_theme(
       accent = "oklch(0.3 0.03 260)",
-      radius = "0.5rem"
+      radius = "0.5rem",
+      scope = ".sb-parity-theme-baseline"
     ),
     block_dark_mode_toggle(),
     block_button("Primary Button (Theme)", icon = "sun"),

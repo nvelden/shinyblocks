@@ -65,5 +65,21 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_input_api_table")
+  shiny::tableOutput("showcase_input_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instance used by tools/parity/ and tools/theme/. Do not remove."
+  ),
+  htmltools::div(
+    style = "max-width: 320px;",
+    block_input(
+      "sb_parity_input_default",
+      value = "Parity",
+      class = "sb-parity-input-default"
+    )
+  )
 )

@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links legacy-audit parity-install parity-build-css parity-setup parity parity-stop \
+	doc-links legacy-audit theme-static theme-test parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
 	preview-shinylive quarto-setup gallery
 
@@ -129,9 +129,19 @@ doc-links:
 legacy-audit:
 	$(R) tools/check-legacy-audit.R
 
+# Layer 1 of the theme-conformance framework: static, no browser. Fails when
+# component CSS hardcodes a color instead of a theme token.
+theme-static:
+	npm run test:themes-static
+
+# Layers 2 + 3: behavioural token-override check + completeness gate. Requires
+# the local showcase running (make showcase) on port 4321.
+theme-test:
+	npm run test:themes
+
 # Quality Gate runs the full release-readiness check sequence. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.
-gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check budget doc-links legacy-audit parity-ci
+gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check budget doc-links legacy-audit theme-static parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"

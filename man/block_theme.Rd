@@ -2,19 +2,28 @@
 % Please edit documentation in R/theme.R
 \name{block_theme}
 \alias{block_theme}
-\title{Create page-scoped theme overrides}
+\title{Create theme overrides}
 \usage{
-block_theme(...)
+block_theme(..., scope = NULL)
 }
 \arguments{
 \item{...}{Named CSS token overrides, such as \code{primary},
 \code{background}, or \code{radius}.}
+
+\item{scope}{Optional CSS selector. When supplied, overrides apply
+only to elements matching \code{scope} and the runtime roots inside it,
+instead of the whole page. Defaults to \code{NULL} (page-wide).}
 }
 \value{
 An \code{htmltools} tag.
 }
 \description{
-Create page-scoped theme overrides
+Emits a scoped \verb{<style>} block that overrides shadcn token variables.
+By default the overrides apply to the whole page (every \code{.sb-app} and
+runtime root). Pass \code{scope} to confine the overrides to a single
+subtree, which is essential when several differently-themed regions
+share one page (for example a component gallery) so a local override
+does not leak into the rest of the app.
 }
 \seealso{
 Other theme: 
