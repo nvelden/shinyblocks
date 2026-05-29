@@ -331,10 +331,37 @@
     });
   }
 
+  // When the app is embedded in a host page (e.g. the docs site loads it in a
+  // Shinylive iframe), let the host drive light/dark mode. The app announces
+  // readiness to the top window and applies any theme the host posts back. This
+  // works across the Shinylive `srcdoc` app frame, which the host cannot reach
+  // by setting `data-theme` directly.
+  function wireEmbeddedThemeBridge() {
+    if (window.shinyblocksThemeBridgeWired) return;
+    if (window.top === window.self) return; // not embedded
+    window.shinyblocksThemeBridgeWired = true;
+
+    window.addEventListener("message", function (event) {
+      var data = event.data;
+      if (!data || data.type !== "shinyblocks:set-theme") return;
+      applyTheme(data.mode || "system");
+    });
+
+    var announce = function (target) {
+      if (!target) return;
+      try {
+        target.postMessage({ type: "shinyblocks:ready" }, "*");
+      } catch (e) {}
+    };
+    announce(window.top);
+    if (window.parent !== window.top) announce(window.parent);
+  }
+
   function init() {
     exposeThemeApi();
     applyTheme(currentThemeMode());
     wireThemeToggleEvents();
+    wireEmbeddedThemeBridge();
     wireGlobalSidebarHandlers();
     tabs().forEach(wireTabs);
     sidebarPages().forEach(wirePage);
