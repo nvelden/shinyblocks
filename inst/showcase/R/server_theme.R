@@ -10,46 +10,113 @@ register_theme_showcase <- function(input, output, session) {
     update_block_theme(session, mode = "system")
   })
 
-  # Dynamic preview UI (renders style overrides + some styled components)
+  # Resolve the active token overrides from the controls, falling back to the
+  # shadcn neutral defaults.
+  theme_overrides <- shiny::reactive({
+    list(
+      radius = input$showcase_theme_doc_radius %||% "0.5rem",
+      primary = input$showcase_theme_doc_primary %||% "oklch(0.205 0 0)",
+      secondary = input$showcase_theme_doc_secondary %||% "oklch(0.97 0 0)",
+      accent = input$showcase_theme_doc_accent %||% "oklch(0.97 0 0)",
+      destructive = input$showcase_theme_doc_destructive %||% "oklch(0.577 0.245 27.325)",
+      muted = input$showcase_theme_doc_muted %||% "oklch(0.97 0 0)",
+      border = input$showcase_theme_doc_border %||% "oklch(0.922 0 0)",
+      ring = input$showcase_theme_doc_ring %||% "oklch(0.708 0 0)"
+    )
+  })
+
+  # Dynamic preview UI (renders style overrides + components covering every
+  # exposed token).
   output$showcase_theme_preview_ui <- shiny::renderUI({
-    radius <- input$showcase_theme_doc_radius %||% "0.5rem"
-    primary <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
-    
+    o <- theme_overrides()
+
+    swatch_style <- function(...) paste(
+      "display: flex; flex-direction: column; gap: 0.35rem;", ...
+    )
+    label_style <- "font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground);"
+
     htmltools::tagList(
       # Scope the override to this preview only so the demo does not leak
       # its token colors into the rest of the gallery.
       block_theme(
-        radius = radius,
-        primary = primary,
-        accent = accent,
+        radius = o$radius,
+        primary = o$primary,
+        secondary = o$secondary,
+        accent = o$accent,
+        destructive = o$destructive,
+        muted = o$muted,
+        border = o$border,
+        ring = o$ring,
         scope = ".sb-theme-demo-scope"
       ),
       htmltools::div(
         class = "sb-theme-demo-scope",
-        style = "display: flex; flex-direction: column; gap: 1rem; width: 100%;",
+        style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
+        # Buttons exercise --primary, --secondary, --destructive, and --border.
         htmltools::div(
-          style = "display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;",
-          block_button("Primary Button", variant = "default"),
-          block_button("Secondary Button", variant = "secondary"),
-          block_button("Outline Button", variant = "outline")
+          style = swatch_style(),
+          htmltools::span(style = label_style, "Buttons — primary / secondary / destructive / outline / ghost"),
+          htmltools::div(
+            style = "display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;",
+            block_button("Primary", variant = "default"),
+            block_button("Secondary", variant = "secondary"),
+            block_button("Destructive", variant = "destructive"),
+            block_button("Outline", variant = "outline"),
+            block_button("Ghost", variant = "ghost")
+          )
         ),
+        # Badges exercise --primary, --secondary, --destructive.
         htmltools::div(
-          style = paste(
-            "padding: 1rem;",
-            "background: var(--accent); color: var(--accent-foreground);",
-            "border: 1px solid color-mix(in oklab, var(--accent) 70%, var(--foreground));",
-            "border-radius: calc(var(--radius) * 1.2);",
-            "font-size: 0.875rem; font-weight: 500;",
-            "display: flex; align-items: center; justify-content: space-between; gap: 1rem;"
+          style = swatch_style(),
+          htmltools::span(style = label_style, "Badges"),
+          htmltools::div(
+            style = "display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;",
+            block_badge("Primary", variant = "default"),
+            block_badge("Secondary", variant = "secondary"),
+            block_badge("Outline", variant = "outline"),
+            block_badge("Destructive", variant = "destructive")
+          )
+        ),
+        # Surfaces exercise --accent, --muted, --border, --ring.
+        htmltools::div(
+          style = "display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;",
+          htmltools::div(
+            style = paste(
+              "padding: 0.85rem; font-size: 0.8rem; font-weight: 500;",
+              "background: var(--accent); color: var(--accent-foreground);",
+              "border-radius: var(--radius);"
+            ),
+            "Accent surface (--accent)"
           ),
-          htmltools::span("Accent surface (uses --accent token)"),
-          block_badge("Token preview", variant = "secondary")
+          htmltools::div(
+            style = paste(
+              "padding: 0.85rem; font-size: 0.8rem; font-weight: 500;",
+              "background: var(--muted); color: var(--muted-foreground);",
+              "border-radius: var(--radius);"
+            ),
+            "Muted surface (--muted)"
+          ),
+          htmltools::div(
+            style = paste(
+              "padding: 0.85rem; font-size: 0.8rem; font-weight: 500;",
+              "border: 1px solid var(--border); border-radius: var(--radius);"
+            ),
+            "Border (--border)"
+          ),
+          htmltools::div(
+            style = paste(
+              "padding: 0.85rem; font-size: 0.8rem; font-weight: 500;",
+              "border: 1px solid var(--ring); border-radius: var(--radius);",
+              "box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);"
+            ),
+            "Focus ring (--ring)"
+          )
         ),
+        # Card exercises --card, --card-foreground, --border, --radius.
         block_card(
           title = "Dynamic Card",
-          description = "Check out the rounded corners and active color tokens!",
-          "This surface and the buttons above immediately inherit the chosen radius, primary, and accent overrides."
+          description = "Rounded corners and surface colors follow the tokens above.",
+          "Every control on the left maps to a block_theme() token; the preview reflects it live."
         )
       )
     )
@@ -62,17 +129,13 @@ register_theme_showcase <- function(input, output, session) {
 
   # Dynamic code snippet rendering
   output$showcase_theme_preview_code <- showcase_render_code({
-    radius_val <- input$showcase_theme_doc_radius %||% "0.5rem"
-    primary_val <- input$showcase_theme_doc_primary %||% "hsl(221.2, 83.2%, 53.3%)"
-    accent_val <- input$showcase_theme_doc_accent %||% "hsl(214, 95%, 93%)"
-
-    paste0(
-      "block_theme(\n",
-      "  radius = \"", radius_val, "\",\n",
-      "  primary = \"", primary_val, "\",\n",
-      "  accent = \"", accent_val, "\"\n",
-      ")"
+    o <- theme_overrides()
+    args <- vapply(
+      names(o),
+      function(name) sprintf("  %s = \"%s\"", name, o[[name]]),
+      character(1)
     )
+    paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
   })
   shiny::outputOptions(
     output,
