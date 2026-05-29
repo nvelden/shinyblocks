@@ -69,6 +69,21 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Scoped resets to shield elements from default/Bootstrap blue outline & checked states */
+  .sb-app :where(input, select, textarea, button, a) {
+    accent-color: var(--primary) !important;
+  }
+
+  .sb-app :where(input, select, textarea, button, a):focus {
+    outline: none !important;
+  }
+
+  .sb-app :where(input, select, textarea, button, a):focus-visible {
+    outline: none !important;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
 }
 
 /* Component layer.
@@ -145,7 +160,7 @@
   }
 
   .sb-nav-item.is-selected {
-    @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;
+    @apply bg-sidebar-accent text-sidebar-accent-foreground font-semibold;
   }
 
   .sb-sidebar-toggle,

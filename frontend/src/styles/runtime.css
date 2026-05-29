@@ -60,6 +60,44 @@
   --ring: oklch(43.9% 0 0);
 }
 
+/* Scoped element resets and accent-color overrides to prevent Bootstrap/default blue leaks and focus borders */
+[data-shinyblocks-root] input,
+[data-shinyblocks-root] select,
+[data-shinyblocks-root] textarea,
+[data-shinyblocks-portal-root] input,
+[data-shinyblocks-portal-root] select,
+[data-shinyblocks-portal-root] textarea {
+  accent-color: var(--primary) !important;
+}
+
+[data-shinyblocks-root] input:focus,
+[data-shinyblocks-root] select:focus,
+[data-shinyblocks-root] textarea:focus,
+[data-shinyblocks-root] button:focus,
+[data-shinyblocks-root] a:focus,
+[data-shinyblocks-portal-root] input:focus,
+[data-shinyblocks-portal-root] select:focus,
+[data-shinyblocks-portal-root] textarea:focus,
+[data-shinyblocks-portal-root] button:focus,
+[data-shinyblocks-portal-root] a:focus {
+  outline: none !important;
+}
+
+[data-shinyblocks-root] input:focus-visible,
+[data-shinyblocks-root] select:focus-visible,
+[data-shinyblocks-root] textarea:focus-visible,
+[data-shinyblocks-root] button:focus-visible,
+[data-shinyblocks-root] a:focus-visible,
+[data-shinyblocks-portal-root] input:focus-visible,
+[data-shinyblocks-portal-root] select:focus-visible,
+[data-shinyblocks-portal-root] textarea:focus-visible,
+[data-shinyblocks-portal-root] button:focus-visible,
+[data-shinyblocks-portal-root] a:focus-visible {
+  outline: none !important;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
 [data-shinyblocks-root][data-shinyblocks-runtime="true"][data-sb-mounted="true"] {
   --shinyblocks-runtime-mounted: 1;
 }
@@ -792,7 +830,7 @@
 }
 
 [data-shinyblocks-root] .sb-checkbox-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-checkbox-button {
@@ -897,7 +935,7 @@
 }
 
 [data-shinyblocks-root] .sb-switch-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-switch-button {
@@ -1010,7 +1048,7 @@
 }
 
 [data-shinyblocks-root] .sb-textarea-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-textarea-control {
@@ -1068,7 +1106,7 @@
 }
 
 [data-shinyblocks-root] .sb-input-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-input-control {
@@ -1125,7 +1163,7 @@
 }
 
 [data-shinyblocks-root] .sb-slider-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-slider[data-disabled="true"] {
@@ -1198,7 +1236,7 @@
 }
 
 [data-shinyblocks-root] .sb-radio-group-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-radio-group-control {
@@ -1300,7 +1338,7 @@
 }
 
 [data-shinyblocks-root] .sb-select-native {
-  display: none;
+  display: none !important;
 }
 
 [data-shinyblocks-root] .sb-select-trigger {
