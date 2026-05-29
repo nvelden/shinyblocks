@@ -972,7 +972,7 @@ block_skeleton <- function(class = NULL, ...) {
 
 #' Create a spinner
 #'
-#' @param label Accessible label.
+#' @param label Accessible `aria-label` announced by assistive technology.
 #' @param size Visual size.
 #' @param color Semantic color.
 #' @param class Additional classes.

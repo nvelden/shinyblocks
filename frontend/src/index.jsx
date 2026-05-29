@@ -558,10 +558,16 @@ function Spinner({ payload }) {
   const color = props.color || "default";
 
   return (
-    <span
+    <svg
       data-slot="spinner"
       data-size={size}
       data-color={color}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={classNames(
         "sb-spinner",
         `sb-spinner-size-${size}`,
@@ -571,7 +577,9 @@ function Spinner({ payload }) {
       role="status"
       aria-label={props.label || "Loading"}
       style={payload.style}
-    />
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
   );
 }
 

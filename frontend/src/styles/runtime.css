@@ -434,35 +434,35 @@
 }
 
 [data-shinyblocks-root] .sb-spinner {
-  display: inline-flex;
+  display: inline-block;
   width: 1rem;
   height: 1rem;
-  border: 2px solid color-mix(in oklab, var(--muted-foreground) 30%, transparent);
-  border-top-color: var(--foreground);
-  border-radius: 9999px;
+  color: var(--foreground);
   animation: shinyblocks-spin 1s linear infinite;
 }
 
 [data-shinyblocks-root] .sb-spinner-size-sm {
   width: 0.875rem;
   height: 0.875rem;
-  border-width: 1.5px;
 }
 
 [data-shinyblocks-root] .sb-spinner-size-lg {
   width: 2rem;
   height: 2rem;
-  border-width: 3px;
 }
 
 [data-shinyblocks-root] .sb-spinner-color-muted {
-  border-color: color-mix(in oklab, var(--muted-foreground) 25%, transparent);
-  border-top-color: var(--muted-foreground);
+  color: var(--muted-foreground);
 }
 
 [data-shinyblocks-root] .sb-spinner-color-destructive {
-  border-color: color-mix(in oklab, var(--destructive) 25%, transparent);
-  border-top-color: var(--destructive);
+  color: var(--destructive);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-shinyblocks-root] .sb-spinner {
+    animation-duration: 1.8s;
+  }
 }
 
 [data-shinyblocks-root] .sb-skeleton {

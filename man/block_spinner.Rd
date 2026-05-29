@@ -13,7 +13,7 @@ block_spinner(
 )
 }
 \arguments{
-\item{label}{Accessible label.}
+\item{label}{Accessible \code{aria-label} announced by assistive technology.}
 
 \item{size}{Visual size.}
 

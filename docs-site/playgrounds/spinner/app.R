@@ -73,8 +73,11 @@ ui <- block_page(
             "Accessibility"
           ),
           block_field(
-            block_field_label("label", `for` = "showcase_spinner_doc_label"),
+            block_field_label("aria-label", `for` = "showcase_spinner_doc_label"),
             block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1, resize = "none")
+          ),
+          block_field_description(
+            "Screen-reader label only; it does not render visible text."
           )
         ),
         htmltools::div(
