@@ -92,15 +92,11 @@ ui <- block_page(
         class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
         
         # Left Column: Controls Panel
-        htmltools::div(
-          class = "showcase-playground__controls", style = paste(
-          "flex: 1; min-width: 280px; max-width: 320px;",
-            "border: 1px solid var(--border); border-radius: 0.75rem;",
-            "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
-            "background: color-mix(in oklab, var(--muted) 40%, transparent);"
-          ),
-          
-          # Content Controls Group
+        block_card(
+                  title = "Controls",
+                  class = "showcase-playground__controls",
+                  style = "flex: 1; min-width: 280px; max-width: 320px;",
+# Content Controls Group
           htmltools::div(
             style = "display: flex; flex-direction: column; gap: 0.75rem;",
             htmltools::tags$h4(

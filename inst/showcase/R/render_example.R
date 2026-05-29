@@ -36,14 +36,10 @@ showcase_playground_layout <- function(
     `aria-label` = "Interactive Playground",
     class = "showcase-playground",
     style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-    htmltools::tags$div(
+    block_card(
+      title = "Controls",
       class = "showcase-playground__controls",
-      style = paste(
-        "flex: 1; min-width: 280px; max-width: 320px;",
-        "border: 1px solid var(--border); border-radius: 0.75rem;",
-        "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
-        "background: color-mix(in oklab, var(--muted) 40%, transparent);"
-      ),
+      style = "flex: 1; min-width: 280px; max-width: 320px;",
       controls
     ),
     htmltools::tags$div(

@@ -57,9 +57,11 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      htmltools::div(
-        class = "showcase-playground__controls", style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
-        control_group(
+      block_card(
+                title = "Controls",
+                class = "showcase-playground__controls",
+                style = "flex: 1; min-width: 280px; max-width: 320px;",
+control_group(
           "Content", first = TRUE,
           block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")),
           block_field(block_field_label("description", `for` = "showcase_dialog_doc_description"), block_textarea("showcase_dialog_doc_description", value = "This cannot be undone.", rows = 2, resize = "none")),

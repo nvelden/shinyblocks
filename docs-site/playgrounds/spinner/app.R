@@ -59,14 +59,11 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      htmltools::div(
-        class = "showcase-playground__controls", style = paste(
-          "flex: 1; min-width: 280px; max-width: 320px;",
-          "border: 1px solid var(--border); border-radius: 0.75rem;",
-          "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem;",
-          "background: color-mix(in oklab, var(--muted) 40%, transparent);"
-        ),
-        htmltools::div(
+      block_card(
+                title = "Controls",
+                class = "showcase-playground__controls",
+                style = "flex: 1; min-width: 280px; max-width: 320px;",
+htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
