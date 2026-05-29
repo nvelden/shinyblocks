@@ -104,7 +104,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("code", `for` = "showcase_code_doc_code"),
-            block_textarea("showcase_code_doc_code", value = default_code, rows = 6)
+            block_textarea("showcase_code_doc_code", value = default_code, rows = 6, resize = "none")
           ),
           block_field(
             block_field_label("language", `for` = "showcase_code_doc_language"),
@@ -152,7 +152,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_code_doc_style"),
-            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;")
+            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;", resize = "none")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_code_doc_class"),

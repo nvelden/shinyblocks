@@ -74,15 +74,15 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("title", `for` = "showcase_value_box_doc_title"),
-            block_textarea("showcase_value_box_doc_title", value = "Net Revenue", rows = 1)
+            block_textarea("showcase_value_box_doc_title", value = "Net Revenue", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("value", `for` = "showcase_value_box_doc_value"),
-            block_textarea("showcase_value_box_doc_value", value = "$45,231.89", rows = 1)
+            block_textarea("showcase_value_box_doc_value", value = "$45,231.89", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_value_box_doc_desc"),
-            block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 2)
+            block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 2, resize = "none")
           )
         ),
         htmltools::div(
@@ -124,7 +124,8 @@ ui <- block_page(
               "showcase_value_box_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., min-width: 18rem;"
+              placeholder = "e.g., min-width: 18rem;",
+              resize = "none"
             )
           )
         )

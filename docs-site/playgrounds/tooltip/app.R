@@ -66,11 +66,11 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("trigger label", `for` = "showcase_tooltip_doc_trigger"),
-            block_textarea("showcase_tooltip_doc_trigger", value = "Hover me", rows = 1)
+            block_textarea("showcase_tooltip_doc_trigger", value = "Hover me", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("content", `for` = "showcase_tooltip_doc_content"),
-            block_textarea("showcase_tooltip_doc_content", value = "Tooltip details go here.", rows = 2)
+            block_textarea("showcase_tooltip_doc_content", value = "Tooltip details go here.", rows = 2, resize = "none")
           ),
           block_field(
             block_field_label("delay_duration", `for` = "showcase_tooltip_doc_delay"),
@@ -98,7 +98,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_tooltip_doc_style"),
-            block_textarea("showcase_tooltip_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;")
+            block_textarea("showcase_tooltip_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_tooltip_doc_class"),

@@ -74,11 +74,11 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("title", `for` = "showcase_empty_doc_title"),
-            block_textarea("showcase_empty_doc_title", value = "No projects found", rows = 1)
+            block_textarea("showcase_empty_doc_title", value = "No projects found", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_empty_doc_description"),
-            block_textarea("showcase_empty_doc_description", value = "Get started by creating a new repository.", rows = 2)
+            block_textarea("showcase_empty_doc_description", value = "Get started by creating a new repository.", rows = 2, resize = "none")
           )
         ),
         htmltools::div(

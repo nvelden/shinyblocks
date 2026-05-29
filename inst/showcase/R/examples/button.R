@@ -35,7 +35,7 @@ htmltools::tagList(
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Content"),
             block_field(
               block_field_label("label", `for` = "showcase_button_doc_label"),
-              block_textarea("showcase_button_doc_label", value = "Continue", rows = 1)
+              block_textarea("showcase_button_doc_label", value = "Continue", rows = 1, resize = "none")
             ),
             block_field(
               block_field_label("variant", `for` = "showcase_button_doc_variant"),
@@ -86,7 +86,7 @@ htmltools::tagList(
             ),
             block_field(
               block_field_label("style", `for` = "showcase_button_doc_style"),
-              block_textarea("showcase_button_doc_style", value = "", rows = 1, placeholder = "e.g., min-width: 10rem;")
+              block_textarea("showcase_button_doc_style", value = "", rows = 1, placeholder = "e.g., min-width: 10rem;", resize = "none")
             ),
             block_field(
               block_field_label("class", `for` = "showcase_button_doc_class"),

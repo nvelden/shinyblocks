@@ -109,19 +109,20 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("label", `for` = "showcase_textarea_doc_label"),
-            block_textarea("showcase_textarea_doc_label", value = "Notes", rows = 1)
+            block_textarea("showcase_textarea_doc_label", value = "Notes", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("placeholder", `for` = "showcase_textarea_doc_placeholder"),
             block_textarea(
               "showcase_textarea_doc_placeholder",
               value = "Add release notes here...",
-              rows = 1
+              rows = 1,
+              resize = "none"
             )
           ),
           block_field(
             block_field_label("initial value", `for` = "showcase_textarea_doc_value"),
-            block_textarea("showcase_textarea_doc_value", value = "", rows = 2)
+            block_textarea("showcase_textarea_doc_value", value = "", rows = 2, resize = "none")
           )
         ),
         htmltools::div(
@@ -164,7 +165,8 @@ ui <- block_page(
               "showcase_textarea_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., font-family: var(--font-mono);"
+              placeholder = "e.g., font-family: var(--font-mono);",
+              resize = "none"
             )
           ),
           block_field(

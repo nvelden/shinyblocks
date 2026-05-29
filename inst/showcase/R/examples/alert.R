@@ -5,14 +5,15 @@ htmltools::tagList(
           "Content", first = TRUE,
           block_field(
             block_field_label("title", `for` = "showcase_alert_doc_title"),
-            block_textarea("showcase_alert_doc_title", value = "Heads up", rows = 1)
+            block_textarea("showcase_alert_doc_title", value = "Heads up", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_alert_doc_description"),
             block_textarea(
               "showcase_alert_doc_description",
               value = "shinyblocks alerts surface important inline messages.",
-              rows = 3
+              rows = 3,
+              resize = "none"
             )
           ),
           block_field(
@@ -65,7 +66,8 @@ htmltools::tagList(
               "showcase_alert_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., border-style: dashed;"
+              placeholder = "e.g., border-style: dashed;",
+              resize = "none"
             )
           )
         )

@@ -5,7 +5,7 @@ htmltools::tagList(
           "Accessibility", first = TRUE,
           block_field(
             block_field_label("label", `for` = "showcase_spinner_doc_label"),
-            block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1)
+            block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1, resize = "none")
           )
         ),
         showcase_controls_group(

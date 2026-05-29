@@ -7,14 +7,15 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("trigger label", `for` = "showcase_popover_doc_trigger"),
-          block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1)
+          block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1, resize = "none")
         ),
         block_field(
           block_field_label("body", `for` = "showcase_popover_doc_body"),
           block_textarea(
             "showcase_popover_doc_body",
             value = "Place additional details, a small form, or contextual actions inside the popover.",
-            rows = 3
+            rows = 3,
+            resize = "none"
           )
         )
       ),
@@ -47,7 +48,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("style", `for` = "showcase_popover_doc_style"),
-          block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;")
+          block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_popover_doc_class"),

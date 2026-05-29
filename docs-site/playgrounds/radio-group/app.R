@@ -118,7 +118,8 @@ ui <- block_page(
             block_textarea(
               "showcase_radio_group_doc_choices",
               value = "All|all\nMentions|mentions\nNone|none",
-              rows = 3
+              rows = 3,
+              resize = "none"
             )
           ),
           block_field(
@@ -162,7 +163,8 @@ ui <- block_page(
               "showcase_radio_group_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., padding: 0.5rem;"
+              placeholder = "e.g., padding: 0.5rem;",
+              resize = "none"
             )
           ),
           block_field(

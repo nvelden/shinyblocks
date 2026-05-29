@@ -154,7 +154,8 @@ ui <- block_page(
                 "showcase_input_doc_style",
                 value = "",
                 rows = 1,
-                placeholder = "e.g., font-family: var(--font-mono);"
+                placeholder = "e.g., font-family: var(--font-mono);",
+                resize = "none"
               )
             ),
             block_field(

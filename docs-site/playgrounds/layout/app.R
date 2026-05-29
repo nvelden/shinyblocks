@@ -66,11 +66,11 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("header title", `for` = "showcase_layout_doc_title"),
-            block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1)
+            block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
-            block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1)
+            block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
@@ -78,7 +78,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
-            block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1)
+            block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
           )
         ),
         htmltools::div(

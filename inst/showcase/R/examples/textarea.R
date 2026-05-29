@@ -40,7 +40,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_textarea_doc_label",
                 value = "Notes",
-                rows = 1
+                rows = 1,
+                resize = "none"
               )
             ),
             block_field(
@@ -48,7 +49,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_textarea_doc_placeholder",
                 value = "Add release notes here…",
-                rows = 1
+                rows = 1,
+                resize = "none"
               )
             ),
             block_field(
@@ -56,7 +58,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_textarea_doc_value",
                 value = "",
-                rows = 3
+                rows = 3,
+                resize = "none"
               )
             )
           ),
@@ -70,7 +73,8 @@ htmltools::tagList(
                 block_textarea(
                   "showcase_textarea_doc_rows",
                   value = "3",
-                  rows = 1
+                  rows = 1,
+                  resize = "none"
                 )
               ),
               block_field(
@@ -113,7 +117,8 @@ htmltools::tagList(
                 "showcase_textarea_doc_style",
                 value = "",
                 rows = 1,
-                placeholder = "e.g., font-family: var(--font-mono);"
+                placeholder = "e.g., font-family: var(--font-mono);",
+                resize = "none"
               )
             ),
             block_field(

@@ -127,7 +127,7 @@ ui <- block_page(
             ),
             block_field(
               block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
-              block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1)
+              block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1, resize = "none")
             )
           ),
           
@@ -166,7 +166,7 @@ ui <- block_page(
             ),
             block_field(
               block_field_label("width", `for` = "showcase_select_doc_width"),
-              block_textarea("showcase_select_doc_width", value = "100%", rows = 1)
+              block_textarea("showcase_select_doc_width", value = "100%", rows = 1, resize = "none")
             ),
             block_field(
               block_field_label("style", `for` = "showcase_select_doc_style"),
@@ -174,7 +174,8 @@ ui <- block_page(
                 "showcase_select_doc_style",
                 value = "",
                 rows = 1,
-                placeholder = "e.g., border: 2px dashed red;"
+                placeholder = "e.g., border: 2px dashed red;",
+                resize = "none"
               )
             ),
             block_field(

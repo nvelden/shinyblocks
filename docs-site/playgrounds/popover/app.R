@@ -55,8 +55,8 @@ ui <- block_page(
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
           htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Content"),
-          block_field(block_field_label("trigger label", `for` = "showcase_popover_doc_trigger"), block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1)),
-          block_field(block_field_label("body", `for` = "showcase_popover_doc_body"), block_textarea("showcase_popover_doc_body", value = "Place additional details, a small form, or contextual actions inside the popover.", rows = 3))
+          block_field(block_field_label("trigger label", `for` = "showcase_popover_doc_trigger"), block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1, resize = "none")),
+          block_field(block_field_label("body", `for` = "showcase_popover_doc_body"), block_textarea("showcase_popover_doc_body", value = "Place additional details, a small form, or contextual actions inside the popover.", rows = 3, resize = "none"))
         ),
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
@@ -79,7 +79,7 @@ ui <- block_page(
           htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Styling"),
           block_field(block_field_label("side", `for` = "showcase_popover_doc_side"), block_select("showcase_popover_doc_side", choices = c("bottom", "top", "left", "right"), selected = "bottom", size = "sm")),
           block_field(block_field_label("align", `for` = "showcase_popover_doc_align"), block_select("showcase_popover_doc_align", choices = c("center", "start", "end"), selected = "center", size = "sm")),
-          block_field(block_field_label("style", `for` = "showcase_popover_doc_style"), block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;")),
+          block_field(block_field_label("style", `for` = "showcase_popover_doc_style"), block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
           block_field(block_field_label("class", `for` = "showcase_popover_doc_class"), block_checkbox("showcase_popover_doc_class", "Use custom dashed-border class", value = FALSE))
         )
       ),

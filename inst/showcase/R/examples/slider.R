@@ -78,7 +78,8 @@ htmltools::tagList(
             "showcase_slider_doc_style",
             value = "",
             rows = 1,
-            placeholder = "e.g., max-width: 20rem;"
+            placeholder = "e.g., max-width: 20rem;",
+            resize = "none"
           )
         ),
         block_field(

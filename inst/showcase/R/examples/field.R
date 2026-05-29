@@ -38,7 +38,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_legend",
                 value = "Account Details",
-                rows = 1
+                rows = 1,
+                resize = "none"
               )
             ),
             block_field(
@@ -46,7 +47,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_fname_label",
                 value = "First name",
-                rows = 1
+                rows = 1,
+                resize = "none"
               )
             ),
             block_field(
@@ -54,7 +56,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_fname_desc",
                 value = "Enter your primary name.",
-                rows = 2
+                rows = 2,
+                resize = "none"
               )
             )
           ),
@@ -68,7 +71,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_email_label",
                 value = "Email address",
-                rows = 1
+                rows = 1,
+                resize = "none"
               )
             ),
             block_field(
@@ -76,7 +80,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_email_desc",
                 value = "We will never share your email address with anyone.",
-                rows = 2
+                rows = 2,
+                resize = "none"
               )
             ),
             block_field(
@@ -84,7 +89,8 @@ htmltools::tagList(
               block_textarea(
                 "showcase_field_pw_error",
                 value = "Password must be at least 8 characters long and contain a digit.",
-                rows = 2
+                rows = 2,
+                resize = "none"
               )
             ),
             block_field(

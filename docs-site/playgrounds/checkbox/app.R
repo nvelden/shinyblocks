@@ -104,14 +104,15 @@ ui <- block_page(
             ),
             block_field(
               block_field_label("label", `for` = "showcase_checkbox_doc_label"),
-              block_textarea("showcase_checkbox_doc_label", value = "Email me product updates", rows = 1)
+              block_textarea("showcase_checkbox_doc_label", value = "Email me product updates", rows = 1, resize = "none")
             ),
             block_field(
               block_field_label("description", `for` = "showcase_checkbox_doc_description"),
               block_textarea(
                 "showcase_checkbox_doc_description",
                 value = "Unchecked default checkbox state.",
-                rows = 2
+                rows = 2,
+                resize = "none"
               )
             ),
             block_field(
@@ -119,7 +120,8 @@ ui <- block_page(
               block_textarea(
                 "showcase_checkbox_doc_invalid_message",
                 value = "You must confirm the rollout checklist before continuing.",
-                rows = 2
+                rows = 2,
+                resize = "none"
               )
             )
           ),
@@ -154,7 +156,8 @@ ui <- block_page(
                 "showcase_checkbox_doc_style",
                 value = "",
                 rows = 1,
-                placeholder = "e.g., background: rgba(0,0,0,.03); padding: 0.5rem;"
+                placeholder = "e.g., background: rgba(0,0,0,.03); padding: 0.5rem;",
+                resize = "none"
               )
             ),
             block_field(

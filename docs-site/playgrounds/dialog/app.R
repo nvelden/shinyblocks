@@ -61,9 +61,9 @@ ui <- block_page(
         style = "flex: 1; min-width: 280px; max-width: 320px; border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; background: color-mix(in oklab, var(--muted) 40%, transparent);",
         control_group(
           "Content", first = TRUE,
-          block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1)),
-          block_field(block_field_label("description", `for` = "showcase_dialog_doc_description"), block_textarea("showcase_dialog_doc_description", value = "This cannot be undone.", rows = 2)),
-          block_field(block_field_label("trigger label", `for` = "showcase_dialog_doc_trigger"), block_textarea("showcase_dialog_doc_trigger", value = "Open dialog", rows = 1)),
+          block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")),
+          block_field(block_field_label("description", `for` = "showcase_dialog_doc_description"), block_textarea("showcase_dialog_doc_description", value = "This cannot be undone.", rows = 2, resize = "none")),
+          block_field(block_field_label("trigger label", `for` = "showcase_dialog_doc_trigger"), block_textarea("showcase_dialog_doc_trigger", value = "Open dialog", rows = 1, resize = "none")),
           block_field(block_field_label("footer", `for` = "showcase_dialog_doc_footer"), block_checkbox("showcase_dialog_doc_footer", "Include Cancel + Continue footer", value = TRUE))
         ),
         control_group(
@@ -84,7 +84,7 @@ ui <- block_page(
         control_group(
           "Styling",
           block_field(block_field_label("size", `for` = "showcase_dialog_doc_size"), block_select("showcase_dialog_doc_size", choices = c("default", "sm", "lg", "xl"), selected = "default", size = "sm")),
-          block_field(block_field_label("style", `for` = "showcase_dialog_doc_style"), block_textarea("showcase_dialog_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;")),
+          block_field(block_field_label("style", `for` = "showcase_dialog_doc_style"), block_textarea("showcase_dialog_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
           block_field(block_field_label("class", `for` = "showcase_dialog_doc_class"), block_checkbox("showcase_dialog_doc_class", "Use custom dashed-border class", value = FALSE))
         )
       ),

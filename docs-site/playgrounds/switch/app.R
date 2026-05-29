@@ -144,7 +144,8 @@ ui <- block_page(
               "showcase_switch_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., padding: 0.5rem;"
+              placeholder = "e.g., padding: 0.5rem;",
+              resize = "none"
             )
           ),
           block_field(

@@ -19,11 +19,11 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_input_group_doc_placeholder"),
-          block_textarea("showcase_input_group_doc_placeholder", value = "Search workspace...", rows = 1)
+          block_textarea("showcase_input_group_doc_placeholder", value = "Search workspace...", rows = 1, resize = "none")
         ),
         block_field(
           block_field_label("value", `for` = "showcase_input_group_doc_value"),
-          block_textarea("showcase_input_group_doc_value", value = "", rows = 1)
+          block_textarea("showcase_input_group_doc_value", value = "", rows = 1, resize = "none")
         )
       ),
       showcase_controls_group(
@@ -55,7 +55,8 @@ htmltools::tagList(
             "showcase_input_group_doc_style",
             value = "",
             rows = 1,
-            placeholder = "e.g., font-family: var(--font-mono);"
+            placeholder = "e.g., font-family: var(--font-mono);",
+            resize = "none"
           )
         ),
         block_field(

@@ -82,7 +82,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("label", `for` = "showcase_badge_doc_label"),
-            block_textarea("showcase_badge_doc_label", value = "Deploying", rows = 1)
+            block_textarea("showcase_badge_doc_label", value = "Deploying", rows = 1, resize = "none")
           ),
           block_field(
             block_field_label("variant", `for` = "showcase_badge_doc_variant"),
@@ -115,7 +115,8 @@ ui <- block_page(
               "showcase_badge_doc_class",
               value = "",
               rows = 1,
-              placeholder = "showcase-badge-preview-custom"
+              placeholder = "showcase-badge-preview-custom",
+              resize = "none"
             )
           ),
           block_field(
@@ -124,7 +125,8 @@ ui <- block_page(
               "showcase_badge_doc_style",
               value = "",
               rows = 1,
-              placeholder = "e.g., letter-spacing: 0.04em;"
+              placeholder = "e.g., letter-spacing: 0.04em;",
+              resize = "none"
             )
           )
         )

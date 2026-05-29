@@ -122,7 +122,7 @@ ui <- block_page(
           block_field(block_field_label("width", `for` = "showcase_slider_doc_width"), block_input("showcase_slider_doc_width", value = "20rem", placeholder = "100% or 20rem")),
           block_field(
             block_field_label("style", `for` = "showcase_slider_doc_style"),
-            block_textarea("showcase_slider_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 20rem;")
+            block_textarea("showcase_slider_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 20rem;", resize = "none")
           ),
           block_field(block_field_label("class", `for` = "showcase_slider_doc_class"), block_checkbox("showcase_slider_doc_class", "Use custom dashed-border class"))
         ),

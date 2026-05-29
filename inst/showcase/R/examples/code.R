@@ -8,7 +8,8 @@ htmltools::tagList(
             block_textarea(
               "showcase_code_doc_code",
               value = "plot_data <- function(x) {\n  # Simple summary for a Shiny dashboard\n  mean(x, na.rm = TRUE)\n}\n\nplot_data(c(12, 18, NA, 24))",
-              rows = 6
+              rows = 6,
+              resize = "none"
             )
           ),
           block_field(
@@ -59,7 +60,7 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_code_doc_style"),
-            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;")
+            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;", resize = "none")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_code_doc_class"),

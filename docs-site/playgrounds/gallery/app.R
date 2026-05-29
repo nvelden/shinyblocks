@@ -53,7 +53,7 @@ ui <- block_page(
           block_field_group(
             block_field(block_field_label("Name on card"), block_input("gallery_name", placeholder = "Jane Smith")),
             block_field(block_field_label("Plan"), block_select("gallery_plan", choices = c("Starter", "Professional", "Enterprise"), selected = "Professional", size = "sm")),
-            block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2))
+            block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2, resize = "none"))
           ),
           footer = block_button("Save payment", id = "gallery_save", size = "sm")
         )

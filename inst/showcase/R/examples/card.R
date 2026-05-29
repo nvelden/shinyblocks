@@ -5,22 +5,22 @@ htmltools::tagList(
         "Header", first = TRUE,
         block_field(
           block_field_label("title", `for` = "showcase_card_doc_title"),
-          block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1)
+          block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1, resize = "none")
         ),
         block_field(
           block_field_label("description", `for` = "showcase_card_doc_desc"),
-          block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1)
+          block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1, resize = "none")
         )
       ),
       showcase_controls_group(
         "Content",
         block_field(
           block_field_label("value", `for` = "showcase_card_doc_value"),
-          block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1)
+          block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1, resize = "none")
         ),
         block_field(
           block_field_label("body content", `for` = "showcase_card_doc_body"),
-          block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 2)
+          block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 2, resize = "none")
         ),
         block_field(
           block_field_label("footer", `for` = "showcase_card_doc_footer"),
@@ -44,7 +44,8 @@ htmltools::tagList(
             "showcase_card_doc_style",
             value = "",
             rows = 1,
-            placeholder = "e.g., max-width: 24rem;"
+            placeholder = "e.g., max-width: 24rem;",
+            resize = "none"
           )
         )
       )
