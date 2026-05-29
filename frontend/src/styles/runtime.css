@@ -660,6 +660,7 @@
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content {
+  --sb-dialog-content-width: 32rem;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -668,8 +669,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: calc(100% - 2rem);
-  max-width: 32rem;
+  width: min(var(--sb-dialog-content-width), calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
   max-height: calc(100vh - 4rem);
   overflow: auto;
   border: 1px solid var(--border);
@@ -683,19 +684,19 @@
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content-size-sm {
-  max-width: 24rem;
+  --sb-dialog-content-width: 24rem;
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content-size-default {
-  max-width: 32rem;
+  --sb-dialog-content-width: 32rem;
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content-size-lg {
-  max-width: 48rem;
+  --sb-dialog-content-width: 48rem;
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content-size-xl {
-  max-width: 64rem;
+  --sb-dialog-content-width: 64rem;
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-footer {

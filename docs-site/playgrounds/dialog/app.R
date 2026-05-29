@@ -166,7 +166,14 @@ server <- function(input, output, session) {
       # Render the inline preview at the requested size and only clamp if the
       # canvas is too narrow (the previous `width: 100%; max-width: <size>`
       # collapsed `sm` and `default` to identical widths in narrow iframes).
-      style = paste0("position: relative; display: flex; flex-direction: column; gap: 1rem; width: ", max_width, "; max-width: 100%; margin: 0 auto; border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.4); background: var(--background); padding: 1.5rem; box-sizing: border-box; ", style),
+      style = paste0(
+        "position: relative; display: flex; flex-direction: column; gap: 1rem;",
+        " width: min(", max_width, ", 100%); max-width: 100%; max-height: min(32rem, calc(100vh - 4rem));",
+        " overflow: auto; margin: 0 auto; border: 1px solid var(--border);",
+        " border-radius: calc(var(--radius) * 1.4); background: var(--background);",
+        " padding: 1.5rem; box-sizing: border-box; ",
+        style
+      ),
       htmltools::div(
         htmltools::tags$h2(style = title_style, title),
         if (nzchar(description)) htmltools::tags$p(style = "margin: 0; font-size: 0.875rem; color: var(--muted-foreground);", description)

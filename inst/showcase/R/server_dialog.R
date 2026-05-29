@@ -39,7 +39,8 @@ register_dialog_showcase <- function(input, output, session) {
     base_style <- sprintf(
       paste0(
         "position: relative; display: flex; flex-direction: column; gap: 1rem;",
-        " width: %s; max-width: 100%%; margin: 0 auto; box-sizing: border-box;",
+        " width: min(%s, 100%%); max-width: 100%%; max-height: min(32rem, calc(100vh - 4rem));",
+        " overflow: auto; margin: 0 auto; box-sizing: border-box;",
         " border: 1px solid var(--border);",
         " border-radius: calc(var(--radius) * 1.4); background-color: var(--background);",
         " color: var(--foreground); padding: 1.5rem;",
