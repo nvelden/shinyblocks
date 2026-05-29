@@ -15,8 +15,8 @@ htmltools::tagList(
       showcase_controls_group(
         "Styling",
         block_field(
-          block_field_label("Size", `for` = "showcase_icon_doc_size"),
-          block_select("showcase_icon_doc_size", choices = c("small", "medium", "large"), selected = "medium")
+          block_field_label("size", `for` = "showcase_icon_doc_size"),
+          block_select("showcase_icon_doc_size", choices = c("sm", "default", "lg", "xl"), selected = "default", size = "sm")
         ),
         block_field(
           block_field_label("Color Theme", `for` = "showcase_icon_doc_color"),

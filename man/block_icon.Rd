@@ -4,11 +4,15 @@
 \alias{block_icon}
 \title{Create an icon}
 \usage{
-block_icon(name, class = NULL, ...)
+block_icon(name, size = c("default", "sm", "lg", "xl"), class = NULL, ...)
 }
 \arguments{
 \item{name}{Icon name from the vendored Lucide sprite, or a custom
 \code{htmltools} tag to pass through.}
+
+\item{size}{Icon size. One of \code{"default"} (1rem, the shadcn default),
+\code{"sm"} (0.875rem), \code{"lg"} (1.5rem), or \code{"xl"} (2.25rem). Ignored when
+\code{name} is a custom \code{htmltools} tag.}
 
 \item{class}{Additional classes.}
 

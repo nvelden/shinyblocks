@@ -986,3 +986,26 @@ test_that("block_code handles defaults correctly", {
   expect_identical(payload$props$copyable, TRUE)
   expect_identical(payload$props$variant, "default")
 })
+
+test_that("block_icon size maps to a real size class", {
+  default_icon <- block_icon("home")
+  expect_match(tag_attr(default_icon, "class"), "sb-icon", fixed = TRUE)
+  expect_false(grepl("sb-icon-size-", tag_attr(default_icon, "class"), fixed = TRUE))
+
+  lg_icon <- block_icon("home", size = "lg")
+  expect_match(tag_attr(lg_icon, "class"), "sb-icon-size-lg", fixed = TRUE)
+
+  sm_icon <- block_icon("home", size = "sm", class = "extra")
+  expect_match(tag_attr(sm_icon, "class"), "sb-icon-size-sm", fixed = TRUE)
+  expect_match(tag_attr(sm_icon, "class"), "extra", fixed = TRUE)
+})
+
+test_that("block_icon rejects an unknown size", {
+  expect_error(block_icon("home", size = "huge"))
+})
+
+test_that("block_icon ignores size for tag passthrough", {
+  custom <- htmltools::tags$svg(class = "my-icon")
+  passthrough <- block_icon(custom, size = "lg")
+  expect_false(grepl("sb-icon-size-", tag_attr(passthrough, "class") %||% "", fixed = TRUE))
+})

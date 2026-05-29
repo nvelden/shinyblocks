@@ -2,20 +2,26 @@
 #'
 #' @param name Icon name from the vendored Lucide sprite, or a custom
 #'   `htmltools` tag to pass through.
+#' @param size Icon size. One of `"default"` (1rem, the shadcn default),
+#'   `"sm"` (0.875rem), `"lg"` (1.5rem), or `"xl"` (2.25rem). Ignored when
+#'   `name` is a custom `htmltools` tag.
 #' @param class Additional classes.
 #' @param ... Additional attributes passed to the root `svg` tag.
 #'
 #' @return An `htmltools` tag.
 #' @family icon
 #' @export
-block_icon <- function(name, class = NULL, ...) {
+block_icon <- function(name, size = c("default", "sm", "lg", "xl"), class = NULL, ...) {
+  size <- match_arg(size, c("default", "sm", "lg", "xl"))
+  size_class <- if (identical(size, "default")) NULL else paste0("sb-icon-size-", size)
+
   icon_tag <- if (inherits(name, "shiny.tag")) {
     name
   } else {
     validate_icon_name(name)
 
     htmltools::tags$svg(
-      class = merge_classes("sb-icon", class),
+      class = merge_classes("sb-icon", size_class, class),
       `aria-hidden` = "true",
       focusable = "false",
       ...,

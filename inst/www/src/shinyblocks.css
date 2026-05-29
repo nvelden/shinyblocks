@@ -197,6 +197,20 @@
     @apply size-4 shrink-0;
   }
 
+  /* Icon size scale. `default` keeps size-4 (1rem); compound selectors
+     out-specify the base .sb-icon rule. */
+  .sb-icon.sb-icon-size-sm {
+    @apply size-3.5;
+  }
+
+  .sb-icon.sb-icon-size-lg {
+    @apply size-6;
+  }
+
+  .sb-icon.sb-icon-size-xl {
+    @apply size-9;
+  }
+
   .sb-nav-item > [data-icon] {
     @apply size-4 shrink-0;
   }

@@ -51,21 +51,14 @@ string_literal <- function(value) {
 
 icon_names <- sort(getFromNamespace("shinyblocks_icon_names", "shinyblocks")())
 
-icon_style <- function(size, color) {
-  size_style <- switch(
-    size,
-    small = "width: 1rem; height: 1rem;",
-    large = "width: 2.25rem; height: 2.25rem;",
-    "width: 1.5rem; height: 1.5rem;"
-  )
-  color_style <- switch(
+icon_color_style <- function(color) {
+  switch(
     color,
     muted = "color: var(--muted-foreground);",
     primary = "color: var(--primary);",
     destructive = "color: var(--destructive);",
     NULL
   )
-  paste(c(size_style, color_style), collapse = " ")
 }
 
 ui <- block_page(
@@ -108,8 +101,8 @@ htmltools::div(
             block_field_label("size", `for` = "showcase_icon_doc_size"),
             block_select(
               "showcase_icon_doc_size",
-              choices = c("small", "medium", "large"),
-              selected = "medium",
+              choices = c("sm", "default", "lg", "xl"),
+              selected = "default",
               size = "sm"
             )
           ),
@@ -157,29 +150,30 @@ htmltools::div(
 
 server <- function(input, output, session) {
   preview_args <- reactive({
-    size <- input$showcase_icon_doc_size %||% "medium"
     color <- input$showcase_icon_doc_color %||% "foreground"
-
     list(
       name = input$showcase_icon_doc_name %||% "home",
-      style = icon_style(size, color)
+      size = input$showcase_icon_doc_size %||% "default",
+      style = icon_color_style(color)
     )
   })
 
   output$showcase_icon_preview_ui <- renderUI({
     args <- preview_args()
-    block_icon(args$name, style = args$style)
+    block_icon(args$name, size = args$size, style = args$style)
   })
   outputOptions(output, "showcase_icon_preview_ui", suspendWhenHidden = FALSE)
 
   output$showcase_icon_preview_code <- showcase_render_code({
     args <- preview_args()
-    paste0(
-      "block_icon(\n",
-      "  name = ", string_literal(args$name), ",\n",
-      "  style = ", string_literal(args$style), "\n",
-      ")"
-    )
+    lines <- c(paste0("  name = ", string_literal(args$name)))
+    if (!identical(args$size, "default")) {
+      lines <- c(lines, paste0("  size = ", string_literal(args$size)))
+    }
+    if (!is.null(args$style)) {
+      lines <- c(lines, paste0("  style = ", string_literal(args$style)))
+    }
+    paste0("block_icon(\n", paste(lines, collapse = ",\n"), "\n)")
   })
   outputOptions(output, "showcase_icon_preview_code", suspendWhenHidden = FALSE)
 }

@@ -1,29 +1,21 @@
 register_icon_showcase <- function(input, output, session) {
   output$showcase_icon_preview_ui <- shiny::renderUI({
     name <- input$showcase_icon_doc_name %||% "home"
-    size <- input$showcase_icon_doc_size %||% "medium"
+    size <- input$showcase_icon_doc_size %||% "default"
     color <- input$showcase_icon_doc_color %||% "foreground"
-    
-    style_str <- ""
-    if (size == "small") {
-      style_str <- paste0(style_str, "width: 1rem; height: 1rem;")
-    } else if (size == "medium") {
-      style_str <- paste0(style_str, "width: 1.5rem; height: 1.5rem;")
-    } else if (size == "large") {
-      style_str <- paste0(style_str, "width: 2.25rem; height: 2.25rem;")
-    }
-    
-    if (color == "muted") {
-      style_str <- paste0(style_str, " color: var(--muted-foreground);")
-    } else if (color == "primary") {
-      style_str <- paste0(style_str, " color: var(--primary);")
-    } else if (color == "destructive") {
-      style_str <- paste0(style_str, " color: var(--destructive);")
-    }
-    
+
+    color_style <- switch(
+      color,
+      muted = "color: var(--muted-foreground);",
+      primary = "color: var(--primary);",
+      destructive = "color: var(--destructive);",
+      NULL
+    )
+
     block_icon(
       name = name,
-      style = if (nzchar(style_str)) style_str else NULL
+      size = size,
+      style = color_style
     )
   })
   shiny::outputOptions(
@@ -38,33 +30,23 @@ register_icon_showcase <- function(input, output, session) {
     }
 
     name_val <- input$showcase_icon_doc_name %||% "home"
-    size_val <- input$showcase_icon_doc_size %||% "medium"
+    size_val <- input$showcase_icon_doc_size %||% "default"
     color_val <- input$showcase_icon_doc_color %||% "foreground"
 
-    style_parts <- c()
-    if (size_val == "small") {
-      style_parts <- c(style_parts, "width: 1rem; height: 1rem;")
-    } else if (size_val == "medium") {
-      style_parts <- c(style_parts, "width: 1.5rem; height: 1.5rem;")
-    } else if (size_val == "large") {
-      style_parts <- c(style_parts, "width: 2.25rem; height: 2.25rem;")
-    }
-    
-    if (color_val == "muted") {
-      style_parts <- c(style_parts, "color: var(--muted-foreground);")
-    } else if (color_val == "primary") {
-      style_parts <- c(style_parts, "color: var(--primary);")
-    } else if (color_val == "destructive") {
-      style_parts <- c(style_parts, "color: var(--destructive);")
-    }
-
-    args <- c(
-      paste0('name = "', name_val, '"')
+    color_style <- switch(
+      color_val,
+      muted = "color: var(--muted-foreground);",
+      primary = "color: var(--primary);",
+      destructive = "color: var(--destructive);",
+      NULL
     )
 
-    if (length(style_parts) > 0) {
-      style_str <- paste(style_parts, collapse = " ")
-      args <- c(args, paste0("style = ", string_literal(style_str)))
+    args <- c(paste0('name = "', name_val, '"'))
+    if (!identical(size_val, "default")) {
+      args <- c(args, paste0('size = "', size_val, '"'))
+    }
+    if (!is.null(color_style)) {
+      args <- c(args, paste0("style = ", string_literal(color_style)))
     }
 
     paste0("block_icon(\n  ", paste(args, collapse = ",\n  "), "\n)")
@@ -77,11 +59,12 @@ register_icon_showcase <- function(input, output, session) {
 
   output$showcase_icon_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("name", "class", "..."),
-      Type = c("character | tag", "character", "named attributes"),
-      Default = c("required", "NULL", "none"),
+      Argument = c("name", "size", "class", "..."),
+      Type = c("character | tag", "character", "character", "named attributes"),
+      Default = c("required", "\"default\"", "NULL", "none"),
       Description = c(
         "Icon name from the vendored Lucide sprite or custom htmltools element.",
+        "Icon size: default (1rem), sm (0.875rem), lg (1.5rem), or xl (2.25rem).",
         "Additional CSS class merged onto the svg element.",
         "Additional attributes passed to the svg tag (e.g. style, width, height, etc.)."
       )
