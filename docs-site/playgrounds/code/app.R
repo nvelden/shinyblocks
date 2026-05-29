@@ -49,15 +49,90 @@ string_literal <- function(value) {
   paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
 }
 
-default_code <- paste(
-  "plot_data <- function(x) {",
-  "  # Simple summary for a Shiny dashboard",
-  "  mean(x, na.rm = TRUE)",
-  "}",
-  "",
-  "plot_data(c(12, 18, NA, 24))",
-  sep = "\n"
-)
+# Sample snippet per language so the Code playground demonstrates the
+# component's language-aware highlighting instead of one hardcoded example.
+code_language_sample <- function(language) {
+  samples <- list(
+    r = paste(
+      "plot_data <- function(x) {",
+      "  # Simple summary for a Shiny dashboard",
+      "  mean(x, na.rm = TRUE)",
+      "}",
+      "",
+      "plot_data(c(12, 18, NA, 24))",
+      sep = "\n"
+    ),
+    python = paste(
+      "def greet(name):",
+      "    # Build a friendly message",
+      "    return f\"Hello, {name}!\"",
+      "",
+      "print(greet(\"world\"))",
+      sep = "\n"
+    ),
+    javascript = paste(
+      "function greet(name) {",
+      "  // Build a friendly message",
+      "  return `Hello, ${name}!`;",
+      "}",
+      "",
+      "console.log(greet(\"world\"));",
+      sep = "\n"
+    ),
+    typescript = paste(
+      "function greet(name: string): string {",
+      "  // Build a friendly message",
+      "  return `Hello, ${name}!`;",
+      "}",
+      "",
+      "console.log(greet(\"world\"));",
+      sep = "\n"
+    ),
+    html = paste(
+      "<!-- Page heading -->",
+      "<section class=\"card\">",
+      "  <h1 id=\"title\">Hello, world!</h1>",
+      "  <a href=\"#start\">Get started</a>",
+      "</section>",
+      sep = "\n"
+    ),
+    css = paste(
+      "/* Card surface */",
+      ".card {",
+      "  display: flex;",
+      "  padding: 1rem;",
+      "  color: var(--foreground);",
+      "}",
+      sep = "\n"
+    ),
+    json = paste(
+      "{",
+      "  \"name\": \"shinyblocks\",",
+      "  \"version\": \"0.1.0\",",
+      "  \"private\": true,",
+      "  \"keywords\": [\"shiny\", \"shadcn\"]",
+      "}",
+      sep = "\n"
+    ),
+    sql = paste(
+      "SELECT id, name, created_at",
+      "FROM users",
+      "WHERE active = TRUE",
+      "ORDER BY created_at DESC",
+      "LIMIT 10;",
+      sep = "\n"
+    ),
+    bash = paste(
+      "#!/usr/bin/env bash",
+      "# Deploy the built assets",
+      "for file in dist/*.js; do",
+      "  echo \"Uploading $file\"",
+      "done",
+      sep = "\n"
+    )
+  )
+  samples[[language]] %||% samples[["r"]]
+}
 
 language_choices <- c(
   "r",
@@ -100,16 +175,15 @@ htmltools::div(
             "Content"
           ),
           block_field(
-            block_field_label("code", `for` = "showcase_code_doc_code"),
-            block_textarea("showcase_code_doc_code", value = default_code, rows = 6, resize = "none")
-          ),
-          block_field(
             block_field_label("language", `for` = "showcase_code_doc_language"),
             block_select(
               "showcase_code_doc_language",
               choices = language_choices,
               selected = "r",
               size = "sm"
+            ),
+            block_field_description(
+              "The sample snippet updates to match the selected language."
             )
           )
         ),
@@ -192,10 +266,9 @@ htmltools::div(
 
 server <- function(input, output, session) {
   preview_args <- reactive({
-    code <- input$showcase_code_doc_code %||% default_code
-    if (!nzchar(code)) code <- default_code
     language <- input$showcase_code_doc_language %||% "r"
     if (!nzchar(language)) language <- "r"
+    code <- code_language_sample(language)
     style <- input$showcase_code_doc_style %||% ""
     list(
       code = code,

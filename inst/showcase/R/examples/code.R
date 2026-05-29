@@ -4,15 +4,6 @@ htmltools::tagList(
         showcase_controls_group(
           "Content", first = TRUE,
           block_field(
-            block_field_label("code", `for` = "showcase_code_doc_code"),
-            block_textarea(
-              "showcase_code_doc_code",
-              value = "plot_data <- function(x) {\n  # Simple summary for a Shiny dashboard\n  mean(x, na.rm = TRUE)\n}\n\nplot_data(c(12, 18, NA, 24))",
-              rows = 6,
-              resize = "none"
-            )
-          ),
-          block_field(
             block_field_label("language", `for` = "showcase_code_doc_language"),
             block_select(
               "showcase_code_doc_language",
@@ -29,6 +20,9 @@ htmltools::tagList(
               ),
               selected = "r",
               size = "sm"
+            ),
+            block_field_description(
+              "The sample snippet updates to match the selected language."
             )
           )
         ),

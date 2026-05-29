@@ -1,8 +1,93 @@
+# Sample snippet per language so the Code playground demonstrates the
+# component's language-aware highlighting instead of one hardcoded example.
+code_language_sample <- function(language) {
+  samples <- list(
+    r = paste(
+      "plot_data <- function(x) {",
+      "  # Simple summary for a Shiny dashboard",
+      "  mean(x, na.rm = TRUE)",
+      "}",
+      "",
+      "plot_data(c(12, 18, NA, 24))",
+      sep = "\n"
+    ),
+    python = paste(
+      "def greet(name):",
+      "    # Build a friendly message",
+      "    return f\"Hello, {name}!\"",
+      "",
+      "print(greet(\"world\"))",
+      sep = "\n"
+    ),
+    javascript = paste(
+      "function greet(name) {",
+      "  // Build a friendly message",
+      "  return `Hello, ${name}!`;",
+      "}",
+      "",
+      "console.log(greet(\"world\"));",
+      sep = "\n"
+    ),
+    typescript = paste(
+      "function greet(name: string): string {",
+      "  // Build a friendly message",
+      "  return `Hello, ${name}!`;",
+      "}",
+      "",
+      "console.log(greet(\"world\"));",
+      sep = "\n"
+    ),
+    html = paste(
+      "<!-- Page heading -->",
+      "<section class=\"card\">",
+      "  <h1 id=\"title\">Hello, world!</h1>",
+      "  <a href=\"#start\">Get started</a>",
+      "</section>",
+      sep = "\n"
+    ),
+    css = paste(
+      "/* Card surface */",
+      ".card {",
+      "  display: flex;",
+      "  padding: 1rem;",
+      "  color: var(--foreground);",
+      "}",
+      sep = "\n"
+    ),
+    json = paste(
+      "{",
+      "  \"name\": \"shinyblocks\",",
+      "  \"version\": \"0.1.0\",",
+      "  \"private\": true,",
+      "  \"keywords\": [\"shiny\", \"shadcn\"]",
+      "}",
+      sep = "\n"
+    ),
+    sql = paste(
+      "SELECT id, name, created_at",
+      "FROM users",
+      "WHERE active = TRUE",
+      "ORDER BY created_at DESC",
+      "LIMIT 10;",
+      sep = "\n"
+    ),
+    bash = paste(
+      "#!/usr/bin/env bash",
+      "# Deploy the built assets",
+      "for file in dist/*.js; do",
+      "  echo \"Uploading $file\"",
+      "done",
+      sep = "\n"
+    )
+  )
+  samples[[language]] %||% samples[["r"]]
+}
+
 register_code_showcase <- function(input, output, session) {
   output$showcase_code_preview_ui <- shiny::renderUI({
-    code_val <- input$showcase_code_doc_code %||% ""
-    lang_val <- input$showcase_code_doc_language %||% ""
-    if (!nzchar(lang_val)) lang_val <- NULL
+    lang_val <- input$showcase_code_doc_language %||% "r"
+    if (!nzchar(lang_val)) lang_val <- "r"
+    code_val <- code_language_sample(lang_val)
 
     style_val <- input$showcase_code_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
@@ -25,11 +110,12 @@ register_code_showcase <- function(input, output, session) {
   )
 
   output$showcase_code_preview_code <- showcase_render_code({
-    code_val <- input$showcase_code_doc_code %||% ""
+    lang_val <- input$showcase_code_doc_language %||% "r"
+    if (!nzchar(lang_val)) lang_val <- "r"
+    code_val <- code_language_sample(lang_val)
     # Escape quotes and formatting for R string representation
     escaped_code <- gsub("\n", "\\\\n", gsub('"', '\\\\"', code_val))
 
-    lang_val <- input$showcase_code_doc_language %||% ""
     copyable_val <- input$showcase_code_doc_copyable
     line_numbers_val <- input$showcase_code_doc_line_numbers
     header_val <- input$showcase_code_doc_header
