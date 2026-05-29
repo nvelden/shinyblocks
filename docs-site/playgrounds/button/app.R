@@ -157,10 +157,14 @@ ui <- block_page(
               block_field_label("size", `for` = "showcase_button_doc_size"),
               block_select(
                 "showcase_button_doc_size",
-                choices = c("default", "sm", "lg", "icon"),
+                choices = c("default", "sm", "lg"),
                 selected = "default",
                 size = "sm"
               )
+            ),
+            block_field(
+              block_field_label("icon-only", `for` = "showcase_button_doc_icon_only"),
+              block_checkbox("showcase_button_doc_icon_only", "Render icon-only button", value = FALSE)
             ),
             block_field(
               block_field_label("style", `for` = "showcase_button_doc_style"),
@@ -250,8 +254,10 @@ server <- function(input, output, session) {
     if (!nzchar(label)) label <- "Continue"
 
     size <- input$showcase_button_doc_size %||% "default"
+    icon_only <- isTRUE(input$showcase_button_doc_icon_only)
     icon <- button_doc_icon(input$showcase_button_doc_icon)
-    if (identical(size, "icon")) {
+    if (icon_only) {
+      size <- "icon"
       if (is.null(icon)) icon <- "search"
       label <- NULL
     }

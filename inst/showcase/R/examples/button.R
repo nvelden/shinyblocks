@@ -82,7 +82,11 @@ htmltools::tagList(
             htmltools::tags$h3(style = "font-size: 0.875rem; font-weight: 600; margin: 0; color: var(--foreground);", "Styling"),
             block_field(
               block_field_label("size", `for` = "showcase_button_doc_size"),
-              block_select("showcase_button_doc_size", choices = c("default", "sm", "lg", "icon"), selected = "default")
+              block_select("showcase_button_doc_size", choices = c("default", "sm", "lg"), selected = "default")
+            ),
+            block_field(
+              block_field_label("icon-only", `for` = "showcase_button_doc_icon_only"),
+              block_checkbox("showcase_button_doc_icon_only", "Render icon-only button", value = FALSE)
             ),
             block_field(
               block_field_label("style", `for` = "showcase_button_doc_style"),

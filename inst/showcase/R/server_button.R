@@ -22,13 +22,15 @@ register_button_showcase <- function(input, output, session) {
     }
     variant <- input$showcase_button_doc_variant %||% "default"
     size <- input$showcase_button_doc_size %||% "default"
+    icon_only <- isTRUE(input$showcase_button_doc_icon_only)
     icon <- button_doc_icon(input$showcase_button_doc_icon)
     icon_position <- input$showcase_button_doc_icon_position %||% "inline-start"
     style <- input$showcase_button_doc_style %||% ""
     if (!nzchar(style)) {
       style <- NULL
     }
-    if (identical(size, "icon")) {
+    if (icon_only) {
+      size <- "icon"
       if (is.null(icon)) {
         icon <- "search"
       }
@@ -83,12 +85,14 @@ register_button_showcase <- function(input, output, session) {
     }
     variant_val <- input$showcase_button_doc_variant %||% "default"
     size_val <- input$showcase_button_doc_size %||% "default"
+    icon_only_val <- isTRUE(input$showcase_button_doc_icon_only)
     icon_val <- button_doc_icon(input$showcase_button_doc_icon)
     icon_position_val <- input$showcase_button_doc_icon_position %||% "inline-start"
     disabled_val <- isTRUE(input$showcase_button_doc_disabled)
     style_val <- input$showcase_button_doc_style %||% ""
     class_val <- isTRUE(input$showcase_button_doc_class)
-    if (identical(size_val, "icon")) {
+    if (icon_only_val) {
+      size_val <- "icon"
       if (is.null(icon_val)) {
         icon_val <- "search"
       }
