@@ -32,7 +32,8 @@ showcase_playground_layout <- function(
     "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
   )
 
-  htmltools::tags$div(
+  htmltools::tags$section(
+    `aria-label` = "Interactive Playground",
     class = "showcase-playground",
     style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
     htmltools::tags$div(
