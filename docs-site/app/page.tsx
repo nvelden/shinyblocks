@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import manifest from "@/lib/preview-manifest.json";
+import { PlaygroundFrame } from "@/components/playground-frame";
 
 export default function HomePage() {
   const gallery = manifest.find((c) => c.slug === "gallery");
@@ -48,7 +49,7 @@ export default function HomePage() {
         {gallery && (
           gallery.hasPlayground ? (
             <div className="overflow-hidden rounded-lg border border-border bg-card">
-              <iframe
+              <PlaygroundFrame
                 src="/shinyblocks/playgrounds/gallery/"
                 title="Interactive components gallery"
                 loading="lazy"

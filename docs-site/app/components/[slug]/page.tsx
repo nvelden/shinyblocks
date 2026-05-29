@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import manifestData from "@/lib/preview-manifest.json";
 import { API_REFERENCE_DATABASE } from "@/lib/api-reference";
+import { PlaygroundFrame } from "@/components/playground-frame";
 
 interface ManifestEntry {
   name: string;
@@ -91,7 +92,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
               </h2>
               {component.hasPlayground ? (
                 <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-                  <iframe
+                  <PlaygroundFrame
                     src={`/shinyblocks/playgrounds/${slug}/`}
                     title={`${component.name} playground`}
                     loading="lazy"
