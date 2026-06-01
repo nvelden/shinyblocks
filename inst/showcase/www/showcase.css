@@ -135,6 +135,12 @@
   outline-offset: 2px;
 }
 
+.sb-radio-group-control.showcase-radio-group-preview-custom {
+  border: 2px dashed var(--ring) !important;
+  padding: 0.75rem !important;
+  border-radius: 0.5rem !important;
+}
+
 .showcase-slider-preview-custom .sb-slider-thumb,
 .sb-slider.showcase-slider-preview-custom .sb-slider-thumb {
   border: 2px dashed var(--ring) !important;

@@ -99,7 +99,7 @@ test_that("showcase owns its theme in the page head and renders one body landmar
   head <- paste(rendered$head, collapse = "\n")
   html <- paste(rendered$html, collapse = "\n")
 
-  expect_match(head, 'href="showcase.css?v=20260521_09"', fixed = TRUE)
+  expect_match(head, 'href="showcase.css?v=20260601_01"', fixed = TRUE)
   body_matches <- regmatches(
     html,
     gregexpr('<main class="sb-body">', html, fixed = TRUE)
@@ -107,6 +107,23 @@ test_that("showcase owns its theme in the page head and renders one body landmar
 
   expect_length(body_matches, 1L)
   expect_false(grepl("<head>", html, fixed = TRUE))
+})
+
+test_that("showcase styling controls have matching CSS hooks", {
+  css_file <- system.file(
+    "showcase",
+    "www",
+    "showcase.css",
+    package = "shinyblocks",
+    mustWork = TRUE
+  )
+  css <- paste(readLines(css_file, warn = FALSE), collapse = "\n")
+
+  expect_match(
+    css,
+    ".sb-radio-group-control.showcase-radio-group-preview-custom",
+    fixed = TRUE
+  )
 })
 
 test_that("every exported block_*() renders into the showcase UI", {
