@@ -1,4 +1,4 @@
-# shinyblocks
+# shinyblocks <img src="man/figures/logo.png" align="right" height="180" alt="shinyblocks hex sticker" />
 
 [![R-CMD-check](https://github.com/nvelden/shinyblocks/actions/workflows/ci.yml/badge.svg)](https://github.com/nvelden/shinyblocks/actions/workflows/ci.yml)
 [![Status: experimental](https://img.shields.io/badge/status-experimental-orange.svg)](https://github.com/nvelden/shinyblocks)
