@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 export default function ChangelogPage() {
   const changelogHtmlPath = path.join(process.cwd(), "content/changelog.html");
@@ -17,38 +18,51 @@ export default function ChangelogPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl px-6 py-12">
-      <div className="flex flex-col lg:flex-row gap-12">
-        
-        {/* Main Content Area */}
-        <main className="flex-1 min-w-0 max-w-4xl">
-          <div className="flex flex-col gap-4 mb-10 border-b border-border/60 pb-8">
-            <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Changelog</h1>
-            <p className="text-muted-foreground text-lg">
-              Stay up to date with the latest additions, fixes, and architectural developments in shinyblocks.
+    <div className="mx-auto w-full max-w-screen-xl px-6 py-10 md:py-14">
+      <div className="grid grid-cols-1 gap-12 xl:grid-cols-[minmax(0,1fr)_16rem]">
+        <main className="min-w-0 max-w-3xl">
+          <div className="mb-10 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Changelog
+              </h1>
+              <Link
+                href="https://github.com/nvelden/shinyblocks/blob/main/NEWS.md"
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                NEWS
+                <ExternalLink className="size-3" aria-hidden="true" />
+              </Link>
+            </div>
+            <p className="text-base text-muted-foreground">
+              Latest updates and announcements.
             </p>
           </div>
 
           <article 
-            className="prose dark:prose-invert max-w-none text-foreground leading-relaxed
-              [&>h2]:scroll-m-20 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:tracking-tight [&>h2]:mt-12 [&>h2]:mb-6 [&>h2]:border-b [&>h2]:pb-2 [&>h2]:text-foreground
-              [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:my-4 [&>ul]:space-y-3
-              [&>ul>li]:text-muted-foreground [&>ul>li]:text-sm
-              [&_code]:font-mono [&_code]:text-xs [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-foreground/90"
+            className="max-w-none text-foreground
+              [&>h2]:mt-12 [&>h2]:scroll-m-20 [&>h2]:text-2xl [&>h2]:font-semibold [&>h2]:tracking-tight [&>h2]:text-foreground first:[&>h2]:mt-0
+              [&>h3]:mt-8 [&>h3]:scroll-m-20 [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:tracking-tight [&>h3]:text-foreground
+              [&>p]:mt-4 [&>p]:text-sm [&>p]:leading-7 [&>p]:text-muted-foreground
+              [&>ul]:my-5 [&>ul]:list-disc [&>ul]:space-y-2 [&>ul]:pl-5
+              [&>ul>li]:pl-1 [&>ul>li]:text-sm [&>ul>li]:leading-7 [&>ul>li]:text-muted-foreground
+              [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:underline-offset-4
+              [&_code]:rounded-md [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_code]:text-foreground
+              [&_pre]:mt-4 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:border [&_pre]:bg-muted/50 [&_pre]:p-4
+              [&_pre_code]:bg-transparent [&_pre_code]:p-0"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         </main>
 
-        {/* Right Sidebar - TOC (Desktop only) */}
-        <aside className="hidden xl:block w-64 shrink-0">
-          <div className="sticky top-20 flex flex-col gap-4 pl-6 border-l border-border/60">
-            <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">On this page</h3>
-            <nav className="flex flex-col gap-2.5">
+        <aside className="hidden xl:block">
+          <div className="sticky top-20 flex flex-col gap-4 border-l border-border/60 pl-6">
+            <h2 className="text-sm font-semibold text-foreground">On This Page</h2>
+            <nav className="flex flex-col gap-2">
               {toc.map((item) => (
                 <Link
                   key={item.slug}
                   href={`/changelog#${item.slug}`}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {item.title}
                 </Link>
@@ -56,7 +70,6 @@ export default function ChangelogPage() {
             </nav>
           </div>
         </aside>
-
       </div>
     </div>
   );

@@ -19,8 +19,24 @@ function main() {
 
   let newsContent = fs.readFileSync(newsPath, "utf-8");
 
-  // Normalize # to ## so all version headings are h2 for Playwright spec
-  newsContent = newsContent.replace(/^#\s+/gm, "## ");
+  const releaseHeadingPattern = /^(?:\d+\.\d+\.\d+(?:\.\d+)?|shinyblocks\b)/i;
+
+  newsContent = newsContent
+    .split("\n")
+    .map((line) => {
+      const h1 = line.match(/^#\s+(.+)$/);
+      if (h1) {
+        return `## ${h1[1].trim()}`;
+      }
+
+      const h2 = line.match(/^##\s+(.+)$/);
+      if (h2 && !releaseHeadingPattern.test(h2[1].trim())) {
+        return `### ${h2[1].trim()}`;
+      }
+
+      return line;
+    })
+    .join("\n");
 
   // Extract versions for TOC
   const toc: { title: string; slug: string }[] = [];
@@ -40,7 +56,10 @@ function main() {
     const text = this.parser.parseInline(tokens);
     const slug = slugify(text);
     if (depth === 2) {
-      return `<h2 id="${slug}" class="scroll-m-20 text-2xl font-bold tracking-tight mt-10 mb-4 border-b pb-2 text-foreground">${text}</h2>\n`;
+      return `<h2 id="${slug}">${text}</h2>\n`;
+    }
+    if (depth === 3) {
+      return `<h3 id="${slug}">${text}</h3>\n`;
     }
     return `<h${depth}>${text}</h${depth}>\n`;
   };
