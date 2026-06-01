@@ -96,11 +96,12 @@ ui <- block_page(
       )
     ),
     htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: start;",
+      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: stretch;",
       panel(
         block_card(
           title = "Payment method",
           description = "Secure checkout profile",
+          style = "height: 100%;",
           block_field_group(
             block_field(block_field_label("Name on card"), block_input("gallery_name", placeholder = "Jane Smith")),
             block_field(
@@ -135,26 +136,30 @@ ui <- block_page(
         block_card(
           title = "Budget",
           description = "Monthly operating budget",
+          style = "height: 100%;",
           block_slider("gallery_budget", min = 1000, max = 10000, value = 5200, step = 100),
           block_separator(),
           stack(
             mini_label("Monthly spend", textOutput("gallery_budget_value", inline = TRUE)),
             mini_label("Forecast", textOutput("gallery_forecast_value", inline = TRUE)),
             mini_label("Refresh jobs", uiOutput("gallery_refresh_state"))
+          ),
+          block_separator(),
+          stack(
+            htmltools::strong(style = "font-size: 0.875rem; font-weight: 600;", "Workspace status"),
+            row(
+              block_badge("Production"),
+              block_badge("Synced", variant = "secondary"),
+              block_badge("Verified", variant = "outline")
+            )
           )
-        ),
-        htmltools::div(
-          style = "display: flex; gap: 0.5rem; flex-wrap: wrap;",
-          block_badge("Production"),
-          block_badge("Synced", variant = "secondary"),
-          block_badge("Verified", variant = "outline"),
-          block_tooltip("SLA", "Measured across app, API, and billing checks.", side = "top")
         )
       ),
       panel(
         block_card(
           title = "Preferences",
           description = "Workspace notifications",
+          style = "height: 100%;",
           block_field_group(
             block_switch("gallery_notifications", "Email notifications", value = TRUE),
             block_checkbox("gallery_terms", "Enable weekly digest", value = TRUE),
@@ -164,45 +169,46 @@ ui <- block_page(
               selected = "prod",
               orientation = "vertical"
             )
-          )
-        ),
-        block_tabs(
-          id = "gallery_tabs",
-          selected = "activity",
-          block_tab(
-            "Activity",
-            value = "activity",
-            stack(
-              block_alert("All systems operational.", description = "Runtime alerts, tabs, badges, and form controls are active."),
-              block_popover(
-                "Deploy notes",
-                stack(
-                  htmltools::tags$p(style = "margin: 0;", "Latest release shipped component previews and budget checks."),
-                  block_badge("No incidents", variant = "secondary")
-                ),
-                id = "gallery_popover",
-                align = "end"
+          ),
+          block_separator(),
+          block_tabs(
+            id = "gallery_tabs",
+            selected = "activity",
+            block_tab(
+              "Activity",
+              value = "activity",
+              stack(
+                block_alert("All systems operational.", description = "Runtime alerts, tabs, badges, and form controls are active."),
+                block_popover(
+                  "Deploy notes",
+                  stack(
+                    htmltools::tags$p(style = "margin: 0;", "Latest release shipped component previews and budget checks."),
+                    block_badge("No incidents", variant = "secondary")
+                  ),
+                  id = "gallery_popover",
+                  align = "end"
+                )
               )
-            )
-          ),
-          block_tab(
-            "Members",
-            value = "members",
-            block_empty(
-              "No pending invites",
-              description = "New invitations appear here.",
-              icon = "users",
-              action = block_button("Invite member", size = "sm", variant = "outline", icon = "plus")
-            )
-          ),
-          block_tab(
-            "Deploy",
-            value = "deploy",
-            block_code(
-              "block_page(\n  block_card(\n    title = \"Workspace dashboard\",\n    block_value_box(\"Uptime\", \"99.98%\")\n  )\n)",
-              language = "r",
-              header = TRUE,
-              line_numbers = FALSE
+            ),
+            block_tab(
+              "Members",
+              value = "members",
+              block_empty(
+                "No pending invites",
+                description = "New invitations appear here.",
+                icon = "users",
+                action = block_button("Invite member", size = "sm", variant = "outline", icon = "plus")
+              )
+            ),
+            block_tab(
+              "Deploy",
+              value = "deploy",
+              block_code(
+                "block_page(\n  block_card(\n    title = \"Workspace dashboard\",\n    block_value_box(\"Uptime\", \"99.98%\")\n  )\n)",
+                language = "r",
+                header = TRUE,
+                line_numbers = FALSE
+              )
             )
           )
         )
