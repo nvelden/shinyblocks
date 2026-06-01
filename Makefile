@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase \
+.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
 	check-fast lint spell urls test docs check pkgdown budget \
 	doc-links legacy-audit theme-static theme-test parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
@@ -19,6 +19,7 @@ help:
 	@echo "  watch-css       - Tailwind v4 in --watch mode"
 	@echo "  dev             - devtools::load_all() in an R session"
 	@echo "  showcase        - load_all() and run inst/showcase"
+	@echo "  showcase-health - verify the local showcase responds on its configured port"
 	@echo "  check-fast      - lint + test + build-css (~20s)"
 	@echo ""
 	@echo "Phase exit:"
@@ -161,9 +162,14 @@ PORT_PKGDOWN    ?= 4322
 PORT_SHINYLIVE  ?= 4323
 PORT_PARITY     ?= 5173
 
-# Re-bind showcase to a known port for the preview workflow.
+# Re-bind showcase to a known port for the preview workflow. In sandboxed
+# agent sessions, run this target and showcase-health outside the sandbox:
+# an isolated process may print "Listening" without being externally reachable.
 showcase:
 	$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase", port = $(PORT_SHOWCASE), launch.browser = FALSE)'
+
+showcase-health:
+	curl -fsSI "http://127.0.0.1:$(PORT_SHOWCASE)/"
 
 parity-install:
 	cd parity && npm ci
