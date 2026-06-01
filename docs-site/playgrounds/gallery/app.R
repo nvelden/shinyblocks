@@ -23,6 +23,38 @@ panel <- function(...) {
   htmltools::div(style = "display: flex; flex-direction: column; gap: 1rem; min-width: 0;", ...)
 }
 
+stack <- function(..., gap = "0.75rem") {
+  htmltools::div(style = paste0("display: flex; flex-direction: column; gap: ", gap, "; min-width: 0;"), ...)
+}
+
+row <- function(..., gap = "0.5rem", wrap = TRUE) {
+  htmltools::div(
+    style = paste0(
+      "display: flex; align-items: center; gap: ", gap, ";",
+      if (isTRUE(wrap)) " flex-wrap: wrap;" else "",
+      " min-width: 0;"
+    ),
+    ...
+  )
+}
+
+mini_label <- function(label, value) {
+  htmltools::div(
+    style = "display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.875rem;",
+    htmltools::span(style = "color: var(--muted-foreground);", label),
+    htmltools::strong(style = "font-weight: 600;", value)
+  )
+}
+
+loading_lines <- function() {
+  stack(
+    block_skeleton(style = "height: 0.75rem; width: 70%;"),
+    block_skeleton(style = "height: 0.75rem; width: 46%;"),
+    block_skeleton(style = "height: 3rem; width: 100%;"),
+    gap = "0.5rem"
+  )
+}
+
 ui <- block_page(
   title = "shinyblocks - Live gallery",
   theme = htmltools::tagList(
@@ -45,32 +77,78 @@ ui <- block_page(
     ),
     uiOutput("gallery_alert"),
     htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 1rem; align-items: start;",
+      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
+      uiOutput("gallery_metric"),
+      uiOutput("gallery_budget_metric"),
+      block_value_box(
+        title = "Members",
+        value = "24",
+        description = "+3 this week",
+        icon = "users",
+        block_badge("Growing", variant = "secondary")
+      ),
+      block_value_box(
+        title = "Uptime",
+        value = "99.98%",
+        description = "Last 30 days",
+        icon = "gauge",
+        block_badge("Healthy", variant = "outline")
+      )
+    ),
+    htmltools::div(
+      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: start;",
       panel(
         block_card(
           title = "Payment method",
           description = "Secure checkout profile",
           block_field_group(
             block_field(block_field_label("Name on card"), block_input("gallery_name", placeholder = "Jane Smith")),
+            block_field(
+              block_field_label("Billing email"),
+              block_input_group(
+                block_input_group_addon(block_icon("mail")),
+                block_input("gallery_email", placeholder = "billing@acme.app", type = "email")
+              )
+            ),
             block_field(block_field_label("Plan"), block_select("gallery_plan", choices = c("Starter", "Professional", "Enterprise"), selected = "Professional", size = "sm")),
             block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2, resize = "none"))
           ),
-          footer = block_button("Save payment", id = "gallery_save", size = "sm")
+          footer = row(
+            block_button("Save payment", id = "gallery_save", size = "sm", icon = "save"),
+            block_dialog(
+              "gallery_invoice_dialog",
+              title = "Invoice preview",
+              description = "A compact dialog using the current dashboard values.",
+              stack(
+                mini_label("Plan", "Professional"),
+                mini_label("Budget", "$5,200 / month"),
+                mini_label("Environment", "Production")
+              ),
+              footer = block_button("Close", size = "sm", variant = "outline"),
+              trigger = "Preview invoice",
+              size = "sm"
+            )
+          )
         )
       ),
       panel(
-        uiOutput("gallery_metric"),
         block_card(
           title = "Budget",
           description = "Monthly operating budget",
           block_slider("gallery_budget", min = 1000, max = 10000, value = 5200, step = 100),
-          footer = textOutput("gallery_budget_value")
+          block_separator(),
+          stack(
+            mini_label("Monthly spend", textOutput("gallery_budget_value", inline = TRUE)),
+            mini_label("Forecast", textOutput("gallery_forecast_value", inline = TRUE)),
+            mini_label("Refresh jobs", uiOutput("gallery_refresh_state"))
+          )
         ),
         htmltools::div(
           style = "display: flex; gap: 0.5rem; flex-wrap: wrap;",
           block_badge("Production"),
           block_badge("Synced", variant = "secondary"),
-          block_badge("Verified", variant = "outline")
+          block_badge("Verified", variant = "outline"),
+          block_tooltip("SLA", "Measured across app, API, and billing checks.", side = "top")
         )
       ),
       panel(
@@ -82,16 +160,72 @@ ui <- block_page(
             block_checkbox("gallery_terms", "Enable weekly digest", value = TRUE),
             block_radio_group(
               "gallery_environment",
-              choices = c("Production" = "prod", "Staging" = "stage"),
-              selected = "prod"
+              choices = c("Production" = "prod", "Staging" = "stage", "Review" = "review"),
+              selected = "prod",
+              orientation = "vertical"
             )
           )
         ),
         block_tabs(
           id = "gallery_tabs",
           selected = "activity",
-          block_tab("Activity", value = "activity", block_alert("All systems operational.")),
-          block_tab("Members", value = "members", block_empty("No pending invites", "New invitations appear here.", icon = "users"))
+          block_tab(
+            "Activity",
+            value = "activity",
+            stack(
+              block_alert("All systems operational.", description = "Runtime alerts, tabs, badges, and form controls are active."),
+              block_popover(
+                "Deploy notes",
+                stack(
+                  htmltools::tags$p(style = "margin: 0;", "Latest release shipped component previews and budget checks."),
+                  block_badge("No incidents", variant = "secondary")
+                ),
+                id = "gallery_popover",
+                align = "end"
+              )
+            )
+          ),
+          block_tab(
+            "Members",
+            value = "members",
+            block_empty(
+              "No pending invites",
+              description = "New invitations appear here.",
+              icon = "users",
+              action = block_button("Invite member", size = "sm", variant = "outline", icon = "plus")
+            )
+          ),
+          block_tab(
+            "Deploy",
+            value = "deploy",
+            block_code(
+              "block_page(\n  block_card(\n    title = \"Workspace dashboard\",\n    block_value_box(\"Uptime\", \"99.98%\")\n  )\n)",
+              language = "r",
+              header = TRUE,
+              line_numbers = FALSE
+            )
+          )
+        )
+      )
+    ),
+    block_card(
+      title = "Pipeline readiness",
+      description = "Skeletons, separators, badges, alerts, and spinner states in one workflow.",
+      htmltools::div(
+        style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;",
+        stack(block_badge("Loading surface", variant = "secondary"), loading_lines()),
+        stack(
+          block_badge("Checks", variant = "outline"),
+          mini_label("Runtime CSS", "OK"),
+          block_separator(),
+          mini_label("Shiny binding", "OK"),
+          block_separator(),
+          mini_label("Docs preview", "OK")
+        ),
+        stack(
+          block_badge("Next sync"),
+          row(block_spinner(size = "sm", color = "muted"), htmltools::span("Waiting for changes"), wrap = FALSE),
+          block_alert("Ready to publish", description = "Refresh the dashboard to simulate a live update.", icon = "check-circle")
         )
       )
     )
@@ -127,10 +261,35 @@ server <- function(input, output, session) {
     )
   })
 
+  output$gallery_budget_metric <- renderUI({
+    value <- input$gallery_budget %||% 5200
+    block_value_box(
+      title = "Budget",
+      value = paste0("$", format(value, big.mark = ",", scientific = FALSE)),
+      description = "Monthly cap",
+      icon = "pie-chart",
+      block_badge(if (value > 8000) "High" else "On track", variant = if (value > 8000) "destructive" else "secondary")
+    )
+  })
+
   output$gallery_budget_value <- renderText({
     value <- input$gallery_budget %||% 5200
     paste0("$", format(value, big.mark = ",", scientific = FALSE), " / month")
   })
+
+  output$gallery_forecast_value <- renderText({
+    value <- input$gallery_budget %||% 5200
+    paste0("$", format(round(value * 1.12), big.mark = ",", scientific = FALSE))
+  })
+
+  output$gallery_refresh_state <- renderUI({
+    if (refreshes() == 0L) {
+      block_badge("Idle", variant = "outline")
+    } else {
+      row(block_spinner(size = "sm", color = "muted"), block_badge(paste(refreshes(), "runs"), variant = "secondary"), wrap = FALSE)
+    }
+  })
+
 }
 
 shinyApp(ui, server)
