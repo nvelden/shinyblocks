@@ -123,7 +123,7 @@ server <- function(input, output, session) {
       title = "Active plan",
       value = plan,
       description = paste0("Refreshed ", refreshes(), " time", if (refreshes() == 1L) "" else "s"),
-      icon = "chart-column"
+      icon = "chart-bar"
     )
   })
 

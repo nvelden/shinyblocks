@@ -81,3 +81,38 @@ test_that("every exported block_*() has a component spec doc", {
     )
   )
 })
+
+test_that("docs-site playground icon names are vendored", {
+  docs_site <- file.path(repo_root(), "docs-site")
+  if (!dir.exists(docs_site)) {
+    skip("docs-site is repo-only and not present in R CMD check build")
+  }
+
+  files <- list.files(
+    docs_site,
+    pattern = "\\.R$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  lines <- unlist(lapply(files, readLines, warn = FALSE), use.names = FALSE)
+  matches <- regmatches(
+    lines,
+    gregexpr("icon\\s*=\\s*\"[a-z0-9-]+\"", lines, perl = TRUE)
+  )
+  icon_names <- sort(unique(sub(
+    ".*\"([a-z0-9-]+)\"$",
+    "\\1",
+    unlist(matches, use.names = FALSE)
+  )))
+
+  missing <- setdiff(icon_names, shinyblocks:::shinyblocks_icon_names())
+  expect_identical(
+    missing,
+    character(),
+    label = paste(
+      "docs-site playgrounds reference icons absent from",
+      "inst/www/icons/MANIFEST.json:",
+      paste(missing, collapse = ", ")
+    )
+  )
+})
