@@ -1,34 +1,46 @@
-# Handoff: Theme scaffold, feedback tokens, and Rhea (issue #36)
+# Handoff: Issue #38 Implemented
 
-## Completion Note (2026-06-02)
+## Status (2026-06-02)
 
-Implemented and committed issue #36:
+Issue #38 is implemented locally and ready to push to `origin/main`.
 
-- synced the vendored default neutral scaffold to current official shadcn
-  theming values for dark card/popover/primary/destructive/border/input/ring;
-- added chart colour mappings and the extended radius utility scale to the
-  Tailwind source;
-- added `tools/theme/check-default-token-drift.mjs` plus
-  `npm run test:themes-drift` / Makefile wiring;
-- added shinyblocks feedback tokens (`success`, `warning`, `info`, matching
-  `-foreground` / `-border`, and `destructive-border`);
-- added `success`, `warning`, and `info` variants to `block_alert()` and
-  `block_badge()`;
-- added `block_style("rhea")`, Rhea runtime scoped CSS, Rhea shell scoped CSS,
-  and generalized style parity coverage for Luma + Rhea;
-- refreshed showcase examples, docs-site previews, component specs, NEWS,
-  roxygen output, tests, snapshots, and asset budgets.
-
-Docs under `docs/` are ignored by `.gitignore`, so the issue #36 docs/specs
-were force-added explicitly:
+Tracked issue:
 
 ```text
-docs/component-specs/alert.md
-docs/component-specs/badge.md
-docs/component-specs/style-profiles.md
-docs/component-specs/style.md
-docs/component-specs/theme.md
-docs/research/2026-06-02-upstream-rhea-comparison.md
+https://github.com/nvelden/shinyblocks/issues/38
+```
+
+Plan:
+
+```text
+docs/agent-plans/2026-06-02-docs-home-playground-theme-controls.md
+```
+
+## Issue #38 Work Landed
+
+- Added session-only docs home gallery controls for:
+  - `gallery_style_profile`, populated from `block_style_profiles()`;
+  - `gallery_theme_preset`, populated from `block_theme_presets()`.
+- Kept the gallery default at `style = "default"` and `preset = "neutral"` so
+  the first-load home page remains visually stable.
+- Applied theme changes through a dynamic scoped `block_theme(..., scope =
+  ".sb-app")` render target.
+- Applied style token changes through `block_style(..., scope = ".sb-app")` and
+  a Shiny custom message that updates the gallery `.sb-app` `data-sb-style`
+  marker so Luma/Rhea shell-profile CSS activates.
+- Increased the gallery iframe height from `1240` to `1360` in the playground
+  generator and docs-site preview manifest.
+- Updated the docs-site gallery e2e test so generated `app.json` must include
+  the style/preset controls and the style-profile message handler.
+
+## Files Changed
+
+```text
+docs-site/playgrounds/gallery/app.R
+docs-site/scripts/generate-playgrounds.R
+docs-site/lib/preview-manifest.json
+docs-site/tests/e2e/gallery.spec.ts
+HANDOFF.md
 ```
 
 ## Verification
@@ -36,48 +48,41 @@ docs/research/2026-06-02-upstream-rhea-comparison.md
 Passed locally:
 
 ```bash
-make check-slice
 make check-fast
-Rscript tools/budget.R
-npm run test:themes-browser
-node tools/parity/diff-styles.mjs --all
+npm run test:e2e -- --grep "landing page gallery"
 git diff --check
 ```
 
-Live servers were restarted and verified:
+Notes:
 
-```text
-http://127.0.0.1:4321/                              HTTP 200
-http://127.0.0.1:5173/?component=button&theme=light HTTP 200
-```
+- The first docs e2e attempt failed inside the command sandbox because the
+  Playwright web server could not create the `tsx` IPC pipe. The same command
+  passed outside the sandbox.
+- `air` is not installed in this environment, so `air format .` was not run.
+- `Rscript scripts/generate-playgrounds.R` was run from `docs-site/`. The
+  generated `docs-site/public/playgrounds/` output is ignored by git; tracked
+  broad preview/runtime build churn was restored, keeping only the intended
+  gallery manifest height change.
 
 ## Current Runtime State
 
-At handoff time both local servers are intentionally running:
+Previous handoff noted local servers may be running:
 
 - showcase: `make showcase` on port `4321`;
-- parity reference app: `python3 -m http.server 5173 --directory parity/dist`.
+- parity reference app:
+  `python3 -m http.server 5173 --directory parity/dist`.
 
-Stop them before a new agent-driven restart:
+Before any new agent-driven showcase restart, follow `AGENTS.md`:
 
 ```bash
 lsof -nP -iTCP:4321 -sTCP:LISTEN
 lsof -nP -iTCP:5173 -sTCP:LISTEN
 ```
 
-Then kill the listed PIDs if needed.
+Stop stale listeners first, then restart `make showcase` outside the sandbox and
+verify with `make showcase-health` outside the sandbox.
 
-## Next Step
+## Next Suggested Action
 
-Open a new chat and continue from the pushed branch. Good follow-ups:
-
-- review the pushed diff / CI;
-- decide whether issue #36 can be closed or needs a PR checklist;
-- if continuing product work, start from the next planned component/profile
-  slice rather than reworking this theme slice.
-
-Track work in:
-
-```text
-https://github.com/nvelden/shinyblocks/issues/36
-```
+After pushing this commit, watch CI and close or comment on Issue #38 with the
+passing checks.

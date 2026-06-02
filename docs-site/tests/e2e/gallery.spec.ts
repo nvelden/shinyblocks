@@ -13,4 +13,9 @@ test("landing page gallery lists featured components", async ({ page }) => {
   const app = files.find((file) => file.name === "app.R");
   expect(app?.content).toContain('`data-component-preview` = "button"');
   expect(app?.content).toContain('`data-component-preview` = "card"');
+  expect(app?.content).toContain("gallery_style_profile");
+  expect(app?.content).toContain("gallery_theme_preset");
+  expect(app?.content).toContain("block_style_profiles()");
+  expect(app?.content).toContain("block_theme_presets()");
+  expect(app?.content).toContain("gallery:set-style-profile");
 });

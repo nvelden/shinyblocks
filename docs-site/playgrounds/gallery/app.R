@@ -19,6 +19,9 @@ do.call(library, list("shinyblocks", character.only = TRUE))
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+gallery_style_profiles <- block_style_profiles()
+gallery_theme_presets <- block_theme_presets()
+
 panel <- function(...) {
   htmltools::div(style = "display: flex; flex-direction: column; gap: 1rem; min-width: 0;", ...)
 }
@@ -58,8 +61,23 @@ loading_lines <- function() {
 ui <- block_page(
   title = "shinyblocks - Live gallery",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
+    block_theme(preset = "neutral"),
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
+    htmltools::tags$script(htmltools::HTML(
+      "(function registerGalleryStyleHandler() {
+        if (!window.Shiny || !Shiny.addCustomMessageHandler) {
+          window.setTimeout(registerGalleryStyleHandler, 50);
+          return;
+        }
+        Shiny.addCustomMessageHandler('gallery:set-style-profile', function(profile) {
+          var root = document.querySelector('.sb-app');
+          if (root && profile) root.setAttribute('data-sb-style', profile);
+        });
+      })();"
+    ))
   ),
+  style = block_style("default"),
+  htmltools::div(style = "display: none;", uiOutput("gallery_theme_assets")),
   htmltools::div(
     `data-shinyblocks-root` = "",
     style = "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; box-sizing: border-box;",
@@ -73,6 +91,32 @@ ui <- block_page(
         style = "display: flex; align-items: center; gap: 0.5rem;",
         block_badge("Live", variant = "secondary"),
         block_button("Refresh", id = "gallery_refresh", icon = "refresh-cw", size = "sm")
+      )
+    ),
+    block_card(
+      title = "Appearance",
+      description = "Session theme controls",
+      style = "padding-bottom: 1rem;",
+      htmltools::div(
+        style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1rem;",
+        block_field(
+          block_field_label("Style profile", `for` = "gallery_style_profile"),
+          block_select(
+            "gallery_style_profile",
+            choices = stats::setNames(gallery_style_profiles, gallery_style_profiles),
+            selected = "default",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("Theme preset", `for` = "gallery_theme_preset"),
+          block_select(
+            "gallery_theme_preset",
+            choices = stats::setNames(gallery_theme_presets, gallery_theme_presets),
+            selected = "neutral",
+            size = "sm"
+          )
+        )
       )
     ),
     uiOutput("gallery_alert"),
@@ -249,6 +293,28 @@ ui <- block_page(
 server <- function(input, output, session) {
   refreshes <- reactiveVal(0L)
   saved <- reactiveVal(FALSE)
+
+  selected_style_profile <- reactive({
+    value <- input$gallery_style_profile %||% "default"
+    if (!value %in% gallery_style_profiles) "default" else value
+  })
+
+  selected_theme_preset <- reactive({
+    value <- input$gallery_theme_preset %||% "neutral"
+    if (!value %in% gallery_theme_presets) "neutral" else value
+  })
+
+  observe({
+    session$sendCustomMessage("gallery:set-style-profile", selected_style_profile())
+  })
+
+  output$gallery_theme_assets <- renderUI({
+    style_profile <- selected_style_profile()
+    htmltools::tagList(
+      block_theme(preset = selected_theme_preset(), scope = ".sb-app"),
+      block_style(style_profile, scope = ".sb-app")$style
+    )
+  })
 
   observeEvent(input$gallery_refresh, {
     refreshes(refreshes() + 1L)
