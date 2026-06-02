@@ -322,14 +322,20 @@ update_block_button <- function(
 #' @export
 block_badge <- function(
   label,
-  variant = c("default", "secondary", "outline", "destructive", "ghost", "link"),
+  variant = c(
+    "default", "secondary", "outline", "destructive", "success", "warning",
+    "info", "ghost", "link"
+  ),
   size = c("default", "sm", "lg"),
   class = NULL,
   style = NULL
 ) {
   variant <- match_arg(
     variant,
-    c("default", "secondary", "outline", "destructive", "ghost", "link")
+    c(
+      "default", "secondary", "outline", "destructive", "success", "warning",
+      "info", "ghost", "link"
+    )
   )
   size <- match_arg(size, c("default", "sm", "lg"))
 
@@ -485,7 +491,7 @@ block_alert <- function(
   description = NULL,
   action = NULL,
   icon = "info",
-  variant = c("default", "destructive"),
+  variant = c("default", "destructive", "success", "warning", "info"),
   class = NULL,
   style = NULL
 ) {
@@ -493,7 +499,10 @@ block_alert <- function(
     stop("`title` is required.", call. = FALSE)
   }
 
-  variant <- match_arg(variant, c("default", "destructive"))
+  variant <- match_arg(
+    variant,
+    c("default", "destructive", "success", "warning", "info")
+  )
   title_tag <- as_component_child(title, "alert-title", block_alert_title)
   description_tag <- as_component_child(
     description,

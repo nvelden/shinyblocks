@@ -10,7 +10,7 @@ block_alert(
   description = NULL,
   action = NULL,
   icon = "info",
-  variant = c("default", "destructive"),
+  variant = c("default", "destructive", "success", "warning", "info"),
   class = NULL,
   style = NULL
 )

@@ -9,7 +9,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("variant", `for` = "showcase_badge_doc_variant"),
-          block_select("showcase_badge_doc_variant", choices = c("default", "secondary", "outline", "destructive", "ghost", "link"), selected = "default")
+          block_select("showcase_badge_doc_variant", choices = c("default", "secondary", "outline", "destructive", "success", "warning", "info", "ghost", "link"), selected = "default")
         ),
         block_field(
           block_field_label("size", `for` = "showcase_badge_doc_size"),
@@ -47,6 +47,9 @@ htmltools::tagList(
     block_badge("Secondary", variant = "secondary", class = "sb-parity-badge-secondary"),
     block_badge("Outline", variant = "outline", class = "sb-parity-badge-outline"),
     block_badge("Destructive", variant = "destructive", class = "sb-parity-badge-destructive"),
+    block_badge("Success", variant = "success", class = "sb-parity-badge-success"),
+    block_badge("Warning", variant = "warning", class = "sb-parity-badge-warning"),
+    block_badge("Info", variant = "info", class = "sb-parity-badge-info"),
     block_badge("Ghost", variant = "ghost", class = "sb-parity-badge-ghost"),
     block_badge("Link", variant = "link", class = "sb-parity-badge-link")
   )

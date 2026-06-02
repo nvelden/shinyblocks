@@ -75,7 +75,7 @@ register_badge_showcase <- function(input, output, session) {
       Default = c("required", "\"default\"", "\"default\"", "NULL", "NULL"),
       Description = c(
         "Content rendered inside the badge.",
-        "Visual variant. One of default, secondary, outline, destructive, ghost, or link.",
+        "Visual variant. One of default, secondary, outline, destructive, success, warning, info, ghost, or link.",
         "Visual size. One of sm, default, or lg.",
         "Additional CSS class merged onto the badge element.",
         "Optional inline styles applied to the badge element."

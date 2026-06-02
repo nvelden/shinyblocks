@@ -25,17 +25,17 @@ targets <- list(
     group = "compatibility"
   ),
   list(
-    # Recalibrated for the post-#33 Luma-profile component set (the 36 KB cap
-    # predated that port and was already exceeded at HEAD). Gzipped (below) is
-    # the meaningful transfer budget; raw is a headroom guard.
+    # Recalibrated for the post-#36 Rhea + feedback-token component set.
+    # Gzipped (below) is the meaningful transfer budget; raw is a headroom
+    # guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 44,
+    limit_kb = 48,
     metric = "raw",
     group = "runtime"
   ),
   list(
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 6,
+    limit_kb = 7,
     metric = "gzipped",
     group = "runtime"
   ),

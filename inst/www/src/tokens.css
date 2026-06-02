@@ -4,7 +4,7 @@
  * Style:   new-york
  * Base:    radix
  * Source:  https://ui.shadcn.com (Tailwind v4 default theme)
- * Synced:  TBD.
+ * Synced:  2026-06-02.
  *
  * Editing rules:
  *  - Token VALUES are vendored. Do not modify them by hand.
@@ -40,6 +40,18 @@
 
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
+  --destructive-border: oklch(0.577 0.245 27.325 / 40%);
+
+  /* shinyblocks feedback-state extension. Not part of shadcn core. */
+  --success: oklch(0.962 0.044 156.743);
+  --success-foreground: oklch(0.448 0.119 151.328);
+  --success-border: oklch(0.845 0.143 164.978);
+  --warning: oklch(0.987 0.022 95.277);
+  --warning-foreground: oklch(0.473 0.137 46.201);
+  --warning-border: oklch(0.879 0.169 91.605);
+  --info: oklch(0.97 0.014 254.604);
+  --info-foreground: oklch(0.488 0.243 264.376);
+  --info-border: oklch(0.809 0.105 251.813);
 
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -65,13 +77,13 @@
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
 
-  --card: oklch(0.145 0 0);
+  --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
 
-  --popover: oklch(0.145 0 0);
+  --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
 
-  --primary: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
 
   --secondary: oklch(0.269 0 0);
@@ -83,12 +95,23 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
 
-  --destructive: oklch(0.396 0.141 25.723);
+  --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
+  --destructive-border: oklch(0.704 0.191 22.216 / 50%);
 
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --success: oklch(0.262 0.051 172.552);
+  --success-foreground: oklch(0.765 0.177 163.223);
+  --success-border: oklch(0.527 0.154 150.069);
+  --warning: oklch(0.279 0.077 45.635);
+  --warning-foreground: oklch(0.852 0.199 91.936);
+  --warning-border: oklch(0.666 0.179 58.318);
+  --info: oklch(0.282 0.091 267.935);
+  --info-foreground: oklch(0.809 0.105 251.813);
+  --info-border: oklch(0.585 0.233 277.117);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
 
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);

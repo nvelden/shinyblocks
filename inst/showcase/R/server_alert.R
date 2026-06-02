@@ -118,7 +118,7 @@ register_alert_showcase <- function(input, output, session) {
         "Optional descriptive text. Rendered inside a block_alert_description().",
         "Optional action content. Use block_alert_action() to position a button or link.",
         "Optional leading icon name or element.",
-        "Visual variant. One of default or destructive.",
+        "Visual variant. One of default, destructive, success, warning, or info.",
         "Additional CSS class merged onto the alert container.",
         "Optional inline styles applied to the alert container."
       )

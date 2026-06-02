@@ -24,14 +24,24 @@ export const THEME_REGISTRY = {
   alert: {
     section: "alert",
     bindings: [
-      { selector: ".sb-parity-alert-destructive", property: "color", token: "--destructive" }
+      { selector: ".sb-parity-alert-destructive", property: "color", token: "--destructive" },
+      { selector: ".sb-parity-alert-destructive", property: "borderColor", token: "--destructive-border" }
     ]
   },
   badge: {
     section: "badge",
     bindings: [
       { selector: ".sb-parity-badge-default", property: "backgroundColor", token: "--primary" },
-      { selector: ".sb-parity-badge-default", property: "color", token: "--primary-foreground" }
+      { selector: ".sb-parity-badge-default", property: "color", token: "--primary-foreground" },
+      { selector: ".sb-parity-badge-success", property: "backgroundColor", token: "--success" },
+      { selector: ".sb-parity-badge-success", property: "color", token: "--success-foreground" },
+      { selector: ".sb-parity-badge-success", property: "borderColor", token: "--success-border" },
+      { selector: ".sb-parity-badge-warning", property: "backgroundColor", token: "--warning" },
+      { selector: ".sb-parity-badge-warning", property: "color", token: "--warning-foreground" },
+      { selector: ".sb-parity-badge-warning", property: "borderColor", token: "--warning-border" },
+      { selector: ".sb-parity-badge-info", property: "backgroundColor", token: "--info" },
+      { selector: ".sb-parity-badge-info", property: "color", token: "--info-foreground" },
+      { selector: ".sb-parity-badge-info", property: "borderColor", token: "--info-border" }
     ]
   },
   button: {

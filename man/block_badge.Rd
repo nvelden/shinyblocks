@@ -6,7 +6,8 @@
 \usage{
 block_badge(
   label,
-  variant = c("default", "secondary", "outline", "destructive", "ghost", "link"),
+  variant = c("default", "secondary", "outline", "destructive", "success", "warning",
+    "info", "ghost", "link"),
   size = c("default", "sm", "lg"),
   class = NULL,
   style = NULL

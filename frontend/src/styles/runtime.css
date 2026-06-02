@@ -25,6 +25,17 @@
   --accent: oklch(97% 0 0);
   --accent-foreground: oklch(20.5% 0 0);
   --destructive: oklch(57.7% 0.245 27.325);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --destructive-border: oklch(57.7% 0.245 27.325 / 40%);
+  --success: oklch(96.2% 0.044 156.743);
+  --success-foreground: oklch(44.8% 0.119 151.328);
+  --success-border: oklch(84.5% 0.143 164.978);
+  --warning: oklch(98.7% 0.022 95.277);
+  --warning-foreground: oklch(47.3% 0.137 46.201);
+  --warning-border: oklch(87.9% 0.169 91.605);
+  --info: oklch(97% 0.014 254.604);
+  --info-foreground: oklch(48.8% 0.243 264.376);
+  --info-border: oklch(80.9% 0.105 251.813);
   --border: oklch(92.2% 0 0);
   --input: oklch(92.2% 0 0);
   --ring: oklch(70.8% 0 0);
@@ -73,11 +84,11 @@
 [data-theme="dark"] [data-shinyblocks-portal-root] {
   --background: oklch(14.5% 0 0);
   --foreground: oklch(98.5% 0 0);
-  --card: oklch(14.5% 0 0);
+  --card: oklch(20.5% 0 0);
   --card-foreground: oklch(98.5% 0 0);
-  --popover: oklch(14.5% 0 0);
+  --popover: oklch(20.5% 0 0);
   --popover-foreground: oklch(98.5% 0 0);
-  --primary: oklch(98.5% 0 0);
+  --primary: oklch(92.2% 0 0);
   --primary-foreground: oklch(20.5% 0 0);
   --secondary: oklch(26.9% 0 0);
   --secondary-foreground: oklch(98.5% 0 0);
@@ -85,10 +96,21 @@
   --muted-foreground: oklch(70.8% 0 0);
   --accent: oklch(26.9% 0 0);
   --accent-foreground: oklch(98.5% 0 0);
-  --destructive: oklch(39.6% 0.141 25.723);
-  --border: oklch(26.9% 0 0);
-  --input: oklch(26.9% 0 0);
-  --ring: oklch(43.9% 0 0);
+  --destructive: oklch(70.4% 0.191 22.216);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --destructive-border: oklch(70.4% 0.191 22.216 / 50%);
+  --success: oklch(26.2% 0.051 172.552);
+  --success-foreground: oklch(76.5% 0.177 163.223);
+  --success-border: oklch(52.7% 0.154 150.069);
+  --warning: oklch(27.9% 0.077 45.635);
+  --warning-foreground: oklch(85.2% 0.199 91.936);
+  --warning-border: oklch(66.6% 0.179 58.318);
+  --info: oklch(28.2% 0.091 267.935);
+  --info-foreground: oklch(80.9% 0.105 251.813);
+  --info-border: oklch(58.5% 0.233 277.117);
+  --border: oklch(100% 0 0 / 10%);
+  --input: oklch(100% 0 0 / 15%);
+  --ring: oklch(55.6% 0 0);
 }
 
 /* Scoped element resets and accent-color overrides to prevent Bootstrap/default blue leaks and focus borders */
@@ -461,6 +483,24 @@
   color: white;
 }
 
+[data-shinyblocks-root] .sb-badge-success {
+  border-color: var(--success-border);
+  background-color: var(--success);
+  color: var(--success-foreground);
+}
+
+[data-shinyblocks-root] .sb-badge-warning {
+  border-color: var(--warning-border);
+  background-color: var(--warning);
+  color: var(--warning-foreground);
+}
+
+[data-shinyblocks-root] .sb-badge-info {
+  border-color: var(--info-border);
+  background-color: var(--info);
+  color: var(--info-foreground);
+}
+
 [data-theme="dark"] [data-shinyblocks-root] .sb-badge-destructive {
   background-color: color-mix(in oklch, var(--destructive) 60%, transparent);
 }
@@ -669,7 +709,25 @@
 [data-shinyblocks-root] .sb-alert-destructive {
   background-color: var(--card);
   color: var(--destructive);
-  border-color: color-mix(in oklch, var(--destructive) 40%, transparent);
+  border-color: var(--destructive-border);
+}
+
+[data-shinyblocks-root] .sb-alert-success {
+  background-color: var(--success);
+  color: var(--success-foreground);
+  border-color: var(--success-border);
+}
+
+[data-shinyblocks-root] .sb-alert-warning {
+  background-color: var(--warning);
+  color: var(--warning-foreground);
+  border-color: var(--warning-border);
+}
+
+[data-shinyblocks-root] .sb-alert-info {
+  background-color: var(--info);
+  color: var(--info-foreground);
+  border-color: var(--info-border);
 }
 
 [data-shinyblocks-root] .sb-alert-icon {
@@ -1872,6 +1930,125 @@
 
 /* Empty — dashed border, p-12 (radius via token). */
 [data-sb-style="luma"] [data-shinyblocks-root] .sb-empty {
+  border-style: dashed;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+/*
+ * Rhea style profile. Rhea is the compact Luma sibling: repeated recipes stay
+ * in R/style-profiles.R; only structural geometry that cannot be expressed by
+ * one token lives here. Values mirror official Radix Rhea
+ * (apps/v4/registry/styles/style-rhea.css).
+ */
+[data-theme="dark"] [data-sb-style="rhea"] [data-shinyblocks-root].sb-card {
+  box-shadow: var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-button-default:hover {
+  background-color: color-mix(in oklch, var(--primary) 80%, transparent);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-button:active:not([aria-haspopup="true"]) {
+  transform: translateY(1px);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-textarea-control {
+  padding: 0.5rem 0.625rem;
+  resize: none;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-portal-root] .sb-select-item {
+  min-height: 1.75rem;
+  gap: 0.5rem;
+  padding: 0.375rem 2rem 0.375rem 0.5rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch-button {
+  border-width: 2px;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch:not([data-size="sm"]):not([data-size="lg"]) .sb-switch-button {
+  width: 2rem;
+  height: 1.25rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch:not([data-size="sm"]):not([data-size="lg"]) .sb-switch-thumb {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-button {
+  width: 1.5rem;
+  height: 1rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] .sb-switch-thumb {
+  transform: translateX(calc(100% - 4px));
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-slider-track {
+  height: 0.25rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-slider-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: 0;
+  background-color: var(--background);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1),
+    0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-slider-thumb:hover,
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-slider-thumb:focus-visible {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1),
+    0 0 0 4px color-mix(in oklch, var(--ring) 30%, transparent);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-radio-group-control {
+  gap: 0.75rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] .sb-radio-group-indicator {
+  background-color: var(--primary-foreground);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-portal-root] .sb-dialog-overlay {
+  background-color: rgb(0 0 0 / 0.3);
+  backdrop-filter: blur(4px);
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-portal-root] .sb-tooltip-content {
+  padding: 0.375rem 0.75rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-alert {
+  padding: 0.75rem 1rem;
+  column-gap: 0.625rem;
+  row-gap: 0.125rem;
+}
+
+[data-sb-style="rhea"] [data-shinyblocks-root] .sb-empty {
   border-style: dashed;
   padding: 3rem;
   gap: 1rem;

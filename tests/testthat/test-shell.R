@@ -704,11 +704,17 @@ test_that("badge variants map to runtime props", {
   destructive <- runtime_payload_from(
     block_badge("Blocked", variant = "destructive")
   )
+  success <- runtime_payload_from(block_badge("Synced", variant = "success"))
+  warning <- runtime_payload_from(block_badge("Review", variant = "warning"))
+  info <- runtime_payload_from(block_badge("Active", variant = "info"))
   outline <- runtime_payload_from(block_badge("Draft", variant = "outline"))
   ghost <- runtime_payload_from(block_badge("Quiet", variant = "ghost"))
   link <- runtime_payload_from(block_badge("Docs", variant = "link", size = "lg"))
 
   expect_identical(destructive$props$variant, "destructive")
+  expect_identical(success$props$variant, "success")
+  expect_identical(warning$props$variant, "warning")
+  expect_identical(info$props$variant, "info")
   expect_identical(outline$props$variant, "outline")
   expect_identical(ghost$props$variant, "ghost")
   expect_identical(link$props$variant, "link")
@@ -832,6 +838,13 @@ test_that("alerts accept composed title and description tags", {
   expect_match(payload$props$actionHtml, "Review", fixed = TRUE)
   expect_match(payload$props$actionHtml, "sb-alert-action", fixed = TRUE)
   expect_null(payload$props$iconHtml)
+})
+
+test_that("alerts expose feedback-state variants", {
+  for (variant in c("success", "warning", "info")) {
+    payload <- runtime_payload_from(block_alert("Status", variant = variant))
+    expect_identical(payload$props$variant, variant)
+  }
 })
 
 test_that("value boxes render expected regions", {

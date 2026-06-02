@@ -69,7 +69,7 @@ test_that("block_alert validates required title and variant", {
   })
 
   expect_snapshot(error = TRUE, {
-    block_alert("Notice", variant = "warning")
+    block_alert("Notice", variant = "urgent")
   })
 })
 

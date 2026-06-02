@@ -128,7 +128,20 @@ register_theme_showcase <- function(input, output, session) {
             block_badge("Primary", variant = "default"),
             block_badge("Secondary", variant = "secondary"),
             block_badge("Outline", variant = "outline"),
-            block_badge("Destructive", variant = "destructive")
+            block_badge("Destructive", variant = "destructive"),
+            block_badge("Success", variant = "success"),
+            block_badge("Warning", variant = "warning"),
+            block_badge("Info", variant = "info")
+          )
+        ),
+        htmltools::div(
+          style = swatch_style(),
+          htmltools::span(style = label_style, "Feedback alerts: shinyblocks extensions"),
+          htmltools::div(
+            style = "display: flex; flex-direction: column; gap: 0.5rem;",
+            block_alert("Success", variant = "success", icon = "check"),
+            block_alert("Warning", variant = "warning", icon = "alert-triangle"),
+            block_alert("Info", variant = "info", icon = "info")
           )
         ),
         # Surfaces exercise --accent, --muted, --border, --ring.

@@ -154,7 +154,7 @@ export const STYLE_REGISTRY = {
   },
   sidebar: {
     section: "layout",
-    bindings: [{ selector: ".sb-sidebar-nav", property: "gap" }]
+    bindings: [{ selector: ".sb-sidebar-toggle", property: "borderRadius" }]
   },
   tabs: {
     section: "tabs",

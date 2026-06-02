@@ -35,7 +35,7 @@ htmltools::tagList(
             block_field_label("variant", `for` = "showcase_alert_doc_variant"),
             block_select(
               "showcase_alert_doc_variant",
-              choices = c("default", "destructive"),
+              choices = c("default", "destructive", "success", "warning", "info"),
               selected = "default",
               size = "sm"
             )
@@ -99,6 +99,9 @@ htmltools::tagList(
       action = block_alert_action(block_button("Review", variant = "outline", size = "sm")),
       class = "sb-parity-alert-action"
     ),
-    block_alert("Build failed", description = "Three components failed to render.", variant = "destructive", icon = "alert-triangle", class = "sb-parity-alert-destructive")
+    block_alert("Build failed", description = "Three components failed to render.", variant = "destructive", icon = "alert-triangle", class = "sb-parity-alert-destructive"),
+    block_alert("Payment received", description = "The invoice is settled.", variant = "success"),
+    block_alert("Needs review", description = "Confirm the account details.", variant = "warning"),
+    block_alert("Sync active", description = "Changes are being propagated.", variant = "info")
   )
 )

@@ -1,5 +1,5 @@
 test_that("block_style_profiles returns the supported profiles", {
-  expect_identical(block_style_profiles(), c("default", "luma"))
+  expect_identical(block_style_profiles(), c("default", "luma", "rhea"))
   expect_identical(
     block_style_profiles(),
     shinyblocks:::style_profile_names()
@@ -7,11 +7,12 @@ test_that("block_style_profiles returns the supported profiles", {
 })
 
 test_that("block_style validates the profile name", {
-  expect_error(block_style("rhea"), "Unknown style profile")
+  expect_error(block_style("nova"), "Unknown style profile")
   expect_error(block_style(c("default", "default")), "single supported style-profile")
   expect_error(block_style(""), "single supported style-profile")
   expect_silent(block_style("default"))
   expect_silent(block_style("luma"))
+  expect_silent(block_style("rhea"))
 })
 
 test_that("block_style('luma') emits the luma profile tokens page-wide", {
@@ -129,15 +130,17 @@ test_that("block_style rejects internal geometry tokens passed via ...", {
   expect_error(block_style("default", input_surface = "red"), "Unknown style override")
 })
 
-test_that("the luma profile only uses emittable tokens", {
+test_that("built-in profiles only use emittable tokens", {
   # The style-profile parity harness (tools/theme/style-registry.mjs) parses the
   # luma list and maps each key through the public + internal token maps. Every
   # luma key must be an emittable token name with a non-empty value, or that
   # parse breaks.
-  luma <- shinyblocks:::style_profiles[["luma"]]
-  expect_true(length(luma) > 0)
-  expect_true(all(names(luma) %in% names(shinyblocks:::style_emit_token_map())))
-  expect_true(all(nzchar(unlist(luma))))
+  for (profile in c("luma", "rhea")) {
+    values <- shinyblocks:::style_profiles[[profile]]
+    expect_true(length(values) > 0)
+    expect_true(all(names(values) %in% names(shinyblocks:::style_emit_token_map())))
+    expect_true(all(nzchar(unlist(values))))
+  }
 })
 
 test_that("block_style('luma') emits internal radius and surface tokens", {
@@ -145,4 +148,11 @@ test_that("block_style('luma') emits internal radius and surface tokens", {
   expect_match(css, "--sb-card-radius: 2rem;", fixed = TRUE)
   expect_match(css, "--sb-input-surface: color-mix(in oklch, var(--input) 50%, transparent);", fixed = TRUE)
   expect_match(css, "--sb-input-border: transparent;", fixed = TRUE)
+})
+
+test_that("block_style('rhea') emits compact profile tokens", {
+  css <- as.character(block_style("rhea")$style)
+  expect_match(css, "--sb-control-height: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-card-radius: min(calc(var(--radius) * 2.6), 24px);", fixed = TRUE)
+  expect_match(css, "--sb-input-radius: 1rem;", fixed = TRUE)
 })

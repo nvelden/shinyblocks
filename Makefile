@@ -78,6 +78,7 @@ dev:
 check-fast:
 	$(R) -e 'devtools::test(filter = "style|utils")'
 	npm run test:themes-static
+	npm run test:themes-drift
 	npm run test:style-leanness
 	git diff --check
 	@echo "check-fast OK"
@@ -142,6 +143,7 @@ legacy-audit:
 # component CSS hardcodes a color instead of a theme token.
 theme-static:
 	npm run test:themes-static
+	npm run test:themes-drift
 
 # Layers 2 + 3: behavioural token-override check + completeness gate + palette
 # sweep + style-profile parity. Requires the local showcase running

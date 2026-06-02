@@ -52,7 +52,7 @@
       block_badge("New", variant = "primary")
     Condition
       Error:
-      ! `variant` must be one of "default", "secondary", "outline", "destructive", "ghost", "link".
+      ! `variant` must be one of "default", "secondary", "outline", "destructive", "success", "warning", "info", "ghost", "link".
 
 # block_alert validates required title and variant
 
@@ -65,10 +65,10 @@
 ---
 
     Code
-      block_alert("Notice", variant = "warning")
+      block_alert("Notice", variant = "urgent")
     Condition
       Error:
-      ! `variant` must be one of "default", "destructive".
+      ! `variant` must be one of "default", "destructive", "success", "warning", "info".
 
 # block_value_box validates variant
 
