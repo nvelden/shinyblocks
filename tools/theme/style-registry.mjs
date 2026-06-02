@@ -143,36 +143,32 @@ export const STYLE_REGISTRY = {
     reason: "An icon-sized spinner has no profile-sensitive geometry; Luma leaves it unchanged."
   },
 
-  // --- R-side composition primitives: shell port deferred (Slice 4) ------
+  // --- R-side shell families: Luma ported (compiled into inst/www/shinyblocks.css) ---
   nav: {
     section: "nav-item",
-    mode: "profile-neutral",
-    reason:
-      "Shell family. The Luma shell port is deferred (requires recompiling the Tailwind shell CSS, make build-css); Luma is not advertised across the shell yet. See Slice 4."
+    bindings: [
+      { selector: ".sb-parity-nav-baseline .sb-nav-item", property: "borderRadius" }
+    ]
   },
   sidebar: {
     section: "layout",
-    mode: "profile-neutral",
-    reason:
-      "Shell family. The Luma shell port is deferred (requires recompiling the Tailwind shell CSS, make build-css); Luma is not advertised across the shell yet. See Slice 4."
+    bindings: [{ selector: ".sb-sidebar-nav", property: "gap" }]
   },
   tabs: {
     section: "tabs",
-    mode: "profile-neutral",
-    reason:
-      "Shell family. The Luma shell port is deferred (requires recompiling the Tailwind shell CSS, make build-css); Luma is not advertised across the shell yet. See Slice 4."
+    bindings: [
+      { selector: ".sb-parity-tabs-default .sb-tabs-list", property: "borderRadius" }
+    ]
   },
   field: {
     section: "field",
-    mode: "profile-neutral",
-    reason:
-      "Shell family. The Luma shell port is deferred (requires recompiling the Tailwind shell CSS, make build-css); Luma is not advertised across the shell yet. See Slice 4."
+    bindings: [{ selector: ".sb-parity-field-default", property: "gap" }]
   },
   "input-group": {
     section: "input-group",
-    mode: "profile-neutral",
-    reason:
-      "Shell family. The Luma shell port is deferred (requires recompiling the Tailwind shell CSS, make build-css); Luma is not advertised across the shell yet. See Slice 4."
+    bindings: [
+      { selector: ".sb-parity-input-group-leading", property: "borderRadius" }
+    ]
   }
 };
 

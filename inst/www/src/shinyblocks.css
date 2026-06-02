@@ -501,4 +501,85 @@
       @apply inline-flex;
     }
   }
+
+  /*
+   * Luma style profile — shell families (sidebar, nav, tabs, fields, input
+   * groups). Activated by data-sb-style="luma" on the .sb-app shell
+   * (block_page(style = block_style("luma"))).
+   *
+   * Shared visual-feel tokens (control padding/gap, shadows, focus ring) come
+   * from the `luma` profile list in R/style-profiles.R, emitted as `--sb-*`
+   * overrides by block_style(). The rules below cover shell differences that
+   * cannot be a shared token: larger/pill radii, wider menu gaps and taller
+   * menu hit targets, translucent input-group surfaces, and field gaps.
+   *
+   * Values mirror official upstream Radix Luma
+   * (apps/v4/registry/styles/style-luma.css + radix-luma/ui); see
+   * docs/research/2026-06-01-upstream-luma-comparison.md. Tailwind radii:
+   * rounded-xl = 0.75rem, rounded-2xl = 1rem, rounded-3xl = 1.5rem,
+   * rounded-4xl = 2rem, rounded-full = 9999px.
+   */
+
+  /* Tabs — rounded-full pill list and triggers, wider trigger padding. */
+  [data-sb-style="luma"] .sb-tabs-list {
+    border-radius: 9999px;
+  }
+
+  [data-sb-style="luma"] .sb-tabs-trigger {
+    border-radius: 9999px;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  /* Line tabs keep their flat underline geometry (no pill). */
+  [data-sb-style="luma"] .sb-tabs-list[data-variant="line"],
+  [data-sb-style="luma"] .sb-tabs-trigger[data-variant="line"] {
+    border-radius: 0;
+  }
+
+  /* Nav menu item — larger radius, taller hit target, wider padding. */
+  [data-sb-style="luma"] .sb-nav-item {
+    border-radius: 0.75rem;
+    min-height: 2.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Sidebar/nav menus — wider gap between menu items, softer toggle radius. */
+  [data-sb-style="luma"] .sb-nav,
+  [data-sb-style="luma"] .sb-sidebar-nav {
+    gap: 0.375rem;
+  }
+
+  [data-sb-style="luma"] .sb-sidebar-toggle {
+    border-radius: 0.75rem;
+  }
+
+  /* Field — wider field and group gaps; softer fieldset chrome. */
+  [data-sb-style="luma"] .sb-field {
+    gap: 0.75rem;
+  }
+
+  [data-sb-style="luma"] .sb-field-group {
+    gap: 2rem;
+  }
+
+  [data-sb-style="luma"] .sb-field-set {
+    border-radius: 1.5rem;
+    border-color: transparent;
+    padding: 1.5rem;
+  }
+
+  /* Input group — rounded-4xl pill, translucent surface, transparent border. */
+  [data-sb-style="luma"] .sb-input-group {
+    border-radius: 2rem;
+    border-color: transparent;
+    background-color: color-mix(in oklch, var(--input) 50%, transparent);
+  }
+
+  [data-sb-style="luma"] .sb-input-group-addon {
+    border-color: transparent;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
