@@ -9,6 +9,23 @@ function getArg(flag) {
   return process.argv[index + 1] ?? null;
 }
 
+// Navigate to the showcase, turning a connection failure into an actionable
+// message instead of letting Playwright's raw error bubble up. The caller's
+// try/finally still closes the browser so the process exits instead of hanging.
+async function gotoShowcase(page, url) {
+  try {
+    await page.goto(url, { waitUntil: "networkidle" });
+  } catch (err) {
+    if (/ERR_CONNECTION_REFUSED|ERR_CONNECTION/.test(String(err))) {
+      throw new Error(
+        `Showcase not reachable at ${url}. Start it first: \`make showcase\`. ` +
+          `This render check needs the live showcase.`
+      );
+    }
+    throw err;
+  }
+}
+
 function selectorForState(selectors, state) {
   if (typeof selectors === "string") {
     return selectors;
@@ -148,37 +165,39 @@ async function main() {
   }
 
   const browser = await chromium.launch();
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
-    deviceScaleFactor: 1
-  });
-  const page = await context.newPage();
-
   const issues = [];
-  for (const name of components) {
-    const config = getComponentConfig(name);
-    for (const theme of config.themes) {
-      await page.goto("about:blank");
-      await page.goto(config.showcaseUrl, { waitUntil: "networkidle" });
-      await page.waitForSelector(config.showcaseReadySelector, {
-        state: "attached",
-        timeout: 10000
-      });
-      await setShowcaseTheme(page, theme);
+  try {
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+      deviceScaleFactor: 1
+    });
+    const page = await context.newPage();
 
-      for (const state of config.states) {
-        const stateIssues = await checkState(page, config, theme, state);
-        if (stateIssues.length > 0) {
-          issues.push(...stateIssues);
-          console.log(`FAIL ${config.component} ${theme}/${state}`);
-        } else {
-          console.log(`OK   ${config.component} ${theme}/${state}`);
+    for (const name of components) {
+      const config = getComponentConfig(name);
+      for (const theme of config.themes) {
+        await page.goto("about:blank");
+        await gotoShowcase(page, config.showcaseUrl);
+        await page.waitForSelector(config.showcaseReadySelector, {
+          state: "attached",
+          timeout: 10000
+        });
+        await setShowcaseTheme(page, theme);
+
+        for (const state of config.states) {
+          const stateIssues = await checkState(page, config, theme, state);
+          if (stateIssues.length > 0) {
+            issues.push(...stateIssues);
+            console.log(`FAIL ${config.component} ${theme}/${state}`);
+          } else {
+            console.log(`OK   ${config.component} ${theme}/${state}`);
+          }
         }
       }
     }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
 
   if (issues.length > 0) {
     console.error("\nRender check failed:");

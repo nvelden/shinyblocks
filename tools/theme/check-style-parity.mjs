@@ -44,6 +44,23 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 const SHOWCASE_URL = process.env.SHOWCASE_URL || "http://127.0.0.1:4321";
 
+// Navigate to the showcase, turning a connection failure into an actionable
+// message instead of letting Playwright's raw error bubble up. The caller's
+// try/finally still closes the browser so the process exits instead of hanging.
+async function gotoShowcase(page, url) {
+  try {
+    await page.goto(url, { waitUntil: "networkidle" });
+  } catch (err) {
+    if (/ERR_CONNECTION_REFUSED|ERR_CONNECTION/.test(String(err))) {
+      throw new Error(
+        `Showcase not reachable at ${url}. Start it first: \`make showcase\` ` +
+          `(or set SHOWCASE_URL). This browser check needs the live showcase.`
+      );
+    }
+    throw err;
+  }
+}
+
 // --- Completeness gate ----------------------------------------------------
 function runtimeComponentNames() {
   const src = fs.readFileSync(path.join(ROOT, "R", "runtime.R"), "utf8");
@@ -158,69 +175,71 @@ async function run() {
   }
 
   const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto(SHOWCASE_URL, { waitUntil: "networkidle" });
-  await disableMotion(page);
+  try {
+    const page = await browser.newPage();
+    await gotoShowcase(page, SHOWCASE_URL);
+    await disableMotion(page);
 
-  for (const profile of profiles) {
-    const tokenOverrides = profileTokenOverrides(profile);
-    console.log(`\n--- profile: ${profile} ---`);
+    for (const profile of profiles) {
+      const tokenOverrides = profileTokenOverrides(profile);
+      console.log(`\n--- profile: ${profile} ---`);
 
-    for (const [name, config] of Object.entries(STYLE_REGISTRY)) {
-      const mode = config.mode || "profile";
-      if (mode === "overlay") {
-        const a = overlayAffected(profile, name);
-        if (a.ok) {
-          passes += 1;
-          const via = [a.hasToken && "tokens", a.hasCss && "css"]
-            .filter(Boolean)
-            .join("+");
-          overlays.push(`${profile} :: ${name} (overlay, via ${via})`);
-        } else {
-          failures += 1;
-          console.error(
-            `  FAIL ${profile} :: ${name} (overlay) — profile sets no ${name}_* ` +
-              `token and has no [data-sb-style="${profile}"] ${name} rule`
-          );
+      for (const [name, config] of Object.entries(STYLE_REGISTRY)) {
+        const mode = config.mode || "profile";
+        if (mode === "overlay") {
+          const a = overlayAffected(profile, name);
+          if (a.ok) {
+            passes += 1;
+            const via = [a.hasToken && "tokens", a.hasCss && "css"]
+              .filter(Boolean)
+              .join("+");
+            overlays.push(`${profile} :: ${name} (overlay, via ${via})`);
+          } else {
+            failures += 1;
+            console.error(
+              `  FAIL ${profile} :: ${name} (overlay) — profile sets no ${name}_* ` +
+                `token and has no [data-sb-style="${profile}"] ${name} rule`
+            );
+          }
+          continue;
         }
-        continue;
-      }
-      if (mode === "profile-neutral") {
-        neutrals.push(`${profile} :: ${name} (profile-neutral: ${config.reason})`);
-        continue;
-      }
+        if (mode === "profile-neutral") {
+          neutrals.push(`${profile} :: ${name} (profile-neutral: ${config.reason})`);
+          continue;
+        }
 
-      await page.waitForSelector(config.bindings[0].selector, {
-        state: "attached",
-        timeout: 10000
-      });
+        await page.waitForSelector(config.bindings[0].selector, {
+          state: "attached",
+          timeout: 10000
+        });
 
-      for (const b of config.bindings) {
-        const r = await measureProfileShift(
-          page,
-          b.selector,
-          b.property,
-          profile,
-          tokenOverrides
-        );
-        const label = `${profile} :: ${name} :: ${b.property} (${b.selector})`;
-        if (r.missing) {
-          failures += 1;
-          console.error(`  FAIL ${label}  (element not found)`);
-        } else if (r.after !== r.before) {
-          passes += 1;
-          console.log(`  ok   ${label}  ${r.before} -> ${r.after}`);
-        } else {
-          failures += 1;
-          console.error(
-            `  FAIL ${label}  unchanged under ${profile} (${r.before}) — component does not respond to the style profile`
+        for (const b of config.bindings) {
+          const r = await measureProfileShift(
+            page,
+            b.selector,
+            b.property,
+            profile,
+            tokenOverrides
           );
+          const label = `${profile} :: ${name} :: ${b.property} (${b.selector})`;
+          if (r.missing) {
+            failures += 1;
+            console.error(`  FAIL ${label}  (element not found)`);
+          } else if (r.after !== r.before) {
+            passes += 1;
+            console.log(`  ok   ${label}  ${r.before} -> ${r.after}`);
+          } else {
+            failures += 1;
+            console.error(
+              `  FAIL ${label}  unchanged under ${profile} (${r.before}) — component does not respond to the style profile`
+            );
+          }
         }
       }
     }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
 
   console.log(
     `\nStyle parity: ${passes} passed, ${failures} failed, ` +

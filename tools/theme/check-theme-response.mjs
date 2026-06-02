@@ -28,6 +28,23 @@ const SENTINELS = {
   dark: "rgb(4, 5, 6)"
 };
 
+// Navigate to the showcase, turning a connection failure into an actionable
+// message instead of letting Playwright's raw error bubble up. The caller's
+// try/finally still closes the browser so the process exits instead of hanging.
+async function gotoShowcase(page, url) {
+  try {
+    await page.goto(url, { waitUntil: "networkidle" });
+  } catch (err) {
+    if (/ERR_CONNECTION_REFUSED|ERR_CONNECTION/.test(String(err))) {
+      throw new Error(
+        `Showcase not reachable at ${url}. Start it first: \`make showcase\` ` +
+          `(or set SHOWCASE_URL). This browser check needs the live showcase.`
+      );
+    }
+    throw err;
+  }
+}
+
 // --- Completeness gate ----------------------------------------------------
 // Read RUNTIME_COMPONENT_NAMES from R/runtime.R so the gate tracks the single
 // source of truth without duplicating the list here.
@@ -239,57 +256,59 @@ async function run() {
   }
 
   const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto(SHOWCASE_URL, { waitUntil: "networkidle" });
-  await disableMotion(page);
+  try {
+    const page = await browser.newPage();
+    await gotoShowcase(page, SHOWCASE_URL);
+    await disableMotion(page);
 
-  for (const [name, config] of Object.entries(THEME_REGISTRY)) {
-    if (config.mode === "static-only") {
-      skips.push(`${name} (static-only: ${config.reason})`);
-      continue;
-    }
+    for (const [name, config] of Object.entries(THEME_REGISTRY)) {
+      if (config.mode === "static-only") {
+        skips.push(`${name} (static-only: ${config.reason})`);
+        continue;
+      }
 
-    await page.waitForSelector(config.bindings[0].selector, {
-      state: "attached",
-      timeout: 10000
-    });
+      await page.waitForSelector(config.bindings[0].selector, {
+        state: "attached",
+        timeout: 10000
+      });
 
-    for (const mode of ["light", "dark"]) {
-      await setTheme(page, mode);
-      const sentinel = SENTINELS[mode];
+      for (const mode of ["light", "dark"]) {
+        await setTheme(page, mode);
+        const sentinel = SENTINELS[mode];
 
-      for (const b of config.bindings) {
-        const r = await measureWithOverride(
-          page,
-          config.section,
-          b.selector,
-          b.property,
-          b.token,
-          sentinel
-        );
-        const label = `${name} :: ${mode} :: ${b.property} -> ${b.token}`;
-        if (r.missing) {
-          failures += 1;
-          console.error(`  FAIL ${label}  (element not found: ${b.selector})`);
-        } else if (r.after === sentinel) {
-          passes += 1;
-          console.log(`  ok   ${label}`);
-        } else {
-          failures += 1;
-          console.error(
-            `  FAIL ${label}  expected ${sentinel}, got ${r.after} (before ${r.before}) — property not bound to ${b.token}`
+        for (const b of config.bindings) {
+          const r = await measureWithOverride(
+            page,
+            config.section,
+            b.selector,
+            b.property,
+            b.token,
+            sentinel
           );
+          const label = `${name} :: ${mode} :: ${b.property} -> ${b.token}`;
+          if (r.missing) {
+            failures += 1;
+            console.error(`  FAIL ${label}  (element not found: ${b.selector})`);
+          } else if (r.after === sentinel) {
+            passes += 1;
+            console.log(`  ok   ${label}`);
+          } else {
+            failures += 1;
+            console.error(
+              `  FAIL ${label}  expected ${sentinel}, got ${r.after} (before ${r.before}) — property not bound to ${b.token}`
+            );
+          }
         }
       }
     }
+
+    console.log("\nPalette sweep (every preset, light + dark):");
+    const palette = await runPaletteSweep(page);
+    passes += palette.passes;
+    failures += palette.failures;
+  } finally {
+    await browser.close();
   }
-
-  console.log("\nPalette sweep (every preset, light + dark):");
-  const palette = await runPaletteSweep(page);
-  passes += palette.passes;
-  failures += palette.failures;
-
-  await browser.close();
 
   console.log(
     `\nTheme response: ${passes} passed, ${failures} failed, ${skips.length} static-only.`
