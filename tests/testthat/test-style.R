@@ -1,0 +1,121 @@
+test_that("block_style_profiles returns the supported profiles", {
+  expect_identical(block_style_profiles(), c("default", "luma"))
+  expect_identical(
+    block_style_profiles(),
+    shinyblocks:::style_profile_names()
+  )
+})
+
+test_that("block_style validates the profile name", {
+  expect_error(block_style("rhea"), "Unknown style profile")
+  expect_error(block_style(c("default", "default")), "single supported style-profile")
+  expect_error(block_style(""), "single supported style-profile")
+  expect_silent(block_style("default"))
+  expect_silent(block_style("luma"))
+})
+
+test_that("block_style('luma') emits the luma profile tokens page-wide", {
+  css <- as.character(block_style("luma")$style)
+
+  expect_match(css, "sb-style-overrides", fixed = TRUE)
+  expect_match(css, '.sb-app[data-sb-style="luma"]{', fixed = TRUE)
+  # Shared tokens that differ from the default profile.
+  expect_match(css, "--sb-control-padding-x: 0.75rem;", fixed = TRUE)
+  expect_match(css, "--sb-control-gap: 0.375rem;", fixed = TRUE)
+  expect_match(css, "--sb-control-shadow: none;", fixed = TRUE)
+  expect_match(css, "--sb-overlay-gap: 1.5rem;", fixed = TRUE)
+  expect_match(css, "--sb-focus-ring-opacity: 30%;", fixed = TRUE)
+})
+
+test_that("explicit overrides win over luma profile values", {
+  css <- as.character(block_style(
+    "luma",
+    control_gap = "1rem",
+    control_padding_x = "2rem"
+  )$style)
+
+  expect_match(css, "--sb-control-gap: 1rem;", fixed = TRUE)
+  expect_match(css, "--sb-control-padding-x: 2rem;", fixed = TRUE)
+  # Untouched luma tokens still emit their profile value.
+  expect_match(css, "--sb-focus-ring-opacity: 30%;", fixed = TRUE)
+})
+
+test_that("block_style returns a shinyblocks_style object", {
+  obj <- block_style("default", control_height = "2.5rem")
+  expect_s3_class(obj, "shinyblocks_style")
+  expect_identical(obj$profile, "default")
+})
+
+test_that("block_style with no overrides emits no style tag", {
+  obj <- block_style("default")
+  expect_null(obj$style)
+})
+
+test_that("block_style maps snake_case overrides to --sb-* properties", {
+  css <- as.character(block_style(
+    "default",
+    control_height = "2.5rem",
+    surface_gap = "2rem",
+    focus_ring_width = "2px"
+  )$style)
+
+  expect_match(css, "sb-style-overrides", fixed = TRUE)
+  expect_match(css, "--sb-control-height: 2.5rem;", fixed = TRUE)
+  expect_match(css, "--sb-surface-gap: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-focus-ring-width: 2px;", fixed = TRUE)
+})
+
+test_that("block_style rejects unknown and raw CSS-variable override names", {
+  expect_error(block_style("default", not_a_token = "x"), "Unknown style override")
+  expect_error(
+    block_style("default", `--sb-control-height` = "2.5rem"),
+    "Unknown style override"
+  )
+  expect_error(block_style("default", "2.5rem"), "must be named")
+})
+
+test_that("block_style targets the profile selector and portal roots page-wide", {
+  css <- as.character(block_style("default", control_height = "2.5rem")$style)
+
+  expect_match(css, '.sb-app[data-sb-style="default"]{', fixed = TRUE)
+  expect_match(css, "[data-shinyblocks-root],", fixed = TRUE)
+  expect_match(css, "[data-shinyblocks-portal-root]{", fixed = TRUE)
+})
+
+test_that("block_style confines overrides to scope when supplied", {
+  css <- as.character(block_style("default", control_height = "2.5rem", scope = ".demo")$style)
+
+  expect_match(css, ".demo{", fixed = TRUE)
+  expect_match(css, ".demo [data-shinyblocks-root],", fixed = TRUE)
+  expect_match(css, ".demo [data-shinyblocks-portal-root]{", fixed = TRUE)
+  expect_no_match(css, "data-sb-style", fixed = TRUE)
+})
+
+test_that("block_style rejects an invalid scope", {
+  expect_error(
+    block_style("default", control_height = "2.5rem", scope = c(".a", ".b")),
+    "single non-empty CSS selector"
+  )
+  expect_error(
+    block_style("default", control_height = "2.5rem", scope = ""),
+    "single non-empty CSS selector"
+  )
+})
+
+test_that("style_token_map covers every public override name", {
+  expect_setequal(
+    shinyblocks:::style_override_names(),
+    names(shinyblocks:::style_token_map())
+  )
+  expect_true(all(grepl("^sb-", shinyblocks:::style_token_map())))
+})
+
+test_that("the luma profile only uses curated public tokens", {
+  # The style-profile parity harness (tools/theme/style-registry.mjs) parses the
+  # luma list and maps each key through style_token_map(). Every luma key must be
+  # a public override name with a non-empty value, or that parse breaks.
+  luma <- shinyblocks:::style_profiles[["luma"]]
+  expect_true(length(luma) > 0)
+  expect_true(all(names(luma) %in% shinyblocks:::style_override_names()))
+  expect_true(all(nzchar(unlist(luma))))
+})

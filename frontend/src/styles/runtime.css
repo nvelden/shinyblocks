@@ -28,10 +28,41 @@
   --border: oklch(92.2% 0 0);
   --input: oklch(92.2% 0 0);
   --ring: oklch(70.8% 0 0);
+
+  /*
+   * Curated public style-profile tokens (the default profile). These are
+   * shinyblocks-owned (not shadcn-vendored) and are the stable surface that
+   * block_style() overrides. Values here must equal the historical hardcoded
+   * runtime defaults so the default profile is visually identical.
+   */
+  --sb-font-body: inherit;
+  --sb-font-heading: inherit;
+  --sb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sb-control-font-size: 0.875rem;
+  --sb-control-font-weight: 500;
+  --sb-control-height: 2.25rem;
+  --sb-control-height-sm: 2rem;
+  --sb-control-height-lg: 2.5rem;
+  --sb-control-padding-x: 1rem;
+  --sb-control-gap: 0.5rem;
+  --sb-surface-padding: 1.5rem;
+  --sb-surface-gap: 1.5rem;
+  --sb-overlay-padding: 1.5rem;
+  --sb-overlay-gap: 1rem;
+  --sb-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --sb-surface-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  --sb-overlay-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --sb-focus-ring-width: 3px;
+  --sb-focus-ring-opacity: 50%;
+  --sb-disabled-opacity: 0.5;
+  --sb-transition-duration: 0.15s;
 }
 
 [data-shinyblocks-root] {
   box-sizing: border-box;
+  font-family: var(--sb-font-body);
 }
 
 [data-shinyblocks-portal-root] {
@@ -95,7 +126,7 @@
 [data-shinyblocks-portal-root] a:focus-visible {
   outline: none !important;
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root][data-shinyblocks-runtime="true"][data-sb-mounted="true"] {
@@ -104,7 +135,7 @@
 
 [data-shinyblocks-root][data-shinyblocks-runtime="true"][data-disabled] {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root].border-dashed,
@@ -148,13 +179,13 @@
 [data-shinyblocks-root].sb-card {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--sb-surface-gap);
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) * 1.6);
   background-color: var(--card);
   color: var(--card-foreground);
-  padding: 1.5rem 0;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  padding: var(--sb-surface-padding) 0;
+  box-shadow: var(--sb-surface-shadow);
 }
 
 [data-shinyblocks-root].sb-card [data-shinyblocks-children] {
@@ -165,11 +196,12 @@
   display: grid;
   grid-template-columns: 1fr;
   row-gap: 0.375rem;
-  padding-inline: 1.5rem;
+  padding-inline: var(--sb-surface-padding);
 }
 
 [data-shinyblocks-root] .sb-card-title {
   margin: 0;
+  font-family: var(--sb-font-heading);
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.25;
@@ -184,17 +216,18 @@
 }
 
 [data-shinyblocks-root] .sb-card-value {
+  font-family: var(--sb-font-heading);
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  padding-inline: 1.5rem;
+  padding-inline: var(--sb-surface-padding);
 }
 
 [data-shinyblocks-root] .sb-card-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-inline: 1.5rem;
+  padding-inline: var(--sb-surface-padding);
   font-size: 0.875rem;
 }
 
@@ -206,7 +239,7 @@
 [data-shinyblocks-root] .sb-card-footer {
   display: flex;
   align-items: center;
-  padding-inline: 1.5rem;
+  padding-inline: var(--sb-surface-padding);
 }
 
 [data-shinyblocks-root] .sb-button {
@@ -214,20 +247,20 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--sb-control-gap);
   border: 0 solid transparent;
   border-radius: calc(var(--radius) * 0.8);
-  font-size: 0.875rem;
+  font-size: var(--sb-control-font-size);
   line-height: 1.25rem;
-  font-weight: 500;
+  font-weight: var(--sb-control-font-weight);
   white-space: nowrap;
   outline: none;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  box-shadow: var(--sb-control-shadow);
   transition:
-    color 0.15s,
-    background-color 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+    color var(--sb-transition-duration),
+    background-color var(--sb-transition-duration),
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
 }
 
 [data-shinyblocks-root] .sb-button svg,
@@ -240,12 +273,12 @@
 
 [data-shinyblocks-root] .sb-button:disabled {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-button:focus-visible {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root] .sb-button[aria-invalid="true"] {
@@ -254,8 +287,8 @@
 }
 
 [data-shinyblocks-root] .sb-button-size-default {
-  height: 2.25rem;
-  padding-inline: 1rem;
+  height: var(--sb-control-height);
+  padding-inline: var(--sb-control-padding-x);
   padding-block: 0.5rem;
 }
 
@@ -265,7 +298,7 @@
 }
 
 [data-shinyblocks-root] .sb-button-size-sm {
-  height: 2rem;
+  height: var(--sb-control-height-sm);
   gap: 0.375rem;
   padding-inline: 0.75rem;
 }
@@ -276,7 +309,7 @@
 }
 
 [data-shinyblocks-root] .sb-button-size-lg {
-  height: 2.5rem;
+  height: var(--sb-control-height-lg);
   padding-inline: 1.5rem;
 }
 
@@ -286,8 +319,8 @@
 }
 
 [data-shinyblocks-root] .sb-button-size-icon {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--sb-control-height);
+  height: var(--sb-control-height);
   padding: 0;
 }
 
@@ -706,7 +739,7 @@
   z-index: 51;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--sb-overlay-gap);
   width: min(var(--sb-dialog-content-width), calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
   max-height: calc(100vh - 4rem);
@@ -715,10 +748,8 @@
   border-radius: calc(var(--radius) * 1.4);
   background-color: var(--background);
   color: var(--foreground);
-  padding: 1.5rem;
-  box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  padding: var(--sb-overlay-padding);
+  box-shadow: var(--sb-overlay-shadow);
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-content-size-sm {
@@ -751,6 +782,7 @@
 }
 
 [data-shinyblocks-portal-root] .sb-dialog-title {
+  font-family: var(--sb-font-heading);
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.2;
@@ -802,9 +834,7 @@
   padding: 1rem;
   font-size: 0.875rem;
   line-height: 1.4;
-  box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow: var(--sb-overlay-shadow);
 }
 
 [data-shinyblocks-portal-root] .sb-tooltip-content {
@@ -856,7 +886,7 @@
 
 [data-shinyblocks-root] .sb-checkbox-button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-checkbox-indicator {
@@ -887,7 +917,7 @@
 
 [data-shinyblocks-root] .sb-checkbox-button:focus-visible {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root] .sb-checkbox-button[aria-invalid="true"] {
@@ -924,7 +954,7 @@
 
 [data-shinyblocks-root] .sb-checkbox[data-disabled="true"] .sb-checkbox-text {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-switch {
@@ -959,12 +989,12 @@
 
 [data-shinyblocks-root] .sb-switch-button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-switch-button:focus-visible {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root] .sb-switch-button[aria-invalid="true"] {
@@ -1039,7 +1069,7 @@
 
 [data-shinyblocks-root] .sb-switch[data-disabled="true"] .sb-switch-text {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-textarea {
@@ -1057,7 +1087,7 @@
   min-height: 4rem;
   padding: 0.5rem 0.75rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--sb-control-font-size);
   line-height: 1.25rem;
   color: var(--foreground);
   background-color: var(--background);
@@ -1067,8 +1097,8 @@
   resize: vertical;
   outline: none;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
 }
 
 [data-shinyblocks-root] .sb-textarea-control::placeholder {
@@ -1078,7 +1108,7 @@
 [data-shinyblocks-root] .sb-textarea-control:focus-visible {
   border-color: var(--ring);
   box-shadow:
-    0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
+    0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent),
     0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
@@ -1097,7 +1127,7 @@
 
 [data-shinyblocks-root] .sb-textarea-control:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-input {
@@ -1112,10 +1142,10 @@
 [data-shinyblocks-root] .sb-input-control {
   display: block;
   width: 100%;
-  height: 2.25rem;
+  height: var(--sb-control-height);
   padding: 0.25rem 0.75rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--sb-control-font-size);
   line-height: 1.4;
   color: var(--foreground);
   background-color: var(--background);
@@ -1124,8 +1154,8 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
   outline: none;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
 }
 
 [data-shinyblocks-root] .sb-input-control::placeholder {
@@ -1134,7 +1164,7 @@
 
 [data-shinyblocks-root] .sb-input-control:focus-visible {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root] .sb-input-control[aria-invalid="true"] {
@@ -1148,7 +1178,7 @@
 
 [data-shinyblocks-root] .sb-input-control:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-slider {
@@ -1167,7 +1197,7 @@
 }
 
 [data-shinyblocks-root] .sb-slider[data-disabled="true"] {
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
   pointer-events: none;
 }
 
@@ -1260,7 +1290,7 @@
 
 [data-shinyblocks-root] .sb-radio-group-item[data-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-radio-group-button {
@@ -1288,7 +1318,7 @@
 
 [data-shinyblocks-root] .sb-radio-group-button:focus-visible {
   border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
 }
 
 [data-shinyblocks-root] .sb-radio-group-control[aria-invalid="true"] .sb-radio-group-button {
@@ -1346,22 +1376,22 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--sb-control-gap);
   border: 1px solid var(--input);
   border-radius: calc(var(--radius) * 0.8);
   background-color: transparent;
   color: var(--foreground);
   padding: 0.5rem 0.75rem;
   min-height: auto;
-  font-size: 0.875rem;
+  font-size: var(--sb-control-font-size);
   line-height: 1.25rem;
   outline: none;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  box-shadow: var(--sb-control-shadow);
   cursor: pointer;
   transition:
-    color 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+    color var(--sb-transition-duration),
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
 }
 
 [data-theme="dark"] [data-shinyblocks-root] .sb-select-trigger {
@@ -1376,7 +1406,7 @@
 [data-shinyblocks-root] .sb-select-trigger[data-state="open"] {
   border-color: var(--ring);
   box-shadow:
-    0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
+    0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent),
     0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
@@ -1387,20 +1417,20 @@
 
 [data-shinyblocks-root] .sb-select-trigger:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--sb-disabled-opacity);
 }
 
 [data-shinyblocks-root] .sb-select-size-default {
-  height: 2.25rem;
+  height: var(--sb-control-height);
 }
 
 [data-shinyblocks-root] .sb-select-size-sm {
-  height: 2rem;
+  height: var(--sb-control-height-sm);
   padding: 0.25rem 0.625rem;
 }
 
 [data-shinyblocks-root] .sb-select-size-lg {
-  height: 2.5rem;
+  height: var(--sb-control-height-lg);
   padding: 0.5rem 1rem;
 }
 
@@ -1428,9 +1458,7 @@
   background-color: var(--popover);
   color: var(--popover-foreground);
   padding: 0.25rem;
-  box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow: var(--sb-overlay-shadow);
 }
 
 [data-shinyblocks-portal-root] .sb-select-viewport {
@@ -1493,7 +1521,7 @@
   border: 1px solid var(--border);
   background-color: var(--muted);
   color: var(--sb-code-token-foreground);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: var(--sb-font-mono);
   overflow: hidden;
   text-align: left;
 }
@@ -1688,4 +1716,258 @@
 
 [data-shinyblocks-root] .sb-code-token-number {
   color: var(--sb-code-token-function);
+}
+
+/*
+ * Luma style profile (profile-scoped component differences).
+ *
+ * Activated when `data-sb-style="luma"` is on an ancestor (the `.sb-app` shell
+ * for block_page(style = block_style("luma")), or a preview wrapper for scoped
+ * demos). Shared visual-feel tokens (control padding/gap, flat control shadow,
+ * card/overlay elevation, dialog gap, focus-ring opacity) come from the `luma`
+ * profile list in R/style-profiles.R, emitted as `--sb-*` overrides by
+ * block_style(). The rules below cover Luma differences that cannot be a shared
+ * token: larger radii, pill/translucent surfaces, and slider/switch geometry.
+ *
+ * Values mirror official upstream Radix Luma
+ * (apps/v4/registry/styles/style-luma.css); see
+ * docs/research/2026-06-01-upstream-luma-comparison.md. Tailwind radii used:
+ * rounded-2xl = 1rem, rounded-3xl = 1.5rem, rounded-4xl = 2rem, rounded-xl =
+ * 0.75rem, rounded-[5px] = 5px.
+ */
+
+/* Card — rounded-4xl, shadow-md (token) plus a subtle foreground ring. */
+[data-sb-style="luma"] [data-shinyblocks-root].sb-card {
+  border-radius: 2rem;
+  border-color: transparent;
+  box-shadow: var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root].sb-card {
+  box-shadow: var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+/* Value box — no upstream primitive; local decision to follow Luma card. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-value-box {
+  border-radius: 2rem;
+  border-color: transparent;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1),
+    0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+/* Button — rounded-4xl pill, active press translation; flat (token shadow). */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-button {
+  border-radius: 2rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-button-default:hover {
+  background-color: color-mix(in oklch, var(--primary) 80%, transparent);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-button:active:not([aria-haspopup="true"]) {
+  transform: translateY(1px);
+}
+
+/* Badge — rounded-3xl (not fully round in Luma). */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-badge {
+  border-radius: 1.5rem;
+}
+
+/* Input — rounded-3xl, translucent input surface, transparent border, flat. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-input-control {
+  border-radius: 1.5rem;
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+  box-shadow: none;
+}
+
+/* Textarea — rounded-2xl, translucent surface, even padding, no resize. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-textarea-control {
+  border-radius: 1rem;
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+  padding: 0.75rem;
+  box-shadow: none;
+  resize: none;
+}
+
+/* Select trigger — rounded-3xl pill, translucent surface, transparent border. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-select-trigger {
+  border-radius: 1.5rem;
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+}
+
+[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root] .sb-select-trigger {
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+}
+
+/* Select menu — rounded-3xl content with ring, rounded-2xl items. */
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-select-content {
+  border-radius: 1.5rem;
+  border-color: transparent;
+  box-shadow: var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-select-item {
+  border-radius: 1rem;
+  gap: 0.625rem;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-weight: 500;
+}
+
+/* Checkbox — rounded-[5px], translucent unchecked surface, transparent border. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-checkbox-button {
+  border-radius: 5px;
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 90%, transparent);
+  box-shadow: none;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-checkbox-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+/* Switch — border-2 track, larger geometry, pill thumb (24x16 default). */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch-button {
+  border-width: 2px;
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 90%, transparent);
+  box-shadow: none;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch:not([data-size="sm"]):not([data-size="lg"]) .sb-switch-button {
+  width: 2.75rem;
+  height: 1.25rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch:not([data-size="sm"]):not([data-size="lg"]) .sb-switch-thumb {
+  width: 1.5rem;
+  height: 1rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-button {
+  width: 1.75rem;
+  height: 1rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch[data-size="sm"] .sb-switch-thumb {
+  width: 1rem;
+  height: 0.75rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-switch-button[data-state="checked"] .sb-switch-thumb {
+  transform: translateX(calc(100% - 8px));
+}
+
+/* Slider — thicker track, 24x16 pill thumb with ring (Luma-specific). */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-slider-track {
+  height: 0.5rem;
+  background-color: color-mix(in oklch, var(--input) 90%, transparent);
+}
+
+[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root] .sb-slider-track {
+  background-color: color-mix(in oklch, var(--input) 90%, transparent);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-slider-thumb {
+  width: 1.5rem;
+  height: 1rem;
+  border: 0;
+  border-radius: 9999px;
+  background-color: var(--background);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1),
+    0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-slider-thumb:hover,
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-slider-thumb:focus-visible {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1),
+    0 0 0 4px color-mix(in oklch, var(--ring) 30%, transparent);
+}
+
+/* Radio group — wider gap, translucent unchecked surface, primary fill. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-radio-group-control {
+  gap: 0.75rem;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-radio-group-button {
+  border-color: transparent;
+  background-color: color-mix(in oklch, var(--input) 90%, transparent);
+  box-shadow: none;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-radio-group-button[data-state="checked"] .sb-radio-group-indicator {
+  background-color: var(--primary-foreground);
+}
+
+/* Dialog — rounded-4xl, shadow-xl with ring; overlay blur at /30 black. */
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-dialog-content {
+  border-radius: 2rem;
+  border-color: transparent;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1),
+    0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-dialog-overlay {
+  background-color: rgb(0 0 0 / 0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* Popover — rounded-3xl with ring (shadow-lg from token). */
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-popover-content {
+  border-radius: 1.5rem;
+  border-color: transparent;
+  box-shadow: var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+/* Tooltip — rounded-xl, px-3 py-1.5. */
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-tooltip-content {
+  border-radius: 0.75rem;
+  padding: 0.375rem 0.75rem;
+}
+
+/* Alert — rounded-2xl, px-4 py-3. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-alert {
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  column-gap: 0.625rem;
+  row-gap: 0.125rem;
+}
+
+/* Empty — rounded-2xl, dashed border, p-12. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-empty {
+  border-radius: 1rem;
+  border-style: dashed;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+/* Skeleton — rounded-2xl. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-skeleton {
+  border-radius: 1rem;
+}
+
+/* Code — no upstream primitive; local decision to soften the frame radius. */
+[data-sb-style="luma"] [data-shinyblocks-root] .sb-code-block {
+  border-radius: 1.25rem;
 }

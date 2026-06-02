@@ -9,7 +9,16 @@ source_showcase <- function() {
 # component (block_body via block_page) and therefore not expected as a
 # standalone showcase section. They still appear in the rendered HTML
 # via their parent — see the class-coverage test below.
-showcase_internal <- character()
+#
+# Also excludes non-rendering discovery helpers:
+#   - block_theme_presets / block_style_profiles return character vectors and
+#     emit no markup of their own.
+# block_style is now surfaced in the Theme showcase (style-profile selector plus
+# a Luma parity fixture), so it is no longer excluded.
+showcase_internal <- c(
+  "block_theme_presets",
+  "block_style_profiles"
+)
 
 block_class_for <- function(fn_name) {
   gsub("_", "-", sub("^block_", "sb-", fn_name))
@@ -211,14 +220,24 @@ test_that("theme showcase overrides are scoped to the preview wrapper", {
   )
   expect_match(
     rendered,
-    paste0(
-      '[data-sb-preview="theme"]{',
-      "--accent: oklch(0.3 0.03 260);--radius: 0.5rem;}"
-    ),
+    'id="showcase_theme_doc_preset"',
+    fixed = TRUE
+  )
+  # The parity fixture scopes its override to its own wrapper (not the
+  # section-wide [data-sb-preview="theme"]), so it cannot bleed into the live
+  # demo preview that also lives inside the Theme section.
+  expect_match(
+    rendered,
+    ".sb-parity-theme-baseline{--accent: oklch(0.3 0.03 260);--radius: 0.5rem;}",
     fixed = TRUE
   )
   expect_false(grepl(
     "\\.sb-app\\{--accent: oklch\\(0\\.3 0\\.03 260\\)",
+    rendered
+  ))
+  # And it must not leak to the whole section either.
+  expect_false(grepl(
+    '\\[data-sb-preview="theme"\\]\\{--accent: oklch\\(0\\.3 0\\.03 260\\)',
     rendered
   ))
 })

@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
 	check-fast lint spell urls test docs check pkgdown budget \
-	doc-links legacy-audit theme-static theme-test parity-install parity-build-css parity-setup parity parity-stop \
+	doc-links legacy-audit theme-static theme-test style-parity parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate clean deploy-showcase preview preview-pkgdown \
 	preview-shinylive
 
@@ -131,10 +131,18 @@ legacy-audit:
 theme-static:
 	npm run test:themes-static
 
-# Layers 2 + 3: behavioural token-override check + completeness gate. Requires
-# the local showcase running (make showcase) on port 4321.
+# Layers 2 + 3: behavioural token-override check + completeness gate + palette
+# sweep + style-profile parity. Requires the local showcase running
+# (make showcase) on port 4321.
 theme-test:
 	npm run test:themes
+
+# Style-profile parity only: proves every component responds to the active
+# visual profile (default vs Luma) or declares why it does not. Kept separate
+# from the colour-token checks so a failure names the right layer. Requires the
+# local showcase running on port 4321.
+style-parity:
+	npm run test:style-parity
 
 # Quality Gate runs the full release-readiness check sequence. CI runs this.
 # Order matters: cheap automated checks first, review and parity last.

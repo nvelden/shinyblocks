@@ -30,6 +30,11 @@ export const ALLOWED_LITERALS = [
     // shadcn dialog overlay is `bg-black/50` — a fixed scrim, theme-independent.
     value: "rgb(0 0 0 / 0.5)",
     reason: "shadcn dialog overlay scrim is a fixed bg-black/50, not a token"
+  },
+  {
+    // Luma dialog overlay is `bg-black/30` — a fixed scrim, theme-independent.
+    value: "rgb(0 0 0 / 0.3)",
+    reason: "Luma dialog overlay scrim is a fixed bg-black/30, not a token"
   }
 ];
 

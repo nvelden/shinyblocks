@@ -42,6 +42,46 @@ test_that("block_page includes optional theme overrides in head", {
   expect_match(head, "--primary: oklch(0.5 0.2 250);", fixed = TRUE)
 })
 
+test_that("block_page applies a style profile and injects its overrides", {
+  page <- block_page(
+    title = "Example",
+    style = block_style("default", control_height = "2.5rem")
+  )
+  rendered <- htmltools::renderTags(page)
+  html <- paste(rendered$html, collapse = "")
+  head <- paste(rendered$head, collapse = "")
+
+  expect_match(html, 'data-sb-style="default"', fixed = TRUE)
+  expect_match(head, "sb-style-overrides", fixed = TRUE)
+  expect_match(head, "--sb-control-height: 2.5rem;", fixed = TRUE)
+})
+
+test_that("block_page applies the luma profile", {
+  page <- block_page(
+    title = "Example",
+    style = block_style("luma")
+  )
+  rendered <- htmltools::renderTags(page)
+  html <- paste(rendered$html, collapse = "")
+  head <- paste(rendered$head, collapse = "")
+
+  expect_match(html, 'data-sb-style="luma"', fixed = TRUE)
+  expect_match(head, "sb-style-overrides", fixed = TRUE)
+  expect_match(head, "--sb-control-gap: 0.375rem;", fixed = TRUE)
+})
+
+test_that("block_page omits data-sb-style when no style is supplied", {
+  html <- paste(htmltools::renderTags(block_page("Body"))$html, collapse = "")
+  expect_no_match(html, "data-sb-style", fixed = TRUE)
+})
+
+test_that("block_page rejects a non-style object", {
+  expect_error(
+    block_page("Body", style = block_theme(primary = "red")),
+    "must be a `block_style\\(\\)` object"
+  )
+})
+
 test_that("layout helpers merge user classes", {
   expect_identical(
     tag_attr(block_header("Header", class = "custom"), "class"),

@@ -19,7 +19,10 @@ Create a dark mode toggle
 }
 \seealso{
 Other theme: 
+\code{\link{block_style}()},
+\code{\link{block_style_profiles}()},
 \code{\link{block_theme}()},
+\code{\link{block_theme_presets}()},
 \code{\link{update_block_theme}()}
 }
 \concept{theme}

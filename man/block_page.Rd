@@ -11,6 +11,7 @@ block_page(
   header = NULL,
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
+  style = NULL,
   class = NULL
 )
 }
@@ -26,6 +27,11 @@ block_page(
 \item{theme_mode}{Initial theme mode.}
 
 \item{theme}{Optional \code{block_theme()} overrides.}
+
+\item{style}{Optional \code{\link[=block_style]{block_style()}} visual style profile. When supplied,
+\code{data-sb-style="<profile>"} is placed on the \code{.sb-app} shell and any
+profile override \verb{<style>} is injected, so the profile applies page-wide
+(including portal overlays).}
 
 \item{class}{Additional classes for the app root.}
 }

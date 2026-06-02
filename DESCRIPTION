@@ -28,6 +28,7 @@ Collate:
     'form-controls.R'
     'radio-group.R'
     'tabs.R'
+    'theme-presets.R'
     'theme.R'
     'dark-mode.R'
     'layout.R'

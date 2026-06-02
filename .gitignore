@@ -56,3 +56,6 @@ test_wasm_app/
 .verify-pids
 .verify-*.log
 .parity-pids
+
+# Local showcase run log
+.showcase.log

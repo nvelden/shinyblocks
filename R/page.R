@@ -6,6 +6,10 @@
 #' @param header Optional header content.
 #' @param theme_mode Initial theme mode.
 #' @param theme Optional `block_theme()` overrides.
+#' @param style Optional [block_style()] visual style profile. When supplied,
+#'   `data-sb-style="<profile>"` is placed on the `.sb-app` shell and any
+#'   profile override `<style>` is injected, so the profile applies page-wide
+#'   (including portal overlays).
 #' @param class Additional classes for the app root.
 #'
 #' @return An `htmltools` tag list suitable for a Shiny UI.
@@ -18,9 +22,21 @@ block_page <- function(
   header = NULL,
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
+  style = NULL,
   class = NULL
 ) {
   theme_mode <- match_arg(theme_mode, c("system", "light", "dark"))
+
+  data_sb_style <- NULL
+  style_tag <- NULL
+  if (!is.null(style)) {
+    if (!inherits(style, "shinyblocks_style")) {
+      stop("`style` must be a `block_style()` object.", call. = FALSE)
+    }
+    data_sb_style <- style$profile
+    style_tag <- style$style
+  }
+
   sidebar <- prepare_sidebar(sidebar)
   sidebar_collapsed <- if (!is.null(sidebar)) {
     sidebar$attribs[["data-collapsed"]] %||% "false"
@@ -37,10 +53,12 @@ block_page <- function(
         htmltools::tags$title(title %||% "shinyblocks"),
         block_favicon_link(),
         block_theme_script(theme_mode),
-        theme
+        theme,
+        style_tag
       ),
       htmltools::tags$div(
         class = merge_classes("sb-app", class),
+        `data-sb-style` = data_sb_style,
         htmltools::tags$div(
           class = merge_classes(
             "sb-page",

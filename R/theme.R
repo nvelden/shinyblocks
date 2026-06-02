@@ -1,6 +1,7 @@
 #' Create theme overrides
 #'
-#' Emits a scoped `<style>` block that overrides shadcn token variables.
+#' Emits a scoped `<style>` block that selects and overrides shadcn token
+#' variables.
 #' By default the overrides apply to the whole page (every `.sb-app` and
 #' runtime root). Pass `scope` to confine the overrides to a single
 #' subtree, which is essential when several differently-themed regions
@@ -16,6 +17,8 @@
 #'
 #' @param ... Named CSS token overrides, such as `primary`,
 #'   `background`, or `radius`. Applied in both light and dark mode.
+#' @param preset Optional built-in semantic color palette. One of `neutral`,
+#'   `stone`, `zinc`, `mauve`, `olive`, `mist`, or `taupe`.
 #' @param scope Optional CSS selector. When supplied, overrides apply
 #'   only to elements matching `scope` and the runtime roots inside it,
 #'   instead of the whole page. Defaults to `NULL` (page-wide).
@@ -26,9 +29,10 @@
 #' @return An `htmltools` tag.
 #' @family theme
 #' @export
-block_theme <- function(..., scope = NULL, dark = NULL) {
+block_theme <- function(..., preset = NULL, scope = NULL, dark = NULL) {
   overrides <- list(...)
   light_names <- names(overrides)
+  preset <- validate_theme_preset(preset)
 
   if (length(overrides) > 0 && (is.null(light_names) || any(!nzchar(light_names)))) {
     stop("`block_theme()` overrides must be named.", call. = FALSE)
@@ -43,8 +47,8 @@ block_theme <- function(..., scope = NULL, dark = NULL) {
     }
   }
 
-  if (length(overrides) == 0 && is.null(dark)) {
-    stop("`block_theme()` requires named token overrides.", call. = FALSE)
+  if (length(overrides) == 0 && is.null(dark) && is.null(preset)) {
+    stop("`block_theme()` requires a `preset` or named token overrides.", call. = FALSE)
   }
 
   invalid <- setdiff(c(light_names, names(dark)), theme_token_names())
@@ -82,12 +86,21 @@ block_theme <- function(..., scope = NULL, dark = NULL) {
     )
   }
 
-  theme_css <- ""
-  if (length(overrides) > 0) {
-    theme_css <- paste0(theme_css, rules("", declarations(overrides)))
+  light_values <- overrides
+  dark_values <- dark
+  if (!is.null(preset)) {
+    values <- theme_preset(preset)
+    light_values <- merge_theme_values(values$light, overrides)
+    dark_values <- merge_theme_values(values$dark, overrides)
+    dark_values <- merge_theme_values(dark_values, dark %||% list())
   }
-  if (!is.null(dark)) {
-    theme_css <- paste0(theme_css, rules("[data-theme=\"dark\"] ", declarations(dark)))
+
+  theme_css <- ""
+  if (length(light_values) > 0) {
+    theme_css <- paste0(theme_css, rules("", declarations(light_values)))
+  }
+  if (!is.null(dark_values)) {
+    theme_css <- paste0(theme_css, rules("[data-theme=\"dark\"] ", declarations(dark_values)))
   }
 
   attach_shinyblocks_deps(
@@ -96,6 +109,18 @@ block_theme <- function(..., scope = NULL, dark = NULL) {
       htmltools::HTML(theme_css)
     )
   )
+}
+
+#' Supported built-in colour presets
+#'
+#' @return A character vector of built-in palette names accepted by the
+#'   `preset` argument of [block_theme()].
+#' @family theme
+#' @export
+#' @examples
+#' block_theme_presets()
+block_theme_presets <- function() {
+  theme_preset_names()
 }
 
 #' Update the active theme

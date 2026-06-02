@@ -57,6 +57,39 @@ ui <- block_page(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
           htmltools::tags$h4(style = group_header_style, "Tokens"),
           block_field(
+            block_field_label("preset", `for` = "showcase_theme_doc_preset"),
+            block_select(
+              "showcase_theme_doc_preset",
+              choices = c(
+                "default (no preset)" = "inherit",
+                stats::setNames(
+                  shinyblocks:::theme_preset_names(),
+                  shinyblocks:::theme_preset_names()
+                )
+              ),
+              selected = "inherit",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("style profile", `for` = "showcase_theme_doc_style"),
+            block_select(
+              "showcase_theme_doc_style",
+              choices = c(
+                "default" = "inherit",
+                stats::setNames(
+                  setdiff(shinyblocks:::style_profile_names(), "default"),
+                  setdiff(shinyblocks:::style_profile_names(), "default")
+                )
+              ),
+              selected = "inherit",
+              size = "sm"
+            ),
+            block_field_description(
+              "block_style() visual profile. Token controls below layer over the profile."
+            )
+          ),
+          block_field(
             block_field_label("radius", `for` = "showcase_theme_doc_radius"),
             block_select("showcase_theme_doc_radius", choices = c("0rem", "0.25rem", "0.5rem", "1rem", "1.5rem"), selected = "0.5rem", size = "sm")
           ),
@@ -204,6 +237,23 @@ server <- function(input, output, session) {
     if (is.null(v) || !nzchar(v) || identical(v, "inherit")) NULL else v
   }
 
+  selected_preset <- reactive({
+    value <- input$showcase_theme_doc_preset
+    if (is.null(value) || !nzchar(value) || identical(value, "inherit")) {
+      return(NULL)
+    }
+    value
+  })
+
+  selected_style <- reactive({
+    value <- input$showcase_theme_doc_style
+    if (is.null(value) || !nzchar(value) || identical(value, "inherit") ||
+      identical(value, "default")) {
+      return(NULL)
+    }
+    value
+  })
+
   # Base overrides apply to both modes; "inherit" leaves a token at its
   # adaptive light/dark default so it stays readable in both modes.
   theme_overrides <- reactive({
@@ -230,8 +280,17 @@ server <- function(input, output, session) {
   })
 
   output$showcase_theme_preview_ui <- renderUI({
+    preset <- selected_preset()
+    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
+
+    # block_style() returns a shinyblocks_style object (profile + style tag);
+    # take only its $style tag for the preview. The profile name activates the
+    # scoped component CSS via data-sb-style on the wrapper below.
+    style_tag <- if (!is.null(style_profile)) {
+      block_style(style_profile, scope = ".sb-theme-demo-scope")$style
+    }
 
     label_style <- "font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground);"
     surface <- function(bg, fg, text) htmltools::div(
@@ -245,12 +304,18 @@ server <- function(input, output, session) {
     )
 
     htmltools::tagList(
-      do.call(block_theme, c(
-        o,
-        list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
-      )),
+      do.call(
+        block_theme,
+        c(
+          list(preset = preset),
+          o,
+          list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
+        )
+      ),
+      style_tag,
       htmltools::div(
         class = "sb-theme-demo-scope",
+        `data-sb-style` = style_profile,
         style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.35rem;",
@@ -302,6 +367,8 @@ server <- function(input, output, session) {
   })
 
   output$showcase_theme_preview_code <- showcase_render_code({
+    preset <- selected_preset()
+    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
     args <- vapply(
@@ -319,7 +386,19 @@ server <- function(input, output, session) {
         "  dark = list(\n", paste(dark_args, collapse = ",\n"), "\n  )"
       ))
     }
-    paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
+    if (!is.null(preset)) {
+      args <- c(sprintf("  preset = \"%s\"", preset), args)
+    }
+    theme_call <- paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
+
+    if (is.null(style_profile)) {
+      return(theme_call)
+    }
+    paste0(
+      "block_page(\n",
+      sprintf("  style = block_style(\"%s\"),\n", style_profile),
+      "  theme = ", gsub("\n", "\n  ", theme_call), "\n)"
+    )
   })
 
   output$showcase_theme_action_code <- showcase_render_code({

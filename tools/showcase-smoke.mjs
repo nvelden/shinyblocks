@@ -123,14 +123,15 @@ try {
 
   await page.goto(`${url}/#tabs`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#tabs:not([hidden])");
-  const tabsRoot = page.locator("#showcase_tabs");
+  // Drive the stable parity instance (overview/usage tabs, defaults to overview).
+  const tabsRoot = page.locator("#showcase_tabs_parity_default");
   await tabsRoot.locator(".sb-tabs-trigger[data-value='usage']").click();
   await page.waitForFunction(() => {
     const trigger = document.querySelector(
-      "#showcase_tabs .sb-tabs-trigger[data-value='usage']"
+      "#showcase_tabs_parity_default .sb-tabs-trigger[data-value='usage']"
     );
     const panel = document.querySelector(
-      "#showcase_tabs .sb-tabs-panel[data-value='usage']"
+      "#showcase_tabs_parity_default .sb-tabs-panel[data-value='usage']"
     );
     return trigger?.getAttribute("aria-selected") === "true" &&
       trigger?.getAttribute("data-state") === "active" &&
@@ -138,13 +139,15 @@ try {
       !panel.hasAttribute("hidden");
   });
 
+  // ArrowRight from the last tab (usage) wraps roving focus back to overview
+  // and activates it (automatic activation), hiding the usage panel.
   await tabsRoot.locator(".sb-tabs-trigger[data-value='usage']").press("ArrowRight");
   await page.waitForFunction(() => {
     const trigger = document.querySelector(
-      "#showcase_tabs .sb-tabs-trigger[data-value='settings']"
+      "#showcase_tabs_parity_default .sb-tabs-trigger[data-value='overview']"
     );
     const previousPanel = document.querySelector(
-      "#showcase_tabs .sb-tabs-panel[data-value='usage']"
+      "#showcase_tabs_parity_default .sb-tabs-panel[data-value='usage']"
     );
     return trigger?.getAttribute("aria-selected") === "true" &&
       trigger?.getAttribute("data-state") === "active" &&

@@ -10,6 +10,25 @@ register_theme_showcase <- function(input, output, session) {
     update_block_theme(session, mode = "system")
   })
 
+  selected_preset <- shiny::reactive({
+    value <- input$showcase_theme_doc_preset
+    if (is.null(value) || !nzchar(value) || identical(value, "inherit")) {
+      return(NULL)
+    }
+    value
+  })
+
+  # Selected visual style profile (block_style()). "inherit"/default keeps the
+  # built-in default profile, which emits nothing.
+  selected_style <- shiny::reactive({
+    value <- input$showcase_theme_doc_style
+    if (is.null(value) || !nzchar(value) || identical(value, "inherit") ||
+      identical(value, "default")) {
+      return(NULL)
+    }
+    value
+  })
+
   # Resolve the active token overrides from the controls. A `block_theme()`
   # override applies to BOTH light and dark mode (one value), so any token left
   # at "inherit" is intentionally NOT overridden — it keeps the package's
@@ -50,8 +69,20 @@ register_theme_showcase <- function(input, output, session) {
   # Dynamic preview UI (renders style overrides + components covering every
   # exposed token).
   output$showcase_theme_preview_ui <- shiny::renderUI({
+    preset <- selected_preset()
+    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
+
+    # Scope the visual profile to this preview wrapper. block_style() emits the
+    # profile's --sb-* tokens for the scope; data-sb-style on the wrapper (set
+    # below) activates the profile-scoped component CSS.
+    # block_style() returns a shinyblocks_style object (profile + style tag);
+    # take only its $style tag for the preview. The profile name activates the
+    # scoped component CSS via data-sb-style on the wrapper below.
+    style_tag <- if (!is.null(style_profile)) {
+      block_style(style_profile, scope = ".sb-theme-demo-scope")$style
+    }
 
     swatch_style <- function(...) paste(
       "display: flex; flex-direction: column; gap: 0.35rem;", ...
@@ -62,12 +93,18 @@ register_theme_showcase <- function(input, output, session) {
       # Scope the override to this preview only so the demo does not leak
       # its token colors into the rest of the gallery. Only user-picked tokens
       # are passed; the rest keep their adaptive light/dark defaults.
-      do.call(block_theme, c(
-        o,
-        list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
-      )),
+      do.call(
+        block_theme,
+        c(
+          list(preset = preset),
+          o,
+          list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
+        )
+      ),
+      style_tag,
       htmltools::div(
         class = "sb-theme-demo-scope",
+        `data-sb-style` = style_profile,
         style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
         # Buttons exercise --primary, --secondary, --destructive, and --border.
         htmltools::div(
@@ -146,6 +183,8 @@ register_theme_showcase <- function(input, output, session) {
 
   # Dynamic code snippet rendering
   output$showcase_theme_preview_code <- showcase_render_code({
+    preset <- selected_preset()
+    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
     args <- vapply(
@@ -163,7 +202,21 @@ register_theme_showcase <- function(input, output, session) {
         "  dark = list(\n", paste(dark_args, collapse = ",\n"), "\n  )"
       ))
     }
-    paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
+    if (!is.null(preset)) {
+      args <- c(sprintf("  preset = \"%s\"", preset), args)
+    }
+    theme_call <- paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
+
+    # When a non-default style profile is active, show the full page authoring
+    # form: block_page(style = block_style(...), theme = block_theme(...)).
+    if (is.null(style_profile)) {
+      return(theme_call)
+    }
+    paste0(
+      "block_page(\n",
+      sprintf("  style = block_style(\"%s\"),\n", style_profile),
+      "  theme = ", gsub("\n", "\n  ", theme_call), "\n)"
+    )
   })
   shiny::outputOptions(
     output,
@@ -189,10 +242,11 @@ register_theme_showcase <- function(input, output, session) {
   # API Reference table
   output$showcase_theme_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("...", "session", "mode"),
-      Type = c("Named HSL/CSS token overrides", "Shiny Session", "character"),
-      Default = c("none", "getDefaultReactiveDomain()", "required"),
+      Argument = c("preset", "...", "session", "mode"),
+      Type = c("character", "Named HSL/CSS token overrides", "Shiny Session", "character"),
+      Default = c("NULL", "none", "getDefaultReactiveDomain()", "required"),
       Description = c(
+        "Optional built-in semantic light/dark palette.",
         "CSS variables to override (e.g., primary, radius, border, background, chart-1).",
         "The active Shiny session domain (required for theme updates).",
         "The targeted theme mode: 'system', 'light', or 'dark'."

@@ -4,11 +4,14 @@
 \alias{block_theme}
 \title{Create theme overrides}
 \usage{
-block_theme(..., scope = NULL, dark = NULL)
+block_theme(..., preset = NULL, scope = NULL, dark = NULL)
 }
 \arguments{
 \item{...}{Named CSS token overrides, such as \code{primary},
 \code{background}, or \code{radius}. Applied in both light and dark mode.}
+
+\item{preset}{Optional built-in semantic color palette. One of \code{neutral},
+\code{stone}, \code{zinc}, \code{mauve}, \code{olive}, \code{mist}, or \code{taupe}.}
 
 \item{scope}{Optional CSS selector. When supplied, overrides apply
 only to elements matching \code{scope} and the runtime roots inside it,
@@ -22,7 +25,8 @@ default) when \verb{[data-theme="dark"]} is active. Defaults to \code{NULL}.}
 An \code{htmltools} tag.
 }
 \description{
-Emits a scoped \verb{<style>} block that overrides shadcn token variables.
+Emits a scoped \verb{<style>} block that selects and overrides shadcn token
+variables.
 By default the overrides apply to the whole page (every \code{.sb-app} and
 runtime root). Pass \code{scope} to confine the overrides to a single
 subtree, which is essential when several differently-themed regions
@@ -40,6 +44,9 @@ dark value in dark mode.
 \seealso{
 Other theme: 
 \code{\link{block_dark_mode_toggle}()},
+\code{\link{block_style}()},
+\code{\link{block_style_profiles}()},
+\code{\link{block_theme_presets}()},
 \code{\link{update_block_theme}()}
 }
 \concept{theme}

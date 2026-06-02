@@ -14,6 +14,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { THEME_REGISTRY, RSIDE_PRIMITIVES } from "./theme-registry.mjs";
@@ -103,6 +104,131 @@ async function measureWithOverride(page, section, selector, property, token, sen
   );
 }
 
+// --- Palette sweep --------------------------------------------------------
+// Exercises every shipped block_theme(preset = ...) palette in light *and*
+// dark mode end-to-end. R is the source of truth: we ask it to emit each
+// preset's <style> overrides, inject them into the showcase exactly as
+// block_page(theme = block_theme(preset)) would, and assert a representative
+// primary-bound element actually adopts the palette's --primary in each mode.
+//
+// The representative element re-uses an existing parity fixture and binding so
+// this stays in lockstep with the components the theme framework already
+// covers. We assert the element's computed colour equals its own resolved
+// --primary (proving the palette reaches it) and record per-(preset, mode)
+// values to confirm palettes differ from each other and light differs from
+// dark.
+const PALETTE_PROBE = {
+  section: "button",
+  selector: ".sb-parity-button-default[data-slot='button']",
+  property: "backgroundColor",
+  token: "--primary"
+};
+
+function presetStyles() {
+  // name then CSS, framed by rare sentinels so CSS commas/braces survive.
+  const rExpr =
+    'suppressMessages(devtools::load_all(".", quiet=TRUE));' +
+    "for (p in shinyblocks:::theme_preset_names()) {" +
+    'cat("@@SB_PRESET@@", p, "\\n", sep="");' +
+    "cat(as.character(block_theme(preset = p)));" +
+    'cat("\\n@@SB_END@@\\n")}';
+  const out = execFileSync("Rscript", ["-e", rExpr], {
+    cwd: ROOT,
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024
+  });
+  const presets = {};
+  const re = /@@SB_PRESET@@(.+?)\n([\s\S]*?)\n@@SB_END@@/g;
+  let m;
+  while ((m = re.exec(out)) !== null) {
+    presets[m[1].trim()] = m[2];
+  }
+  return presets;
+}
+
+async function measurePalette(page, css) {
+  return await page.evaluate(
+    ({ css, selector, property, token }) => {
+      const style = document.createElement("style");
+      style.id = "__sb_palette_probe__";
+      style.textContent = css;
+      document.head.appendChild(style);
+      const el = document.querySelector(selector);
+      if (!el) {
+        style.remove();
+        return { missing: true };
+      }
+      void el.offsetHeight;
+      const value = getComputedStyle(el)[property];
+      const resolved = getComputedStyle(el).getPropertyValue(token).trim();
+      style.remove();
+      return { value, resolved };
+    },
+    { css, ...PALETTE_PROBE }
+  );
+}
+
+async function runPaletteSweep(page) {
+  let failures = 0;
+  let passes = 0;
+  const presets = presetStyles();
+  const names = Object.keys(presets);
+  if (names.length === 0) {
+    console.error("  FAIL palette-sweep: R emitted no presets");
+    return { passes: 0, failures: 1 };
+  }
+
+  await page.goto(`${SHOWCASE_URL}/#${PALETTE_PROBE.section}`, {
+    waitUntil: "networkidle"
+  });
+  await page.waitForTimeout(600);
+  await disableMotion(page);
+
+  // Per-mode resolved --primary values, used to assert palettes are distinct.
+  const seen = { light: {}, dark: {} };
+
+  for (const name of names) {
+    // R emits both `.sb-app{...}` (light) and `[data-theme="dark"] .sb-app{...}`
+    // so the same injected <style> drives both modes; we just flip the mode.
+    const css = presets[name];
+    for (const mode of ["light", "dark"]) {
+      await setTheme(page, mode);
+      const r = await measurePalette(page, css);
+      const label = `palette ${name} :: ${mode}`;
+      if (r.missing) {
+        failures += 1;
+        console.error(`  FAIL ${label}  (element not found: ${PALETTE_PROBE.selector})`);
+      } else if (r.value === r.resolved && r.resolved.length > 0) {
+        passes += 1;
+        seen[mode][name] = r.resolved;
+        console.log(`  ok   ${label}  --primary -> ${r.resolved}`);
+      } else {
+        failures += 1;
+        console.error(
+          `  FAIL ${label}  ${PALETTE_PROBE.property} ${r.value} != resolved ${PALETTE_PROBE.token} ${r.resolved}`
+        );
+      }
+    }
+  }
+
+  // Palettes must be visually distinct, and light must differ from dark.
+  for (const mode of ["light", "dark"]) {
+    const distinct = new Set(Object.values(seen[mode]));
+    if (Object.keys(seen[mode]).length > 1 && distinct.size <= 1) {
+      failures += 1;
+      console.error(`  FAIL palette-distinct :: ${mode}: all palettes resolved to the same --primary`);
+    }
+  }
+  for (const name of names) {
+    if (seen.light[name] && seen.dark[name] && seen.light[name] === seen.dark[name]) {
+      failures += 1;
+      console.error(`  FAIL palette ${name}: light and dark --primary are identical`);
+    }
+  }
+
+  return { passes, failures };
+}
+
 async function run() {
   let failures = 0;
   let passes = 0;
@@ -157,6 +283,11 @@ async function run() {
       }
     }
   }
+
+  console.log("\nPalette sweep (every preset, light + dark):");
+  const palette = await runPaletteSweep(page);
+  passes += palette.passes;
+  failures += palette.failures;
 
   await browser.close();
 

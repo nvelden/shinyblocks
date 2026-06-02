@@ -27,7 +27,14 @@ test_that("core helpers return tags", {
   expect_s3_class(block_tab("Overview", "Body"), "shiny.tag")
   expect_s3_class(block_tabs(block_tab("Overview", "Body")), "shiny.tag")
   expect_s3_class(block_theme(primary = "oklch(0.5 0.2 250)"), "shiny.tag")
+  expect_s3_class(block_theme(preset = "olive"), "shiny.tag")
+  expect_s3_class(block_style("default"), "shinyblocks_style")
   expect_s3_class(block_dark_mode_toggle(), "shiny.tag")
+})
+
+test_that("block_page accepts a style profile", {
+  page <- block_page("Body", style = block_style("default", control_height = "2.5rem"))
+  expect_s3_class(page, "shiny.tag.list")
 })
 
 test_that("showcase app sources without launching", {
