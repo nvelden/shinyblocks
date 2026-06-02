@@ -3,9 +3,14 @@ import { PATH } from "./paths";
 
 test("landing page gallery lists featured components", async ({ page }) => {
   await page.goto(PATH.home);
-  // Expect to find the component preview cards for button and card
-  const buttonPreview = page.locator("[data-component-preview='button']");
-  const cardPreview = page.locator("[data-component-preview='card']");
-  await expect(buttonPreview).toBeVisible();
-  await expect(cardPreview).toBeVisible();
+  const gallery = page.locator("iframe[title='Interactive components gallery']");
+  await expect(gallery).toBeVisible();
+  await expect(gallery).toHaveAttribute("src", "/shinyblocks/playgrounds/gallery/");
+
+  const response = await page.request.get(`${PATH.home}playgrounds/gallery/app.json`);
+  expect(response.ok()).toBe(true);
+  const files = (await response.json()) as Array<{ name: string; content: string }>;
+  const app = files.find((file) => file.name === "app.R");
+  expect(app?.content).toContain('`data-component-preview` = "button"');
+  expect(app?.content).toContain('`data-component-preview` = "card"');
 });

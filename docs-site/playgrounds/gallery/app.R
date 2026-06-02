@@ -98,36 +98,44 @@ ui <- block_page(
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: stretch;",
       panel(
-        block_card(
-          title = "Payment method",
-          description = "Secure checkout profile",
+        htmltools::div(
+          `data-component-preview` = "card",
           style = "height: 100%;",
-          block_field_group(
-            block_field(block_field_label("Name on card"), block_input("gallery_name", placeholder = "Jane Smith")),
-            block_field(
-              block_field_label("Billing email"),
-              block_input_group(
-                block_input_group_addon(block_icon("mail")),
-                block_input("gallery_email", placeholder = "billing@acme.app", type = "email")
-              )
-            ),
-            block_field(block_field_label("Plan"), block_select("gallery_plan", choices = c("Starter", "Professional", "Enterprise"), selected = "Professional", size = "sm")),
-            block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2, resize = "none"))
-          ),
-          footer = row(
-            block_button("Save payment", id = "gallery_save", size = "sm", icon = "save"),
-            block_dialog(
-              "gallery_invoice_dialog",
-              title = "Invoice preview",
-              description = "A compact dialog using the current dashboard values.",
-              stack(
-                mini_label("Plan", "Professional"),
-                mini_label("Budget", "$5,200 / month"),
-                mini_label("Environment", "Production")
+          block_card(
+            title = "Payment method",
+            description = "Secure checkout profile",
+            style = "height: 100%;",
+            block_field_group(
+              block_field(block_field_label("Name on card"), block_input("gallery_name", placeholder = "Jane Smith")),
+              block_field(
+                block_field_label("Billing email"),
+                block_input_group(
+                  block_input_group_addon(block_icon("mail")),
+                  block_input("gallery_email", placeholder = "billing@acme.app", type = "email")
+                )
               ),
-              footer = block_button("Close", size = "sm", variant = "outline"),
-              trigger = "Preview invoice",
-              size = "sm"
+              block_field(block_field_label("Plan"), block_select("gallery_plan", choices = c("Starter", "Professional", "Enterprise"), selected = "Professional", size = "sm")),
+              block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2, resize = "none"))
+            ),
+            footer = row(
+              htmltools::div(
+                `data-component-preview` = "button",
+                block_button("Save payment", id = "gallery_save", size = "sm", icon = "save")
+              ),
+              block_dialog(
+                "gallery_invoice_dialog",
+                title = "Invoice preview",
+                description = "A compact dialog using the current dashboard values.",
+                stack(
+                  mini_label("Plan", "Professional"),
+                  mini_label("Budget", "$5,200 / month"),
+                  mini_label("Environment", "Production")
+                ),
+                footer = block_button("Close", size = "sm", variant = "outline"),
+                trigger = "Preview invoice",
+                size = "sm"
+              ),
+              wrap = TRUE
             )
           )
         )
