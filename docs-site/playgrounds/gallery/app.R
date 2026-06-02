@@ -49,6 +49,26 @@ mini_label <- function(label, value) {
   )
 }
 
+appearance_control <- function(label, input_id, choices, selected) {
+  htmltools::div(
+    style = "display: flex; align-items: center; gap: 0.5rem; min-width: 0;",
+    htmltools::tags$label(
+      `for` = input_id,
+      style = "font-size: 0.8125rem; font-weight: 500; color: var(--muted-foreground);",
+      label
+    ),
+    htmltools::div(
+      style = "min-width: 8.5rem;",
+      block_select(
+        input_id,
+        choices = stats::setNames(choices, choices),
+        selected = selected,
+        size = "sm"
+      )
+    )
+  )
+}
+
 loading_lines <- function() {
   stack(
     block_skeleton(style = "height: 0.75rem; width: 70%;"),
@@ -93,31 +113,14 @@ ui <- block_page(
         block_button("Refresh", id = "gallery_refresh", icon = "refresh-cw", size = "sm")
       )
     ),
-    block_card(
-      title = "Appearance",
-      description = "Session theme controls",
-      style = "padding-bottom: 1rem;",
-      htmltools::div(
-        style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1rem;",
-        block_field(
-          block_field_label("Style profile", `for` = "gallery_style_profile"),
-          block_select(
-            "gallery_style_profile",
-            choices = stats::setNames(gallery_style_profiles, gallery_style_profiles),
-            selected = "default",
-            size = "sm"
-          )
-        ),
-        block_field(
-          block_field_label("Theme preset", `for` = "gallery_theme_preset"),
-          block_select(
-            "gallery_theme_preset",
-            choices = stats::setNames(gallery_theme_presets, gallery_theme_presets),
-            selected = "neutral",
-            size = "sm"
-          )
-        )
-      )
+    htmltools::div(
+      `aria-label` = "Appearance",
+      style = paste(
+        "display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap;",
+        "padding-bottom: 0.25rem;"
+      ),
+      appearance_control("Style", "gallery_style_profile", gallery_style_profiles, "default"),
+      appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, "neutral")
     ),
     uiOutput("gallery_alert"),
     htmltools::div(
@@ -315,6 +318,10 @@ server <- function(input, output, session) {
       block_style(style_profile, scope = ".sb-app")$style
     )
   })
+  # The theme/style <style> assets live in a hidden container; Shiny suspends
+  # hidden outputs by default, which would stop theme-preset changes from ever
+  # rendering. Keep it live so preset switches re-emit the scoped tokens.
+  outputOptions(output, "gallery_theme_assets", suspendWhenHidden = FALSE)
 
   observeEvent(input$gallery_refresh, {
     refreshes(refreshes() + 1L)
