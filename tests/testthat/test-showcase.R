@@ -5,6 +5,25 @@ source_showcase <- function() {
   env
 }
 
+showcase_fixture <- local({
+  fixture <- NULL
+
+  function() {
+    if (is.null(fixture)) {
+      env <- source_showcase()
+      rendered <- htmltools::renderTags(env$ui)
+      fixture <<- list(
+        env = env,
+        rendered = rendered,
+        head = paste(rendered$head, collapse = "\n"),
+        html = paste(rendered$html, collapse = "\n")
+      )
+    }
+
+    fixture
+  }
+})
+
 # Functions whose markup is emitted transitively by another exported
 # component (block_body via block_page) and therefore not expected as a
 # standalone showcase section. They still appear in the rendered HTML
@@ -67,7 +86,8 @@ test_that("every showcase example evaluates to a tag", {
 })
 
 test_that("showcase declares a sections list and renders each one", {
-  env <- source_showcase()
+  fixture <- showcase_fixture()
+  env <- fixture$env
 
   expect_true(is.list(env$sections))
   expect_gt(length(env$sections), 0)
@@ -84,7 +104,7 @@ test_that("showcase declares a sections list and renders each one", {
     )
   }
 
-  rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
+  rendered <- fixture$html
 
   for (s in env$sections) {
     expect_match(
@@ -103,10 +123,9 @@ test_that("showcase declares a sections list and renders each one", {
 })
 
 test_that("showcase owns its theme in the page head and renders one body landmark", {
-  env <- source_showcase()
-  rendered <- htmltools::renderTags(env$ui)
-  head <- paste(rendered$head, collapse = "\n")
-  html <- paste(rendered$html, collapse = "\n")
+  fixture <- showcase_fixture()
+  head <- fixture$head
+  html <- fixture$html
 
   expect_match(head, 'href="showcase.css?v=20260601_01"', fixed = TRUE)
   body_matches <- regmatches(
@@ -136,8 +155,8 @@ test_that("showcase styling controls have matching CSS hooks", {
 })
 
 test_that("every exported block_*() renders into the showcase UI", {
-  env <- source_showcase()
-  rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
+  fixture <- showcase_fixture()
+  rendered <- fixture$html
 
   exported <- getNamespaceExports("shinyblocks")
   components <- setdiff(
@@ -177,8 +196,9 @@ test_that("every exported block_*() renders into the showcase UI", {
 })
 
 test_that("only the first showcase section is initially visible", {
-  env <- source_showcase()
-  rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
+  fixture <- showcase_fixture()
+  env <- fixture$env
+  rendered <- fixture$html
 
   first_id <- env$sections[[1L]]$id
 
@@ -210,8 +230,7 @@ test_that("only the first showcase section is initially visible", {
 })
 
 test_that("theme showcase overrides are scoped to the preview wrapper", {
-  env <- source_showcase()
-  rendered <- paste(htmltools::renderTags(env$ui)$html, collapse = "\n")
+  rendered <- showcase_fixture()$html
 
   expect_match(
     rendered,
@@ -243,7 +262,7 @@ test_that("theme showcase overrides are scoped to the preview wrapper", {
 })
 
 test_that("interactive sections use the full playground layout", {
-  env <- source_showcase()
+  env <- showcase_fixture()$env
   section_map <- stats::setNames(env$sections, vapply(env$sections, `[[`, "", "id"))
   interactive_contract <- list(
     button = list(require_actions = FALSE),

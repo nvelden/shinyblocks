@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import { getComponentConfig } from "./registry.mjs";
+import { getComponentConfig, listComponentNames } from "./registry.mjs";
 
 function getArg(flag) {
   const index = process.argv.indexOf(flag);
@@ -91,6 +91,7 @@ async function prepareState(page, config, state, selectors) {
       document.activeElement.blur();
     }
   });
+  await page.keyboard.press("Escape");
   await page.waitForTimeout(100);
 
   if (config.prepareShowcaseState) {
@@ -105,14 +106,6 @@ async function prepareState(page, config, state, selectors) {
 }
 
 async function checkState(page, config, theme, state) {
-  await page.goto("about:blank");
-  await page.goto(config.showcaseUrl, { waitUntil: "networkidle" });
-  await page.waitForSelector(config.showcaseReadySelector, {
-    state: "attached",
-    timeout: 10000
-  });
-  await setShowcaseTheme(page, theme);
-
   const selectors = config.roles
     ? roleSelectorMap(config.roles, "showcase", state)
     : selectorForState(config.showcaseSelectors, state);
@@ -147,11 +140,13 @@ async function checkState(page, config, theme, state) {
 
 async function main() {
   const component = getArg("--component");
-  if (!component) {
-    throw new Error("Missing required --component <name> argument.");
+  const components = process.argv.includes("--all")
+    ? listComponentNames()
+    : [component];
+  if (!component && !process.argv.includes("--all")) {
+    throw new Error("Pass --component <name> or --all.");
   }
 
-  const config = getComponentConfig(component);
   const browser = await chromium.launch();
   const context = await browser.newContext({
     viewport: { width: 1280, height: 800 },
@@ -160,14 +155,25 @@ async function main() {
   const page = await context.newPage();
 
   const issues = [];
-  for (const theme of config.themes) {
-    for (const state of config.states) {
-      const stateIssues = await checkState(page, config, theme, state);
-      if (stateIssues.length > 0) {
-        issues.push(...stateIssues);
-        console.log(`FAIL ${config.component} ${theme}/${state}`);
-      } else {
-        console.log(`OK   ${config.component} ${theme}/${state}`);
+  for (const name of components) {
+    const config = getComponentConfig(name);
+    for (const theme of config.themes) {
+      await page.goto("about:blank");
+      await page.goto(config.showcaseUrl, { waitUntil: "networkidle" });
+      await page.waitForSelector(config.showcaseReadySelector, {
+        state: "attached",
+        timeout: 10000
+      });
+      await setShowcaseTheme(page, theme);
+
+      for (const state of config.states) {
+        const stateIssues = await checkState(page, config, theme, state);
+        if (stateIssues.length > 0) {
+          issues.push(...stateIssues);
+          console.log(`FAIL ${config.component} ${theme}/${state}`);
+        } else {
+          console.log(`OK   ${config.component} ${theme}/${state}`);
+        }
       }
     }
   }
@@ -175,14 +181,14 @@ async function main() {
   await browser.close();
 
   if (issues.length > 0) {
-    console.error(`\n${config.component} render check failed:`);
+    console.error("\nRender check failed:");
     for (const issue of issues) {
       console.error(`- ${issue}`);
     }
     process.exit(1);
   }
 
-  console.log(`\nRender check OK for ${config.component}.`);
+  console.log(`\nRender check OK for ${components.join(", ")}.`);
 }
 
 main().catch((error) => {

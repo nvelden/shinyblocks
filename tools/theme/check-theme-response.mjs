@@ -178,11 +178,10 @@ async function runPaletteSweep(page) {
     return { passes: 0, failures: 1 };
   }
 
-  await page.goto(`${SHOWCASE_URL}/#${PALETTE_PROBE.section}`, {
-    waitUntil: "networkidle"
+  await page.waitForSelector(PALETTE_PROBE.selector, {
+    state: "attached",
+    timeout: 10000
   });
-  await page.waitForTimeout(600);
-  await disableMotion(page);
 
   // Per-mode resolved --primary values, used to assert palettes are distinct.
   const seen = { light: {}, dark: {} };
@@ -241,6 +240,8 @@ async function run() {
 
   const browser = await chromium.launch();
   const page = await browser.newPage();
+  await page.goto(SHOWCASE_URL, { waitUntil: "networkidle" });
+  await disableMotion(page);
 
   for (const [name, config] of Object.entries(THEME_REGISTRY)) {
     if (config.mode === "static-only") {
@@ -248,11 +249,10 @@ async function run() {
       continue;
     }
 
-    await page.goto(`${SHOWCASE_URL}/#${config.section}`, {
-      waitUntil: "networkidle"
+    await page.waitForSelector(config.bindings[0].selector, {
+      state: "attached",
+      timeout: 10000
     });
-    await page.waitForTimeout(600);
-    await disableMotion(page);
 
     for (const mode of ["light", "dark"]) {
       await setTheme(page, mode);

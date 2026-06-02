@@ -8,7 +8,7 @@ This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package 
 - `r-package-development`: installed locally under `.agents/skills/r-package-development` and `.claude/skills/r-package-development`.
 - `testing-r-packages`: installed locally under `.agents/skills/testing-r-packages` and `.claude/skills/testing-r-packages`.
 - `critical-code-reviewer`: installed locally under `.agents/skills/critical-code-reviewer` and `.claude/skills/critical-code-reviewer`.
-- `shinyblocks-component`: installed locally under `.agents/skills/shinyblocks-component` and `.claude/skills/shinyblocks-component`. End-to-end recipe for adding a `block_*()` component: per-gate sync rule (R + CSS + showcase + tests + spec + pkgdown + NEWS), shadcn-fidelity workflow against the `apps/v4/registry/new-york-v4` source, and the mechanical visual-parity harness under `tools/parity/`. **Invoke whenever the user asks to add a component, port a shadcn component, wrap a Shiny widget as a block, or improve parity of an existing `block_*()`** — don't reinvent the workflow each time.
+- `shinyblocks-component`: installed locally under `.agents/skills/shinyblocks-component` and `.claude/skills/shinyblocks-component`. End-to-end recipe for adding a `block_*()` component: per-gate sync rule (R + CSS + showcase + tests + spec + docs-site + NEWS), shadcn-fidelity workflow against the `apps/v4/registry/new-york-v4` source, and the mechanical visual-parity harness under `tools/parity/`. **Invoke whenever the user asks to add a component, port a shadcn component, wrap a Shiny widget as a block, or improve parity of an existing `block_*()`** — don't reinvent the workflow each time.
 - `caveman`: installed locally under `.agents/skills/caveman` and `.claude/skills/caveman`. Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler, articles, and pleasantries while keeping full technical accuracy. Use when user says "caveman mode", "talk like caveman", "use caveman", "less tokens", "be brief", or invokes /caveman.
 
 
@@ -35,6 +35,10 @@ The root `components.json` and `package.json` exist only to provide shadcn proje
 - Follow the r-package-development skill when adding exported functions: roxygen docs, focused tests, and `devtools::document()` when docs change.
 - Follow the testing-r-packages skill for modern `testthat` 3 patterns when adding or refactoring tests.
 - After editing runtime JS/CSS, showcase wiring, or component update handlers, fully restart the local showcase.
+- Use verification tiers deliberately: `make check-fast` during edits,
+  `make check-slice` once per vertical slice, `make gate` before PR/phase exit,
+  and `make gate-release` only before release. Run browser/parity checks at a
+  slice boundary when the changed area affects runtime behavior or visuals.
 - In Codex/agent sessions, always run `make showcase` outside the command sandbox / with escalation. A sandboxed process can print `Listening on http://127.0.0.1:4321` while remaining unreachable from later commands, so do not try a sandboxed launch first and do not treat the log line as proof that the showcase is usable.
 - Before every agent-driven showcase restart, run `lsof -nP -iTCP:4321 -sTCP:LISTEN`. If a stale listener exists, stop that process first so stale CSS/JS cannot remain active. After the escalated restart, run `make showcase-health` outside the sandbox / with escalation and require an HTTP success response.
 - In Codex/agent sessions, prefer temp files / `--body-file` / here-docs for complex shell payloads. Do not inline long `gh issue comment ... --body "..."` strings or heavily nested `Rscript -e "..."` expressions when they contain parentheses, backticks, quotes, or Markdown; zsh parsing and sandbox command wrapping can fail before the real command runs.

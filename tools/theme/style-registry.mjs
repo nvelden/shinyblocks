@@ -19,10 +19,12 @@
 //                        Luma and asserts the property *changes* from its
 //                        default value, proving the profile actually reaches the
 //                        component.
-//   "overlay"         -> Luma changes the component, but the themed surface only
-//                        renders after interaction (portal overlays). Covered by
-//                        the presence of [data-sb-style="luma"] CSS rather than a
-//                        runtime measurement. Requires a `reason`.
+//   "overlay"         -> The profile changes the component, but the themed
+//                        surface only renders after interaction (portal
+//                        overlays). Instead of a runtime measurement, the parity
+//                        check asserts the profile actually affects it: it sets
+//                        at least one `<component>_*` token and/or has a
+//                        [data-sb-style] rule for it. Requires a `reason`.
 //   "profile-neutral" -> Luma intentionally does not change the component.
 //                        Requires a `reason`. The completeness gate still
 //                        requires the entry so a component is never silently
@@ -116,19 +118,19 @@ export const STYLE_REGISTRY = {
     section: "dialog",
     mode: "overlay",
     reason:
-      "Dialog content (rounded-4xl, blurred /30 scrim) only renders when open; the [data-sb-style='luma'] rules are present and covered by the static CSS scan."
+      "Dialog content (radius/ring tokens + blurred scrim) only renders when open; asserted by the overlay presence check (profile sets dialog_* tokens and/or a [data-sb-style] dialog rule)."
   },
   popover: {
     section: "popover",
     mode: "overlay",
     reason:
-      "Popover content (rounded-3xl, foreground ring) only renders when open; the [data-sb-style='luma'] rules are present and covered by the static CSS scan."
+      "Popover content (radius + foreground-ring tokens) only renders when open; asserted by the overlay presence check (profile sets popover_* tokens and/or a [data-sb-style] popover rule)."
   },
   tooltip: {
     section: "tooltip",
     mode: "overlay",
     reason:
-      "Tooltip content (rounded-xl, tighter padding) only renders on hover/focus; the [data-sb-style='luma'] rules are present and covered by the static CSS scan."
+      "Tooltip content (radius token + tighter padding) only renders on hover/focus; asserted by the overlay presence check (profile sets tooltip_* tokens and/or a [data-sb-style] tooltip rule)."
   },
 
   // --- Runtime components: profile-neutral -------------------------------
@@ -173,11 +175,13 @@ export const STYLE_REGISTRY = {
 };
 
 // --- Luma token overrides, parsed from R (single source of truth) ---------
-// The runtime parity check toggles the page into Luma by stamping
-// data-sb-style="luma" on .sb-app *and* injecting the shared --sb-* token
-// overrides exactly as block_style("luma") would. To avoid a second editable
-// copy of those values, we parse them out of R/style-profiles.R: the luma list
-// (snake_case -> value) plus the snake_case -> --sb-* property map.
+// The runtime parity check toggles the page into a profile by stamping
+// data-sb-style="<profile>" on .sb-app *and* injecting the --sb-* token
+// overrides exactly as block_style("<profile>") would. To avoid a second
+// editable copy of those values, we parse them out of R/style-profiles.R: the
+// profile's list (snake_case -> value) plus the snake_case -> --sb-* map. This
+// is profile-agnostic — a new profile is swept with no edits here, mirroring the
+// colour-preset sweep in check-theme-response.mjs.
 
 function parseListBlock(src, listName) {
   const start = src.indexOf(`${listName} = list(`);
@@ -200,8 +204,9 @@ function parseListBlock(src, listName) {
   return out;
 }
 
-function parseTokenMap(src) {
-  const fnStart = src.indexOf("style_token_map <- function()");
+function parseNamedMap(src, fnName) {
+  const fnStart = src.indexOf(`${fnName} <- function()`);
+  if (fnStart === -1) return {};
   const cStart = src.indexOf("c(", fnStart);
   let depth = 0;
   let i = cStart + 1;
@@ -221,20 +226,78 @@ function parseTokenMap(src) {
   return out;
 }
 
-export function lumaTokenOverrides() {
-  const src = fs.readFileSync(path.join(ROOT, "R", "style-profiles.R"), "utf8");
-  const luma = parseListBlock(src, "luma");
+// Every token block_style() may emit: the public allowlist plus the internal
+// per-component geometry tokens (radii, surfaces, borders, shadows).
+function parseTokenMap(src) {
+  return {
+    ...parseNamedMap(src, "style_token_map"),
+    ...parseNamedMap(src, "style_internal_token_map")
+  };
+}
+
+function readProfilesSrc() {
+  return fs.readFileSync(path.join(ROOT, "R", "style-profiles.R"), "utf8");
+}
+
+// Top-level profile names in `style_profiles <- list(...)`, excluding the
+// no-op `default`. Parsed by tracking nesting depth so only the direct
+// `name = list(` children of `style_profiles` count.
+export function styleProfileNames(src = readProfilesSrc()) {
+  const anchor = src.indexOf("style_profiles <- list(");
+  if (anchor === -1) {
+    throw new Error("Could not find `style_profiles <- list(` in R/style-profiles.R.");
+  }
+  const open = src.indexOf("(", anchor);
+  let depth = 0;
+  const names = [];
+  for (let i = open; i < src.length; i++) {
+    const ch = src[i];
+    if (ch === "(") {
+      depth++;
+      // A direct child `name = list(` opens while we are inside the outer
+      // `style_profiles <- list(` (depth 1), taking depth to 2.
+      if (depth === 2) {
+        const head = src.slice(0, i);
+        const m = head.match(/([A-Za-z0-9_.]+)\s*=\s*list$/);
+        if (m) names.push(m[1]);
+      }
+    } else if (ch === ")") {
+      depth--;
+      if (depth === 0) break;
+    }
+  }
+  return names.filter((n) => n !== "default");
+}
+
+// The snake_case token names a profile sets (keys of its `style_profiles` list).
+export function profileTokenNames(profile, src = readProfilesSrc()) {
+  return Object.keys(parseListBlock(src, profile));
+}
+
+// The --sb-* override declarations a given profile emits, exactly as
+// block_style("<profile>") would. Throws if the profile sets a token with no
+// entry in either token-map tier.
+export function profileTokenOverrides(profile, src = readProfilesSrc()) {
+  const values = parseListBlock(src, profile);
   const map = parseTokenMap(src);
   const decls = [];
-  for (const [name, value] of Object.entries(luma)) {
+  for (const [name, value] of Object.entries(values)) {
     const cssVar = map[name];
     if (!cssVar) {
-      throw new Error(`Luma token \`${name}\` has no entry in style_token_map().`);
+      throw new Error(
+        `Profile \`${profile}\` token \`${name}\` has no entry in ` +
+          "style_token_map() or style_internal_token_map()."
+      );
     }
     decls.push(`--${cssVar}: ${value};`);
   }
   if (decls.length === 0) {
-    throw new Error("Parsed no Luma token overrides from R/style-profiles.R.");
+    throw new Error(`Parsed no token overrides for profile \`${profile}\`.`);
   }
   return decls.join("");
+}
+
+// Back-compat alias.
+export function lumaTokenOverrides() {
+  return profileTokenOverrides("luma");
 }

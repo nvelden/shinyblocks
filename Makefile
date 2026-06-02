@@ -1,7 +1,7 @@
 .PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
-	check-fast lint spell urls test docs check pkgdown budget \
+	check-fast check-slice lint spell urls test docs check pkgdown budget \
 	doc-links legacy-audit theme-static theme-test style-parity parity-install parity-build-css parity-setup parity parity-stop \
-	parity-ci gate clean deploy-showcase preview preview-pkgdown \
+	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
 	preview-shinylive
 
 # Defaults you can override on the command line.
@@ -20,7 +20,8 @@ help:
 	@echo "  dev             - devtools::load_all() in an R session"
 	@echo "  showcase        - load_all() and run inst/showcase"
 	@echo "  showcase-health - verify the local showcase responds on its configured port"
-	@echo "  check-fast      - lint + test + build-css (~20s)"
+	@echo "  check-fast      - focused R tests + cheap static audits"
+	@echo "  check-slice     - full tests + builds/static audits for a vertical slice"
 	@echo ""
 	@echo "Phase exit:"
 	@echo "  build-css       - compile inst/www/src -> inst/www"
@@ -45,14 +46,15 @@ help:
 	@echo "  parity-stop     - stop the parity reference app"
 	@echo "  parity-ci       - automated run across registered parity components"
 	@echo "  doc-links       - tools/check-doc-links.R"
-	@echo "  gate            - run the full Quality Gate"
+	@echo "  gate            - run the automated PR/phase-exit gate"
 	@echo ""
 	@echo "Local preview (visual sanity check after a phase slice):"
-	@echo "  preview            - showcase + pkgdown side by side"
-	@echo "  preview-pkgdown    - build pkgdown site and serve site/pkgdown"
+	@echo "  preview            - showcase + docs site side by side"
+	@echo "  preview-docs       - build and serve docs-site/"
 	@echo "  preview-shinylive  - build Shinylive export and serve site/showcase"
 	@echo ""
 	@echo "Release-only:"
+	@echo "  gate-release    - run gate plus network/release-only checks"
 	@echo "  deploy-showcase - push showcase to its hosted deployment"
 	@echo "  clean           - remove generated artifacts"
 
@@ -73,10 +75,20 @@ dev:
 # `showcase` lives in the Local Preview section so it shares port
 # defaults with the other preview targets.
 
-check-fast: lint test build-css build-runtime
+check-fast:
+	$(R) -e 'devtools::test(filter = "style|utils")'
+	npm run test:themes-static
+	npm run test:style-leanness
+	git diff --check
 	@echo "check-fast OK"
 
-# ---------- Phase exit ----------
+# ---------- Slice boundary ----------
+
+check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness
+	git diff --check
+	@echo "check-slice OK"
+
+# ---------- PR / phase exit ----------
 
 build-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --minify
@@ -144,9 +156,15 @@ theme-test:
 style-parity:
 	npm run test:style-parity
 
-# Quality Gate runs the full release-readiness check sequence. CI runs this.
-# Order matters: cheap automated checks first, review and parity last.
-gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls test docs check budget doc-links legacy-audit theme-static parity-ci
+# Static leanness gate (no browser): fails when a [data-sb-style] profile rule
+# hardcodes a recipe property (radius / translucent surface / foreground ring)
+# that must instead be a profile token. Keeps profiles data, not CSS (issue #34).
+style-leanness:
+	npm run test:style-leanness
+
+# Quality Gate runs automated PR/phase-exit checks. Network and release-only
+# checks stay in gate-release so routine development does not pay for them.
+gate: check-slice runtime-test runtime-shiny-test showcase-test lint spell docs budget parity-ci
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"
@@ -162,11 +180,11 @@ gate: build-css build-runtime runtime-test runtime-shiny-test lint spell urls te
 # Visual sanity check you can run after any slice. Each target uses a
 # different port so two can run side by side without colliding:
 #   showcase           -> http://127.0.0.1:4321
-#   preview-pkgdown    -> http://127.0.0.1:4322
+#   preview-docs       -> http://127.0.0.1:4173/shinyblocks/
 #   preview-shinylive  -> http://127.0.0.1:4323
 
 PORT_SHOWCASE   ?= 4321
-PORT_PKGDOWN    ?= 4322
+PORT_DOCS       ?= 4173
 PORT_SHINYLIVE  ?= 4323
 PORT_PARITY     ?= 5173
 
@@ -226,17 +244,14 @@ parity-ci:
 	@$(R) -e 'devtools::load_all("."); shiny::runApp("inst/showcase", port = $(PORT_SHOWCASE), launch.browser = FALSE)' >/dev/null 2>&1 & echo $$! > .parity-ci-showcase-pid
 	@echo "Waiting for showcase app to start..."
 	@sleep 5
-	@echo "Running parity tests across the shared registry..."
-	@components=$$(node --input-type=module -e 'import { listComponentNames } from "./tools/parity/registry.mjs"; console.log(listComponentNames().join(" "))'); \
-	status=0; \
-	for component in $$components; do \
+	@echo "Running parity tests across the shared registry in one browser..."
+	@status=0; \
+	node tools/parity/diff-styles.mjs --all || status=1; \
+	if [ $$status -eq 0 ]; then \
 		echo ""; \
-		echo "== parity :: $$component =="; \
-		if ! $(MAKE) parity COMPONENT=$$component; then \
-			status=1; \
-			break; \
-		fi; \
-	done; \
+		echo "== palette sweep + style-profile parity (themes-browser) =="; \
+		npm run test:themes-browser || status=1; \
+	fi; \
 	$(MAKE) parity-stop >/dev/null 2>&1 || true; \
 	if [ -f .parity-ci-showcase-pid ]; then \
 		kill $$(cat .parity-ci-showcase-pid) >/dev/null 2>&1 || true; \
@@ -249,12 +264,8 @@ parity-ci:
 		exit 1; \
 	fi
 
-preview-pkgdown:
-	$(R) -e 'pkgdown::build_site(preview = FALSE)'
-	@echo ""
-	@echo "Serving pkgdown site at http://127.0.0.1:$(PORT_PKGDOWN)"
-	@echo "Press Ctrl+C to stop."
-	python3 -m http.server $(PORT_PKGDOWN) --directory site/pkgdown
+preview-docs:
+	cd docs-site && PORT=$(PORT_DOCS) npm run preview
 
 preview-shinylive:
 	@if [ ! -f tools/export-shinylive.R ]; then \
@@ -268,15 +279,18 @@ preview-shinylive:
 	@echo "Press Ctrl+C to stop."
 	python3 -m http.server $(PORT_SHINYLIVE) --directory site/showcase
 
-# Run the showcase + pkgdown together. Useful before a phase exit so
+# Run the showcase + docs site together. Useful before a phase exit so
 # you can flip between the live components and their reference pages.
 preview:
 	@echo "Starting showcase at http://127.0.0.1:$(PORT_SHOWCASE)"
-	@echo "Starting pkgdown  at http://127.0.0.1:$(PORT_PKGDOWN)"
+	@echo "Starting docs site at http://127.0.0.1:$(PORT_DOCS)/shinyblocks/"
 	@echo "Press Ctrl+C to stop both."
-	@$(MAKE) -j 2 showcase preview-pkgdown
+	@$(MAKE) -j 2 showcase preview-docs
 
 # ---------- Release-only ----------
+
+gate-release: gate urls check
+	@echo "gate-release OK"
 
 deploy-showcase:
 	$(R) -e 'rsconnect::deployApp("inst/showcase", appName = "shinyblocks-showcase")'

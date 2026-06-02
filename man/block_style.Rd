@@ -14,9 +14,19 @@ preserves the current shinyblocks visuals.}
 \code{control_height = "2.5rem"}. Override values win over the profile's
 built-in values.}
 
-\item{scope}{Optional CSS selector. When supplied, overrides apply only to
-elements matching \code{scope} (and the runtime/portal roots inside it) instead
-of the whole page. Defaults to \code{NULL} (page-wide).}
+\item{scope}{Optional CSS selector. When supplied, the profile's tokens
+(and any \code{...} overrides) apply only to elements matching \code{scope} (and the
+runtime/portal roots inside it) instead of the whole page. Defaults to
+\code{NULL} (page-wide).
+
+Scope covers every token-driven part of a profile — radii, surfaces,
+borders, shadows, and the shared \verb{--sb-*} tokens. A profile may also carry a
+little genuinely-structural CSS (for example a switch's enlarged geometry or
+a dialog's blurred scrim) that is keyed off a page-level
+\code{data-sb-style="<profile>"} attribute, which \code{scope} alone does not set. For
+full per-subtree fidelity, also place \code{data-sb-style="<profile>"} on the
+scope element (the showcase's scoped previews do this). Passing \code{style} to
+\code{\link[=block_page]{block_page()}} applies the profile page-wide and needs none of this.}
 }
 \value{
 A \code{shinyblocks_style} object consumed by \code{\link[=block_page]{block_page()}}.

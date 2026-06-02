@@ -22,9 +22,19 @@
 #' @param ... Named token overrides from the curated allowlist, such as
 #'   `control_height = "2.5rem"`. Override values win over the profile's
 #'   built-in values.
-#' @param scope Optional CSS selector. When supplied, overrides apply only to
-#'   elements matching `scope` (and the runtime/portal roots inside it) instead
-#'   of the whole page. Defaults to `NULL` (page-wide).
+#' @param scope Optional CSS selector. When supplied, the profile's tokens
+#'   (and any `...` overrides) apply only to elements matching `scope` (and the
+#'   runtime/portal roots inside it) instead of the whole page. Defaults to
+#'   `NULL` (page-wide).
+#'
+#'   Scope covers every token-driven part of a profile — radii, surfaces,
+#'   borders, shadows, and the shared `--sb-*` tokens. A profile may also carry a
+#'   little genuinely-structural CSS (for example a switch's enlarged geometry or
+#'   a dialog's blurred scrim) that is keyed off a page-level
+#'   `data-sb-style="<profile>"` attribute, which `scope` alone does not set. For
+#'   full per-subtree fidelity, also place `data-sb-style="<profile>"` on the
+#'   scope element (the showcase's scoped previews do this). Passing `style` to
+#'   [block_page()] applies the profile page-wide and needs none of this.
 #'
 #' @return A `shinyblocks_style` object consumed by [block_page()].
 #' @family theme
@@ -61,7 +71,7 @@ block_style <- function(profile = "default", ..., scope = NULL) {
 
   style_tag <- NULL
   if (length(values) > 0) {
-    token_map <- style_token_map()
+    token_map <- style_emit_token_map()
     decls <- paste(
       vapply(
         names(values),

@@ -110,12 +110,39 @@ test_that("style_token_map covers every public override name", {
   expect_true(all(grepl("^sb-", shinyblocks:::style_token_map())))
 })
 
-test_that("the luma profile only uses curated public tokens", {
+test_that("internal tokens are emittable but not public overrides", {
+  internal <- shinyblocks:::style_internal_token_map()
+  expect_true(all(grepl("^sb-", internal)))
+  # Internal geometry tokens are a separate tier: they are not accepted via `...`.
+  expect_length(intersect(names(internal), shinyblocks:::style_override_names()), 0)
+  # block_style() emits both tiers; names must be unique across them.
+  emit <- shinyblocks:::style_emit_token_map()
+  expect_setequal(
+    names(emit),
+    c(names(shinyblocks:::style_token_map()), names(internal))
+  )
+  expect_false(any(duplicated(names(emit))))
+})
+
+test_that("block_style rejects internal geometry tokens passed via ...", {
+  expect_error(block_style("default", card_radius = "1rem"), "Unknown style override")
+  expect_error(block_style("default", input_surface = "red"), "Unknown style override")
+})
+
+test_that("the luma profile only uses emittable tokens", {
   # The style-profile parity harness (tools/theme/style-registry.mjs) parses the
-  # luma list and maps each key through style_token_map(). Every luma key must be
-  # a public override name with a non-empty value, or that parse breaks.
+  # luma list and maps each key through the public + internal token maps. Every
+  # luma key must be an emittable token name with a non-empty value, or that
+  # parse breaks.
   luma <- shinyblocks:::style_profiles[["luma"]]
   expect_true(length(luma) > 0)
-  expect_true(all(names(luma) %in% shinyblocks:::style_override_names()))
+  expect_true(all(names(luma) %in% names(shinyblocks:::style_emit_token_map())))
   expect_true(all(nzchar(unlist(luma))))
+})
+
+test_that("block_style('luma') emits internal radius and surface tokens", {
+  css <- as.character(block_style("luma")$style)
+  expect_match(css, "--sb-card-radius: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-input-surface: color-mix(in oklch, var(--input) 50%, transparent);", fixed = TRUE)
+  expect_match(css, "--sb-input-border: transparent;", fixed = TRUE)
 })

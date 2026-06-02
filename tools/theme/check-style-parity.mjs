@@ -12,18 +12,32 @@
 // fails the theme check; a profile regression fails this one.
 //
 // Mechanism (per "profile" binding): measure the profile-sensitive computed
-// property in the default profile, then toggle the page into Luma exactly as
-// block_page(style = block_style("luma")) would — stamp data-sb-style="luma" on
-// .sb-app and inject the shared --sb-* token overrides parsed from
-// R/style-profiles.R — and assert the property *changes*. If a component stopped
-// responding to the profile (e.g. a hardcoded radius), the property will not
-// change and the check fails.
+// property in the default profile, then toggle the page into each non-default
+// profile exactly as block_page(style = block_style("<profile>")) would — stamp
+// data-sb-style="<profile>" on .sb-app and inject the --sb-* token overrides
+// parsed from that profile's list in R/style-profiles.R — and assert the
+// property *changes*. If a component stopped responding to the profile (e.g. a
+// hardcoded radius), the property will not change and the check fails.
+//
+// Profiles are swept generically (styleProfileNames()), so a new profile is
+// checked with no edits here — mirroring the colour-preset sweep in
+// check-theme-response.mjs. Each registry binding names a property the profile
+// is expected to shift (radii/surfaces are token-driven; switch/slider/radio
+// geometry is CSS-driven), so "changed from default" is the portable invariant
+// that proves the profile reaches every component. (A future per-(profile,
+// binding) expected-value table could tighten this once a second profile that
+// intentionally keeps some defaults exists.)
 
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import { STYLE_REGISTRY, lumaTokenOverrides } from "./style-registry.mjs";
+import {
+  STYLE_REGISTRY,
+  styleProfileNames,
+  profileTokenOverrides,
+  profileTokenNames
+} from "./style-registry.mjs";
 import { RSIDE_PRIMITIVES } from "./theme-registry.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -69,6 +83,26 @@ function checkCompleteness() {
   return ok;
 }
 
+// --- Overlay presence check -----------------------------------------------
+// Portal overlays (dialog/popover/tooltip) only render after interaction, so we
+// cannot measure them in a static page. Instead assert the profile actually
+// affects the component: it sets at least one `<name>_*` token, or it has a
+// [data-sb-style="<profile>"] rule referencing the component's `sb-<name>-`
+// classes. This replaces the previous (false) "covered by a static CSS scan"
+// claim — there was no such scan.
+const RUNTIME_CSS = fs.readFileSync(
+  path.join(ROOT, "frontend", "src", "styles", "runtime.css"),
+  "utf8"
+);
+
+function overlayAffected(profile, name) {
+  const tokens = profileTokenNames(profile);
+  const hasToken = tokens.some((t) => t === name || t.startsWith(`${name}_`));
+  const cssRe = new RegExp(`\\[data-sb-style="${profile}"\\][^{]*sb-${name}-`);
+  const hasCss = cssRe.test(RUNTIME_CSS);
+  return { hasToken, hasCss, ok: hasToken || hasCss };
+}
+
 // --- Runtime profile-toggle check ----------------------------------------
 async function disableMotion(page) {
   await page.addStyleTag({
@@ -77,20 +111,20 @@ async function disableMotion(page) {
   });
 }
 
-async function measureProfileShift(page, selector, property, tokenOverrides) {
+async function measureProfileShift(page, selector, property, profile, tokenOverrides) {
   return await page.evaluate(
-    ({ selector, property, tokenOverrides }) => {
+    ({ selector, property, profile, tokenOverrides }) => {
       const el = document.querySelector(selector);
       if (!el) return { missing: true };
       const before = getComputedStyle(el)[property];
 
       const app = document.querySelector(".sb-app") || document.documentElement;
       const prevStyle = app.dataset.sbStyle;
-      app.dataset.sbStyle = "luma";
+      app.dataset.sbStyle = profile;
 
       const style = document.createElement("style");
       style.id = "__sb_style_probe__";
-      style.textContent = `[data-sb-style="luma"]{${tokenOverrides}}`;
+      style.textContent = `[data-sb-style="${profile}"]{${tokenOverrides}}`;
       document.head.appendChild(style);
 
       void el.offsetHeight;
@@ -102,7 +136,7 @@ async function measureProfileShift(page, selector, property, tokenOverrides) {
 
       return { before, after };
     },
-    { selector, property, tokenOverrides }
+    { selector, property, profile, tokenOverrides }
   );
 }
 
@@ -117,42 +151,71 @@ async function run() {
     return;
   }
 
-  const tokenOverrides = lumaTokenOverrides();
+  const profiles = styleProfileNames();
+  if (profiles.length === 0) {
+    console.log("No non-default style profiles to check.");
+    return;
+  }
 
   const browser = await chromium.launch();
   const page = await browser.newPage();
+  await page.goto(SHOWCASE_URL, { waitUntil: "networkidle" });
+  await disableMotion(page);
 
-  for (const [name, config] of Object.entries(STYLE_REGISTRY)) {
-    const mode = config.mode || "profile";
-    if (mode === "overlay") {
-      overlays.push(`${name} (overlay: ${config.reason})`);
-      continue;
-    }
-    if (mode === "profile-neutral") {
-      neutrals.push(`${name} (profile-neutral: ${config.reason})`);
-      continue;
-    }
+  for (const profile of profiles) {
+    const tokenOverrides = profileTokenOverrides(profile);
+    console.log(`\n--- profile: ${profile} ---`);
 
-    await page.goto(`${SHOWCASE_URL}/#${config.section}`, {
-      waitUntil: "networkidle"
-    });
-    await page.waitForTimeout(600);
-    await disableMotion(page);
+    for (const [name, config] of Object.entries(STYLE_REGISTRY)) {
+      const mode = config.mode || "profile";
+      if (mode === "overlay") {
+        const a = overlayAffected(profile, name);
+        if (a.ok) {
+          passes += 1;
+          const via = [a.hasToken && "tokens", a.hasCss && "css"]
+            .filter(Boolean)
+            .join("+");
+          overlays.push(`${profile} :: ${name} (overlay, via ${via})`);
+        } else {
+          failures += 1;
+          console.error(
+            `  FAIL ${profile} :: ${name} (overlay) — profile sets no ${name}_* ` +
+              `token and has no [data-sb-style="${profile}"] ${name} rule`
+          );
+        }
+        continue;
+      }
+      if (mode === "profile-neutral") {
+        neutrals.push(`${profile} :: ${name} (profile-neutral: ${config.reason})`);
+        continue;
+      }
 
-    for (const b of config.bindings) {
-      const r = await measureProfileShift(page, b.selector, b.property, tokenOverrides);
-      const label = `${name} :: ${b.property} (${b.selector})`;
-      if (r.missing) {
-        failures += 1;
-        console.error(`  FAIL ${label}  (element not found)`);
-      } else if (r.after !== r.before) {
-        passes += 1;
-        console.log(`  ok   ${label}  ${r.before} -> ${r.after}`);
-      } else {
-        failures += 1;
-        console.error(
-          `  FAIL ${label}  unchanged under Luma (${r.before}) — component does not respond to the style profile`
+      await page.waitForSelector(config.bindings[0].selector, {
+        state: "attached",
+        timeout: 10000
+      });
+
+      for (const b of config.bindings) {
+        const r = await measureProfileShift(
+          page,
+          b.selector,
+          b.property,
+          profile,
+          tokenOverrides
         );
+        const label = `${profile} :: ${name} :: ${b.property} (${b.selector})`;
+        if (r.missing) {
+          failures += 1;
+          console.error(`  FAIL ${label}  (element not found)`);
+        } else if (r.after !== r.before) {
+          passes += 1;
+          console.log(`  ok   ${label}  ${r.before} -> ${r.after}`);
+        } else {
+          failures += 1;
+          console.error(
+            `  FAIL ${label}  unchanged under ${profile} (${r.before}) — component does not respond to the style profile`
+          );
+        }
       }
     }
   }
@@ -161,7 +224,8 @@ async function run() {
 
   console.log(
     `\nStyle parity: ${passes} passed, ${failures} failed, ` +
-      `${overlays.length} overlay, ${neutrals.length} profile-neutral.`
+      `${overlays.length} overlay, ${neutrals.length} profile-neutral ` +
+      `across ${profiles.length} profile(s): ${profiles.join(", ")}.`
   );
   if (overlays.length) {
     console.log("Overlay (Luma CSS present, rendered on interaction):");

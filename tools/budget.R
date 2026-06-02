@@ -25,8 +25,11 @@ targets <- list(
     group = "compatibility"
   ),
   list(
+    # Recalibrated for the post-#33 Luma-profile component set (the 36 KB cap
+    # predated that port and was already exceeded at HEAD). Gzipped (below) is
+    # the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 36,
+    limit_kb = 44,
     metric = "raw",
     group = "runtime"
   ),
