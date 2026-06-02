@@ -110,6 +110,15 @@ ui <- block_page(
       htmltools::div(
         style = "display: flex; align-items: center; gap: 0.5rem;",
         block_badge("Live", variant = "secondary"),
+        block_popover(
+          "Notifications",
+          stack(
+            htmltools::tags$p(style = "margin: 0; font-size: 0.875rem;", "2 deploy events since your last visit."),
+            block_badge("All clear", variant = "secondary")
+          ),
+          id = "gallery_header_popover",
+          align = "end"
+        ),
         block_button("Refresh", id = "gallery_refresh", icon = "refresh-cw", size = "sm")
       )
     ),
@@ -122,7 +131,6 @@ ui <- block_page(
       appearance_control("Style", "gallery_style_profile", gallery_style_profiles, "default"),
       appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, "neutral")
     ),
-    uiOutput("gallery_alert"),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
       uiOutput("gallery_metric"),
@@ -182,6 +190,7 @@ ui <- block_page(
                 trigger = "Preview invoice",
                 size = "sm"
               ),
+              uiOutput("gallery_save_state", inline = TRUE),
               wrap = TRUE
             )
           )
@@ -267,26 +276,23 @@ ui <- block_page(
             )
           )
         )
-      )
-    ),
-    block_card(
-      title = "Pipeline readiness",
-      description = "Skeletons, separators, badges, alerts, and spinner states in one workflow.",
-      htmltools::div(
-        style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;",
-        stack(block_badge("Loading surface", variant = "secondary"), loading_lines()),
-        stack(
-          block_badge("Checks", variant = "outline"),
-          mini_label("Runtime CSS", "OK"),
-          block_separator(),
-          mini_label("Shiny binding", "OK"),
-          block_separator(),
-          mini_label("Docs preview", "OK")
-        ),
-        stack(
-          block_badge("Next sync"),
-          row(block_spinner(size = "sm", color = "muted"), htmltools::span("Waiting for changes"), wrap = FALSE),
-          block_alert("Ready to publish", description = "Refresh the dashboard to simulate a live update.", icon = "check-circle")
+      ),
+      panel(
+        block_card(
+          title = "Pipeline readiness",
+          description = "Skeletons, separators, spinners, and alerts in one stack.",
+          style = "height: 100%;",
+          stack(
+            block_badge("Loading surface", variant = "secondary"),
+            loading_lines(),
+            block_separator(),
+            block_badge("Checks", variant = "outline"),
+            mini_label("Runtime CSS", "OK"),
+            mini_label("Shiny binding", "OK"),
+            block_separator(),
+            row(block_spinner(size = "sm", color = "muted"), htmltools::span("Waiting for changes"), wrap = FALSE),
+            block_alert("Ready to publish", description = "Refresh to simulate a live update.", icon = "check-circle")
+          )
         )
       )
     )
@@ -330,11 +336,11 @@ server <- function(input, output, session) {
     saved(TRUE)
   })
 
-  output$gallery_alert <- renderUI({
+  output$gallery_save_state <- renderUI({
     if (isTRUE(saved())) {
-      block_alert("Payment settings saved.", description = "Your workspace billing profile is up to date.")
+      block_badge("Saved", variant = "secondary")
     } else {
-      block_alert("Complete the payment profile to enable automatic renewals.", variant = "default")
+      NULL
     }
   })
 
