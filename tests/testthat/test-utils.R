@@ -153,17 +153,11 @@ test_that("block_button() without id omits binding and input-id markers", {
 })
 
 test_that("update_block_button sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_button(
-      session,
+      capture$session,
       "confirm",
       label = "Save",
       variant = "destructive",
@@ -176,6 +170,7 @@ test_that("update_block_button sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-button-confirm")
   expect_match(message$payload$labelHtml, "Save", fixed = TRUE)
   expect_identical(message$payload$variant, "destructive")
@@ -189,16 +184,11 @@ test_that("update_block_button sends input binding messages", {
 })
 
 test_that("update_block_button clears icon and style via NULL", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_button(session, "confirm", icon = NULL, style = NULL)
+  update_block_button(capture$session, "confirm", icon = NULL, style = NULL)
 
+  message <- capture$last_payload()
   expect_true("iconName" %in% names(message))
   expect_null(message$iconName)
   expect_true("iconHtml" %in% names(message))
@@ -208,17 +198,11 @@ test_that("update_block_button clears icon and style via NULL", {
 })
 
 test_that("update_block_select sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_select(
-      session,
+      capture$session,
       "plan",
       selected = "pro",
       choices = c(Free = "free", Pro = "pro"),
@@ -232,6 +216,7 @@ test_that("update_block_select sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-select-plan")
   expect_identical(message$payload$selected, "pro")
   expect_identical(message$payload$choices[[2]]$label, "Pro")
@@ -245,17 +230,11 @@ test_that("update_block_select sends input binding messages", {
 })
 
 test_that("update_block_checkbox sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_checkbox(
-      session,
+      capture$session,
       "agree",
       checked = TRUE,
       disabled = TRUE,
@@ -265,6 +244,7 @@ test_that("update_block_checkbox sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-checkbox-agree")
   expect_identical(message$payload$checked, TRUE)
   expect_identical(message$payload$disabled, TRUE)
@@ -274,31 +254,20 @@ test_that("update_block_checkbox sends input binding messages", {
 })
 
 test_that("cosmetic update_block_checkbox messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_checkbox(session, "agree", class = "renamed")
+  update_block_checkbox(capture$session, "agree", class = "renamed")
+  message <- capture$last_payload()
   expect_identical(message$notify, FALSE)
   expect_null(message$checked)
 })
 
 test_that("update_block_switch sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_switch(
-      session,
+      capture$session,
       "alerts",
       checked = TRUE,
       disabled = TRUE,
@@ -309,6 +278,7 @@ test_that("update_block_switch sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-switch-alerts")
   expect_identical(message$payload$checked, TRUE)
   expect_identical(message$payload$disabled, TRUE)
@@ -319,31 +289,20 @@ test_that("update_block_switch sends input binding messages", {
 })
 
 test_that("cosmetic update_block_switch messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_switch(session, "alerts", class = "renamed")
+  update_block_switch(capture$session, "alerts", class = "renamed")
+  message <- capture$last_payload()
   expect_identical(message$notify, FALSE)
   expect_null(message$checked)
 })
 
 test_that("update_block_slider sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_slider(
-      session,
+      capture$session,
       "volume",
       value = c(25, 75),
       min = 0,
@@ -361,6 +320,7 @@ test_that("update_block_slider sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-slider-volume")
   expect_identical(message$payload$value, c(25, 75))
   expect_identical(message$payload$min, 0)
@@ -378,31 +338,20 @@ test_that("update_block_slider sends input binding messages", {
 })
 
 test_that("cosmetic update_block_slider messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_slider(session, "volume", class = "renamed")
+  update_block_slider(capture$session, "volume", class = "renamed")
+  message <- capture$last_payload()
   expect_identical(message$notify, FALSE)
   expect_null(message$value)
 })
 
 test_that("update_block_dialog sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_dialog(
-      session,
+      capture$session,
       "confirm",
       open = TRUE,
       title = "New title",
@@ -411,6 +360,7 @@ test_that("update_block_dialog sends input binding messages", {
     )
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-dialog-confirm")
   expect_identical(message$payload$open, TRUE)
   expect_match(message$payload$titleHtml, "New title", fixed = TRUE)
@@ -419,15 +369,10 @@ test_that("update_block_dialog sends input binding messages", {
 })
 
 test_that("cosmetic update_block_dialog messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_dialog(session, "confirm", title = "Renamed")
+  update_block_dialog(capture$session, "confirm", title = "Renamed")
+  message <- capture$last_payload()
   expect_identical(message$notify, FALSE)
   expect_match(message$titleHtml, "Renamed", fixed = TRUE)
   expect_null(message$open)
@@ -545,16 +490,10 @@ test_that("block_popover without id is client-only", {
 })
 
 test_that("update_block_popover sends input binding messages", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session()
 
   update_block_popover(
-    session,
+    capture$session,
     "details",
     open = TRUE,
     trigger = "Updated label",
@@ -565,6 +504,7 @@ test_that("update_block_popover sends input binding messages", {
     class = "custom-popover"
   )
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-popover-details")
   expect_identical(message$payload$open, TRUE)
   expect_identical(message$payload$triggerLabel, "Updated label")
@@ -577,16 +517,11 @@ test_that("update_block_popover sends input binding messages", {
 })
 
 test_that("cosmetic update_block_popover messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = function(id) paste0("module-", id),
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session(ns = function(id) paste0("module-", id))
 
-  update_block_popover(session, "details", class = "custom")
+  update_block_popover(capture$session, "details", class = "custom")
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-popover-module-details")
   expect_identical(message$payload$class, NULL)
   expect_identical(message$payload$contentClass, "custom")
@@ -594,22 +529,17 @@ test_that("cosmetic update_block_popover messages do not notify", {
 })
 
 test_that("update_block_popover clears clearable fields", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
   update_block_popover(
-    session,
+    capture$session,
     "details",
     body = NULL,
     style = NULL,
     class = NULL
   )
 
+  message <- capture$last_payload()
   expect_true("bodyHtml" %in% names(message))
   expect_true("contentStyle" %in% names(message))
   expect_true("contentClass" %in% names(message))
@@ -619,14 +549,11 @@ test_that("update_block_popover clears clearable fields", {
 })
 
 test_that("update_block_popover validates session and enums", {
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) NULL
-  )
+  capture <- local_input_message_session()
 
   expect_error(update_block_popover(NULL, "details"), "session")
-  expect_error(update_block_popover(session, "details", side = "diagonal"), "one of")
-  expect_error(update_block_popover(session, "details", align = "weird"), "one of")
+  expect_error(update_block_popover(capture$session, "details", side = "diagonal"), "one of")
+  expect_error(update_block_popover(capture$session, "details", align = "weird"), "one of")
 })
 
 test_that("block_dialog forwards hide_title to props", {
@@ -663,84 +590,60 @@ test_that("block_dialog rejects unknown size values", {
 })
 
 test_that("update_block_dialog forwards size and footer", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
   update_block_dialog(
-    session,
+    capture$session,
     "confirm",
     size = "xl",
     footer = htmltools::tags$button("OK")
   )
 
+  message <- capture$last_payload()
   expect_identical(message$size, "xl")
   expect_match(message$footerHtml, "OK", fixed = TRUE)
   expect_identical(message$notify, FALSE)
 })
 
 test_that("update_block_dialog forwards class and style", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
   update_block_dialog(
-    session,
+    capture$session,
     "confirm",
     class = "custom-dialog",
     style = "border: 2px dashed red;"
   )
 
+  message <- capture$last_payload()
   expect_identical(message$className, "custom-dialog")
   expect_identical(message$style$border, "2px dashed red")
   expect_identical(message$notify, FALSE)
 })
 
 test_that("update_block_dialog clears footer when passed NULL", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
-  update_block_dialog(session, "confirm", footer = NULL)
+  update_block_dialog(capture$session, "confirm", footer = NULL)
+  message <- capture$last_payload()
   expect_true("footerHtml" %in% names(message))
   expect_null(message$footerHtml)
 })
 
 test_that("update_block_dialog rejects invalid size values", {
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) NULL
-  )
+  capture <- local_input_message_session()
   expect_error(
-    update_block_dialog(session, "confirm", size = "huge"),
+    update_block_dialog(capture$session, "confirm", size = "huge"),
     "size"
   )
 })
 
 test_that("update_block_select maps clearable NULL fields", {
-  message <- NULL
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) {
-      message <<- payload
-    }
-  )
+  capture <- local_input_message_session()
 
   expect_invisible(
     update_block_select(
-      session,
+      capture$session,
       "plan",
       selected = NULL,
       placeholder = NULL,
@@ -748,6 +651,7 @@ test_that("update_block_select maps clearable NULL fields", {
     )
   )
 
+  message <- capture$last_payload()
   expect_identical(message$selected, "")
   expect_null(message$placeholder)
   expect_null(message$class)
@@ -755,26 +659,19 @@ test_that("update_block_select maps clearable NULL fields", {
 })
 
 test_that("cosmetic update_block_select messages do not notify", {
-  message <- NULL
-  session <- list(
-    ns = function(id) paste0("module-", id),
-    sendInputMessage = function(input_id, payload) {
-      message <<- list(input_id = input_id, payload = payload)
-    }
-  )
+  capture <- local_input_message_session(ns = function(id) paste0("module-", id))
 
-  update_block_select(session, "plan", width = "12rem")
+  update_block_select(capture$session, "plan", width = "12rem")
 
+  message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-select-module-plan")
   expect_identical(message$payload$width, "12rem")
   expect_identical(message$payload$notify, FALSE)
 })
 
 test_that("update_block_select validates selected replacement choices", {
-  session <- list(
-    ns = identity,
-    sendInputMessage = function(input_id, payload) NULL
-  )
+  capture <- local_input_message_session()
+  session <- capture$session
 
   expect_snapshot(error = TRUE, {
     update_block_select(
@@ -944,14 +841,10 @@ test_that("block_theme_presets exposes the built-in palette names", {
 })
 
 test_that("update_block_theme sends a custom message", {
-  message <- NULL
-  session <- list(
-    sendCustomMessage = function(type, payload) {
-      message <<- list(type = type, payload = payload)
-    }
-  )
+  capture <- local_custom_message_session()
 
-  expect_invisible(update_block_theme(session, mode = "dark"))
+  expect_invisible(update_block_theme(capture$session, mode = "dark"))
+  message <- capture$last_message()
   expect_identical(message$type, "sb:theme")
   expect_identical(message$payload$mode, "dark")
 })

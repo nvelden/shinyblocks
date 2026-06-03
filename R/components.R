@@ -297,13 +297,13 @@ update_block_button <- function(
     payload$spriteHref <- sprite_href()
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "button", payload, notify_key = NULL)
@@ -648,16 +648,22 @@ update_block_dialog <- function(
   payload <- list()
 
   if (!missing(open)) {
-    payload$open <- isTRUE(open)
+    payload <- payload_set_if_present(payload, "open", open, isTRUE)
   }
   if (!missing(title)) {
-    payload$titleHtml <- if (is.null(title)) NULL else html_fragment(title)
+    payload <- payload_set_if_present(
+      payload, "titleHtml", title,
+      function(value) if (is.null(value)) NULL else html_fragment(value)
+    )
   }
   if (!missing(description)) {
-    payload$descriptionHtml <- if (is.null(description)) NULL else html_fragment(description)
+    payload <- payload_set_if_present(
+      payload, "descriptionHtml", description,
+      function(value) if (is.null(value)) NULL else html_fragment(value)
+    )
   }
   if (!missing(footer)) {
-    payload["footerHtml"] <- list(if (is.null(footer)) NULL else html_fragment(footer))
+    payload <- payload_set_clearable(payload, "footerHtml", footer, html_fragment)
   }
   if (!missing(size)) {
     allowed <- c("default", "sm", "lg", "xl")
@@ -673,10 +679,10 @@ update_block_dialog <- function(
     payload$size <- size
   }
   if (!missing(class)) {
-    payload["className"] <- list(class)
+    payload <- payload_set_clearable(payload, "className", class)
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
 
   runtime_input_update(
@@ -788,7 +794,7 @@ update_block_popover <- function(
   payload <- list()
 
   if (!missing(open)) {
-    payload$open <- isTRUE(open)
+    payload <- payload_set_if_present(payload, "open", open, isTRUE)
   }
   if (!missing(trigger)) {
     if (is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
@@ -797,7 +803,7 @@ update_block_popover <- function(
     payload$triggerLabel <- trigger
   }
   if (!missing(body)) {
-    payload["bodyHtml"] <- list(if (is.null(body)) NULL else html_fragment(body))
+    payload <- payload_set_clearable(payload, "bodyHtml", body, html_fragment)
   }
   if (!missing(side)) {
     payload$side <- match.arg(side, c("bottom", "top", "left", "right"))
@@ -806,10 +812,10 @@ update_block_popover <- function(
     payload$align <- match.arg(align, c("center", "start", "end"))
   }
   if (!missing(style)) {
-    payload["contentStyle"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "contentStyle", style)
   }
   if (!missing(class)) {
-    payload["contentClass"] <- list(class)
+    payload <- payload_set_clearable(payload, "contentClass", class)
   }
 
   runtime_input_update(

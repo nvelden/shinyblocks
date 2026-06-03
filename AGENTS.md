@@ -1,98 +1,88 @@
 # Agent Instructions
 
-This repo is an R package scaffold for `shinyshadcn`, a Shiny dashboard package inspired by shadcn/ui.
+`shinyblocks` is an R package of shadcn-inspired, composable UI blocks for Shiny.
+shadcn/ui is design-system source material — translate it into the package's
+runtime, R API, and assets, not React source dropped into the package.
 
-## Installed Skills
+## Architecture
 
-- `shadcn`: installed locally under `.agents/skills/shadcn` and `.claude/skills/shadcn`.
-- `r-package-development`: installed locally under `.agents/skills/r-package-development` and `.claude/skills/r-package-development`.
-- `testing-r-packages`: installed locally under `.agents/skills/testing-r-packages` and `.claude/skills/testing-r-packages`.
-- `critical-code-reviewer`: installed locally under `.agents/skills/critical-code-reviewer` and `.claude/skills/critical-code-reviewer`.
-- `shinyblocks-component`: installed locally under `.agents/skills/shinyblocks-component` and `.claude/skills/shinyblocks-component`. End-to-end recipe for adding a `block_*()` component: per-gate sync rule (R + CSS + showcase + tests + spec + docs-site + NEWS), shadcn-fidelity workflow against the `apps/v4/registry/new-york-v4` source, and the mechanical visual-parity harness under `tools/parity/`. **Invoke whenever the user asks to add a component, port a shadcn component, wrap a Shiny widget as a block, or improve parity of an existing `block_*()`** — don't reinvent the workflow each time.
-- `caveman`: installed locally under `.agents/skills/caveman` and `.claude/skills/caveman`. Ultra-compressed communication mode. Cuts token usage ~75% by dropping filler, articles, and pleasantries while keeping full technical accuracy. Use when user says "caveman mode", "talk like caveman", "use caveman", "less tokens", "be brief", or invokes /caveman.
+- Maintainer-owned **React/TS runtime** in `frontend/src`, built with Vite to
+  `inst/www/shinyblocks-runtime.{js,css}`. R emits a payload rendered under
+  `[data-shinyblocks-root]` (ADR 0017).
+- CSS source in `inst/www/src/` builds to `inst/www/shinyblocks.css` and
+  `preflight.scoped.css`; app styles scoped under `.sb-app` (ADR 0022).
+- Next.js docs site in `docs-site/` (ADR 0018).
+- `inst/www/*.js|*.css`, `man/`, and the icon sprite are generated — edit the
+  source and rebuild, never the output.
+- `components.json` / root `package.json` exist only for shadcn CLI/agent
+  context and are excluded from the R package build.
 
+## Installed skills
 
-Use the shadcn skill for shadcn/ui component conventions, naming, composition rules, theming tokens, and accessibility patterns. This repo is not a React app, so translate those patterns into R, `htmltools`, Shiny, and package assets instead of adding React components directly.
+Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 
-Use the r-package-development skill for R package structure, roxygen2 docs, `devtools`, `testthat`, `NEWS.md`, and package checks.
+- `shinyblocks-component` — end-to-end recipe for adding/refactoring a
+  `block_*()`: per-gate sync (R + runtime + CSS + showcase + tests + spec +
+  docs-site + NEWS), shadcn fidelity, and the parity harness under
+  `tools/parity/`. **Invoke for any add-a-component / port / parity request.**
+- `shadcn` — shadcn conventions, tokens, composition, accessibility.
+- `r-package-development` — package structure, roxygen2, devtools, NEWS, checks.
+- `testing-r-packages` — `testthat` 3 patterns, fixtures, snapshots, cleanup.
+- `critical-code-reviewer` — defect/regression/maintainability reviews.
+- `caveman` — ultra-terse output when asked.
 
-Use the testing-r-packages skill when writing, organizing, or improving `testthat` tests, including fixtures, snapshots, mocking, cleanup, and test structure.
+## Working style
 
-Use the critical-code-reviewer skill when the user asks for a review, critique, pull request review, or risk-focused assessment. Keep review output focused on concrete defects, regressions, missing tests, and maintainability risks.
+- Read `docs/ROADMAP.md` and the relevant ADR before implementing.
+- Keep changes small and vertical: one component or planning artifact at a time.
+- App-author code stays `htmltools`/`shiny`; never push a frontend build onto
+  users. A new framework or a reversal of the runtime port needs a new ADR.
+- Exported functions: roxygen docs, focused tests, `devtools::document()` when
+  docs change. Follow the r-package-development / testing-r-packages skills.
+- Accessible, keyboard-friendly markup; examples runnable on a standard
+  R/Shiny install.
+- After editing runtime JS/CSS, showcase wiring, or update handlers, fully
+  restart the showcase.
+- Verification tiers: `make check-fast` while editing · `make check-slice` per
+  slice · `make gate` before PR/phase exit · `make gate-release` before release.
+  Run parity/browser checks at slice boundaries.
 
-The root `components.json` and `package.json` exist only to provide shadcn project context to AI agents and the `shadcn` CLI. They are excluded from the R package build.
+### Agent-session gotchas
 
-## Working Style
+- Run `make showcase` outside the command sandbox / with escalation. A sandboxed
+  process can log `Listening on http://127.0.0.1:4321` while staying unreachable
+  — do not treat the log line as proof the showcase works.
+- Before a showcase restart, run `lsof -nP -iTCP:4321 -sTCP:LISTEN` and stop any
+  stale listener so old CSS/JS cannot persist. After the escalated restart, run
+  `make showcase-health` (escalated) and require an HTTP success response.
+- Prefer temp files / `--body-file` / here-docs for complex shell payloads.
+  Don't inline long `gh ... --body "..."` or nested `Rscript -e "..."` strings
+  with parentheses, backticks, quotes, or Markdown — zsh/sandbox wrapping can
+  fail before the real command runs.
 
-- Read `PLAN.md` and `docs/ROADMAP.md` before implementing.
-- Keep changes small and vertical: one component or one planning artifact at a time.
-- Prefer idiomatic R package structure over custom conventions.
-- Use `htmltools`, `shiny`, and package assets under `inst/` before introducing a frontend build step.
-- Do not add a Node/Tailwind build unless a decision record explicitly approves it.
-- Do not run `npx shadcn@latest add` into this package unless a decision record explicitly approves using generated React source as research material.
-- Use accessible markup and keyboard-friendly interactions.
-- Keep examples runnable with a standard R/Shiny installation.
-- Follow the r-package-development skill when adding exported functions: roxygen docs, focused tests, and `devtools::document()` when docs change.
-- Follow the testing-r-packages skill for modern `testthat` 3 patterns when adding or refactoring tests.
-- After editing runtime JS/CSS, showcase wiring, or component update handlers, fully restart the local showcase.
-- Use verification tiers deliberately: `make check-fast` during edits,
-  `make check-slice` once per vertical slice, `make gate` before PR/phase exit,
-  and `make gate-release` only before release. Run browser/parity checks at a
-  slice boundary when the changed area affects runtime behavior or visuals.
-- In Codex/agent sessions, always run `make showcase` outside the command sandbox / with escalation. A sandboxed process can print `Listening on http://127.0.0.1:4321` while remaining unreachable from later commands, so do not try a sandboxed launch first and do not treat the log line as proof that the showcase is usable.
-- Before every agent-driven showcase restart, run `lsof -nP -iTCP:4321 -sTCP:LISTEN`. If a stale listener exists, stop that process first so stale CSS/JS cannot remain active. After the escalated restart, run `make showcase-health` outside the sandbox / with escalation and require an HTTP success response.
-- In Codex/agent sessions, prefer temp files / `--body-file` / here-docs for complex shell payloads. Do not inline long `gh issue comment ... --body "..."` strings or heavily nested `Rscript -e "..."` expressions when they contain parentheses, backticks, quotes, or Markdown; zsh parsing and sandbox command wrapping can fail before the real command runs.
+## Important files
 
-## Important Files
-
-- `PLAN.md`: current product and architecture plan.
-- `docs/ROADMAP.md`: implementation sequence.
-- `docs/decisions/`: architecture decision records.
-- `R/`: exported R API.
-- `inst/www/`: CSS and JavaScript assets.
-- `inst/templates/`: starter app templates or examples.
-- `tests/testthat/`: package tests.
+- `docs/ROADMAP.md` — implementation sequence and quality gates.
+- `docs/decisions/` — architecture decision records (ADRs).
+- `HANDOFF.md` — in-flight work / current issue context.
+- `R/` — exported R API. `frontend/src/` — runtime. `inst/www/src/` — CSS source.
+- `inst/templates/` — starter app templates. `tests/testthat/` — package tests.
 
 ## Commands
 
-Use these when dependencies are installed:
-
 ```bash
-Rscript -e "devtools::document()"
+Rscript -e "devtools::document()"   # or R CMD check . if devtools is unavailable
 Rscript -e "devtools::test()"
-Rscript -e "devtools::check()"
+npm exec -- shadcn@latest docs button card sidebar tabs   # shadcn reference
 ```
 
-If `devtools` is unavailable:
+## Coding constraints
 
-```bash
-R CMD check .
-```
-
-For shadcn reference context:
-
-```bash
-npm exec -- shadcn@latest info --json
-npm exec -- shadcn@latest docs button card sidebar tabs
-```
-
-## Coding Constraints
-
-- Do not rewrite generated `man/` files by hand.
-- Do not commit local `.Rproj.user`, `.Rhistory`, `.RData`, or package check directories.
-- Add exported functions with roxygen comments.
-- Keep public API examples simple and runnable.
+- Do not hand-edit generated `man/` files or build outputs under `inst/www/`.
+- Do not commit `.Rproj.user`, `.Rhistory`, `.RData`, or check directories.
 - Add tests for each exported helper once behavior is defined.
 
-## Agent Planning
+## Agent planning
 
-When creating a plan, save it under `docs/agent-plans/YYYY-MM-DD-short-title.md`.
-
-Plans should include:
-
-- goal;
-- assumptions;
-- proposed API;
-- files to edit;
-- tests/checks;
-- open questions.
+Save plans under `docs/agent-plans/YYYY-MM-DD-short-title.md` with: goal,
+assumptions, proposed API, files to edit, tests/checks, open questions.

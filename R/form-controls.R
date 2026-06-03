@@ -34,17 +34,13 @@ block_textarea <- function(
     stop("`rows` must be a positive number.", call. = FALSE)
   }
 
-  hidden_native <- htmltools::tags$textarea(
-    id = input_id,
+  hidden_native <- hidden_native_textarea(
+    input_id,
     class = "sb-textarea-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    style = "display:none",
-    if (is.null(value)) "" else as.character(value)
+    value = if (is.null(value)) "" else as.character(value)
   )
 
-  wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
+  wrapper_style <- normalize_width_style(width)
 
   runtime_component(
     component = "textarea",
@@ -101,10 +97,13 @@ update_block_textarea <- function(
   payload <- list()
 
   if (!missing(value)) {
-    payload$value <- if (is.null(value)) "" else as.character(value)
+    payload <- payload_set_if_present(
+      payload, "value", value,
+      function(value) if (is.null(value)) "" else as.character(value)
+    )
   }
   if (!missing(placeholder)) {
-    payload["placeholder"] <- list(placeholder)
+    payload <- payload_set_clearable(payload, "placeholder", placeholder)
   }
   if (!missing(rows)) {
     if (!is.numeric(rows) || length(rows) != 1 || is.na(rows) || rows < 1) {
@@ -113,19 +112,19 @@ update_block_textarea <- function(
     payload$rows <- as.integer(rows)
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(invalid)) {
-    payload$invalid <- isTRUE(invalid)
+    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
   }
   if (!missing(resize)) {
     payload$resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "textarea", payload, notify = notify)
@@ -162,18 +161,14 @@ block_input <- function(
   validate_input_id(input_id)
   type <- match.arg(type)
 
-  hidden_native <- htmltools::tags$input(
-    id = input_id,
+  hidden_native <- hidden_native_input(
+    input_id,
     type = type,
     class = "sb-input-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    style = "display:none",
     value = if (is.null(value)) "" else as.character(value)
   )
 
-  wrapper_style <- if (!is.null(width)) paste0("width:", htmltools::validateCssUnit(width), ";") else NULL
+  wrapper_style <- normalize_width_style(width)
 
   runtime_component(
     component = "input",
@@ -226,25 +221,28 @@ update_block_input <- function(
   payload <- list()
 
   if (!missing(value)) {
-    payload$value <- if (is.null(value)) "" else as.character(value)
+    payload <- payload_set_if_present(
+      payload, "value", value,
+      function(value) if (is.null(value)) "" else as.character(value)
+    )
   }
   if (!missing(placeholder)) {
-    payload["placeholder"] <- list(placeholder)
+    payload <- payload_set_clearable(payload, "placeholder", placeholder)
   }
   if (!missing(type)) {
     payload$type <- match.arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(invalid)) {
-    payload$invalid <- isTRUE(invalid)
+    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "input", payload, notify = notify)
@@ -272,15 +270,13 @@ block_checkbox <- function(
 ) {
   validate_input_id(input_id)
 
-  hidden_native <- htmltools::tags$input(
-    id = input_id,
+  hidden_native <- hidden_native_input(
+    input_id,
     type = "checkbox",
     class = "sb-checkbox-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    checked = if (isTRUE(value)) NA else NULL,
-    disabled = if (isTRUE(disabled)) NA else NULL
+    checked = isTRUE(value),
+    disabled = isTRUE(disabled),
+    style = NULL
   )
 
   runtime_component(
@@ -325,16 +321,16 @@ update_block_checkbox <- function(
   payload <- list()
 
   if (!missing(checked)) {
-    payload$checked <- isTRUE(checked)
+    payload <- payload_set_if_present(payload, "checked", checked, isTRUE)
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(
@@ -368,15 +364,13 @@ block_switch <- function(
   validate_input_id(input_id)
   size <- match_arg(size, c("default", "sm", "lg"))
 
-  hidden_native <- htmltools::tags$input(
-    id = input_id,
+  hidden_native <- hidden_native_input(
+    input_id,
     type = "checkbox",
     class = "sb-switch-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    checked = if (isTRUE(value)) NA else NULL,
-    disabled = if (isTRUE(disabled)) NA else NULL
+    checked = isTRUE(value),
+    disabled = isTRUE(disabled),
+    style = NULL
   )
 
   runtime_component(
@@ -424,19 +418,19 @@ update_block_switch <- function(
   payload <- list()
 
   if (!missing(checked)) {
-    payload$checked <- isTRUE(checked)
+    payload <- payload_set_if_present(payload, "checked", checked, isTRUE)
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(size)) {
     payload$size <- match_arg(size, c("default", "sm", "lg"))
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(
@@ -511,20 +505,18 @@ block_slider <- function(
     stop("`step` must be a single positive numeric value.", call. = FALSE)
   }
 
-  hidden_native <- htmltools::tags$input(
-    id = input_id,
+  hidden_native <- hidden_native_input(
+    input_id,
     type = "hidden",
     class = "sb-slider-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    value = paste(value, collapse = ",")
+    value = paste(value, collapse = ","),
+    style = NULL
   )
 
   wrapper_style <- if (orientation == "vertical") {
     "display:inline-flex;"
   } else if (!is.null(width)) {
-    paste0("width:", htmltools::validateCssUnit(width), ";")
+    normalize_width_style(width)
   } else {
     NULL
   }
@@ -601,19 +593,19 @@ update_block_slider <- function(
           length(value) > 2 || any(is.na(value))) {
       stop("`value` must be one or two numeric values.", call. = FALSE)
     }
-    payload$value <- as.numeric(value)
+    payload <- payload_set_if_present(payload, "value", value, as.numeric)
   }
   if (!missing(min)) {
     if (!is.numeric(min) || length(min) != 1 || is.na(min)) {
       stop("`min` must be a single numeric value.", call. = FALSE)
     }
-    payload$min <- as.numeric(min)
+    payload <- payload_set_if_present(payload, "min", min, as.numeric)
   }
   if (!missing(max)) {
     if (!is.numeric(max) || length(max) != 1 || is.na(max)) {
       stop("`max` must be a single numeric value.", call. = FALSE)
     }
-    payload$max <- as.numeric(max)
+    payload <- payload_set_if_present(payload, "max", max, as.numeric)
   }
   if (!missing(min) && !missing(max) && min >= max) {
     stop("`min` must be strictly less than `max`.", call. = FALSE)
@@ -632,25 +624,25 @@ update_block_slider <- function(
     payload$orientation <- match_arg(orientation, c("horizontal", "vertical"))
   }
   if (!missing(show_value)) {
-    payload$showValue <- isTRUE(show_value)
+    payload <- payload_set_if_present(payload, "showValue", show_value, isTRUE)
   }
   if (!missing(min_label)) {
-    payload["minLabel"] <- list(if (is.null(min_label)) NULL else as.character(min_label))
+    payload <- payload_set_clearable(payload, "minLabel", min_label, as.character)
   }
   if (!missing(max_label)) {
-    payload["maxLabel"] <- list(if (is.null(max_label)) NULL else as.character(max_label))
+    payload <- payload_set_clearable(payload, "maxLabel", max_label, as.character)
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(invalid)) {
-    payload$invalid <- isTRUE(invalid)
+    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "slider", payload, notify = notify)

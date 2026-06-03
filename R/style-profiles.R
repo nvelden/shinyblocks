@@ -25,7 +25,7 @@
 # `--sb-<component>-radius` custom property with a fallback to its historical
 # value), so the only remaining `[data-sb-style="luma"]` CSS is the
 # genuinely-structural geometry (pill/translucent surfaces, slider/switch
-# metrics). See docs/research/2026-06-01-upstream-luma-comparison.md.
+# metrics).
 style_profiles <- list(
   default = list(),
   luma = list(

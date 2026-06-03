@@ -1,4 +1,126 @@
-# Handoff: Issue #40 — CSS isolation audit
+# Handoff: Issue #41 — Refactor runtime, CSS, R helpers, and tests
+
+## Status (2026-06-03) — READY FOR NEXT SLICE
+
+Created tracked issue:
+
+```text
+https://github.com/nvelden/shinyblocks/issues/41
+```
+
+Goal: make the package layers smaller and easier to change without changing the
+public API. The review found no emergency defects, but the codebase has several
+large mixed-responsibility files and verbose tests that now slow refactors.
+
+Primary targets:
+
+1. `frontend/src/index.jsx` (~3,000 lines): split into component modules,
+   runtime hooks, syntax highlighting, and a small registry/mounter entry file.
+2. `frontend/src/styles/runtime.css` (~2,000 lines): split source CSS by
+   responsibility and consolidate repeated focus/invalid/disabled/profile rules.
+3. `R/components.R` (~1,000 lines): split by component family while preserving
+   exported function names.
+4. R updater/form helper duplication: add small internal helpers for payload
+   setters, clearable fields, width styles, and hidden native inputs.
+5. `tests/testthat/test-shell.R` and `tests/testthat/test-utils.R`: consolidate
+   fake Shiny session setup and replace brittle raw-string assertions with
+   payload/custom expectations where possible.
+
+Suggested first slice:
+
+1. Add test helpers for captured Shiny input/custom messages. **Done:**
+   `tests/testthat/setup.R` now provides `local_input_message_session()` and
+   `local_custom_message_session()`, and the updater coverage in
+   `tests/testthat/test-utils.R` uses those helpers instead of per-test fake
+   session capture blocks.
+2. Use them to slim `test-utils.R` updater tests. **Done.**
+3. Then extract small R updater helpers and verify behavior remains unchanged.
+   **Done:** `R/runtime-input-update.R` now owns shared helpers for payload
+   setters, clearable payload fields, normalized style payloads, width style
+   strings, and hidden native input/textarea construction. The helpers are used
+   across form controls, select, radio group, and button/dialog/popover updater
+   paths.
+
+Verification so far:
+
+```bash
+Rscript -e "devtools::load_all('.'); testthat::test_file('tests/testthat/test-utils.R')"
+# 0 failures, 0 warnings, 16 CRAN skips
+Rscript -e "devtools::load_all('.'); testthat::test_file('tests/testthat/test-shell.R')"
+# 0 failures, 0 warnings
+Rscript -e "devtools::load_all('.'); testthat::test_file('tests/testthat/test-runtime-payload.R')"
+# 0 failures, 0 warnings, 1 CRAN skip
+make showcase-health
+# HTTP/1.1 200 OK
+make check-fast
+# 0 failures, 0 warnings; theme static/drift/leanness and diff check passed
+npm run build:runtime
+# built runtime JS/CSS successfully
+npm run test:runtime
+# Runtime smoke test passed; Select overflow smoke test passed
+make showcase-health
+# HTTP/1.1 200 OK after escalated showcase restart on :4321
+make check-slice
+# 0 failures, 0 warnings, 1 skip; doc links, legacy audit, theme/static drift,
+# style leanness, and diff check passed
+```
+
+Suggested second slice:
+
+1. Split `frontend/src/index.jsx` around low-risk modules first:
+   `highlighting/*`, `components/basic/*`, then overlay/input hooks.
+   **Partly done:** syntax highlighting now lives in
+   `frontend/src/highlighting/code.jsx`; shared JSX helpers live in
+   `frontend/src/components/shared.jsx`; stateless/basic runtime components
+   (`badge`, `separator`, `spinner`, `skeleton`, `empty`, `value-box`, `alert`)
+   live in `frontend/src/components/basic.jsx`. `frontend/src/index.jsx`
+   dropped from ~3,000 lines to ~2,500 lines. Stateful controls, overlays,
+   `button`, `code`, and the mounter remain in `index.jsx`.
+2. Run runtime/build checks after each extraction. **Done for this slice.**
+
+Suggested third slice:
+
+1. Split `frontend/src/styles/runtime.css` into source partials.
+2. Consolidate shared profile rules for `luma` and `rhea`.
+3. Rebuild generated runtime assets; do not hand-edit `inst/www` outputs.
+
+Verification targets:
+
+```bash
+make check-fast
+make check-slice
+```
+
+If runtime JS/CSS, showcase wiring, or update handlers change, restart the
+showcase per `AGENTS.md`, then run the showcase health check.
+
+Current commit candidate:
+
+```text
+ M AGENTS.md
+ M HANDOFF.md
+ M NEWS.md
+ M R/components.R
+ M R/form-controls.R
+ M R/radio-group.R
+ M R/runtime-input-update.R
+ M R/select.R
+ M R/style-profiles.R
+ M frontend/src/index.jsx
+ M inst/www/shinyblocks-runtime.js
+ M tests/testthat/setup.R
+ M tests/testthat/test-utils.R
+ A frontend/src/components/basic.jsx
+ A frontend/src/components/shared.jsx
+ A frontend/src/highlighting/code.jsx
+```
+
+`.vscode/` remains untracked and should not be included in the issue #41
+commit unless explicitly requested.
+
+---
+
+# Previous Handoff: Issue #40 — CSS isolation audit
 
 ## Status (2026-06-03) — RESOLVED
 

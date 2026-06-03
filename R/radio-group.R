@@ -39,12 +39,14 @@ block_radio_group <- function(
   }
   selected_value <- selected %||% choice_values[[1]]
 
-  hidden_native <- htmltools::tags$input(
-    id = input_id,
+  hidden_native <- hidden_native_input(
+    input_id,
     type = "hidden",
     class = "sb-radio-group-native",
-    `data-shiny-no-bind-input` = "",
-    value = selected_value
+    value = selected_value,
+    style = NULL,
+    tabindex = NULL,
+    aria_hidden = FALSE
   )
 
   runtime_component(
@@ -102,22 +104,22 @@ update_block_radio_group <- function(
     payload$choices <- runtime_choice_records(choices_df)
   }
   if (!missing(selected)) {
-    payload["selected"] <- list(if (is.null(selected)) NULL else as.character(selected))
+    payload <- payload_set_clearable(payload, "selected", selected, as.character)
   }
   if (!missing(disabled)) {
-    payload$disabled <- isTRUE(disabled)
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
   }
   if (!missing(invalid)) {
-    payload$invalid <- isTRUE(invalid)
+    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
   }
   if (!missing(orientation)) {
     payload$orientation <- match.arg(orientation, c("vertical", "horizontal"))
   }
   if (!missing(style)) {
-    payload["style"] <- list(if (is.null(style)) NULL else normalize_runtime_style(style))
+    payload <- payload_set_style(payload, "style", style)
   }
   if (!missing(class)) {
-    payload["class"] <- list(class)
+    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(

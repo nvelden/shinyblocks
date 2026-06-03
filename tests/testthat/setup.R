@@ -44,3 +44,56 @@ runtime_payload_from <- function(tag) {
   )
   jsonlite::fromJSON(json, simplifyVector = FALSE)
 }
+
+local_input_message_session <- function(ns = identity) {
+  messages <- list()
+  session <- list(
+    ns = ns,
+    sendInputMessage = function(input_id, payload) {
+      messages[[length(messages) + 1L]] <<- list(
+        input_id = input_id,
+        payload = payload
+      )
+    }
+  )
+
+  list(
+    session = session,
+    messages = function() messages,
+    last_message = function() {
+      if (!length(messages)) {
+        stop("No input messages were captured.", call. = FALSE)
+      }
+      messages[[length(messages)]]
+    },
+    last_payload = function() {
+      if (!length(messages)) {
+        stop("No input messages were captured.", call. = FALSE)
+      }
+      messages[[length(messages)]]$payload
+    }
+  )
+}
+
+local_custom_message_session <- function() {
+  messages <- list()
+  session <- list(
+    sendCustomMessage = function(type, payload) {
+      messages[[length(messages) + 1L]] <<- list(
+        type = type,
+        payload = payload
+      )
+    }
+  )
+
+  list(
+    session = session,
+    messages = function() messages,
+    last_message = function() {
+      if (!length(messages)) {
+        stop("No custom messages were captured.", call. = FALSE)
+      }
+      messages[[length(messages)]]
+    }
+  )
+}
