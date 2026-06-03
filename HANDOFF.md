@@ -1,6 +1,6 @@
 # Handoff: Issue #41 — Refactor runtime, CSS, R helpers, and tests
 
-## Status (2026-06-03) — FOURTH SLICE COMPLETE
+## Status (2026-06-03) — FIFTH SLICE COMPLETE
 
 Created tracked issue:
 
@@ -171,20 +171,48 @@ Suggested fifth slice:
 
 1. Continue `frontend/src/index.jsx` decomposition from the issue #41 plan:
    first replace the `RuntimeMount` component ladder with a registry map, then
-   extract one remaining focused runtime group at a time.
+   extract one remaining focused runtime group at a time. **First step done:**
+   `RuntimeMount` now uses a `COMPONENTS` registry map instead of the long
+   component `if` ladder. The existing silent fallback for unknown components is
+   preserved for forward compatibility, and `card` remains a no-op runtime
+   mount through a small `CardRuntimeMount` entry.
 2. Or, if staying in CSS, follow up on shell-family profile tokenization so the
    leanness gate can eventually cover `inst/www/src/shinyblocks.css` too.
 
 If runtime JS/CSS, showcase wiring, or update handlers change, restart the
 showcase per `AGENTS.md`, then run the showcase health check.
 
+Verification for fifth slice:
+
+```bash
+npm run build:runtime
+# built runtime JS/CSS successfully
+npm run test:runtime
+# Runtime smoke test passed; Select overflow smoke test passed
+make check-fast
+# 0 failures, 0 warnings; theme static/drift/leanness and diff check passed
+make check-slice
+# 0 failures, 0 warnings, 1 skip; doc links, legacy audit, theme/static drift,
+# style leanness, and diff check passed
+make showcase-health
+# HTTP/1.1 200 OK after escalated showcase restart on :4321
+```
+
+Suggested sixth slice:
+
+1. Continue the issue #41 runtime decomposition by extracting one focused
+   component group from `frontend/src/index.jsx`; the lowest-risk next step is
+   `Code` into `frontend/src/components/code.jsx` because syntax highlighting is
+   already isolated in `frontend/src/highlighting/code.jsx`.
+2. Rebuild runtime assets, run runtime smoke coverage, run `make check-fast`,
+   then restart the showcase and require `make showcase-health` success.
+
 Current commit candidate:
 
 ```text
  M HANDOFF.md
- M frontend/src/styles/runtime/08-style-profiles.css
- M inst/www/shinyblocks-runtime.css
- M tools/theme/check-style-leanness.mjs
+ M frontend/src/index.jsx
+ M inst/www/shinyblocks-runtime.js
 ```
 
 `.vscode/` remains untracked and should not be included in the issue #41

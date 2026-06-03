@@ -52,85 +52,38 @@ import { highlightCodeLine } from "./highlighting/code.jsx";
 
 const mounted = new Map();
 
+function CardRuntimeMount() {
+  return null;
+}
+
+const COMPONENTS = {
+  button: Button,
+  badge: Badge,
+  separator: Separator,
+  spinner: Spinner,
+  skeleton: Skeleton,
+  empty: Empty,
+  code: Code,
+  "value-box": ValueBox,
+  alert: Alert,
+  card: CardRuntimeMount,
+  dialog: Dialog,
+  popover: Popover,
+  tooltip: Tooltip,
+  checkbox: Checkbox,
+  switch: Switch,
+  textarea: Textarea,
+  input: Input,
+  "radio-group": RadioGroup,
+  slider: Slider,
+  select: Select
+};
+
 function RuntimeMount({ payload, root }) {
-  if (payload.component === "button") {
-    return <Button payload={payload} root={root} />;
-  }
+  const Component = COMPONENTS[payload.component];
 
-  if (payload.component === "badge") {
-    return <Badge payload={payload} />;
-  }
-
-  if (payload.component === "separator") {
-    return <Separator payload={payload} />;
-  }
-
-  if (payload.component === "spinner") {
-    return <Spinner payload={payload} />;
-  }
-
-  if (payload.component === "skeleton") {
-    return <Skeleton payload={payload} />;
-  }
-
-  if (payload.component === "empty") {
-    return <Empty payload={payload} />;
-  }
-
-  if (payload.component === "code") {
-    return <Code payload={payload} />;
-  }
-
-  if (payload.component === "value-box") {
-    return <ValueBox payload={payload} />;
-  }
-
-  if (payload.component === "alert") {
-    return <Alert payload={payload} />;
-  }
-
-  if (payload.component === "card") {
-    return null;
-  }
-
-  if (payload.component === "dialog") {
-    return <Dialog payload={payload} root={root} />;
-  }
-
-  if (payload.component === "popover") {
-    return <Popover payload={payload} root={root} />;
-  }
-
-  if (payload.component === "tooltip") {
-    return <Tooltip payload={payload} root={root} />;
-  }
-
-  if (payload.component === "checkbox") {
-    return <Checkbox payload={payload} root={root} />;
-  }
-
-  if (payload.component === "switch") {
-    return <Switch payload={payload} root={root} />;
-  }
-
-  if (payload.component === "textarea") {
-    return <Textarea payload={payload} root={root} />;
-  }
-
-  if (payload.component === "input") {
-    return <Input payload={payload} root={root} />;
-  }
-
-  if (payload.component === "radio-group") {
-    return <RadioGroup payload={payload} root={root} />;
-  }
-
-  if (payload.component === "slider") {
-    return <Slider payload={payload} root={root} />;
-  }
-
-  if (payload.component === "select") {
-    return <Select payload={payload} root={root} />;
+  if (Component) {
+    return <Component payload={payload} root={root} />;
   }
 
   return (
