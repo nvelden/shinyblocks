@@ -95,12 +95,67 @@ async function checkProfile(page, style) {
   await page.keyboard.press("Escape");
 }
 
+// Companion guard: when the whole list fits in the available space the popover
+// must NOT show a scrollbar. Pinning the border-box to the exact measured
+// content height left the scrolling viewport a fraction short (scrollHeight is
+// integer rounded), so `overflow-y: auto` painted a permanent, unnecessary
+// scrollbar. The box now caps to available space and the flex column shrinks
+// to its content, so a roomy viewport leaves the viewport un-scrollable.
+async function checkNoSpuriousScrollbar(page, style) {
+  await page.setContent(`
+    <!doctype html>
+    <html>
+      <head>
+        <style>${runtimeCss}</style>
+        <script>window.Shiny={setInputValue(){},bindAll(){},unbindAll(){}};</script>
+      </head>
+      <body style="margin:0">
+        <div style="height: 40px"></div>
+        <div class="sb-app"${style ? ` data-sb-style="${style}"` : ""} id="runtime-select"
+             data-shinyblocks-root data-shinyblocks-runtime="true">
+          <script type="application/json" data-shinyblocks-payload>${selectPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
+        </div>
+        <script>${runtime}</script>
+      </body>
+    </html>
+  `);
+
+  await page.locator("[data-slot='select-trigger']").click();
+  await page.waitForSelector("[data-slot='select-content'][data-state='open']");
+
+  const scrollable = await page.evaluate(() => {
+    const content = document.querySelector("[data-slot='select-content'][data-state='open']");
+    const viewport = content.querySelector("[data-slot='select-viewport']");
+    // Allow 1px for sub-pixel rounding; anything more is a real scrollbar.
+    return viewport.scrollHeight - viewport.clientHeight > 1;
+  });
+
+  assert.ok(
+    !scrollable,
+    `[${style || "default"}] popover must not scroll when every option fits`
+  );
+
+  await page.keyboard.press("Escape");
+}
+
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 320, height: 220 } });
 try {
   await checkProfile(page, null);
   await checkProfile(page, "luma");
-  console.log("Select overflow smoke test passed.");
 } finally {
   await browser.close();
+}
+
+// Tall viewport so the full list fits with room to spare.
+const roomyBrowser = await chromium.launch();
+const roomyPage = await roomyBrowser.newPage({ viewport: { width: 320, height: 600 } });
+try {
+  await checkNoSpuriousScrollbar(roomyPage, null);
+  await checkNoSpuriousScrollbar(roomyPage, "luma");
+  console.log("Select overflow smoke test passed.");
+} finally {
+  await roomyBrowser.close();
 }

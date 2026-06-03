@@ -2500,6 +2500,11 @@ function Select({ payload, root }) {
     const naturalHeight = contentHeight != null
       ? contentHeight
       : Math.max(choicesRef.current.length * estimatedItemHeight + 16, estimatedItemHeight + 16);
+    // `desiredHeight` is the natural content height, clamped only by the hard
+    // 384px cap. It drives the side (top/bottom) decision but must NOT be the
+    // box's maxHeight: pinning the border-box to the exact measured height
+    // leaves the scrolling viewport a fraction short (scrollHeight is integer
+    // rounded), so `overflow-y: auto` paints a scrollbar that isn't needed.
     const desiredHeight = Math.min(naturalHeight, maxContentHeight);
     const availableBelow = Math.max(0, viewportHeight - rect.bottom - gap - viewportPadding);
     const availableAbove = Math.max(0, rect.top - gap - viewportPadding);
@@ -2520,7 +2525,10 @@ function Select({ payload, root }) {
       top: side === "top" ? rect.top - gap : rect.bottom + gap,
       left,
       minWidth,
-      maxHeight: Math.max(1, Math.min(desiredHeight, availableHeight))
+      // Cap to the space actually available (never below the 384px ceiling).
+      // The flex column shrinks to its content when shorter than this cap, so
+      // a scrollbar only appears when the content truly overflows the viewport.
+      maxHeight: Math.max(1, Math.min(maxContentHeight, availableHeight))
     });
   }
 
