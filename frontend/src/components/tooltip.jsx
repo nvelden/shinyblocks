@@ -1,25 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
+import {
+  floatingTransform,
+  useFloatingPosition
+} from "../runtime/overlays.js";
 import { classNames } from "./shared.jsx";
-
-function popoverTransform(side, align) {
-  if (side === "top" || side === "bottom") {
-    const y = side === "top" ? "-100%" : "0";
-    if (align === "center") return `translate(-50%, ${y})`;
-    if (align === "start") return `translate(0, ${y})`;
-    return `translate(-100%, ${y})`;
-  }
-  const x = side === "left" ? "-100%" : "0";
-  if (align === "center") return `translate(${x}, -50%)`;
-  if (align === "end") return `translate(${x}, -100%)`;
-  return `translate(${x}, 0)`;
-}
 
 export function Tooltip({ payload }) {
   const props = payload.props || {};
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState(null);
   const triggerRef = useRef(null);
   const contentRef = useRef(null);
   const openTimerRef = useRef(null);
@@ -32,6 +22,7 @@ export function Tooltip({ payload }) {
   const contentStyle = props.contentStyle || null;
   const contentClass = props.contentClass || null;
   const contentId = `${payload.id || "tooltip"}-content`;
+  const position = useFloatingPosition({ open, triggerRef, side, align });
 
   function clearTimers() {
     if (openTimerRef.current) {
@@ -63,50 +54,6 @@ export function Tooltip({ payload }) {
   }
 
   useEffect(() => () => clearTimers(), []);
-
-  useEffect(() => {
-    if (!open || !triggerRef.current) return undefined;
-
-    function updatePosition() {
-      const rect = triggerRef.current.getBoundingClientRect();
-      const offset = 8;
-      let top = 0;
-      let left = 0;
-      if (side === "bottom") {
-        top = rect.bottom + offset;
-      } else if (side === "top") {
-        top = rect.top - offset;
-      } else if (side === "left") {
-        left = rect.left - offset;
-        top = rect.top;
-      } else if (side === "right") {
-        left = rect.right + offset;
-        top = rect.top;
-      }
-      if (side === "top" || side === "bottom") {
-        if (align === "center") {
-          left = rect.left + rect.width / 2;
-        } else if (align === "start") {
-          left = rect.left;
-        } else {
-          left = rect.right;
-        }
-      } else if (align === "center") {
-        top = rect.top + rect.height / 2;
-      } else if (align === "end") {
-        top = rect.bottom;
-      }
-      setPosition({ top, left });
-    }
-
-    updatePosition();
-    window.addEventListener("scroll", updatePosition, true);
-    window.addEventListener("resize", updatePosition);
-    return () => {
-      window.removeEventListener("scroll", updatePosition, true);
-      window.removeEventListener("resize", updatePosition);
-    };
-  }, [open, side, align]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -157,7 +104,7 @@ export function Tooltip({ payload }) {
               position: "fixed",
               top: `${position.top}px`,
               left: `${position.left}px`,
-              transform: popoverTransform(side, align),
+              transform: floatingTransform(side, align),
               ...(contentStyle || {})
             }}
             dangerouslySetInnerHTML={{ __html: bodyHtml || "" }}

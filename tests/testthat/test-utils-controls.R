@@ -33,18 +33,20 @@ test_that("update_block_select validates selected replacement choices", {
   capture <- local_input_message_session()
   session <- capture$session
 
-  expect_snapshot(error = TRUE, {
+  expect_error(
     update_block_select(
       session,
       "plan",
       selected = "team",
       choices = c(Free = "free", Pro = "pro")
-    )
-  })
+    ),
+    "`selected` must match one of `choices`"
+  )
 })
 
 test_that("block_textarea validates rows", {
-  expect_snapshot(error = TRUE, {
-    block_textarea("notes", rows = 0)
-  })
+  expect_error(
+    block_textarea("notes", rows = 0),
+    "`rows` must be a positive number"
+  )
 })

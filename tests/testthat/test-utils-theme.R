@@ -1,11 +1,7 @@
 test_that("block_theme validates named and known tokens", {
-  expect_snapshot(error = TRUE, {
-    block_theme("bad")
-  })
+  expect_error(block_theme("bad"), "`block_theme\\(\\)` overrides must be named")
 
-  expect_snapshot(error = TRUE, {
-    block_theme(not_a_token = "red")
-  })
+  expect_error(block_theme(not_a_token = "red"), "Unknown theme token")
 })
 
 test_that("block_theme emits every built-in semantic palette", {
@@ -159,7 +155,5 @@ test_that("update_block_theme sends a custom message", {
 })
 
 test_that("update_block_theme requires a session", {
-  expect_snapshot(error = TRUE, {
-    update_block_theme(NULL)
-  })
+  expect_error(update_block_theme(NULL), "`session` is required")
 })

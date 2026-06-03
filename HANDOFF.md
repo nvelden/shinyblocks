@@ -13,6 +13,8 @@ Issue #41 decomposition work is handled locally:
   `DESCRIPTION` `Collate` list was updated.
 - The oversized shell and utility test files were split by concern, with
   snapshots moved to matching split test names.
+- Popover/tooltip now share overlay positioning helpers in
+  `frontend/src/runtime/overlays.js`.
 
 Current local changes:
 
@@ -42,6 +44,14 @@ Current local changes:
  A tests/testthat/test-utils-runtime-updates.R
  A tests/testthat/test-utils-theme.R
  M tools/check-legacy-audit.R
+ A frontend/src/runtime/overlays.js
+ M frontend/src/components/popover.jsx
+ M frontend/src/components/tooltip.jsx
+ M inst/www/shinyblocks-runtime.js
+ D tests/testthat/_snaps/utils-controls.md
+ D tests/testthat/_snaps/utils-theme.md
+ M tests/testthat/test-utils-controls.R
+ M tests/testthat/test-utils-theme.R
  ?? .vscode/
 ```
 
