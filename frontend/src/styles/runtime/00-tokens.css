@@ -1,0 +1,105 @@
+[data-shinyblocks-root],
+[data-shinyblocks-portal-root] {
+  --radius: 0.625rem;
+  --background: oklch(100% 0 0);
+  --foreground: oklch(14.5% 0 0);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(14.5% 0 0);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(14.5% 0 0);
+  --primary: oklch(20.5% 0 0);
+  --primary-foreground: oklch(98.5% 0 0);
+  --secondary: oklch(97% 0 0);
+  --secondary-foreground: oklch(20.5% 0 0);
+  --muted: oklch(97% 0 0);
+  --muted-foreground: oklch(55.6% 0 0);
+  --accent: oklch(97% 0 0);
+  --accent-foreground: oklch(20.5% 0 0);
+  --destructive: oklch(57.7% 0.245 27.325);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --destructive-border: oklch(57.7% 0.245 27.325 / 40%);
+  --success: oklch(96.2% 0.044 156.743);
+  --success-foreground: oklch(44.8% 0.119 151.328);
+  --success-border: oklch(84.5% 0.143 164.978);
+  --warning: oklch(98.7% 0.022 95.277);
+  --warning-foreground: oklch(47.3% 0.137 46.201);
+  --warning-border: oklch(87.9% 0.169 91.605);
+  --info: oklch(97% 0.014 254.604);
+  --info-foreground: oklch(48.8% 0.243 264.376);
+  --info-border: oklch(80.9% 0.105 251.813);
+  --border: oklch(92.2% 0 0);
+  --input: oklch(92.2% 0 0);
+  --ring: oklch(70.8% 0 0);
+
+  /*
+   * Curated public style-profile tokens (the default profile). These are
+   * shinyblocks-owned (not shadcn-vendored) and are the stable surface that
+   * block_style() overrides. Values here must equal the historical hardcoded
+   * runtime defaults so the default profile is visually identical.
+   */
+  --sb-font-body: inherit;
+  --sb-font-heading: inherit;
+  --sb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sb-control-font-size: 0.875rem;
+  --sb-control-font-weight: 500;
+  --sb-control-height: 2.25rem;
+  --sb-control-height-sm: 2rem;
+  --sb-control-height-lg: 2.5rem;
+  --sb-control-padding-x: 1rem;
+  --sb-control-gap: 0.5rem;
+  --sb-surface-padding: 1.5rem;
+  --sb-surface-gap: 1.5rem;
+  --sb-overlay-padding: 1.5rem;
+  --sb-overlay-gap: 1rem;
+  --sb-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --sb-surface-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  --sb-overlay-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --sb-focus-ring-width: 3px;
+  --sb-focus-ring-opacity: 50%;
+  --sb-disabled-opacity: 0.5;
+  --sb-transition-duration: 0.15s;
+}
+
+[data-shinyblocks-root] {
+  box-sizing: border-box;
+  font-family: var(--sb-font-body);
+}
+
+[data-shinyblocks-portal-root] {
+  color: var(--foreground);
+}
+
+[data-theme="dark"] [data-shinyblocks-root],
+[data-theme="dark"] [data-shinyblocks-portal-root] {
+  --background: oklch(14.5% 0 0);
+  --foreground: oklch(98.5% 0 0);
+  --card: oklch(20.5% 0 0);
+  --card-foreground: oklch(98.5% 0 0);
+  --popover: oklch(20.5% 0 0);
+  --popover-foreground: oklch(98.5% 0 0);
+  --primary: oklch(92.2% 0 0);
+  --primary-foreground: oklch(20.5% 0 0);
+  --secondary: oklch(26.9% 0 0);
+  --secondary-foreground: oklch(98.5% 0 0);
+  --muted: oklch(26.9% 0 0);
+  --muted-foreground: oklch(70.8% 0 0);
+  --accent: oklch(26.9% 0 0);
+  --accent-foreground: oklch(98.5% 0 0);
+  --destructive: oklch(70.4% 0.191 22.216);
+  --destructive-foreground: oklch(98.5% 0 0);
+  --destructive-border: oklch(70.4% 0.191 22.216 / 50%);
+  --success: oklch(26.2% 0.051 172.552);
+  --success-foreground: oklch(76.5% 0.177 163.223);
+  --success-border: oklch(52.7% 0.154 150.069);
+  --warning: oklch(27.9% 0.077 45.635);
+  --warning-foreground: oklch(85.2% 0.199 91.936);
+  --warning-border: oklch(66.6% 0.179 58.318);
+  --info: oklch(28.2% 0.091 267.935);
+  --info-foreground: oklch(80.9% 0.105 251.813);
+  --info-border: oklch(58.5% 0.233 277.117);
+  --border: oklch(100% 0 0 / 10%);
+  --input: oklch(100% 0 0 / 15%);
+  --ring: oklch(55.6% 0 0);
+}

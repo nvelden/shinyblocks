@@ -1,0 +1,84 @@
+/* Scoped element resets and accent-color overrides to prevent Bootstrap/default blue leaks and focus borders */
+[data-shinyblocks-root] input,
+[data-shinyblocks-root] select,
+[data-shinyblocks-root] textarea,
+[data-shinyblocks-portal-root] input,
+[data-shinyblocks-portal-root] select,
+[data-shinyblocks-portal-root] textarea {
+  accent-color: var(--primary) !important;
+}
+
+[data-shinyblocks-root] input:focus,
+[data-shinyblocks-root] select:focus,
+[data-shinyblocks-root] textarea:focus,
+[data-shinyblocks-root] button:focus,
+[data-shinyblocks-root] a:focus,
+[data-shinyblocks-portal-root] input:focus,
+[data-shinyblocks-portal-root] select:focus,
+[data-shinyblocks-portal-root] textarea:focus,
+[data-shinyblocks-portal-root] button:focus,
+[data-shinyblocks-portal-root] a:focus {
+  outline: none !important;
+}
+
+[data-shinyblocks-root] input:focus-visible,
+[data-shinyblocks-root] select:focus-visible,
+[data-shinyblocks-root] textarea:focus-visible,
+[data-shinyblocks-root] button:focus-visible,
+[data-shinyblocks-root] a:focus-visible,
+[data-shinyblocks-portal-root] input:focus-visible,
+[data-shinyblocks-portal-root] select:focus-visible,
+[data-shinyblocks-portal-root] textarea:focus-visible,
+[data-shinyblocks-portal-root] button:focus-visible,
+[data-shinyblocks-portal-root] a:focus-visible {
+  outline: none !important;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
+}
+
+[data-shinyblocks-root][data-shinyblocks-runtime="true"][data-sb-mounted="true"] {
+  --shinyblocks-runtime-mounted: 1;
+}
+
+[data-shinyblocks-root][data-shinyblocks-runtime="true"][data-disabled] {
+  pointer-events: none;
+  opacity: var(--sb-disabled-opacity);
+}
+
+[data-shinyblocks-root].border-dashed,
+[data-shinyblocks-root] .border-dashed {
+  border-style: dashed !important;
+}
+
+[data-shinyblocks-root].bg-transparent,
+[data-shinyblocks-root] .bg-transparent {
+  background-color: transparent !important;
+}
+
+[data-shinyblocks-root].shadow-sm,
+[data-shinyblocks-root] .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+[data-shinyblocks-root].shadow-md,
+[data-shinyblocks-root] .shadow-md {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+[data-shinyblocks-root].shadow-lg,
+[data-shinyblocks-root] .shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.15),
+    0 4px 6px -4px rgb(0 0 0 / 0.15) !important;
+}
+
+[data-shinyblocks-root] > [data-shinyblocks-react]:empty,
+[data-shinyblocks-root] > [data-shinyblocks-children]:empty {
+  display: none;
+}
+
+[data-shinyblocks-root] > [data-shinyblocks-react] {
+  display: contents;
+}

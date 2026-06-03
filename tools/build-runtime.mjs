@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { readCssSource } from "./css-source.mjs";
 
 const root = process.cwd();
 
@@ -12,13 +13,9 @@ function minifyCss(source) {
     .trim();
 }
 
-async function readText(file) {
-  return readFile(path.join(root, file), "utf8");
-}
-
 await mkdir(path.join(root, "inst/www"), { recursive: true });
 
-const css = await readText("frontend/src/styles/runtime.css");
+const css = readCssSource(root, "frontend/src/styles/runtime.css");
 await writeFile(
   path.join(root, "inst/www/shinyblocks-runtime.css"),
   `${minifyCss(css)}\n`

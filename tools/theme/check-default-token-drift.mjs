@@ -12,12 +12,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readCssSource } from "../css-source.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 
 const shell = fs.readFileSync(path.join(ROOT, "inst/www/src/tokens.css"), "utf8");
-const runtime = fs.readFileSync(path.join(ROOT, "frontend/src/styles/runtime.css"), "utf8");
+const runtime = readCssSource(ROOT, "frontend/src/styles/runtime.css");
 
 function block(css, selector) {
   const start = css.indexOf(`${selector} {`);

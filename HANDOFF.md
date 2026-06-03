@@ -1,6 +1,6 @@
 # Handoff: Issue #41 — Refactor runtime, CSS, R helpers, and tests
 
-## Status (2026-06-03) — READY FOR NEXT SLICE
+## Status (2026-06-03) — THIRD SLICE COMPLETE
 
 Created tracked issue:
 
@@ -81,14 +81,51 @@ Suggested second slice:
 Suggested third slice:
 
 1. Split `frontend/src/styles/runtime.css` into source partials.
+   **Done:** `frontend/src/styles/runtime.css` is now an import entry and the
+   runtime rules live in focused partials under `frontend/src/styles/runtime/`
+   (`00-tokens.css` through `08-style-profiles.css`).
 2. Consolidate shared profile rules for `luma` and `rhea`.
+   **Deferred:** the split preserved behavior and kept profile selectors in
+   one partial; consolidation is the next low-risk CSS follow-up.
 3. Rebuild generated runtime assets; do not hand-edit `inst/www` outputs.
+   **Done:** `npm run build:runtime` and `make check-slice` rebuilt runtime
+   assets. Generated CSS content stayed behaviorally unchanged.
+
+Build/theme tooling update:
+
+- Added `tools/css-source.mjs` to inline local CSS `@import` partials.
+- `tools/build-runtime.mjs` now minifies the inlined runtime CSS source before
+  writing `inst/www/shinyblocks-runtime.css`.
+- Theme token, default-token drift, and style leanness gates now scan the
+  inlined runtime source instead of only the import entry.
 
 Verification targets:
 
 ```bash
 make check-fast
 make check-slice
+```
+
+Verification for third slice:
+
+```bash
+npm run build:runtime
+# built runtime JS/CSS successfully
+npm run test:themes-static
+# passed
+npm run test:themes-drift
+# passed
+npm run test:style-leanness
+# passed
+npm run test:runtime
+# Runtime smoke test passed; Select overflow smoke test passed
+make check-fast
+# 0 failures, 0 warnings; theme static/drift/leanness and diff check passed
+make check-slice
+# 0 failures, 0 warnings, 1 skip; doc links, legacy audit, theme/static drift,
+# style leanness, and diff check passed
+make showcase-health
+# HTTP/1.1 200 OK after escalated showcase restart on :4321
 ```
 
 If runtime JS/CSS, showcase wiring, or update handlers change, restart the

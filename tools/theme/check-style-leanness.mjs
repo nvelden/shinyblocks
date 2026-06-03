@@ -21,6 +21,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readCssSource } from "../css-source.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -120,7 +121,7 @@ function run() {
   for (const rel of STYLESHEETS) {
     const file = path.join(ROOT, rel);
     if (!fs.existsSync(file)) continue;
-    const css = fs.readFileSync(file, "utf8");
+    const css = readCssSource(ROOT, rel);
     for (const { selector, body } of parseRules(css)) {
       if (!selector.includes("[data-sb-style=")) continue;
       scanned += 1;
