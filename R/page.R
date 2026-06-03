@@ -52,6 +52,7 @@ block_page <- function(
       htmltools::tags$head(
         htmltools::tags$title(title %||% "shinyblocks"),
         block_favicon_link(),
+        block_page_chrome_style(),
         block_theme_script(theme_mode),
         theme,
         style_tag
@@ -106,6 +107,22 @@ block_body <- function(..., class = NULL) {
       class = merge_classes("sb-body", class),
       ...
     )
+  )
+}
+
+# Minimal host-document reset for the page-owning entry point.
+#
+# The Tailwind Preflight reset is scoped to `.sb-app` so it never touches a
+# host page (ADR 0022). `block_page()` is the explicit "shinyblocks owns the
+# page" entry point, so it may reset the document `<body>` margin that the
+# UA adds (and that the global Preflight used to zero) — without this the
+# `.sb-app` shell renders with an 8px gutter around it. Components used
+# standalone inside a host app do not emit this, so the host keeps its own
+# body styling.
+block_page_chrome_style <- function() {
+  htmltools::tags$style(
+    class = "sb-page-chrome",
+    htmltools::HTML("body{margin:0;padding:0}")
   )
 }
 

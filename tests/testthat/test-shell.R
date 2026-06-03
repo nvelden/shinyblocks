@@ -42,6 +42,15 @@ test_that("block_page includes optional theme overrides in head", {
   expect_match(head, "--primary: oklch(0.5 0.2 250);", fixed = TRUE)
 })
 
+test_that("block_page emits a page-owner body reset (Preflight is scoped to .sb-app)", {
+  head <- paste(htmltools::renderTags(block_page("Body"))$head, collapse = "")
+
+  # The Tailwind Preflight reset is scoped to .sb-app (ADR 0022), so the
+  # page-owning entry point restores the body margin reset itself.
+  expect_match(head, "sb-page-chrome", fixed = TRUE)
+  expect_match(head, "body{margin:0;padding:0}", fixed = TRUE)
+})
+
 test_that("block_page applies a style profile and injects its overrides", {
   page <- block_page(
     title = "Example",

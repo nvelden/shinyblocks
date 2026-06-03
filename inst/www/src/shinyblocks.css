@@ -20,7 +20,18 @@
  * See ADR 0006 (styling foundation) and ADR 0009 (upstream sync).
  */
 
-@import "tailwindcss" source(none);
+/*
+ * Granular Tailwind v4 imports (instead of `@import "tailwindcss"`) so the
+ * Preflight reset can be scoped under `.sb-app` rather than shipped globally.
+ * `preflight.scoped.css` is generated from the installed Tailwind's Preflight
+ * by `tools/build-preflight.mjs` (run first by `make build-css`). This keeps
+ * shinyblocks embeddable in a host page without resetting the host document.
+ * See ADR 0022 (CSS isolation).
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "./preflight.scoped.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
 @import "./tokens.css";
 
 @theme {

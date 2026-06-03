@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
+.PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
 	check-fast check-slice lint spell urls test docs check pkgdown budget \
 	doc-links legacy-audit theme-static theme-test style-parity parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
@@ -91,7 +91,10 @@ check-slice: build-css build-runtime test doc-links legacy-audit theme-static st
 
 # ---------- PR / phase exit ----------
 
-build-css:
+build-preflight:
+	node tools/build-preflight.mjs
+
+build-css: build-preflight
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --minify
 
 build-runtime:

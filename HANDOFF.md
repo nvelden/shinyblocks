@@ -1,88 +1,85 @@
-# Handoff: Issue #38 Implemented
+# Handoff: Issue #40 — CSS isolation audit
 
-## Status (2026-06-02)
+## Status (2026-06-03) — RESOLVED
 
-Issue #38 is implemented locally and ready to push to `origin/main`.
+Implemented the **composable** option (a). All three actionable findings fixed,
+documented in [ADR 0022](docs/decisions/0022-css-isolation.md) and `NEWS.md`:
+
+1. Preflight reset scoped under `.sb-app` via granular Tailwind imports +
+   generated `inst/www/src/preflight.scoped.css` (`tools/build-preflight.mjs`,
+   chained into `make build-css`). `block_page()` emits a page-owner
+   `body{margin:0;padding:0}` reset (`sb-page-chrome`).
+2. Shell tokens moved from `:root` → `.sb-app` (and `[data-theme="dark"]` →
+   `[data-theme="dark"] .sb-app`) in `inst/www/src/tokens.css`.
+3. Bare `localStorage["theme"]` read removed (`inst/www/shinyblocks.js`, reads
+   only `sb-theme`).
+
+Finding 4 (global `@property --tw-*` defaults) left as a documented note (inert).
+`make check-slice` green; showcase restarted on :4321 and visually verified
+(light + dark). The historical audit detail below is retained for reference.
+
+---
 
 Tracked issue:
 
 ```text
-https://github.com/nvelden/shinyblocks/issues/38
+https://github.com/nvelden/shinyblocks/issues/40
 ```
 
-Plan:
+## Decision Needed First
 
-```text
-docs/agent-plans/2026-06-02-docs-home-playground-theme-controls.md
-```
+shinyblocks currently assumes it **owns the whole page**. Before fixing, decide:
 
-## Issue #38 Work Landed
+- **(a) Make it composable** — scope the Preflight reset + design tokens under
+  `.sb-app` / `.sb-page` so shinyblocks can be embedded in an existing
+  Shiny/bslib app; or
+- **(b) Page-owning only** — keep current behavior and document the constraint
+  (ADR 0006 / 0009 area).
 
-- Added session-only docs home gallery controls for:
-  - `gallery_style_profile`, populated from `block_style_profiles()`;
-  - `gallery_theme_preset`, populated from `block_theme_presets()`.
-- Kept the gallery default at `style = "default"` and `preset = "neutral"` so
-  the first-load home page remains visually stable.
-- Applied theme changes through a dynamic scoped `block_theme(..., scope =
-  ".sb-app")` render target.
-- Applied style token changes through `block_style(..., scope = ".sb-app")` and
-  a Shiny custom message that updates the gallery `.sb-app` `data-sb-style`
-  marker so Luma/Rhea shell-profile CSS activates.
-- Increased the gallery iframe height from `1240` to `1360` in the playground
-  generator and docs-site preview manifest.
-- Updated the docs-site gallery e2e test so generated `app.json` must include
-  the style/preset controls and the style-profile message handler.
+Findings 1 and 2 below only need fixing under option (a). Finding 3 is worth
+fixing either way.
 
-## Files Changed
+## Findings (full detail in issue #40)
 
-```text
-docs-site/playgrounds/gallery/app.R
-docs-site/scripts/generate-playgrounds.R
-docs-site/lib/preview-manifest.json
-docs-site/tests/e2e/gallery.spec.ts
-HANDOFF.md
-```
+1. **Tailwind Preflight reset ships globally unscoped** (`inst/www/shinyblocks.css`,
+   `@layer base`). Resets `*`, `ol,ul,menu`, `h1..h6`, `img/svg/video`,
+   `[hidden]` document-wide. Partly cushioned by `@layer` (unlayered author CSS
+   wins) but still clobbers UA defaults. Fix: scope under `.sb-app`/`.sb-page`
+   in `inst/www/src/shinyblocks.css`, then `make build-css`.
+2. **Unprefixed `:root` tokens** (`inst/www/src/tokens.css`): `--background`,
+   `--foreground`, `--primary`, `--border`, `--input`, `--ring`, `--radius`, …
+   collide with any other shadcn-token lib on the page. Token *names* are a
+   public theming contract (renaming = major release), so scope rather than
+   rename.
+3. **Bare `localStorage["theme"]` read** (`inst/www/shinyblocks.js:9`) — writes
+   prefixed `sb-theme` but reads generic `"theme"` first. Drop/gate the bare
+   read. Fix regardless of option a/b.
+4. Global `@property --tw-*` defaults — note only, no action.
 
-## Verification
+## Confirmed Clean (no action)
 
-Passed locally:
+- `htmlDependency` name `"shinyblocks"` (`R/deps.R:4`)
+- `addResourcePath` prefix `"shinyblocks"` (`R/zzz.R:3`)
+- Message handler `"sb:theme"` guarded (`inst/www/shinyblocks.js:344`)
+- Input handler `"shinyblocks.button"` (`R/zzz.R:7`)
+- No vendored jQuery/Bootstrap; React runtime is a self-contained IIFE
+- `setInputValue` uses `{priority:"event"}` (`inst/www/shinyblocks.js:119`)
+- Idempotent wiring guards + MutationObserver + `shiny:connected` resync
+
+## Suggested Fix Steps (next chat, if option a)
+
+1. Scope Preflight + tokens under `.sb-app`/`.sb-page` in `inst/www/src/`.
+2. `make build-css` to regenerate the committed `inst/www/shinyblocks.css`.
+3. Remove the bare `localStorage["theme"]` read.
+4. Re-run parity harness (`tools/parity/`) + `make check-slice`; restart
+   showcase on 4321 per `AGENTS.md`.
+5. Add/extend ADR documenting the isolation contract; update NEWS.
+
+## Runtime State
+
+Local servers may be running (see `AGENTS.md` before restarting):
 
 ```bash
-make check-fast
-npm run test:e2e -- --grep "landing page gallery"
-git diff --check
+lsof -nP -iTCP:4321 -sTCP:LISTEN   # showcase
+lsof -nP -iTCP:5173 -sTCP:LISTEN   # parity reference app
 ```
-
-Notes:
-
-- The first docs e2e attempt failed inside the command sandbox because the
-  Playwright web server could not create the `tsx` IPC pipe. The same command
-  passed outside the sandbox.
-- `air` is not installed in this environment, so `air format .` was not run.
-- `Rscript scripts/generate-playgrounds.R` was run from `docs-site/`. The
-  generated `docs-site/public/playgrounds/` output is ignored by git; tracked
-  broad preview/runtime build churn was restored, keeping only the intended
-  gallery manifest height change.
-
-## Current Runtime State
-
-Previous handoff noted local servers may be running:
-
-- showcase: `make showcase` on port `4321`;
-- parity reference app:
-  `python3 -m http.server 5173 --directory parity/dist`.
-
-Before any new agent-driven showcase restart, follow `AGENTS.md`:
-
-```bash
-lsof -nP -iTCP:4321 -sTCP:LISTEN
-lsof -nP -iTCP:5173 -sTCP:LISTEN
-```
-
-Stop stale listeners first, then restart `make showcase` outside the sandbox and
-verify with `make showcase-health` outside the sandbox.
-
-## Next Suggested Action
-
-After pushing this commit, watch CI and close or comment on Issue #38 with the
-passing checks.

@@ -7,8 +7,12 @@
  * Dark mode is toggled by setting `data-theme="dark"` on <html> (next-themes
  * is configured with attribute="data-theme" in app/layout.tsx).
  *
- * IF YOU UPDATE TOKENS IN THE PACKAGE'S CSS, RE-COPY THE :root and
- * [data-theme=dark] blocks here. They must stay in sync.
+ * IF YOU UPDATE TOKEN VALUES IN THE PACKAGE, RE-COPY THE VALUES into the
+ * :root / [data-theme=dark] blocks here so they stay in sync. NOTE: the
+ * package scopes these tokens to `.sb-app` (not `:root`) so it can be
+ * embedded without colliding with a host page (ADR 0022). The docs site
+ * owns its whole page, so it deliberately keeps them on `:root` here —
+ * copy the values, not the package's `.sb-app` selector.
  * -------------------------------------------------------------------------- */
 
 :root {

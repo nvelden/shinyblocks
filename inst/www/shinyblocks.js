@@ -6,7 +6,7 @@
     }
 
     try {
-      var mode = localStorage.getItem("theme") || localStorage.getItem("sb-theme") || "system";
+      var mode = localStorage.getItem("sb-theme") || "system";
       return mode === "light" || mode === "dark" || mode === "system"
         ? mode
         : "system";

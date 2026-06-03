@@ -43,9 +43,11 @@ function normalise(value) {
   );
 }
 
+// Shell tokens are scoped to `.sb-app` (not global `:root`) for host-page
+// isolation; see ADR 0022.
 const pairs = [
-  [":root", "[data-shinyblocks-root],\n[data-shinyblocks-portal-root]"],
-  ['[data-theme="dark"]', '[data-theme="dark"] [data-shinyblocks-root],\n[data-theme="dark"] [data-shinyblocks-portal-root]']
+  [".sb-app", "[data-shinyblocks-root],\n[data-shinyblocks-portal-root]"],
+  ['[data-theme="dark"] .sb-app', '[data-theme="dark"] [data-shinyblocks-root],\n[data-theme="dark"] [data-shinyblocks-portal-root]']
 ];
 
 const failures = [];

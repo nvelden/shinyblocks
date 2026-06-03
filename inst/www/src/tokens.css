@@ -10,11 +10,19 @@
  *  - Token VALUES are vendored. Do not modify them by hand.
  *  - Token NAMES are part of shinyblocks's public theming contract.
  *    Renaming a token is a major-release change.
- *  - On upstream sync: copy this file fresh from shadcn upstream,
- *    bump the "Synced" line above.
+ *  - On upstream sync: copy the token VALUES fresh from shadcn upstream,
+ *    bump the "Synced" line above. Keep the `.sb-app` / `[data-theme="dark"]
+ *    .sb-app` selectors below (do not paste shadcn's `:root` / `.dark`
+ *    selectors verbatim).
+ *
+ * Scoping: tokens are set on the `.sb-app` shell (not global `:root`) so
+ * shinyblocks can be embedded in a host page without colliding with another
+ * shadcn-token consumer. Runtime component internals get the same tokens from
+ * frontend/src/styles/runtime.css ([data-shinyblocks-root] /
+ * [data-shinyblocks-portal-root]). See ADR 0022 (CSS isolation).
  */
 
-:root {
+.sb-app {
   --radius: 0.625rem;
 
   --background: oklch(1 0 0);
@@ -73,7 +81,7 @@
   --chart-5: oklch(0.769 0.188 70.08);
 }
 
-[data-theme="dark"] {
+[data-theme="dark"] .sb-app {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
 
