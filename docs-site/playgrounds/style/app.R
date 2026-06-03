@@ -97,11 +97,21 @@ ui <- block_page(
             ), selected = "inherit", size = "sm")
           ),
           block_field(
-            block_field_label("focus ring width", `for` = "showcase_style_doc_focus_ring_width"),
-            block_select("showcase_style_doc_focus_ring_width", choices = c(
+            block_field_label("surface padding", `for` = "showcase_style_doc_surface_padding"),
+            block_select("showcase_style_doc_surface_padding", choices = c(
               "profile default" = "inherit",
-              "thin (1px)" = "1px",
-              "bold (3px)" = "3px"
+              "compact (1rem)" = "1rem",
+              "roomy (2rem)" = "2rem",
+              "spacious (2.5rem)" = "2.5rem"
+            ), selected = "inherit", size = "sm")
+          ),
+          block_field(
+            block_field_label("control font size", `for` = "showcase_style_doc_control_font_size"),
+            block_select("showcase_style_doc_control_font_size", choices = c(
+              "profile default" = "inherit",
+              "small (0.8rem)" = "0.8rem",
+              "large (1rem)" = "1rem",
+              "x-large (1.125rem)" = "1.125rem"
             ), selected = "inherit", size = "sm")
           )
         )
@@ -147,7 +157,8 @@ server <- function(input, output, session) {
     ov <- list(
       control_height = pick("showcase_style_doc_control_height"),
       surface_gap = pick("showcase_style_doc_surface_gap"),
-      focus_ring_width = pick("showcase_style_doc_focus_ring_width")
+      surface_padding = pick("showcase_style_doc_surface_padding"),
+      control_font_size = pick("showcase_style_doc_control_font_size")
     )
     ov[!vapply(ov, is.null, logical(1))]
   })

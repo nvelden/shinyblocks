@@ -533,7 +533,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Selects a built-in visual style profile controlling control sizing, spacing, surfaces, elevation, focus treatment, and motion. Pass to block_page(style = ).",
       arguments: [
         { argument: "profile", type: "character", defaultVal: "'default'", description: "Built-in style profile name (see block_style_profiles())." },
-        { argument: "...", type: "character", defaultVal: "NULL", description: "Curated snake-case token overrides, e.g. control_height, surface_gap, focus_ring_width." },
+        { argument: "...", type: "character", defaultVal: "NULL", description: "Curated snake-case token overrides, e.g. control_height, surface_gap, surface_padding." },
         { argument: "scope", type: "character", defaultVal: "NULL", description: "Optional CSS selector to scope the profile to a subtree instead of the whole page." }
       ]
     },

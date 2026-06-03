@@ -14,7 +14,8 @@ register_style_showcase <- function(input, output, session) {
     ov <- list(
       control_height = pick("showcase_style_doc_control_height"),
       surface_gap = pick("showcase_style_doc_surface_gap"),
-      focus_ring_width = pick("showcase_style_doc_focus_ring_width")
+      surface_padding = pick("showcase_style_doc_surface_padding"),
+      control_font_size = pick("showcase_style_doc_control_font_size")
     )
     ov[!vapply(ov, is.null, logical(1))]
   })
@@ -116,11 +117,11 @@ register_style_showcase <- function(input, output, session) {
       Default = c("\"default\"", "none", "NULL"),
       Description = c(
         "Built-in visual style profile (see block_style_profiles()).",
-        "Curated snake-case overrides, e.g. control_height, surface_gap, focus_ring_width.",
+        "Curated snake-case overrides, e.g. control_height, surface_gap, surface_padding.",
         "Optional CSS selector to scope the profile to a subtree instead of the whole page."
       )
     )
-  }, width = "100%", align = "lll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
   shiny::outputOptions(
     output,
     "showcase_style_api_table",
