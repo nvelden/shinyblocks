@@ -133,6 +133,13 @@ registry <- list(
     featured = FALSE
   ),
   list(
+    name = "Style",
+    slug = "style",
+    file = "style.R",
+    description = "Visual style profiles controlling sizing, spacing, surfaces, elevation, and motion.",
+    featured = FALSE
+  ),
+  list(
     name = "Icon",
     slug = "icon",
     file = "icon.R",

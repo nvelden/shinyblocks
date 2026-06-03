@@ -19,24 +19,6 @@ htmltools::tagList(
           )
         ),
         block_field(
-          block_field_label("style profile", `for` = "showcase_theme_doc_style"),
-          block_select(
-            "showcase_theme_doc_style",
-            choices = c(
-              "default" = "inherit",
-              stats::setNames(
-                setdiff(shinyblocks:::style_profile_names(), "default"),
-                setdiff(shinyblocks:::style_profile_names(), "default")
-              )
-            ),
-            selected = "inherit",
-            size = "sm"
-          ),
-          block_field_description(
-            "block_style() visual profile (block_page(style = )). Token controls below layer over the profile."
-          )
-        ),
-        block_field(
           block_field_label("radius", `for` = "showcase_theme_doc_radius"),
           block_select("showcase_theme_doc_radius", choices = c("0rem", "0.25rem", "0.5rem", "1rem", "1.5rem"), selected = "0.5rem", size = "sm")
         ),
@@ -174,17 +156,5 @@ htmltools::tagList(
     block_dark_mode_toggle(),
     block_button("Primary Button (Theme)", icon = "sun"),
     block_button("Outline Button (Theme)", variant = "outline")
-  ),
-  # Style-profile parity fixture: a Luma block_style() scoped to this wrapper.
-  # block_style() emits a <style class="sb-style-overrides"> with the luma
-  # profile tokens; data-sb-style="luma" on the wrapper activates the scoped
-  # component CSS. Stable instance for tools/parity/; do not remove.
-  htmltools::div(
-    class = "sb-parity-style-baseline",
-    `data-sb-style` = "luma",
-    style = "display: flex; gap: 1rem; align-items: center;",
-    block_style("luma", scope = ".sb-parity-style-baseline"),
-    block_button("Luma Button (Style)"),
-    block_badge("Luma", variant = "secondary")
   )
 )

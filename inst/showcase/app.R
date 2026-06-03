@@ -27,6 +27,7 @@ source(file.path("R", "server_card.R"), local = TRUE)
 source(file.path("R", "server_value_box.R"), local = TRUE)
 source(file.path("R", "server_tabs.R"), local = TRUE)
 source(file.path("R", "server_theme.R"), local = TRUE)
+source(file.path("R", "server_style.R"), local = TRUE)
 source(file.path("R", "server_layout.R"), local = TRUE)
 source(file.path("R", "server_nav_item.R"), local = TRUE)
 source(file.path("R", "server_field.R"), local = TRUE)
@@ -239,6 +240,17 @@ sections <- list(
     file = "theme.R"
   ),
   list(
+    id = "style",
+    label = "Style",
+    icon = "sparkles",
+    title = "Style profile",
+    lead = paste(
+      "block_style() visual profiles — control sizing, spacing, surfaces,",
+      "elevation, and motion — applied page-wide via block_page(style = )."
+    ),
+    file = "style.R"
+  ),
+  list(
     id = "icon",
     label = "Icon",
     icon = "image",
@@ -445,6 +457,7 @@ server <- function(input, output, session) {
   register_value_box_showcase(input, output, session)
   register_tabs_showcase(input, output, session)
   register_theme_showcase(input, output, session)
+  register_style_showcase(input, output, session)
   register_layout_showcase(input, output, session)
   register_nav_item_showcase(input, output, session)
   register_field_showcase(input, output, session)
