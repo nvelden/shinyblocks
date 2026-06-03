@@ -18,17 +18,6 @@ register_theme_showcase <- function(input, output, session) {
     value
   })
 
-  # Selected visual style profile (block_style()). "inherit"/default keeps the
-  # built-in default profile, which emits nothing.
-  selected_style <- shiny::reactive({
-    value <- input$showcase_theme_doc_style
-    if (is.null(value) || !nzchar(value) || identical(value, "inherit") ||
-      identical(value, "default")) {
-      return(NULL)
-    }
-    value
-  })
-
   # Resolve the active token overrides from the controls. A `block_theme()`
   # override applies to BOTH light and dark mode (one value), so any token left
   # at "inherit" is intentionally NOT overridden — it keeps the package's
@@ -70,19 +59,8 @@ register_theme_showcase <- function(input, output, session) {
   # exposed token).
   output$showcase_theme_preview_ui <- shiny::renderUI({
     preset <- selected_preset()
-    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
-
-    # Scope the visual profile to this preview wrapper. block_style() emits the
-    # profile's --sb-* tokens for the scope; data-sb-style on the wrapper (set
-    # below) activates the profile-scoped component CSS.
-    # block_style() returns a shinyblocks_style object (profile + style tag);
-    # take only its $style tag for the preview. The profile name activates the
-    # scoped component CSS via data-sb-style on the wrapper below.
-    style_tag <- if (!is.null(style_profile)) {
-      block_style(style_profile, scope = ".sb-theme-demo-scope")$style
-    }
 
     swatch_style <- function(...) paste(
       "display: flex; flex-direction: column; gap: 0.35rem;", ...
@@ -101,10 +79,8 @@ register_theme_showcase <- function(input, output, session) {
           list(scope = ".sb-theme-demo-scope", dark = if (length(d)) d else NULL)
         )
       ),
-      style_tag,
       htmltools::div(
         class = "sb-theme-demo-scope",
-        `data-sb-style` = style_profile,
         style = "display: flex; flex-direction: column; gap: 1.1rem; width: 100%;",
         # Buttons exercise --primary, --secondary, --destructive, and --border.
         htmltools::div(
@@ -197,7 +173,6 @@ register_theme_showcase <- function(input, output, session) {
   # Dynamic code snippet rendering
   output$showcase_theme_preview_code <- showcase_render_code({
     preset <- selected_preset()
-    style_profile <- selected_style()
     o <- theme_overrides()
     d <- theme_dark_overrides()
     args <- vapply(
@@ -218,18 +193,7 @@ register_theme_showcase <- function(input, output, session) {
     if (!is.null(preset)) {
       args <- c(sprintf("  preset = \"%s\"", preset), args)
     }
-    theme_call <- paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
-
-    # When a non-default style profile is active, show the full page authoring
-    # form: block_page(style = block_style(...), theme = block_theme(...)).
-    if (is.null(style_profile)) {
-      return(theme_call)
-    }
-    paste0(
-      "block_page(\n",
-      sprintf("  style = block_style(\"%s\"),\n", style_profile),
-      "  theme = ", gsub("\n", "\n  ", theme_call), "\n)"
-    )
+    paste0("block_theme(\n", paste(args, collapse = ",\n"), "\n)")
   })
   shiny::outputOptions(
     output,
