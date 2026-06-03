@@ -45,13 +45,7 @@ const LEANNESS_ALLOWLIST = [
     selector: '[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root].sb-card',
     property: "box-shadow",
     reason:
-      "Luma's card ring is stronger in dark mode (10% vs 5%). block_style() emits one static token value and cannot vary it per colour mode, so the dark ring stays in CSS."
-  },
-  {
-    selector: '[data-theme="dark"] [data-sb-style="rhea"] [data-shinyblocks-root].sb-card',
-    property: "box-shadow",
-    reason:
-      "Rhea shares Luma's stronger dark-mode card ring. block_style() emits one static token value and cannot vary it per colour mode, so the dark ring stays in CSS."
+      "Luma and Rhea use a stronger dark-mode card ring (10% vs 5%). block_style() emits one static token value and cannot vary it per colour mode, so the dark ring stays in CSS."
   }
 ];
 

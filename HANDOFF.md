@@ -1,6 +1,6 @@
 # Handoff: Issue #41 — Refactor runtime, CSS, R helpers, and tests
 
-## Status (2026-06-03) — THIRD SLICE COMPLETE
+## Status (2026-06-03) — FOURTH SLICE COMPLETE
 
 Created tracked issue:
 
@@ -128,28 +128,63 @@ make showcase-health
 # HTTP/1.1 200 OK after escalated showcase restart on :4321
 ```
 
+Suggested fourth slice:
+
+1. Consolidate the shared `luma` / `rhea` runtime profile CSS rules without
+   changing profile behavior. **Done:** `frontend/src/styles/runtime/08-style-profiles.css`
+   now keeps common Luma/Rhea structure in shared selector-list rules and leaves
+   only divergent profile metrics as separate declarations. This removes the
+   duplicated dark-card ring, button state, switch checked/border, slider thumb,
+   radio checked/gap, dialog overlay, tooltip, alert, and empty-state recipes.
+2. Keep the static style leanness guard aligned with the consolidated rule.
+   **Done:** `tools/theme/check-style-leanness.mjs` has a single justified
+   dark-card allowlist entry for both Luma and Rhea.
+3. Rebuild generated runtime assets; do not hand-edit `inst/www` outputs.
+   **Done:** `npm run build:runtime` regenerated
+   `inst/www/shinyblocks-runtime.css`.
+
+Verification for fourth slice:
+
+```bash
+npm run test:style-leanness
+# passed; scanned 32 [data-sb-style] rules, 1 allowlisted exception
+npm run test:themes-static
+# passed
+npm run test:themes-drift
+# passed
+Rscript -e "devtools::load_all('.'); testthat::test_file('tests/testthat/test-runtime-css.R')"
+# 0 failures, 0 warnings
+npm run build:runtime
+# built runtime JS/CSS successfully
+npm run test:runtime
+# Runtime smoke test passed; Select overflow smoke test passed
+make check-fast
+# 0 failures, 0 warnings; theme static/drift/leanness and diff check passed
+make check-slice
+# 0 failures, 0 warnings, 1 skip; doc links, legacy audit, theme/static drift,
+# style leanness, and diff check passed
+make showcase-health
+# HTTP/1.1 200 OK after escalated showcase restart on :4321
+```
+
+Suggested fifth slice:
+
+1. Continue `frontend/src/index.jsx` decomposition from the issue #41 plan:
+   first replace the `RuntimeMount` component ladder with a registry map, then
+   extract one remaining focused runtime group at a time.
+2. Or, if staying in CSS, follow up on shell-family profile tokenization so the
+   leanness gate can eventually cover `inst/www/src/shinyblocks.css` too.
+
 If runtime JS/CSS, showcase wiring, or update handlers change, restart the
 showcase per `AGENTS.md`, then run the showcase health check.
 
 Current commit candidate:
 
 ```text
- M AGENTS.md
  M HANDOFF.md
- M NEWS.md
- M R/components.R
- M R/form-controls.R
- M R/radio-group.R
- M R/runtime-input-update.R
- M R/select.R
- M R/style-profiles.R
- M frontend/src/index.jsx
- M inst/www/shinyblocks-runtime.js
- M tests/testthat/setup.R
- M tests/testthat/test-utils.R
- A frontend/src/components/basic.jsx
- A frontend/src/components/shared.jsx
- A frontend/src/highlighting/code.jsx
+ M frontend/src/styles/runtime/08-style-profiles.css
+ M inst/www/shinyblocks-runtime.css
+ M tools/theme/check-style-leanness.mjs
 ```
 
 `.vscode/` remains untracked and should not be included in the issue #41
