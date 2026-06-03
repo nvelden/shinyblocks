@@ -4,18 +4,44 @@
 
 Issue: https://github.com/nvelden/shinyblocks/issues/41
 
-The latest local slice extracted `Popover` from `frontend/src/index.jsx` into
-`frontend/src/components/popover.jsx`, rebuilt the runtime bundle, and restarted
-the showcase. The issue remains open because `frontend/src/index.jsx`,
-`R/components.R`, and the large test files still have decomposition work left.
+Issue #41 decomposition work is handled locally:
+
+- Runtime component bodies were extracted from `frontend/src/index.jsx` into
+  focused files under `frontend/src/components/`.
+- `R/components.R` was split into focused R files (`card.R`, `button.R`,
+  `badge.R`, `code.R`, `alert.R`, `overlays.R`, `indicators.R`) and the
+  `DESCRIPTION` `Collate` list was updated.
+- The oversized shell and utility test files were split by concern, with
+  snapshots moved to matching split test names.
 
 Current local changes:
 
 ```text
  M HANDOFF.md
- A frontend/src/components/popover.jsx
- M frontend/src/index.jsx
- M inst/www/shinyblocks-runtime.js
+ M DESCRIPTION
+ M R/components.R
+ A R/alert.R
+ A R/badge.R
+ A R/button.R
+ A R/card.R
+ A R/code.R
+ A R/indicators.R
+ A R/overlays.R
+ D tests/testthat/_snaps/utils.md
+ A tests/testthat/_snaps/utils-controls.md
+ A tests/testthat/_snaps/utils-core.md
+ A tests/testthat/_snaps/utils-theme.md
+ M tests/testthat/test-shell.R
+ A tests/testthat/test-shell-content.R
+ A tests/testthat/test-shell-forms.R
+ A tests/testthat/test-shell-layout.R
+ M tests/testthat/test-utils.R
+ A tests/testthat/test-utils-controls.R
+ A tests/testthat/test-utils-core.R
+ A tests/testthat/test-utils-overlays.R
+ A tests/testthat/test-utils-runtime-updates.R
+ A tests/testthat/test-utils-theme.R
+ M tools/check-legacy-audit.R
  ?? .vscode/
 ```
 
@@ -28,28 +54,15 @@ npm run build:runtime
 npm run test:runtime
 make check-fast
 make check-slice
+make showcase-health
 ```
 
 `make check-slice` passed with the existing `_pkgdown.yml` skip. Showcase was
-restarted and printed `Listening on http://127.0.0.1:4321`, but the required
-escalated `make showcase-health` call was rejected by the approval layer because
-the session hit the usage limit. Run `make showcase-health` before treating the
-slice as fully verified.
+restarted after the runtime batch and `make showcase-health` returned
+`HTTP/1.1 200 OK`.
 
 ## Next Slice
 
-Extract `Tooltip` from `frontend/src/index.jsx` into
-`frontend/src/components/tooltip.jsx`.
-
-Suggested implementation:
-
-1. Move the existing `Tooltip` component without behavior changes.
-2. Import it into `frontend/src/index.jsx` and keep the existing `COMPONENTS`
-   registry entry.
-3. Rebuild generated runtime assets with `npm run build:runtime`.
-4. Run `npm run test:runtime`, `make check-fast`, and `make check-slice`.
-5. Because runtime JS changes, restart showcase per `AGENTS.md` and require
-   `make showcase-health` success.
-
-Keep this as a move-only slice. Save shared overlay hook extraction for a
-later pass after `Tooltip` has been separated.
+No required follow-up for Issue #41 is known after this local batch. Before
+closing the issue or opening a PR, review the diff, then run the preferred
+pre-PR gate (`make gate`) if time permits.

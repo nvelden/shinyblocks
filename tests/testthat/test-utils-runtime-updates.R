@@ -1,0 +1,212 @@
+test_that("block_button(id =) emits a runtime input id and shinyblocks.button binding", {
+  tag <- block_button("Continue", id = "confirm")
+  html <- as.character(htmltools::renderTags(tag)$html)
+
+  expect_match(html, 'data-sb-component="button"', fixed = TRUE)
+  expect_match(html, 'data-sb-input-id="confirm"', fixed = TRUE)
+  expect_match(html, 'id="sb-runtime-button-confirm"', fixed = TRUE)
+  expect_match(html, '"binding":\\{"input":true,"type":"shinyblocks\\.button"\\}')
+  # id moved into the runtime mount; it must not leak onto inner attrs
+  expect_false(grepl('"attrs":\\{[^}]*"id"', html))
+})
+
+test_that("block_button() without id omits binding and input-id markers", {
+  tag <- block_button("Continue")
+  html <- as.character(htmltools::renderTags(tag)$html)
+  expect_false(grepl("data-sb-input-id", html, fixed = TRUE))
+  expect_false(grepl("shinyblocks.button", html, fixed = TRUE))
+})
+
+test_that("update_block_button sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_button(
+      capture$session,
+      "confirm",
+      label = "Save",
+      variant = "destructive",
+      size = "lg",
+      icon = "check",
+      icon_position = "inline-end",
+      disabled = TRUE,
+      style = "min-width: 10rem;",
+      class = "custom-button"
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-button-confirm")
+  expect_match(message$payload$labelHtml, "Save", fixed = TRUE)
+  expect_identical(message$payload$variant, "destructive")
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$iconName, "check")
+  expect_null(message$payload$iconHtml)
+  expect_identical(message$payload$iconPosition, "inline-end")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$style$minWidth, "10rem")
+  expect_identical(message$payload$class, "custom-button")
+})
+
+test_that("update_block_button clears icon and style via NULL", {
+  capture <- local_input_message_session()
+
+  update_block_button(capture$session, "confirm", icon = NULL, style = NULL)
+
+  message <- capture$last_payload()
+  expect_true("iconName" %in% names(message))
+  expect_null(message$iconName)
+  expect_true("iconHtml" %in% names(message))
+  expect_null(message$iconHtml)
+  expect_true("style" %in% names(message))
+  expect_null(message$style)
+})
+
+test_that("update_block_select sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_select(
+      capture$session,
+      "plan",
+      selected = "pro",
+      choices = c(Free = "free", Pro = "pro"),
+      placeholder = "Choose",
+      disabled = TRUE,
+      width = "16rem",
+      class = "custom-select",
+      size = "lg",
+      invalid = TRUE,
+      notify = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-select-plan")
+  expect_identical(message$payload$selected, "pro")
+  expect_identical(message$payload$choices[[2]]$label, "Pro")
+  expect_identical(message$payload$placeholder, "Choose")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$width, "16rem")
+  expect_identical(message$payload$class, "custom-select")
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$invalid, TRUE)
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("update_block_checkbox sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_checkbox(
+      capture$session,
+      "agree",
+      checked = TRUE,
+      disabled = TRUE,
+      style = "border: 2px dashed red;",
+      class = "custom-checkbox",
+      notify = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-checkbox-agree")
+  expect_identical(message$payload$checked, TRUE)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$style$border, "2px dashed red")
+  expect_identical(message$payload$class, "custom-checkbox")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_checkbox messages do not notify", {
+  capture <- local_input_message_session()
+
+  update_block_checkbox(capture$session, "agree", class = "renamed")
+  message <- capture$last_payload()
+  expect_identical(message$notify, FALSE)
+  expect_null(message$checked)
+})
+
+test_that("update_block_switch sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_switch(
+      capture$session,
+      "alerts",
+      checked = TRUE,
+      disabled = TRUE,
+      size = "lg",
+      style = "border: 2px dashed red;",
+      class = "custom-switch",
+      notify = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-switch-alerts")
+  expect_identical(message$payload$checked, TRUE)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$style$border, "2px dashed red")
+  expect_identical(message$payload$class, "custom-switch")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_switch messages do not notify", {
+  capture <- local_input_message_session()
+
+  update_block_switch(capture$session, "alerts", class = "renamed")
+  message <- capture$last_payload()
+  expect_identical(message$notify, FALSE)
+  expect_null(message$checked)
+})
+
+test_that("update_block_slider sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_slider(
+      capture$session,
+      "volume",
+      value = c(25, 75),
+      min = 0,
+      max = 100,
+      step = 5,
+      orientation = "vertical",
+      show_value = TRUE,
+      min_label = "Quiet",
+      max_label = "Loud",
+      disabled = TRUE,
+      invalid = TRUE,
+      style = "max-width: 20rem;",
+      class = "custom-slider",
+      notify = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-slider-volume")
+  expect_identical(message$payload$value, c(25, 75))
+  expect_identical(message$payload$min, 0)
+  expect_identical(message$payload$max, 100)
+  expect_identical(message$payload$step, 5)
+  expect_identical(message$payload$orientation, "vertical")
+  expect_identical(message$payload$showValue, TRUE)
+  expect_identical(message$payload$minLabel, "Quiet")
+  expect_identical(message$payload$maxLabel, "Loud")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$invalid, TRUE)
+  expect_identical(message$payload$style$maxWidth, "20rem")
+  expect_identical(message$payload$class, "custom-slider")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("cosmetic update_block_slider messages do not notify", {
+  capture <- local_input_message_session()
+
+  update_block_slider(capture$session, "volume", class = "renamed")
+  message <- capture$last_payload()
+  expect_identical(message$notify, FALSE)
+  expect_null(message$value)
+})

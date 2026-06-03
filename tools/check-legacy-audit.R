@@ -33,7 +33,7 @@ allowlist <- data.frame(
   path = c(
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
-    "^tests/testthat/test-shell\\.R$",
+    "^tests/testthat/test-shell-layout\\.R$",
     "^R/style-profiles\\.R$"
   ),
   pattern = c(
