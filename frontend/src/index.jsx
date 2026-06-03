@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
 import {
@@ -2470,7 +2470,23 @@ function Select({ payload, root }) {
     placeholderRef.current = placeholder;
   }, [placeholder]);
 
-  function updatePosition() {
+  // Natural (unclipped) height of the open popover, used to choose a side and
+  // cap the box. Falls back to a per-item estimate before the first paint;
+  // once the content is mounted we measure it so taller items (e.g. the `luma`
+  // style profile's roomier spacing) don't get clipped by `overflow: hidden`.
+  function measuredContentHeight() {
+    const content = contentRef.current;
+    if (!content) return null;
+    const viewport = content.querySelector('[data-slot="select-viewport"]');
+    if (!viewport) return null;
+    const cs = window.getComputedStyle(content);
+    const padY = parseFloat(cs.paddingTop || "0") + parseFloat(cs.paddingBottom || "0");
+    const borderY =
+      parseFloat(cs.borderTopWidth || "0") + parseFloat(cs.borderBottomWidth || "0");
+    return viewport.scrollHeight + padY + borderY;
+  }
+
+  function updatePosition(contentHeight) {
     const trigger = triggerRef.current;
     if (!trigger) return;
 
@@ -2479,14 +2495,15 @@ function Select({ payload, root }) {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
     const gap = 4;
     const viewportPadding = 8;
+    const maxContentHeight = 384;
     const estimatedItemHeight = 32;
-    const estimatedContentHeight = Math.min(
-      Math.max(choicesRef.current.length * estimatedItemHeight + 16, estimatedItemHeight + 16),
-      384
-    );
+    const naturalHeight = contentHeight != null
+      ? contentHeight
+      : Math.max(choicesRef.current.length * estimatedItemHeight + 16, estimatedItemHeight + 16);
+    const desiredHeight = Math.min(naturalHeight, maxContentHeight);
     const availableBelow = Math.max(0, viewportHeight - rect.bottom - gap - viewportPadding);
     const availableAbove = Math.max(0, rect.top - gap - viewportPadding);
-    const side = availableBelow < estimatedContentHeight && availableAbove > availableBelow
+    const side = availableBelow < desiredHeight && availableAbove > availableBelow
       ? "top"
       : "bottom";
     const availableHeight = side === "top" ? availableAbove : availableBelow;
@@ -2503,7 +2520,7 @@ function Select({ payload, root }) {
       top: side === "top" ? rect.top - gap : rect.bottom + gap,
       left,
       minWidth,
-      maxHeight: Math.max(1, Math.min(estimatedContentHeight, availableHeight))
+      maxHeight: Math.max(1, Math.min(desiredHeight, availableHeight))
     });
   }
 
@@ -2649,6 +2666,16 @@ function Select({ payload, root }) {
       window.removeEventListener("scroll", onWindowChange, true);
     };
   }, [open]);
+
+  // Once the popover is painted, reposition using its real height so the side
+  // choice and clamp track the active style profile's item spacing instead of
+  // a fixed estimate. Re-runs when the choices or size change the content box.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const height = measuredContentHeight();
+    if (height != null) updatePosition(height);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, choices, size]);
 
   useEffect(() => {
     if (!open || highlighted < 0) return;

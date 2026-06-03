@@ -1508,6 +1508,9 @@
 [data-shinyblocks-portal-root] .sb-select-content {
   z-index: 50;
   min-width: 8rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--sb-select-content-border, var(--border));
   border-radius: var(--sb-select-content-radius, calc(var(--radius) * 0.8));
@@ -1518,7 +1521,9 @@
 }
 
 [data-shinyblocks-portal-root] .sb-select-viewport {
-  max-height: min(24rem, calc(100vh - 1rem), calc(100% - 0.5rem));
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: min(24rem, calc(100vh - 1rem));
   overflow-y: auto;
   padding-block: 0.25rem;
 }
