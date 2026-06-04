@@ -34,6 +34,7 @@
 | `variant` | `default` or `line`. |
 | `orientation` | `horizontal` or `vertical`. |
 | `class` | Extra classes merged onto the `.sb-tabs` element. |
+| `update_block_tabs()` | Server updater that activates a tab by value via `selected`; `notify = TRUE` also refreshes `input$<id>`. |
 
 ## Rendered contract
 
@@ -56,6 +57,9 @@ part of the rendered contract.
 
 - When `id` is supplied, the local `shinyblocks.js` tabs runtime
   pushes the active `data-value` to `input$<id>`.
+- `update_block_tabs(session, input_id, selected, notify = TRUE)`
+  selects the matching tab from the server and optionally pushes the
+  selected value back to Shiny.
 - Selection, keyboard behaviour (Arrow/Home/End), `aria-selected`,
   `data-state`, and panel visibility are owned by the local runtime.
 

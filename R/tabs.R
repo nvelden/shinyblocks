@@ -117,6 +117,53 @@ block_tabs <- function(
   )
 }
 
+#' Update styled tabs
+#'
+#' Selects a tab rendered by [block_tabs()] from the server.
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to [block_tabs()].
+#' @param selected Tab value to activate.
+#' @param notify Whether Shiny should receive an input event after the tab
+#'   is selected.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family navigation
+#' @export
+update_block_tabs <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  selected,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$sendCustomMessage)) {
+    stop("`session` must provide a `sendCustomMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  if (
+    missing(selected) ||
+      is.null(selected) ||
+      !nzchar(as.character(selected)[[1]])
+  ) {
+    stop("`selected` must be a single non-empty tab value.", call. = FALSE)
+  }
+
+  ns <- if (is.function(session$ns)) session$ns else identity
+  session$sendCustomMessage(
+    "sb:tabs",
+    list(
+      id = ns(input_id),
+      selected = as.character(selected)[[1]],
+      notify = isTRUE(notify)
+    )
+  )
+  invisible(NULL)
+}
+
 normalize_block_tab <- function(tab) {
   if (!inherits(tab, "shiny.tag")) {
     stop("`block_tabs()` children must be `block_tab()` or `shiny::tabPanel()` tags.", call. = FALSE)

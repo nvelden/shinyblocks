@@ -121,6 +121,22 @@
     }
   }
 
+  function activateTabByValue(inputId, value, options) {
+    var selected = String(value || "");
+    if (!inputId || !selected) return;
+
+    tabs().forEach(function (tabset) {
+      if (tabset.getAttribute("data-sb-tabs-input-id") !== inputId) return;
+
+      var trigger = tabTriggers(tabset).find(function (item) {
+        return item.getAttribute("data-value") === selected;
+      });
+      if (!trigger) return;
+
+      activateTab(tabset, trigger, options);
+    });
+  }
+
   function wireTabs(tabset) {
     if (tabset.getAttribute("data-sb-tabs-wired") === "true") return;
     tabset.setAttribute("data-sb-tabs-wired", "true");
@@ -344,6 +360,13 @@
   if (window.Shiny && window.Shiny.addCustomMessageHandler) {
     window.Shiny.addCustomMessageHandler("sb:theme", function (message) {
       applyTheme(message.mode || "system");
+    });
+
+    window.Shiny.addCustomMessageHandler("sb:tabs", function (message) {
+      message = message || {};
+      activateTabByValue(message.id, message.selected, {
+        updateInput: message.notify !== false
+      });
     });
   }
 

@@ -137,19 +137,8 @@ ui <- block_page(
     ),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
-      metric_box(
-        title = "Active plan",
-        value = textOutput("gallery_plan_value", inline = TRUE),
-        description = textOutput("gallery_plan_refresh_value", inline = TRUE),
-        icon = "chart-bar"
-      ),
-      metric_box(
-        title = "Budget",
-        value = textOutput("gallery_budget_metric_value", inline = TRUE),
-        description = "Monthly cap",
-        icon = "pie-chart",
-        uiOutput("gallery_budget_metric_status", inline = TRUE)
-      ),
+      uiOutput("gallery_metric", style = "height: 100%;"),
+      uiOutput("gallery_budget_metric", style = "height: 100%;"),
       metric_box(
         title = "Members",
         value = "24",
@@ -359,25 +348,24 @@ server <- function(input, output, session) {
     }
   })
 
-  output$gallery_plan_value <- renderText({
+  output$gallery_metric <- renderUI({
     plan <- input$gallery_plan %||% "Professional"
-    plan
+    metric_box(
+      title = "Active plan",
+      value = plan,
+      description = paste0("Refreshed ", refreshes(), " time", if (refreshes() == 1L) "" else "s"),
+      icon = "chart-bar"
+    )
   })
 
-  output$gallery_plan_refresh_value <- renderText({
-    paste0("Refreshed ", refreshes(), " time", if (refreshes() == 1L) "" else "s")
-  })
-
-  output$gallery_budget_metric_value <- renderText({
+  output$gallery_budget_metric <- renderUI({
     value <- input$gallery_budget %||% 5200
-    paste0("$", format(value, big.mark = ",", scientific = FALSE))
-  })
-
-  output$gallery_budget_metric_status <- renderUI({
-    value <- input$gallery_budget %||% 5200
-    block_badge(
-      if (value > 8000) "High" else "On track",
-      variant = if (value > 8000) "destructive" else "secondary"
+    metric_box(
+      title = "Budget",
+      value = paste0("$", format(value, big.mark = ",", scientific = FALSE)),
+      description = "Monthly cap",
+      icon = "pie-chart",
+      block_badge(if (value > 8000) "High" else "On track", variant = if (value > 8000) "destructive" else "secondary")
     )
   })
 

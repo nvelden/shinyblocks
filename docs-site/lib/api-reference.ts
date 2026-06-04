@@ -494,10 +494,22 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       name: "block_tabs",
       description: "Sleek reactive card panels organizing dashboard tabs dynamically.",
       arguments: [
-        { argument: "id", type: "character", defaultVal: "required", description: "Shiny reactive tabs output ID." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional Shiny input ID for the active tab value." },
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Tab layout child views created via block_tab()." },
         { argument: "selected", type: "character", defaultVal: "NULL", description: "Name of initial selected active view." },
+        { argument: "variant", type: "'default' | 'line'", defaultVal: "'default'", description: "Visual tab list style." },
+        { argument: "orientation", type: "'horizontal' | 'vertical'", defaultVal: "'horizontal'", description: "Tab list layout direction." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Styling classes applied on layouts wrapper." }
+      ]
+    },
+    {
+      name: "update_block_tabs",
+      description: "Selects an active tab from the Shiny server.",
+      arguments: [
+        { argument: "session", type: "Shiny session", defaultVal: "current domain", description: "Session used to send the update message." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Input ID passed to block_tabs()." },
+        { argument: "selected", type: "character", defaultVal: "required", description: "Tab value to activate." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether to notify Shiny after selecting the tab." }
       ]
     },
     {

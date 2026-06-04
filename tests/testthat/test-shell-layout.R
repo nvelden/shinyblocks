@@ -188,6 +188,26 @@ test_that("block_tabs emits package-owned tab markup", {
   expect_match(html, 'hidden="hidden"', fixed = TRUE)
 })
 
+test_that("block_tabs falls back to first tab for invalid selected value", {
+  tabs <- block_tabs(
+    selected = "missing",
+    block_tab("Overview", value = "overview", "Overview body"),
+    block_tab("Usage", value = "usage", "Usage body")
+  )
+  html <- render_html(tabs)
+
+  expect_match(
+    html,
+    'data-value="overview" data-state="active"',
+    fixed = TRUE
+  )
+  expect_match(
+    html,
+    'data-value="usage" data-state="inactive"',
+    fixed = TRUE
+  )
+})
+
 test_that("sidebar collapse attrs and toggle render", {
   sidebar <- block_sidebar(
     title = "Navigation",

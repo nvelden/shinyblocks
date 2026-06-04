@@ -11,6 +11,9 @@
 .DS_Store
 Thumbs.db
 
+# Local editor settings
+.vscode/
+
 # Build artifacts
 node_modules/
 dist/

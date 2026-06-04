@@ -4,6 +4,10 @@ htmltools::tagList(
       showcase_controls_group(
         "Tab Styles", first = TRUE,
         block_field(
+          block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
+          block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
+        ),
+        block_field(
           block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
           block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
         ),
@@ -11,13 +15,27 @@ htmltools::tagList(
           block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
           block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
         )
+      ),
+      showcase_controls_group(
+        "Actions (Server Update)",
+        htmltools::div(
+          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
+          showcase_action_button("showcase_tabs_select_settings", "Select Settings")
+        )
       )
     ),
     preview_output_id = "showcase_tabs_preview_ui",
     code_output_id = "showcase_tabs_preview_code",
-    extra_outputs = htmltools::tags$div(
-      style = "font-size: 0.875rem; font-weight: 500; padding: 0.5rem; background: var(--secondary); border-radius: 0.25rem;",
-      shiny::textOutput("showcase_tabs_reactive_log")
+    extra_outputs = htmltools::tagList(
+      shiny::uiOutput("showcase_tabs_preview_value"),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_tabs_reactive_code")
+      )
     ),
     preview_canvas_style = paste(
       "position: relative; display: flex; align-items: stretch; justify-content: stretch;",

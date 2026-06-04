@@ -36,6 +36,7 @@ Create styled tabs
 Other navigation: 
 \code{\link{block_nav}()},
 \code{\link{block_nav_item}()},
-\code{\link{block_tab}()}
+\code{\link{block_tab}()},
+\code{\link{update_block_tabs}()}
 }
 \concept{navigation}

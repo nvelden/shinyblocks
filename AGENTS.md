@@ -33,7 +33,7 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 
 ## Working style
 
-- Read `docs/ROADMAP.md` and the relevant ADR before implementing.
+- Read the relevant ADR before implementing.
 - Keep changes small and vertical: one component or planning artifact at a time.
 - App-author code stays `htmltools`/`shiny`; never push a frontend build onto
   users. A new framework or a reversal of the runtime port needs a new ADR.
@@ -55,6 +55,9 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 - Before a showcase restart, run `lsof -nP -iTCP:4321 -sTCP:LISTEN` and stop any
   stale listener so old CSS/JS cannot persist. After the escalated restart, run
   `make showcase-health` (escalated) and require an HTTP success response.
+- Run targeted Playwright/browser checks and docs-site commands that invoke
+  `tsx` outside the command sandbox / with escalation. In sandboxed Codex
+  sessions, `tsx` can fail with IPC permission errors before the real test runs.
 - Prefer temp files / `--body-file` / here-docs for complex shell payloads.
   Don't inline long `gh ... --body "..."` or nested `Rscript -e "..."` strings
   with parentheses, backticks, quotes, or Markdown — zsh/sandbox wrapping can
@@ -62,7 +65,6 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 
 ## Important files
 
-- `docs/ROADMAP.md` — implementation sequence and quality gates.
 - `docs/decisions/` — architecture decision records (ADRs).
 - `HANDOFF.md` — in-flight work / current issue context.
 - `R/` — exported R API. `frontend/src/` — runtime. `inst/www/src/` — CSS source.

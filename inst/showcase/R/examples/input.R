@@ -61,7 +61,14 @@ htmltools::tagList(
     preview_output_id = "showcase_input_preview_ui",
     code_output_id = "showcase_input_preview_code",
     extra_outputs = htmltools::tagList(
-      shiny::uiOutput("showcase_input_preview_value")
+      shiny::uiOutput("showcase_input_preview_value"),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_input_reactive_code")
+      )
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

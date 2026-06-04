@@ -53,6 +53,14 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "sb:slider-change", fixed = TRUE)
 })
 
+test_that("app JS includes tabs update hooks", {
+  js <- app_js()
+
+  expect_match(js, 'addCustomMessageHandler("sb:tabs"', fixed = TRUE)
+  expect_match(js, "activateTabByValue", fixed = TRUE)
+  expect_match(js, "updateInput: message.notify !== false", fixed = TRUE)
+})
+
 test_that("runtime bindings fall back to the payload's initial state.value", {
   js <- runtime_bindings_source()
 

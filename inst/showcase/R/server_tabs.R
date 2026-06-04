@@ -1,17 +1,13 @@
 register_tabs_showcase <- function(input, output, session) {
-  # Server-side reactive log of tab changes
-  output$showcase_tabs_reactive_log <- shiny::renderText({
-    current_tab <- input$showcase_tabs_interactive %||% "overview"
-    paste0("Active tab reported by server: \"", current_tab, "\"")
-  })
-
   # Dynamic preview rendering
   output$showcase_tabs_preview_ui <- shiny::renderUI({
     variant <- input$showcase_tabs_doc_variant %||% "default"
     orientation <- input$showcase_tabs_doc_orientation %||% "horizontal"
+    selected <- input$showcase_tabs_doc_selected %||% "overview"
     
     block_tabs(
       id = "showcase_tabs_interactive",
+      selected = selected,
       variant = variant,
       orientation = orientation,
       block_tab(
@@ -51,12 +47,14 @@ register_tabs_showcase <- function(input, output, session) {
 
   # Dynamic code snippet rendering
   output$showcase_tabs_preview_code <- showcase_render_code({
+    selected_val <- input$showcase_tabs_doc_selected %||% "overview"
     variant_val <- input$showcase_tabs_doc_variant %||% "default"
     orientation_val <- input$showcase_tabs_doc_orientation %||% "horizontal"
 
     paste0(
       "block_tabs(\n",
       "  id = \"showcase_tabs_interactive\",\n",
+      "  selected = \"", selected_val, "\",\n",
       "  variant = \"", variant_val, "\",\n",
       "  orientation = \"", orientation_val, "\",\n",
       "  block_tab(\n",
@@ -83,19 +81,75 @@ register_tabs_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
+  output$showcase_tabs_preview_value <- showcase_render_code({
+    value <- input$showcase_tabs_interactive
+    val_str <- if (is.null(value)) {
+      "<NULL>"
+    } else if (!nzchar(value)) {
+      "<EMPTY>"
+    } else {
+      value
+    }
+    paste0("input$showcase_tabs_interactive = ", val_str)
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_tabs_preview_value",
+    suspendWhenHidden = FALSE
+  )
+
+  reactive_code <- shiny::reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_tabs() code here."
+  ))
+
+  output$showcase_tabs_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_tabs_reactive_code",
+    suspendWhenHidden = FALSE
+  )
+
+  shiny::observeEvent(input$showcase_tabs_select_usage, {
+    update_block_tabs(session, "showcase_tabs_interactive", selected = "usage")
+    update_block_select(session, "showcase_tabs_doc_selected", selected = "usage")
+    reactive_code(paste0(
+      "update_block_tabs(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_tabs_interactive\",\n",
+      "  selected = \"usage\"\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_tabs_select_settings, {
+    update_block_tabs(session, "showcase_tabs_interactive", selected = "settings")
+    update_block_select(session, "showcase_tabs_doc_selected", selected = "settings")
+    reactive_code(paste0(
+      "update_block_tabs(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_tabs_interactive\",\n",
+      "  selected = \"settings\"\n",
+      ")"
+    ))
+  })
+
   # API reference table
   output$showcase_tabs_api_table <- shiny::renderTable({
     data.frame(
-      Argument = c("...", "id", "selected", "variant", "orientation", "class"),
-      Type = c("block_tab() tags", "character", "character", "character", "character", "character"),
-      Default = c("required", "NULL", "NULL", "'default'", "'horizontal'", "NULL"),
+      Argument = c("...", "id", "selected", "variant", "orientation", "class", "update_block_tabs()"),
+      Type = c("block_tab() tags", "character", "character", "character", "character", "character", "function"),
+      Default = c("required", "NULL", "NULL", "'default'", "'horizontal'", "NULL", "selected required"),
       Description = c(
         "List of block_tab() child elements.",
         "Optional input ID to bind active tab changes to the Shiny server.",
         "Optional value/title of the tab to select by default.",
         "Visual style variant: 'default' or 'line'.",
         "Layout orientation: 'horizontal' or 'vertical'.",
-        "Additional CSS class merged onto the tabs container."
+        "Additional CSS class merged onto the tabs container.",
+        "Server updater for selecting an active tab by value."
       )
     )
   }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)

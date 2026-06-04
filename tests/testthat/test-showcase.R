@@ -154,6 +154,57 @@ test_that("showcase styling controls have matching CSS hooks", {
   )
 })
 
+test_that("showcase icon references are vendored", {
+  showcase_dir <- system.file(
+    "showcase",
+    package = "shinyblocks",
+    mustWork = TRUE
+  )
+  files <- list.files(
+    file.path(showcase_dir, "R"),
+    pattern = "\\.R$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  text <- paste(unlist(lapply(files, readLines, warn = FALSE)), collapse = "\n")
+
+  icon_arg_matches <- regmatches(
+    text,
+    gregexpr("icon\\s*=\\s*\"[a-z0-9-]+\"", text, perl = TRUE)
+  )[[1L]]
+  icon_arg_names <- sub(".*\"([a-z0-9-]+)\"$", "\\1", icon_arg_matches)
+
+  doc_icon_controls <- regmatches(
+    text,
+    gregexpr(
+      "block_select\\(\\s*\"[^\"]*_doc_icon\"[\\s\\S]*?choices\\s*=\\s*c\\([^)]*\\)",
+      text,
+      perl = TRUE
+    )
+  )[[1L]]
+  doc_icon_names <- unlist(regmatches(
+    doc_icon_controls,
+    gregexpr("\"[a-z0-9-]+\"", doc_icon_controls, perl = TRUE)
+  ), use.names = FALSE)
+  doc_icon_names <- gsub("\"", "", doc_icon_names, fixed = TRUE)
+
+  icon_names <- sort(unique(setdiff(
+    c(icon_arg_names, doc_icon_names),
+    "none"
+  )))
+  missing <- setdiff(icon_names, shinyblocks:::shinyblocks_icon_names())
+
+  expect_identical(
+    missing,
+    character(),
+    label = paste(
+      "showcase examples reference icons absent from",
+      "inst/www/icons/MANIFEST.json:",
+      paste(missing, collapse = ", ")
+    )
+  )
+})
+
 test_that("every exported block_*() renders into the showcase UI", {
   fixture <- showcase_fixture()
   rendered <- fixture$html
