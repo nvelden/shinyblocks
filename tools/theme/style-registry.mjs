@@ -48,6 +48,9 @@ export const STYLE_REGISTRY = {
   // --- Runtime components: Luma changes them -----------------------------
   card: {
     section: "card",
+    neutralProfiles: {
+      maia: "Maia uses rounded-2xl cards, which matches the current shinyblocks card radius, so this radius binding is unchanged."
+    },
     bindings: [{ selector: ".sb-parity-card-plain", property: "borderRadius" }]
   },
   "value-box": {
@@ -56,6 +59,9 @@ export const STYLE_REGISTRY = {
   },
   button: {
     section: "button",
+    neutralProfiles: {
+      nova: "Nova's default button radius maps to rounded-lg, matching the current shinyblocks default button radius."
+    },
     bindings: [{ selector: ".sb-parity-button-default", property: "borderRadius" }]
   },
   badge: {
@@ -65,25 +71,35 @@ export const STYLE_REGISTRY = {
   input: {
     section: "input",
     neutralProfiles: {
-      brutal: "The default input radius is already 0 (square), and brutal's square geometry sets it to 0 too, so this radius binding is unchanged. Brutal's input difference is the token-driven solid --border colour and flat shadow, not radius."
+      lyra: "Lyra's official style uses square inputs; the default shinyblocks input is already square, so this radius binding is unchanged in this token-only slice.",
+      sera: "Sera's official style uses square inputs; the default shinyblocks input is already square, so this radius binding is unchanged in this token-only slice."
     },
     bindings: [{ selector: ".sb-parity-input-default", property: "borderRadius" }]
   },
   textarea: {
     section: "textarea",
     neutralProfiles: {
-      brutal: "The default textarea radius is already 0 (square), and brutal's square geometry sets it to 0 too, so this radius binding is unchanged. Brutal's textarea difference is the token-driven solid --border colour and flat shadow, not radius."
+      lyra: "Lyra's official style uses square textareas; the default shinyblocks textarea is already square, so this radius binding is unchanged in this token-only slice.",
+      sera: "Sera's official style uses square textareas; the default shinyblocks textarea is already square, so this radius binding is unchanged in this token-only slice."
     },
     bindings: [{ selector: ".sb-parity-textarea-default", property: "borderRadius" }]
   },
   select: {
     section: "select",
+    neutralProfiles: {
+      nova: "Nova's select trigger radius maps to rounded-lg, matching the current shinyblocks default select radius."
+    },
     bindings: [
       { selector: ".sb-parity-select-default [data-slot='select-trigger']", property: "borderRadius" }
     ]
   },
   checkbox: {
     section: "checkbox",
+    neutralProfiles: {
+      mira: "Mira's checkbox radius maps to 0.25rem, matching the current shinyblocks default checkbox radius.",
+      nova: "Nova's checkbox radius maps to 0.25rem, matching the current shinyblocks default checkbox radius.",
+      vega: "Vega's checkbox radius maps to 0.25rem, matching the current shinyblocks default checkbox radius."
+    },
     bindings: [
       { selector: ".sb-parity-checkbox-checked [data-slot='checkbox-control']", property: "borderRadius" }
     ]
@@ -91,10 +107,12 @@ export const STYLE_REGISTRY = {
   switch: {
     section: "switch",
     neutralProfiles: {
-      mono: "Mono is data-only for switch: it flattens the control shadow but does not change switch-specific border width or track/thumb metrics.",
-      soft: "Soft is data-only for switch: it softens radii and shadows page-wide but does not change switch-specific border width or track/thumb metrics.",
-      brutal: "Brutal is data-only for switch: it flattens the switch shadow but does not change switch-specific border width or track/thumb metrics.",
-      glass: "Glass is data-only for switch: it frosts the switch surface but does not change switch-specific border width or track/thumb metrics."
+      lyra: "Lyra is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet.",
+      maia: "Maia is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet.",
+      mira: "Mira is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet.",
+      nova: "Nova is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet.",
+      sera: "Sera is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet.",
+      vega: "Vega is token-only for switch in this slice; switch-specific border width and track/thumb metrics are not ported yet."
     },
     bindings: [
       { selector: ".sb-parity-switch-checked [data-slot='switch-control']", property: "borderTopWidth" }
@@ -103,10 +121,12 @@ export const STYLE_REGISTRY = {
   slider: {
     section: "slider",
     neutralProfiles: {
-      mono: "Mono is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS.",
-      soft: "Soft is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS.",
-      brutal: "Brutal is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS.",
-      glass: "Glass is data-only for slider: it frosts the track surface but does not introduce slider-specific track or thumb geometry CSS."
+      lyra: "Lyra is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
+      maia: "Maia is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
+      mira: "Mira is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
+      nova: "Nova is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
+      sera: "Sera is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
+      vega: "Vega is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet."
     },
     bindings: [
       { selector: ".sb-parity-slider-default [data-slot='slider-track']", property: "height" }
@@ -115,10 +135,12 @@ export const STYLE_REGISTRY = {
   "radio-group": {
     section: "radio-group",
     neutralProfiles: {
-      mono: "Mono keeps the default radio-group gap and checked-fill model; only token-driven surface/border/shadow values differ.",
-      soft: "Soft keeps the default radio-group gap and checked-fill model; it does not change control_gap, so radio-group spacing stays at the default.",
-      brutal: "Brutal keeps the default radio-group gap and checked-fill model; only token-driven border/shadow values differ.",
-      glass: "Glass keeps the default radio-group gap and checked-fill model (its control_gap equals the default); only token-driven surface/border/shadow values differ."
+      lyra: "Lyra keeps the default radio-group checked-fill model; its control_gap equals the default in this token-only slice.",
+      maia: "Maia keeps the default radio-group checked-fill model; its control_gap equals the default in this token-only slice.",
+      mira: "Mira keeps the default radio-group checked-fill model; radio-group spacing is structural CSS and is not ported in this token-only slice.",
+      nova: "Nova keeps the default radio-group checked-fill model; its control_gap equals the default in this token-only slice.",
+      sera: "Sera keeps the default radio-group checked-fill model; its control_gap equals the default in this token-only slice.",
+      vega: "Vega keeps the default radio-group checked-fill model; its control_gap equals the default in this token-only slice."
     },
     bindings: [{ selector: ".sb-parity-radio-group-checked", property: "gap" }]
   },
@@ -129,19 +151,29 @@ export const STYLE_REGISTRY = {
   empty: {
     section: "empty",
     neutralProfiles: {
-      mono: "Mono keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
-      soft: "Soft keeps the default solid empty-state border; its empty-state profile difference is the token-driven (larger) radius only.",
-      brutal: "Brutal keeps the default solid empty-state border; its empty-state profile difference is the token-driven (square, zero) radius only.",
-      glass: "Glass keeps the default solid empty-state border; its empty-state profile difference is the token-driven (larger) radius only."
+      lyra: "Lyra keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      maia: "Maia keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      mira: "Mira keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      nova: "Nova keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      sera: "Sera keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      vega: "Vega keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only."
     },
     bindings: [{ selector: ".sb-parity-empty-default", property: "borderStyle" }]
   },
   skeleton: {
     section: "skeleton",
+    neutralProfiles: {
+      nova: "Nova's skeleton radius maps to rounded-lg, matching the current shinyblocks default skeleton radius.",
+      vega: "Vega's skeleton radius maps to rounded-lg, matching the current shinyblocks default skeleton radius."
+    },
     bindings: [{ selector: ".sb-parity-skeleton-default", property: "borderRadius" }]
   },
   code: {
     section: "code",
+    neutralProfiles: {
+      nova: "Nova's code radius maps to rounded-xl, matching the current shinyblocks default code radius.",
+      vega: "Vega's code radius maps to rounded-xl, matching the current shinyblocks default code radius."
+    },
     bindings: [{ selector: ".sb-parity-code-default", property: "borderRadius" }]
   },
 
@@ -181,10 +213,12 @@ export const STYLE_REGISTRY = {
   nav: {
     section: "nav-item",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; nav item geometry stays at the default shell treatment.",
-      soft: "Soft does not add shell-family structural CSS; nav item geometry stays at the default shell treatment.",
-      brutal: "Brutal does not add shell-family structural CSS; nav item geometry stays at the default shell treatment.",
-      glass: "Glass does not add shell-family structural CSS; nav item geometry stays at the default shell treatment."
+      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
+      mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
+      nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
+      sera: "Sera shell-family structural CSS is not ported in this token-only slice.",
+      vega: "Vega shell-family structural CSS is not ported in this token-only slice."
     },
     bindings: [
       { selector: ".sb-parity-nav-baseline .sb-nav-item", property: "borderRadius" }
@@ -193,20 +227,24 @@ export const STYLE_REGISTRY = {
   sidebar: {
     section: "layout",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment.",
-      soft: "Soft does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment.",
-      brutal: "Brutal does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment.",
-      glass: "Glass does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment."
+      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
+      mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
+      nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
+      sera: "Sera shell-family structural CSS is not ported in this token-only slice.",
+      vega: "Vega shell-family structural CSS is not ported in this token-only slice."
     },
     bindings: [{ selector: ".sb-sidebar-toggle", property: "borderRadius" }]
   },
   tabs: {
     section: "tabs",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; tabs keep the default flat list geometry.",
-      soft: "Soft does not add shell-family structural CSS; tabs keep the default flat list geometry.",
-      brutal: "Brutal does not add shell-family structural CSS; tabs keep the default flat list geometry.",
-      glass: "Glass does not add shell-family structural CSS; tabs keep the default flat list geometry."
+      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
+      mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
+      nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
+      sera: "Sera shell-family structural CSS is not ported in this token-only slice.",
+      vega: "Vega shell-family structural CSS is not ported in this token-only slice."
     },
     bindings: [
       { selector: ".sb-parity-tabs-default .sb-tabs-list", property: "borderRadius" }
@@ -215,20 +253,24 @@ export const STYLE_REGISTRY = {
   field: {
     section: "field",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; field spacing stays at the default shell treatment.",
-      soft: "Soft does not add shell-family structural CSS; field spacing stays at the default shell treatment.",
-      brutal: "Brutal does not add shell-family structural CSS; field spacing stays at the default shell treatment.",
-      glass: "Glass does not add shell-family structural CSS; field spacing stays at the default shell treatment."
+      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
+      mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
+      nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
+      sera: "Sera shell-family structural CSS is not ported in this token-only slice.",
+      vega: "Vega shell-family structural CSS is not ported in this token-only slice."
     },
     bindings: [{ selector: ".sb-parity-field-default", property: "gap" }]
   },
   "input-group": {
     section: "input-group",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; input-group radius stays at the default shell treatment.",
-      soft: "Soft does not add shell-family structural CSS; input-group radius stays at the default shell treatment.",
-      brutal: "Brutal does not add shell-family structural CSS; input-group radius stays at the default shell treatment.",
-      glass: "Glass does not add shell-family structural CSS; input-group radius stays at the default shell treatment."
+      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
+      mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
+      nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
+      sera: "Sera shell-family structural CSS is not ported in this token-only slice.",
+      vega: "Vega shell-family structural CSS is not ported in this token-only slice."
     },
     bindings: [
       { selector: ".sb-parity-input-group-leading", property: "borderRadius" }

@@ -1,14 +1,14 @@
 # Style
 
 > Shinyblocks function: `block_style()` (consumed by `block_page(style = )`)
-> Shadcn reference: Luma and Rhea style models at
-> <https://ui.shadcn.com/docs/changelog/2026-03-luma> and
-> <https://ui.shadcn.com/docs/changelog/2026-05-rhea>
-> Status: Slice 5 plus built-in profile follow-ups (issues #33, #42, #46,
+> Shadcn reference: official v4 style registry at
+> <https://github.com/shadcn-ui/ui/tree/main/apps/v4/registry/styles>
+> Status: Slice 5 plus official-profile alignment (issues #33, #48,
 > [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)). Ships the
-> `default`, `mono`, `soft`, `brutal`, `glass`, `luma`, and `rhea` profiles, the
-> public `--sb-*` token layer, the internal geometry/translucency token layer,
-> the profile-scoped component CSS, and the style-profile
+> `default`, `luma`, `lyra`, `maia`, `mira`, `nova`, `rhea`, `sera`, and `vega`
+> profiles, the public `--sb-*` token layer, the internal
+> geometry/translucency token layer, the profile-scoped component CSS, and the
+> style-profile
 > parity harness (`tools/theme/check-style-parity.mjs` + `style-registry.mjs`).
 > Luma now covers the shell families too (input group, field, tabs, sidebar,
 > nav); all five are measured `profile` bindings in the parity registry.
@@ -87,8 +87,9 @@ is visually identical to pre-Slice-3 shinyblocks.
   surface backgrounds (`--sb-card-surface`, `--sb-value-box-surface`,
   `--sb-select-content-surface`, `--sb-dialog-surface`,
   `--sb-popover-surface`). They default to `none` or the historical opaque
-  colour and let `glass` ship as data instead of bespoke
-  `[data-sb-style="glass"]` CSS.
+  colour. They remain internal infrastructure for future user-defined custom
+  styles/themes; no built-in `glass` profile ships because shadcn has no
+  official `style-glass.css`.
 
 `style_emit_token_map()` is the union (public + internal) that `block_style()`
 actually emits; `...` validates against the public tier only. This lets a profile
@@ -102,35 +103,6 @@ without enlarging the public surface. Adding a profile is then an R list in
 
 Empty override list; its values are the runtime-CSS `--sb-*` defaults above.
 Selecting it changes nothing on its own.
-
-### `mono`
-
-Shinyblocks-owned profile for a compact monospace developer-console feel. It
-uses mono-forward body/heading typography, smaller controls, tighter radii, flat
-surfaces, and a crisp 40% focus ring. It is data-only: no profile-scoped CSS is
-needed.
-
-### `soft`
-
-Shinyblocks-owned profile for an airy rounded dashboard feel. It uses roomier
-surface/overlay spacing, larger radii, softer diffuse shadows, a 35% focus ring,
-and slightly slower transitions. It is data-only.
-
-### `brutal`
-
-Shinyblocks-owned profile for a dense, high-contrast, square-edged product UI.
-It uses compact controls, zero radii, flat elevation, solid border colours, an
-instant transition, and a fully opaque focus ring. A thicker border-width token
-is deliberately deferred; the profile stays data-only.
-
-### `glass`
-
-Shinyblocks-owned profile for a translucent, overlay-heavy frosted-glass feel
-(issue #46). It composes the shared translucent-control and foreground-ring
-recipes, adds `--sb-surface-backdrop: blur(12px) saturate(180%)`, and sets
-translucent elevated-surface backgrounds for cards, value boxes, dialogs,
-popovers, and select menus. The runtime CSS reads those hooks by default, so
-`glass` has no bespoke profile-scoped CSS and passes the leanness gate.
 
 ### `luma`
 
@@ -213,6 +185,29 @@ surface gaps, card density, switch width, slider thickness, and shell spacing.
 The repeated recipes are profile data in `R/style-profiles.R`; scoped CSS is
 limited to structural geometry that cannot be represented by one token.
 
+### `lyra`, `maia`, `mira`, `nova`, `sera`, `vega`
+
+These profiles map to the corresponding official upstream files:
+`style-lyra.css`, `style-maia.css`, `style-mira.css`, `style-nova.css`,
+`style-sera.css`, and `style-vega.css`.
+
+The first issue #48 port expresses each style as token data:
+
+| Profile | Primary treatment |
+| --- | --- |
+| `lyra` | compact square controls and surfaces, 1px focus rings |
+| `maia` | rounded/pill controls, translucent inputs, ringed surfaces |
+| `mira` | extra-compact controls, small radii, subdued focus rings |
+| `nova` | balanced compact rounded controls and cards |
+| `sera` | editorial square geometry, semibold controls, roomier surfaces |
+| `vega` | md-scale radii with subtle shadowed controls and surfaces |
+
+Full structural parity for switch/slider metrics, radio checked-fill models,
+shell-family geometry, text transform/letter spacing, and border-width
+differences remains follow-up work. The parity registry records those
+token-only gaps as explicit neutral entries so they are visible rather than
+silently skipped.
+
 ## Conformance and parity (Slice 5)
 
 Profile parity is checked separately from colour conformance so a failure names
@@ -224,8 +219,9 @@ the right layer:
   light differs from dark. R is the single source of truth for the emitted
   tokens.
 - **Style-profile parity** — `tools/theme/check-style-parity.mjs` (`npm run
-  test:style-parity`, `make style-parity`) toggles the page into Luma like
-  `block_page(style = block_style("luma"))` and asserts each component's
+  test:style-parity`, `make style-parity`) toggles the page into each
+  non-default profile like `block_page(style = block_style("<profile>"))` and
+  asserts each component's
   profile-sensitive computed property (radius, padding, gap, height, border
   width) changes.
 - **Completeness gate** — `tools/theme/style-registry.mjs` requires every

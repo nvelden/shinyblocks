@@ -29,19 +29,19 @@ function overridesMap(profile) {
 
 test("styleProfileNames lists profiles, including c()-composed ones, excluding default", () => {
   const names = styleProfileNames();
-  assert.deepEqual(names, ["mono", "soft", "brutal", "glass", "luma", "rhea"]);
+  assert.deepEqual(names, ["luma", "lyra", "maia", "mira", "nova", "rhea", "sera", "vega"]);
   assert.ok(!names.includes("default"), "default is a no-op profile and must be excluded");
 });
 
-test("plain list() profiles (mono) still parse their literal tokens", () => {
-  const mono = overridesMap("mono");
-  assert.equal(mono["--sb-font-body"], "var(--sb-font-mono)");
-  assert.equal(mono["--sb-control-height"], "2rem");
-  assert.equal(mono["--sb-card-shadow"], "none");
+test("official plain list() profile tokens parse from literal data", () => {
+  const mira = overridesMap("mira");
+  assert.equal(mira["--sb-control-height"], "1.75rem");
+  assert.equal(mira["--sb-card-radius"], "0.5rem");
+  assert.equal(mira["--sb-focus-ring-opacity"], "30%");
 });
 
 test("c()-composed profiles resolve the spliced translucent-surface helper", () => {
-  for (const profile of ["luma", "rhea", "glass"]) {
+  for (const profile of ["luma", "maia", "rhea"]) {
     const o = overridesMap(profile);
     // These tokens exist ONLY in style_translucent_surface_tokens(); a parser
     // that ignored the helper splice would drop them.
@@ -57,7 +57,7 @@ test("c()-composed profiles resolve the spliced translucent-surface helper", () 
 });
 
 test("c()-composed profiles resolve the spliced foreground-ring helper", () => {
-  for (const profile of ["luma", "rhea", "glass"]) {
+  for (const profile of ["luma", "lyra", "maia", "mira", "nova", "rhea", "sera", "vega"]) {
     const o = overridesMap(profile);
     // Tokens that exist ONLY in style_foreground_ring_tokens().
     assert.equal(o["--sb-card-border"], "transparent", `${profile} card border`);

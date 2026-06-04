@@ -1,7 +1,7 @@
 test_that("block_style_profiles returns the supported profiles", {
   expect_identical(
     block_style_profiles(),
-    c("default", "mono", "soft", "brutal", "glass", "luma", "rhea")
+    c("default", "luma", "lyra", "maia", "mira", "nova", "rhea", "sera", "vega")
   )
   expect_identical(
     block_style_profiles(),
@@ -10,111 +10,24 @@ test_that("block_style_profiles returns the supported profiles", {
 })
 
 test_that("block_style validates the profile name", {
-  expect_error(block_style("nova"), "Unknown style profile")
+  expect_error(block_style("mono"), "Unknown style profile")
+  expect_error(block_style("soft"), "Unknown style profile")
+  expect_error(block_style("brutal"), "Unknown style profile")
+  expect_error(block_style("glass"), "Unknown style profile")
   expect_error(
     block_style(c("default", "default")),
     "single supported style-profile"
   )
   expect_error(block_style(""), "single supported style-profile")
   expect_silent(block_style("default"))
-  expect_silent(block_style("mono"))
-  expect_silent(block_style("soft"))
-  expect_silent(block_style("brutal"))
-  expect_silent(block_style("glass"))
   expect_silent(block_style("luma"))
+  expect_silent(block_style("lyra"))
+  expect_silent(block_style("maia"))
+  expect_silent(block_style("mira"))
+  expect_silent(block_style("nova"))
   expect_silent(block_style("rhea"))
-})
-
-test_that("block_style('mono') emits the mono profile tokens page-wide", {
-  css <- as.character(block_style("mono")$style)
-
-  expect_match(css, "sb-style-overrides", fixed = TRUE)
-  expect_match(css, '.sb-app[data-sb-style="mono"]{', fixed = TRUE)
-  expect_match(css, "--sb-font-body: var(--sb-font-mono);", fixed = TRUE)
-  expect_match(css, "--sb-font-heading: var(--sb-font-mono);", fixed = TRUE)
-  expect_match(css, "--sb-control-font-size: 0.8125rem;", fixed = TRUE)
-  expect_match(css, "--sb-control-height: 2rem;", fixed = TRUE)
-  expect_match(css, "--sb-control-padding-x: 0.625rem;", fixed = TRUE)
-  expect_match(css, "--sb-surface-padding: 1rem;", fixed = TRUE)
-  expect_match(css, "--sb-control-shadow: none;", fixed = TRUE)
-  expect_match(css, "--sb-focus-ring-width: 2px;", fixed = TRUE)
-  expect_match(css, "--sb-card-radius: 0.25rem;", fixed = TRUE)
-  expect_match(css, "--sb-input-border: var(--border);", fixed = TRUE)
-  expect_match(css, "--sb-dialog-shadow: none;", fixed = TRUE)
-})
-
-test_that("block_style('soft') emits the soft profile tokens page-wide", {
-  css <- as.character(block_style("soft")$style)
-
-  expect_match(css, "sb-style-overrides", fixed = TRUE)
-  expect_match(css, '.sb-app[data-sb-style="soft"]{', fixed = TRUE)
-  # Airier spacing and softer shadows (public tokens).
-  expect_match(css, "--sb-surface-padding: 2rem;", fixed = TRUE)
-  expect_match(css, "--sb-surface-gap: 2rem;", fixed = TRUE)
-  expect_match(css, "--sb-surface-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.06);", fixed = TRUE)
-  expect_match(css, "--sb-focus-ring-opacity: 35%;", fixed = TRUE)
-  # Softer/larger radii (internal geometry tokens).
-  expect_match(css, "--sb-card-radius: 1.5rem;", fixed = TRUE)
-  expect_match(css, "--sb-badge-radius: 0.75rem;", fixed = TRUE)
-  expect_match(css, "--sb-input-radius: 0.75rem;", fixed = TRUE)
-  expect_match(css, "--sb-dialog-radius: 1.5rem;", fixed = TRUE)
-})
-
-test_that("block_style('brutal') emits the brutal profile tokens page-wide", {
-  css <- as.character(block_style("brutal")$style)
-
-  expect_match(css, "sb-style-overrides", fixed = TRUE)
-  expect_match(css, '.sb-app[data-sb-style="brutal"]{', fixed = TRUE)
-  # Dense controls/surfaces and flat elevation (public tokens).
-  expect_match(css, "--sb-control-height: 2rem;", fixed = TRUE)
-  expect_match(css, "--sb-surface-padding: 1rem;", fixed = TRUE)
-  expect_match(css, "--sb-control-shadow: none;", fixed = TRUE)
-  expect_match(css, "--sb-surface-shadow: none;", fixed = TRUE)
-  # Crisp, fully-opaque focus ring and instant transition.
-  expect_match(css, "--sb-focus-ring-width: 3px;", fixed = TRUE)
-  expect_match(css, "--sb-focus-ring-opacity: 100%;", fixed = TRUE)
-  expect_match(css, "--sb-transition-duration: 0s;", fixed = TRUE)
-  # Square (zero-radius) geometry (internal geometry tokens).
-  expect_match(css, "--sb-card-radius: 0;", fixed = TRUE)
-  expect_match(css, "--sb-badge-radius: 0;", fixed = TRUE)
-  expect_match(css, "--sb-input-radius: 0;", fixed = TRUE)
-  expect_match(css, "--sb-dialog-radius: 0;", fixed = TRUE)
-  # Contrast nudged via the solid border colour (no border-width token yet).
-  expect_match(css, "--sb-input-border: var(--border);", fixed = TRUE)
-})
-
-test_that("block_style('glass') emits the glass profile tokens page-wide", {
-  css <- as.character(block_style("glass")$style)
-
-  expect_match(css, "sb-style-overrides", fixed = TRUE)
-  expect_match(css, '.sb-app[data-sb-style="glass"]{', fixed = TRUE)
-  # New translucency tokens: one shared backdrop blur plus translucent elevated
-  # surface backgrounds (the forcing function for issue #46).
-  expect_match(css, "--sb-surface-backdrop: blur(12px) saturate(180%);", fixed = TRUE)
-  expect_match(
-    css,
-    "--sb-card-surface: color-mix(in oklch, var(--card) 48%, transparent);",
-    fixed = TRUE
-  )
-  expect_match(
-    css,
-    "--sb-dialog-surface: color-mix(in oklch, var(--background) 62%, transparent);",
-    fixed = TRUE
-  )
-  expect_match(
-    css,
-    "--sb-popover-surface: color-mix(in oklch, var(--popover) 58%, transparent);",
-    fixed = TRUE
-  )
-  # Composes the shared translucent-control + foreground-ring recipes (helpers).
-  expect_match(
-    css,
-    "--sb-input-surface: color-mix(in oklch, var(--input) 50%, transparent);",
-    fixed = TRUE
-  )
-  expect_match(css, "--sb-card-border: transparent;", fixed = TRUE)
-  # Generous rounded radii.
-  expect_match(css, "--sb-card-radius: 1.25rem;", fixed = TRUE)
+  expect_silent(block_style("sera"))
+  expect_silent(block_style("vega"))
 })
 
 test_that("block_style('luma') emits the luma profile tokens page-wide", {
@@ -128,6 +41,50 @@ test_that("block_style('luma') emits the luma profile tokens page-wide", {
   expect_match(css, "--sb-control-shadow: none;", fixed = TRUE)
   expect_match(css, "--sb-overlay-gap: 1.5rem;", fixed = TRUE)
   expect_match(css, "--sb-focus-ring-opacity: 30%;", fixed = TRUE)
+})
+
+test_that("official shadcn style profiles emit representative tokens", {
+  expectations <- list(
+    lyra = c(
+      "--sb-control-font-size: 0.75rem;",
+      "--sb-focus-ring-width: 1px;",
+      "--sb-card-radius: 0;"
+    ),
+    maia = c(
+      "--sb-select-radius: 2rem;",
+      "--sb-input-surface: color-mix(in oklch, var(--input) 50%, transparent);",
+      "--sb-focus-ring-width: 3px;"
+    ),
+    mira = c(
+      "--sb-control-height: 1.75rem;",
+      "--sb-card-radius: 0.5rem;",
+      "--sb-focus-ring-opacity: 30%;"
+    ),
+    nova = c(
+      "--sb-control-height: 2rem;",
+      "--sb-card-radius: 0.75rem;",
+      "--sb-badge-radius: 2rem;"
+    ),
+    sera = c(
+      "--sb-control-font-weight: 600;",
+      "--sb-control-padding-x: 1.5rem;",
+      "--sb-card-radius: 0;"
+    ),
+    vega = c(
+      "--sb-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);",
+      "--sb-card-radius: 0.75rem;",
+      "--sb-input-radius: 0.375rem;"
+    )
+  )
+
+  for (profile in names(expectations)) {
+    css <- as.character(block_style(profile)$style)
+    expect_match(css, "sb-style-overrides", fixed = TRUE)
+    expect_match(css, sprintf('.sb-app[data-sb-style="%s"]{', profile), fixed = TRUE)
+    for (decl in expectations[[profile]]) {
+      expect_match(css, decl, fixed = TRUE)
+    }
+  }
 })
 
 test_that("explicit overrides win over luma profile values", {

@@ -9,10 +9,9 @@
 
 - **default** — returns the supported built-in style-profile names as a
   character vector. Currently
-  `c("default", "mono", "soft", "brutal", "glass", "luma", "rhea")`. The
-  `default` profile preserves the current visuals; `mono`, `soft`, `brutal`,
-  and `glass` are shinyblocks-owned token packs; `luma` is the upstream Radix
-  Luma visual profile and `rhea` is its denser sibling (see
+  `c("default", "luma", "lyra", "maia", "mira", "nova", "rhea", "sera", "vega")`.
+  The `default` profile preserves the current visuals; every non-default
+  profile maps to an official shadcn/ui v4 registry style file (see
   [`style.md`](style.md) for token and per-family coverage).
 
 ## R API
@@ -25,6 +24,6 @@ playground controls, so profile names are not hardcoded from documentation.
 
 ## Deliberate divergences from shadcn
 
-- shadcn ships style presets through CLI preset codes; shinyblocks curates a
-  small set of package-owned profiles and exposes their names through this
-  helper.
+- shadcn style files are Tailwind `@apply` registries. shinyblocks translates
+  them into R profile data and scoped package CSS instead of vendoring React or
+  Tailwind source into app-author code.

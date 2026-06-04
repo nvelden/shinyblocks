@@ -27,7 +27,6 @@ register_style_showcase <- function(input, output, session) {
   output$showcase_style_preview_ui <- shiny::renderUI({
     profile <- selected_profile()
     o <- style_overrides()
-    is_glass <- identical(profile, "glass")
 
     style_obj <- do.call(
       block_style,
@@ -45,22 +44,8 @@ register_style_showcase <- function(input, output, session) {
         style = paste(
           "position: relative; isolation: isolate; overflow: hidden;",
           "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem);",
-          "width: 100%; border-radius: var(--sb-card-radius, 1rem);",
-          if (is_glass) "padding: 1.25rem;" else ""
+          "width: 100%; border-radius: var(--sb-card-radius, 1rem);"
         ),
-        if (is_glass) {
-          htmltools::div(
-            `aria-hidden` = "true",
-            style = paste(
-              "position: absolute; inset: 0; z-index: -1;",
-              "background:",
-              "linear-gradient(135deg, color-mix(in oklch, var(--primary) 24%, transparent), transparent 34%),",
-              "linear-gradient(225deg, color-mix(in oklch, var(--accent) 52%, transparent), transparent 38%),",
-              "repeating-linear-gradient(90deg, color-mix(in oklch, var(--border) 38%, transparent) 0 1px, transparent 1px 18px),",
-              "color-mix(in oklch, var(--muted) 32%, transparent);"
-            )
-          )
-        },
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.35rem;",
           htmltools::span(style = label_style, "Buttons: control height, radius, focus ring follow the profile"),
