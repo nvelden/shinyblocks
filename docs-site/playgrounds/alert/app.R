@@ -101,7 +101,7 @@ htmltools::div(
             block_field_label("variant", `for` = "showcase_alert_doc_variant"),
             block_select(
               "showcase_alert_doc_variant",
-              choices = c("default", "destructive"),
+              choices = c("default", "destructive", "success", "warning", "info"),
               selected = "default",
               size = "sm"
             )

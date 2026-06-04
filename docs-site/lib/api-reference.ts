@@ -159,7 +159,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "title", type: "character", defaultVal: "required", description: "Alert title text." },
         { argument: "description", type: "character", defaultVal: "NULL", description: "Supporting description subtext inside the alert." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "Leading Lucide icon name." },
-        { argument: "variant", type: "'default' | 'destructive'", defaultVal: "'default'", description: "Stylesheet visual color preset category." },
+        { argument: "variant", type: "'default' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Stylesheet visual color preset category." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Custom container class classes." }
       ]
     }

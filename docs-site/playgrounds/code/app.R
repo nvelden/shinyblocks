@@ -149,15 +149,7 @@ language_choices <- c(
 ui <- block_page(
   title = "shinyblocks - Code playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
-    htmltools::tags$style(htmltools::HTML(
-      "
-      [data-shinyblocks-root] .sb-code-custom {
-        outline: 2px dashed var(--ring);
-        outline-offset: 4px;
-      }
-      "
-    ))
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
     `data-shinyblocks-root` = "",
