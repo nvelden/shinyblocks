@@ -18,6 +18,8 @@ test("landing page gallery lists featured components", async ({ page }) => {
   expect(app?.content).toContain("block_style_profiles()");
   expect(app?.content).toContain("block_theme_presets()");
   expect(app?.content).toContain("gallery:set-style-profile");
+  expect(app?.content).toContain("metric_box <- function(...)");
+  expect(app?.content).toContain('uiOutput("gallery_metric", style = "height: 100%;")');
   // Regression guard: the theme/style <style> assets live in a hidden
   // container, so the output must opt out of Shiny's suspend-when-hidden or
   // theme-preset changes never render (the controls would do nothing).

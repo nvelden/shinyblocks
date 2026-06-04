@@ -78,6 +78,10 @@ loading_lines <- function() {
   )
 }
 
+metric_box <- function(...) {
+  block_value_box(..., style = "height: 100%;")
+}
+
 ui <- block_page(
   title = "shinyblocks - Live gallery",
   theme = htmltools::tagList(
@@ -133,16 +137,16 @@ ui <- block_page(
     ),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
-      uiOutput("gallery_metric"),
-      uiOutput("gallery_budget_metric"),
-      block_value_box(
+      uiOutput("gallery_metric", style = "height: 100%;"),
+      uiOutput("gallery_budget_metric", style = "height: 100%;"),
+      metric_box(
         title = "Members",
         value = "24",
         description = "+3 this week",
         icon = "users",
         block_badge("Growing", variant = "secondary")
       ),
-      block_value_box(
+      metric_box(
         title = "Uptime",
         value = "99.98%",
         description = "Last 30 days",
@@ -346,7 +350,7 @@ server <- function(input, output, session) {
 
   output$gallery_metric <- renderUI({
     plan <- input$gallery_plan %||% "Professional"
-    block_value_box(
+    metric_box(
       title = "Active plan",
       value = plan,
       description = paste0("Refreshed ", refreshes(), " time", if (refreshes() == 1L) "" else "s"),
@@ -356,7 +360,7 @@ server <- function(input, output, session) {
 
   output$gallery_budget_metric <- renderUI({
     value <- input$gallery_budget %||% 5200
-    block_value_box(
+    metric_box(
       title = "Budget",
       value = paste0("$", format(value, big.mark = ",", scientific = FALSE)),
       description = "Monthly cap",
