@@ -85,7 +85,7 @@ check-fast:
 
 # ---------- Slice boundary ----------
 
-check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness
+check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness style-registry
 	git diff --check
 	@echo "check-slice OK"
 
@@ -166,6 +166,12 @@ style-parity:
 # that must instead be a profile token. Keeps profiles data, not CSS (issue #34).
 style-leanness:
 	npm run test:style-leanness
+
+# Browser-free unit tests for the style-registry R parser (resolves the profile
+# recipe-helper splices). Runs in check-slice so a parser regression is caught
+# without needing the showcase browser gate (style-parity).
+style-registry:
+	npm run test:style-registry
 
 # Quality Gate runs automated PR/phase-exit checks. Network and release-only
 # checks stay in gate-release so routine development does not pay for them.

@@ -26,6 +26,57 @@
 # value), so the only remaining `[data-sb-style="luma"]` CSS is the
 # genuinely-structural geometry (pill/translucent surfaces, slider/switch
 # metrics).
+
+# Shared token recipes for the translucent profiles (luma, rhea). Extracted so a
+# new translucent profile composes them via `c(list(...), helper(), helper())`
+# instead of copy-pasting the recipe. Splicing keeps the emitted `--sb-*` set
+# identical to inlining the tokens. The style-registry parser
+# (tools/theme/style-registry.mjs) resolves these helper calls when it sweeps a
+# profile, so the parity check still sees every spliced token.
+
+# Flat, borderless controls on a color-mixed `--input` surface. Inputs/select
+# use a 50% mix; the small toggles use 90%.
+style_translucent_surface_tokens <- function() {
+  list(
+    input_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
+    input_border = "transparent",
+    input_shadow = "none",
+    textarea_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
+    textarea_border = "transparent",
+    textarea_shadow = "none",
+    select_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
+    select_border = "transparent",
+    checkbox_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
+    checkbox_border = "transparent",
+    checkbox_shadow = "none",
+    switch_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
+    switch_shadow = "none",
+    radio_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
+    radio_border = "transparent",
+    radio_shadow = "none",
+    slider_track_surface = "color-mix(in oklch, var(--input) 90%, transparent)"
+  )
+}
+
+# Transparent borders plus a base elevation and a 1px foreground ring (5% light)
+# on the elevated surfaces. `value_box_shadow` differs per profile (Luma keeps an
+# explicit drop shadow, Rhea uses the var-based recipe), so it is a required
+# argument — a profile that composes this recipe cannot forget to set it.
+style_foreground_ring_tokens <- function(value_box_shadow) {
+  list(
+    card_border = "transparent",
+    card_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
+    value_box_border = "transparent",
+    value_box_shadow = value_box_shadow,
+    select_content_border = "transparent",
+    select_content_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
+    dialog_border = "transparent",
+    dialog_shadow = "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
+    popover_border = "transparent",
+    popover_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+  )
+}
+
 style_profiles <- list(
   default = list(),
   mono = list(
@@ -114,122 +165,79 @@ style_profiles <- list(
     popover_radius = "1rem",
     tooltip_radius = "0.625rem"
   ),
-  luma = list(
-    control_padding_x = "0.75rem",
-    control_gap = "0.375rem",
-    control_shadow = "none",
-    surface_shadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    overlay_gap = "1.5rem",
-    overlay_shadow = "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    focus_ring_opacity = "30%",
-    # Radii (data, not CSS). Tailwind equivalents: 4xl = 2rem, 3xl = 1.5rem,
-    # 2xl = 1rem, xl = 0.75rem, [5px] = 5px, code frame = 1.25rem.
-    card_radius = "2rem",
-    value_box_radius = "2rem",
-    button_radius = "2rem",
-    badge_radius = "1.5rem",
-    input_radius = "1.5rem",
-    textarea_radius = "1rem",
-    select_radius = "1.5rem",
-    select_content_radius = "1.5rem",
-    select_item_radius = "1rem",
-    checkbox_radius = "5px",
-    alert_radius = "1rem",
-    empty_radius = "1rem",
-    skeleton_radius = "1rem",
-    code_radius = "1.25rem",
-    dialog_radius = "2rem",
-    popover_radius = "1.5rem",
-    tooltip_radius = "0.75rem",
-    # Translucent-surface recipe: flat, borderless controls on a color-mixed
-    # `--input` surface. Inputs/select use a 50% mix; the small toggles use 90%.
-    input_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    input_border = "transparent",
-    input_shadow = "none",
-    textarea_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    textarea_border = "transparent",
-    textarea_shadow = "none",
-    select_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    select_border = "transparent",
-    checkbox_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    checkbox_border = "transparent",
-    checkbox_shadow = "none",
-    switch_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    switch_shadow = "none",
-    radio_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    radio_border = "transparent",
-    radio_shadow = "none",
-    slider_track_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    # Foreground-ring recipe: transparent border, base elevation plus a 1px
-    # foreground ring (5% light). Card's stronger dark-mode ring stays in CSS.
-    card_border = "transparent",
-    card_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    value_box_border = "transparent",
-    value_box_shadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    select_content_border = "transparent",
-    select_content_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    dialog_border = "transparent",
-    dialog_shadow = "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    popover_border = "transparent",
-    popover_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+  luma = c(
+    list(
+      control_padding_x = "0.75rem",
+      control_gap = "0.375rem",
+      control_shadow = "none",
+      surface_shadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+      overlay_gap = "1.5rem",
+      overlay_shadow = "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      focus_ring_opacity = "30%",
+      # Radii (data, not CSS). Tailwind equivalents: 4xl = 2rem, 3xl = 1.5rem,
+      # 2xl = 1rem, xl = 0.75rem, [5px] = 5px, code frame = 1.25rem.
+      card_radius = "2rem",
+      value_box_radius = "2rem",
+      button_radius = "2rem",
+      badge_radius = "1.5rem",
+      input_radius = "1.5rem",
+      textarea_radius = "1rem",
+      select_radius = "1.5rem",
+      select_content_radius = "1.5rem",
+      select_item_radius = "1rem",
+      checkbox_radius = "5px",
+      alert_radius = "1rem",
+      empty_radius = "1rem",
+      skeleton_radius = "1rem",
+      code_radius = "1.25rem",
+      dialog_radius = "2rem",
+      popover_radius = "1.5rem",
+      tooltip_radius = "0.75rem"
+    ),
+    style_translucent_surface_tokens(),
+    # Luma keeps its explicit drop shadow on value boxes (not the var-based
+    # recipe); its card's stronger dark-mode ring stays in CSS.
+    style_foreground_ring_tokens(
+      value_box_shadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+    )
   ),
-  rhea = list(
-    control_height = "2rem",
-    control_height_sm = "1.75rem",
-    control_height_lg = "2.25rem",
-    control_padding_x = "0.625rem",
-    control_gap = "0.375rem",
-    control_shadow = "none",
-    surface_padding = "1.25rem",
-    surface_gap = "1.25rem",
-    surface_shadow = "0 1px 2px rgb(0 0 0 / 0.05)",
-    overlay_shadow = "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    focus_ring_opacity = "30%",
-    transition_duration = "0.2s",
-    card_radius = "min(calc(var(--radius) * 2.6), 24px)",
-    value_box_radius = "1.5rem",
-    button_radius = "1rem",
-    badge_radius = "1rem",
-    input_radius = "1rem",
-    textarea_radius = "1rem",
-    select_radius = "1rem",
-    select_content_radius = "1rem",
-    select_item_radius = "0.75rem",
-    checkbox_radius = "5px",
-    alert_radius = "1rem",
-    empty_radius = "1.5rem",
-    skeleton_radius = "1rem",
-    code_radius = "1rem",
-    dialog_radius = "min(calc(var(--radius) * 2.6), 24px)",
-    popover_radius = "1rem",
-    tooltip_radius = "0.75rem",
-    input_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    input_border = "transparent",
-    input_shadow = "none",
-    textarea_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    textarea_border = "transparent",
-    textarea_shadow = "none",
-    select_surface = "color-mix(in oklch, var(--input) 50%, transparent)",
-    select_border = "transparent",
-    checkbox_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    checkbox_border = "transparent",
-    checkbox_shadow = "none",
-    switch_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    switch_shadow = "none",
-    radio_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    radio_border = "transparent",
-    radio_shadow = "none",
-    slider_track_surface = "color-mix(in oklch, var(--input) 90%, transparent)",
-    card_border = "transparent",
-    card_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    value_box_border = "transparent",
-    value_box_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    select_content_border = "transparent",
-    select_content_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    dialog_border = "transparent",
-    dialog_shadow = "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)",
-    popover_border = "transparent",
-    popover_shadow = "var(--sb-overlay-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+  rhea = c(
+    list(
+      control_height = "2rem",
+      control_height_sm = "1.75rem",
+      control_height_lg = "2.25rem",
+      control_padding_x = "0.625rem",
+      control_gap = "0.375rem",
+      control_shadow = "none",
+      surface_padding = "1.25rem",
+      surface_gap = "1.25rem",
+      surface_shadow = "0 1px 2px rgb(0 0 0 / 0.05)",
+      overlay_shadow = "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      focus_ring_opacity = "30%",
+      transition_duration = "0.2s",
+      card_radius = "min(calc(var(--radius) * 2.6), 24px)",
+      value_box_radius = "1.5rem",
+      button_radius = "1rem",
+      badge_radius = "1rem",
+      input_radius = "1rem",
+      textarea_radius = "1rem",
+      select_radius = "1rem",
+      select_content_radius = "1rem",
+      select_item_radius = "0.75rem",
+      checkbox_radius = "5px",
+      alert_radius = "1rem",
+      empty_radius = "1.5rem",
+      skeleton_radius = "1rem",
+      code_radius = "1rem",
+      dialog_radius = "min(calc(var(--radius) * 2.6), 24px)",
+      popover_radius = "1rem",
+      tooltip_radius = "0.75rem"
+    ),
+    style_translucent_surface_tokens(),
+    # Rhea uses the var-based foreground-ring recipe for value boxes.
+    style_foreground_ring_tokens(
+      value_box_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+    )
   )
 )
 

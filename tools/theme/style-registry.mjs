@@ -221,20 +221,36 @@ export const STYLE_REGISTRY = {
 // is profile-agnostic — a new profile is swept with no edits here, mirroring the
 // colour-preset sweep in check-theme-response.mjs.
 
-function parseListBlock(src, listName) {
-  const start = src.indexOf(`${listName} = list(`);
-  if (start === -1) return {};
+// Shared token recipes a profile may splice with `c(list(...), helper(), ...)`
+// instead of inlining the tokens (see R/style-profiles.R). A call site is not a
+// literal `key = "value"` pair, so the parser resolves each helper to its token
+// list and merges it into the profile. Keep this list in sync with the recipe
+// helpers defined in R/style-profiles.R.
+const RECIPE_HELPER_FNS = [
+  "style_translucent_surface_tokens",
+  "style_foreground_ring_tokens"
+];
+
+// Slice the balanced `(...)` body that begins at the `(` at or after openFrom.
+// Counts `(`/`)` bytes without skipping string literals, so it assumes every
+// value string is itself paren-balanced (true for CSS values like
+// `min(calc(var(--radius) * 2.6), 24px)` and `color-mix(...)`). A token value
+// with an unbalanced paren inside a string would corrupt the depth tracking.
+function balancedParenBody(src, openFrom) {
+  const open = src.indexOf("(", openFrom);
+  if (open === -1) return "";
   let depth = 0;
-  let i = src.indexOf("(", start);
-  const open = i;
-  for (; i < src.length; i++) {
+  for (let i = open; i < src.length; i++) {
     if (src[i] === "(") depth++;
     else if (src[i] === ")") {
       depth--;
-      if (depth === 0) break;
+      if (depth === 0) return src.slice(open + 1, i);
     }
   }
-  const body = src.slice(open + 1, i);
+  return "";
+}
+
+function scrapeStringPairs(body) {
   const out = {};
   for (const m of body.matchAll(/([A-Za-z0-9_]+)\s*=\s*"([^"]*)"/g)) {
     out[m[1]] = m[2];
@@ -242,26 +258,34 @@ function parseListBlock(src, listName) {
   return out;
 }
 
+// The token list a recipe-helper function returns (its `list(...)` body).
+function parseHelperTokens(src, fnName) {
+  const start = src.indexOf(`${fnName} <- function`);
+  if (start === -1) return {};
+  const listStart = src.indexOf("list(", start);
+  if (listStart === -1) return {};
+  return scrapeStringPairs(balancedParenBody(src, listStart));
+}
+
+// A profile's tokens: the literal `key = "value"` pairs in its
+// `name = list(...)` / `name = c(...)` block, plus the tokens from any recipe
+// helper it splices in.
+function parseListBlock(src, listName) {
+  let start = src.indexOf(`${listName} = list(`);
+  if (start === -1) start = src.indexOf(`${listName} = c(`);
+  if (start === -1) return {};
+  const body = balancedParenBody(src, start);
+  const out = scrapeStringPairs(body);
+  for (const fn of RECIPE_HELPER_FNS) {
+    if (body.includes(`${fn}(`)) Object.assign(out, parseHelperTokens(src, fn));
+  }
+  return out;
+}
+
 function parseNamedMap(src, fnName) {
   const fnStart = src.indexOf(`${fnName} <- function()`);
   if (fnStart === -1) return {};
-  const cStart = src.indexOf("c(", fnStart);
-  let depth = 0;
-  let i = cStart + 1;
-  const open = src.indexOf("(", cStart);
-  for (i = open; i < src.length; i++) {
-    if (src[i] === "(") depth++;
-    else if (src[i] === ")") {
-      depth--;
-      if (depth === 0) break;
-    }
-  }
-  const body = src.slice(open + 1, i);
-  const out = {};
-  for (const m of body.matchAll(/([A-Za-z0-9_]+)\s*=\s*"([^"]*)"/g)) {
-    out[m[1]] = m[2];
-  }
-  return out;
+  return scrapeStringPairs(balancedParenBody(src, src.indexOf("c(", fnStart)));
 }
 
 // Every token block_style() may emit: the public allowlist plus the internal
@@ -296,7 +320,9 @@ export function styleProfileNames(src = readProfilesSrc()) {
       // `style_profiles <- list(` (depth 1), taking depth to 2.
       if (depth === 2) {
         const head = src.slice(0, i);
-        const m = head.match(/([A-Za-z0-9_.]+)\s*=\s*list$/);
+        // A profile is either `name = list(` or `name = c(` (the latter
+        // composes recipe helpers; see parseListBlock).
+        const m = head.match(/([A-Za-z0-9_.]+)\s*=\s*(?:list|c)$/);
         if (m) names.push(m[1]);
       }
     } else if (ch === ")") {

@@ -22,6 +22,7 @@
     "test:themes-runtime": "node tools/theme/check-theme-response.mjs",
     "test:style-parity": "node tools/theme/check-style-parity.mjs",
     "test:style-leanness": "node tools/theme/check-style-leanness.mjs",
+    "test:style-registry": "node --test tools/theme/style-registry.test.mjs",
     "shadcn:info": "npx shadcn@latest info --json",
     "shadcn:docs": "npx shadcn@latest docs"
   },
