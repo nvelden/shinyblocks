@@ -43,15 +43,16 @@ on :4321 (60 pass / 0 fail), `npm run test:themes-runtime` (82 pass),
 Known CI note: docs-site `e2e` smoke (`theme toggle switches and persists`) is
 flaky on a docs-site theme-toggle assertion unrelated to style profiles.
 
-## Done: `soft` (second profile) — PR #44 open
+## Done: `soft` (second profile) — merged
 
-Implemented and gated on branch `issue-42-soft-style-profile` (PR #44).
+Shipped via PR #44 (squash-merged to `main` as `3e47b98`, branch deleted).
 Airier rounded dashboard UI, shipped as **pure token data** — no
 `[data-sb-style="soft"]` CSS, so the leanness gate is unaffected.
 
 Manual light/dark visual pass: done — looks good (maintainer, 2026-06-04).
-Still owed before merge: critical-code-reviewer on the diff (deferred — to run
-later).
+critical-code-reviewer: done — **Approve**, no blocking/required changes. One
+cosmetic note left for a future tweak: `tooltip_radius` (0.625rem/10px) is only
+~2px above the 8px default, so it barely reads as "softer"; bump it if revisited.
 
 - `R/style-profiles.R`: `soft = list(...)` — roomier `surface_padding`/
   `surface_gap` (2rem), larger overlay padding, softer/larger component radii,
