@@ -1,7 +1,7 @@
 test_that("block_style_profiles returns the supported profiles", {
   expect_identical(
     block_style_profiles(),
-    c("default", "mono", "soft", "luma", "rhea")
+    c("default", "mono", "soft", "brutal", "luma", "rhea")
   )
   expect_identical(
     block_style_profiles(),
@@ -19,6 +19,7 @@ test_that("block_style validates the profile name", {
   expect_silent(block_style("default"))
   expect_silent(block_style("mono"))
   expect_silent(block_style("soft"))
+  expect_silent(block_style("brutal"))
   expect_silent(block_style("luma"))
   expect_silent(block_style("rhea"))
 })
@@ -56,6 +57,29 @@ test_that("block_style('soft') emits the soft profile tokens page-wide", {
   expect_match(css, "--sb-badge-radius: 0.75rem;", fixed = TRUE)
   expect_match(css, "--sb-input-radius: 0.75rem;", fixed = TRUE)
   expect_match(css, "--sb-dialog-radius: 1.5rem;", fixed = TRUE)
+})
+
+test_that("block_style('brutal') emits the brutal profile tokens page-wide", {
+  css <- as.character(block_style("brutal")$style)
+
+  expect_match(css, "sb-style-overrides", fixed = TRUE)
+  expect_match(css, '.sb-app[data-sb-style="brutal"]{', fixed = TRUE)
+  # Dense controls/surfaces and flat elevation (public tokens).
+  expect_match(css, "--sb-control-height: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-surface-padding: 1rem;", fixed = TRUE)
+  expect_match(css, "--sb-control-shadow: none;", fixed = TRUE)
+  expect_match(css, "--sb-surface-shadow: none;", fixed = TRUE)
+  # Crisp, fully-opaque focus ring and instant transition.
+  expect_match(css, "--sb-focus-ring-width: 3px;", fixed = TRUE)
+  expect_match(css, "--sb-focus-ring-opacity: 100%;", fixed = TRUE)
+  expect_match(css, "--sb-transition-duration: 0s;", fixed = TRUE)
+  # Square (zero-radius) geometry (internal geometry tokens).
+  expect_match(css, "--sb-card-radius: 0;", fixed = TRUE)
+  expect_match(css, "--sb-badge-radius: 0;", fixed = TRUE)
+  expect_match(css, "--sb-input-radius: 0;", fixed = TRUE)
+  expect_match(css, "--sb-dialog-radius: 0;", fixed = TRUE)
+  # Contrast nudged via the solid border colour (no border-width token yet).
+  expect_match(css, "--sb-input-border: var(--border);", fixed = TRUE)
 })
 
 test_that("block_style('luma') emits the luma profile tokens page-wide", {
