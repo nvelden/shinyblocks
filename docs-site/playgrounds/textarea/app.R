@@ -79,15 +79,7 @@ parse_rows <- function(value) {
 ui <- block_page(
   title = "shinyblocks - Textarea playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
-    htmltools::tags$style(htmltools::HTML(
-      "
-      [data-shinyblocks-root] .showcase-textarea-preview-custom .sb-textarea-control,
-      [data-shinyblocks-root].showcase-textarea-preview-custom .sb-textarea-control {
-        border: 2px dashed red;
-      }
-      "
-    ))
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
     `data-shinyblocks-root` = "",
@@ -250,7 +242,7 @@ server <- function(input, output, session) {
       invalid = isTRUE(input$showcase_textarea_doc_invalid),
       resize = input$showcase_textarea_doc_resize %||% "vertical",
       style = style,
-      class = if (isTRUE(input$showcase_textarea_doc_class)) "showcase-textarea-preview-custom" else NULL
+      class = if (isTRUE(input$showcase_textarea_doc_class)) "border-dashed" else NULL
     )
   })
 

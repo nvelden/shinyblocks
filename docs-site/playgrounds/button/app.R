@@ -270,7 +270,7 @@ server <- function(input, output, session) {
       icon_position = input$showcase_button_doc_icon_position %||% "inline-start",
       disabled = isTRUE(input$showcase_button_doc_disabled),
       style = style,
-      class = if (isTRUE(input$showcase_button_doc_class)) "showcase-button-preview-custom" else NULL
+      class = if (isTRUE(input$showcase_button_doc_class)) "border-dashed" else NULL
     )
   })
 

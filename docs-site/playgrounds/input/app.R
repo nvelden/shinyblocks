@@ -74,15 +74,7 @@ string_literal <- function(value) {
 ui <- block_page(
   title = "shinyblocks · Input playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
-    htmltools::tags$style(htmltools::HTML(
-      "
-      [data-shinyblocks-root] .showcase-input-preview-custom .sb-input-control,
-      [data-shinyblocks-root].showcase-input-preview-custom .sb-input-control {
-        border: 2px dashed red;
-      }
-      "
-    ))
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
       `data-shinyblocks-root` = "",
@@ -242,7 +234,7 @@ server <- function(input, output, session) {
       disabled = isTRUE(input$showcase_input_doc_disabled),
       invalid = isTRUE(input$showcase_input_doc_invalid),
       style = style,
-      class = if (isTRUE(input$showcase_input_doc_class)) "showcase-input-preview-custom" else NULL
+      class = if (isTRUE(input$showcase_input_doc_class)) "border-dashed" else NULL
     )
   })
 

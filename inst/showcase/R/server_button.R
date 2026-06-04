@@ -47,7 +47,7 @@ register_button_showcase <- function(input, output, session) {
       disabled = isTRUE(input$showcase_button_doc_disabled),
       style = style,
       class = if (isTRUE(input$showcase_button_doc_class)) {
-        "showcase-button-preview-custom"
+        "border-dashed"
       } else {
         NULL
       }
@@ -123,7 +123,7 @@ register_button_showcase <- function(input, output, session) {
       args <- c(args, paste0("style = ", string_literal(style_val)))
     }
     if (class_val) {
-      args <- c(args, 'class = "showcase-button-preview-custom"')
+      args <- c(args, 'class = "border-dashed"')
     }
 
     paste0("block_button(\n  ", paste(args, collapse = ",\n  "), "\n)")

@@ -15,7 +15,7 @@ register_textarea_showcase <- function(input, output, session) {
     style_val <- input$showcase_textarea_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
     class_val <- if (isTRUE(input$showcase_textarea_doc_class)) {
-      "showcase-textarea-preview-custom"
+      "border-dashed"
     } else {
       NULL
     }
@@ -73,7 +73,7 @@ register_textarea_showcase <- function(input, output, session) {
     if (invalid) args <- c(args, "invalid = TRUE")
     if (resize != "vertical") args <- c(args, paste0('resize = "', resize, '"'))
     if (nzchar(style_val)) args <- c(args, paste0('style = "', style_val, '"'))
-    if (custom_class) args <- c(args, 'class = "showcase-textarea-preview-custom"')
+    if (custom_class) args <- c(args, 'class = "border-dashed"')
 
     paste0(
       "block_textarea(\n  ",

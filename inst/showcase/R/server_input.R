@@ -12,7 +12,7 @@ register_input_showcase <- function(input, output, session) {
     style_val <- input$showcase_input_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
     class_val <- if (isTRUE(input$showcase_input_doc_class)) {
-      "showcase-input-preview-custom"
+      "border-dashed"
     } else {
       NULL
     }
@@ -65,7 +65,7 @@ register_input_showcase <- function(input, output, session) {
     if (disabled) args <- c(args, "disabled = TRUE")
     if (invalid) args <- c(args, "invalid = TRUE")
     if (nzchar(style_val)) args <- c(args, paste0('style = "', style_val, '"'))
-    if (custom_class) args <- c(args, 'class = "showcase-input-preview-custom"')
+    if (custom_class) args <- c(args, 'class = "border-dashed"')
 
     paste0(
       "block_input(\n  ",

@@ -120,8 +120,16 @@
   border: 2px dashed var(--ring) !important;
 }
 
+.sb-textarea-control.border-dashed {
+  border: 2px dashed var(--ring) !important;
+}
+
 .showcase-input-preview-custom .sb-input-control,
 .sb-input.showcase-input-preview-custom .sb-input-control {
+  border: 2px dashed var(--ring) !important;
+}
+
+.sb-input-control.border-dashed {
   border: 2px dashed var(--ring) !important;
 }
 
@@ -158,6 +166,10 @@
 
 /* Custom modern utility classes used by showcase dropdown selects */
 .border-dashed {
+  border: 2px dashed var(--ring) !important;
+}
+
+.sb-button.border-dashed {
   border: 2px dashed var(--ring) !important;
 }
 
