@@ -58,6 +58,10 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 - Run targeted Playwright/browser checks and docs-site commands that invoke
   `tsx` outside the command sandbox / with escalation. In sandboxed Codex
   sessions, `tsx` can fail with IPC permission errors before the real test runs.
+- Run GitHub-mutating `gh` commands that require network access, such as
+  `gh issue create`, outside the command sandbox / with escalation on the first
+  attempt. Use `--body-file` for longer issue bodies so shell quoting does not
+  fail before `gh` reaches GitHub.
 - Prefer temp files / `--body-file` / here-docs for complex shell payloads.
   Don't inline long `gh ... --body "..."` or nested `Rscript -e "..."` strings
   with parentheses, backticks, quotes, or Markdown — zsh/sandbox wrapping can
