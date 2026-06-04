@@ -165,6 +165,66 @@ style_profiles <- list(
     popover_radius = "1rem",
     tooltip_radius = "0.625rem"
   ),
+  brutal = list(
+    # shinyblocks-owned profile. Visual target: dense, high-contrast,
+    # square-edged product UI; source audit in
+    # docs/research/2026-06-04-style-profile-sources.md. Data-first like mono and
+    # soft: no brutal-scoped [data-sb-style] CSS. Square (zero-radius) geometry,
+    # dense controls/surfaces, flat (shadow-less) elevation, an instant
+    # transition, and a crisp fully-opaque focus ring. "Stronger borders" wants a
+    # border-WIDTH token that does not exist yet (border width is a hardcoded 1px
+    # in the runtime CSS); that is flagged in the research doc and deferred rather
+    # than faked with bespoke CSS. Contrast is instead nudged by pointing the
+    # control borders at the solid `--border` colour, mirroring mono.
+    control_font_size = "0.8125rem",
+    control_height = "2rem",
+    control_height_sm = "1.75rem",
+    control_height_lg = "2.25rem",
+    control_padding_x = "0.625rem",
+    control_gap = "0.375rem",
+    surface_padding = "1rem",
+    surface_gap = "1rem",
+    overlay_padding = "1rem",
+    overlay_gap = "0.75rem",
+    control_shadow = "none",
+    surface_shadow = "none",
+    overlay_shadow = "none",
+    focus_ring_width = "3px",
+    focus_ring_opacity = "100%",
+    transition_duration = "0s",
+    card_radius = "0",
+    value_box_radius = "0",
+    button_radius = "0",
+    badge_radius = "0",
+    input_radius = "0",
+    textarea_radius = "0",
+    select_radius = "0",
+    select_content_radius = "0",
+    select_item_radius = "0",
+    checkbox_radius = "0",
+    alert_radius = "0",
+    empty_radius = "0",
+    skeleton_radius = "0",
+    code_radius = "0",
+    dialog_radius = "0",
+    popover_radius = "0",
+    tooltip_radius = "0",
+    input_border = "var(--border)",
+    input_shadow = "none",
+    textarea_border = "var(--border)",
+    textarea_shadow = "none",
+    select_border = "var(--border)",
+    checkbox_border = "var(--border)",
+    checkbox_shadow = "none",
+    switch_shadow = "none",
+    radio_border = "var(--border)",
+    radio_shadow = "none",
+    card_shadow = "none",
+    value_box_shadow = "none",
+    select_content_shadow = "none",
+    dialog_shadow = "none",
+    popover_shadow = "none"
+  ),
   luma = c(
     list(
       control_padding_x = "0.75rem",

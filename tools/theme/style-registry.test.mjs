@@ -29,7 +29,7 @@ function overridesMap(profile) {
 
 test("styleProfileNames lists profiles, including c()-composed ones, excluding default", () => {
   const names = styleProfileNames();
-  assert.deepEqual(names, ["mono", "soft", "luma", "rhea"]);
+  assert.deepEqual(names, ["mono", "soft", "brutal", "luma", "rhea"]);
   assert.ok(!names.includes("default"), "default is a no-op profile and must be excluded");
 });
 
