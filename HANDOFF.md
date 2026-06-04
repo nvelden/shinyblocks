@@ -43,11 +43,15 @@ on :4321 (60 pass / 0 fail), `npm run test:themes-runtime` (82 pass),
 Known CI note: docs-site `e2e` smoke (`theme toggle switches and persists`) is
 flaky on a docs-site theme-toggle assertion unrelated to style profiles.
 
-## Done: `soft` (second profile) — PR open
+## Done: `soft` (second profile) — PR #44 open
 
-Implemented and gated on branch `issue-42-soft-style-profile` (PR pending).
+Implemented and gated on branch `issue-42-soft-style-profile` (PR #44).
 Airier rounded dashboard UI, shipped as **pure token data** — no
 `[data-sb-style="soft"]` CSS, so the leanness gate is unaffected.
+
+Manual light/dark visual pass: done — looks good (maintainer, 2026-06-04).
+Still owed before merge: critical-code-reviewer on the diff (deferred — to run
+later).
 
 - `R/style-profiles.R`: `soft = list(...)` — roomier `surface_padding`/
   `surface_gap` (2rem), larger overlay padding, softer/larger component radii,
