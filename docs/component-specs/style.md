@@ -4,10 +4,11 @@
 > Shadcn reference: Luma and Rhea style models at
 > <https://ui.shadcn.com/docs/changelog/2026-03-luma> and
 > <https://ui.shadcn.com/docs/changelog/2026-05-rhea>
-> Status: Slice 5 (issue #33,
+> Status: Slice 5 plus built-in profile follow-ups (issues #33, #42, #46,
 > [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)). Ships the
-> `default`, `luma`, and `rhea` profiles, the public `--sb-*` token layer, the
-> profile-scoped component CSS, and the style-profile
+> `default`, `mono`, `soft`, `brutal`, `glass`, `luma`, and `rhea` profiles, the
+> public `--sb-*` token layer, the internal geometry/translucency token layer,
+> the profile-scoped component CSS, and the style-profile
 > parity harness (`tools/theme/check-style-parity.mjs` + `style-registry.mjs`).
 > Luma now covers the shell families too (input group, field, tabs, sidebar,
 > nav); all five are measured `profile` bindings in the parity registry.
@@ -34,7 +35,7 @@ are emitted as `--sb-*` custom properties.
 
 | Argument | Purpose |
 | --- | --- |
-| `profile` | Built-in profile name. Slice 3 ships only `default`. |
+| `profile` | Built-in profile name. Supported values come from `block_style_profiles()`. |
 | `...` | Named overrides from the fixed allowlist (below). Values emit as `--<mapped-token>: <value>;`. Override values win over profile values. |
 | `scope` | Optional CSS selector confining emitted rules to one subtree. |
 
@@ -82,6 +83,12 @@ is visually identical to pre-Slice-3 shinyblocks.
   `...` (passing one errors as an unknown override). The default runtime CSS
   reads each as `var(--sb-<token>, <historical default>)`, so an unset token is a
   no-op and the default profile is unchanged.
+- **Internal translucency tokens** — `--sb-surface-backdrop` plus elevated
+  surface backgrounds (`--sb-card-surface`, `--sb-value-box-surface`,
+  `--sb-select-content-surface`, `--sb-dialog-surface`,
+  `--sb-popover-surface`). They default to `none` or the historical opaque
+  colour and let `glass` ship as data instead of bespoke
+  `[data-sb-style="glass"]` CSS.
 
 `style_emit_token_map()` is the union (public + internal) that `block_style()`
 actually emits; `...` validates against the public tier only. This lets a profile
@@ -95,6 +102,35 @@ without enlarging the public surface. Adding a profile is then an R list in
 
 Empty override list; its values are the runtime-CSS `--sb-*` defaults above.
 Selecting it changes nothing on its own.
+
+### `mono`
+
+Shinyblocks-owned profile for a compact monospace developer-console feel. It
+uses mono-forward body/heading typography, smaller controls, tighter radii, flat
+surfaces, and a crisp 40% focus ring. It is data-only: no profile-scoped CSS is
+needed.
+
+### `soft`
+
+Shinyblocks-owned profile for an airy rounded dashboard feel. It uses roomier
+surface/overlay spacing, larger radii, softer diffuse shadows, a 35% focus ring,
+and slightly slower transitions. It is data-only.
+
+### `brutal`
+
+Shinyblocks-owned profile for a dense, high-contrast, square-edged product UI.
+It uses compact controls, zero radii, flat elevation, solid border colours, an
+instant transition, and a fully opaque focus ring. A thicker border-width token
+is deliberately deferred; the profile stays data-only.
+
+### `glass`
+
+Shinyblocks-owned profile for a translucent, overlay-heavy frosted-glass feel
+(issue #46). It composes the shared translucent-control and foreground-ring
+recipes, adds `--sb-surface-backdrop: blur(12px) saturate(180%)`, and sets
+translucent elevated-surface backgrounds for cards, value boxes, dialogs,
+popovers, and select menus. The runtime CSS reads those hooks by default, so
+`glass` has no bespoke profile-scoped CSS and passes the leanness gate.
 
 ### `luma`
 

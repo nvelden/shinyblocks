@@ -4,7 +4,8 @@
   gap: var(--sb-surface-gap);
   border: 1px solid var(--sb-card-border, var(--border));
   border-radius: var(--sb-card-radius, calc(var(--radius) * 1.6));
-  background-color: var(--card);
+  background-color: var(--sb-card-surface, var(--card));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   color: var(--card-foreground);
   padding: var(--sb-surface-padding) 0;
   box-shadow: var(--sb-card-shadow, var(--sb-surface-shadow));

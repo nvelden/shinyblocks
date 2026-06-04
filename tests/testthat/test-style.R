@@ -1,7 +1,7 @@
 test_that("block_style_profiles returns the supported profiles", {
   expect_identical(
     block_style_profiles(),
-    c("default", "mono", "soft", "brutal", "luma", "rhea")
+    c("default", "mono", "soft", "brutal", "glass", "luma", "rhea")
   )
   expect_identical(
     block_style_profiles(),
@@ -20,6 +20,7 @@ test_that("block_style validates the profile name", {
   expect_silent(block_style("mono"))
   expect_silent(block_style("soft"))
   expect_silent(block_style("brutal"))
+  expect_silent(block_style("glass"))
   expect_silent(block_style("luma"))
   expect_silent(block_style("rhea"))
 })
@@ -80,6 +81,40 @@ test_that("block_style('brutal') emits the brutal profile tokens page-wide", {
   expect_match(css, "--sb-dialog-radius: 0;", fixed = TRUE)
   # Contrast nudged via the solid border colour (no border-width token yet).
   expect_match(css, "--sb-input-border: var(--border);", fixed = TRUE)
+})
+
+test_that("block_style('glass') emits the glass profile tokens page-wide", {
+  css <- as.character(block_style("glass")$style)
+
+  expect_match(css, "sb-style-overrides", fixed = TRUE)
+  expect_match(css, '.sb-app[data-sb-style="glass"]{', fixed = TRUE)
+  # New translucency tokens: one shared backdrop blur plus translucent elevated
+  # surface backgrounds (the forcing function for issue #46).
+  expect_match(css, "--sb-surface-backdrop: blur(12px) saturate(180%);", fixed = TRUE)
+  expect_match(
+    css,
+    "--sb-card-surface: color-mix(in oklch, var(--card) 48%, transparent);",
+    fixed = TRUE
+  )
+  expect_match(
+    css,
+    "--sb-dialog-surface: color-mix(in oklch, var(--background) 62%, transparent);",
+    fixed = TRUE
+  )
+  expect_match(
+    css,
+    "--sb-popover-surface: color-mix(in oklch, var(--popover) 58%, transparent);",
+    fixed = TRUE
+  )
+  # Composes the shared translucent-control + foreground-ring recipes (helpers).
+  expect_match(
+    css,
+    "--sb-input-surface: color-mix(in oklch, var(--input) 50%, transparent);",
+    fixed = TRUE
+  )
+  expect_match(css, "--sb-card-border: transparent;", fixed = TRUE)
+  # Generous rounded radii.
+  expect_match(css, "--sb-card-radius: 1.25rem;", fixed = TRUE)
 })
 
 test_that("block_style('luma') emits the luma profile tokens page-wide", {

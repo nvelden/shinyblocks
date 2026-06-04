@@ -225,6 +225,65 @@ style_profiles <- list(
     dialog_shadow = "none",
     popover_shadow = "none"
   ),
+  glass = c(
+    list(
+      # shinyblocks-owned profile (issue #46). Visual target: a translucent,
+      # overlay-heavy "frosted glass" UI; source audit in
+      # docs/research/2026-06-04-style-profile-sources.md. Glass is the forcing
+      # function for the translucency tokens: it composes the shared translucent
+      # control + foreground-ring recipes (style_translucent_surface_tokens(),
+      # style_foreground_ring_tokens()) like luma/rhea, frosts the elevated
+      # surfaces via the new `*_surface` background tokens, and turns on a shared
+      # `surface_backdrop` blur the default runtime CSS reads on every
+      # translucent surface. No glass-scoped [data-sb-style] CSS — it ships as
+      # data, so the leanness gate stays green.
+      control_padding_x = "0.875rem",
+      control_gap = "0.5rem",
+      surface_padding = "1.5rem",
+      surface_gap = "1.25rem",
+      overlay_padding = "1.5rem",
+      overlay_gap = "1rem",
+      control_shadow = "none",
+      # Soft, diffuse drop shadows read as floating glass panes.
+      surface_shadow = "0 8px 32px -8px rgb(0 0 0 / 0.18)",
+      overlay_shadow = "0 16px 48px -12px rgb(0 0 0 / 0.28)",
+      focus_ring_opacity = "40%",
+      transition_duration = "0.2s",
+      # Generous, rounded radii (glass panes read as soft).
+      card_radius = "1.25rem",
+      value_box_radius = "1.25rem",
+      button_radius = "0.875rem",
+      badge_radius = "0.875rem",
+      input_radius = "0.875rem",
+      textarea_radius = "0.875rem",
+      select_radius = "0.875rem",
+      select_content_radius = "1rem",
+      select_item_radius = "0.625rem",
+      checkbox_radius = "0.375rem",
+      alert_radius = "1rem",
+      empty_radius = "1.25rem",
+      skeleton_radius = "0.75rem",
+      code_radius = "1rem",
+      dialog_radius = "1.25rem",
+      popover_radius = "1rem",
+      tooltip_radius = "0.625rem",
+      # Frosted glass: one shared backdrop blur (the default runtime CSS reads it
+      # on every translucent surface) plus translucent elevated-surface
+      # backgrounds so the blur shows through.
+      surface_backdrop = "blur(12px) saturate(180%)",
+      card_surface = "color-mix(in oklch, var(--card) 48%, transparent)",
+      value_box_surface = "color-mix(in oklch, var(--card) 48%, transparent)",
+      select_content_surface = "color-mix(in oklch, var(--popover) 58%, transparent)",
+      dialog_surface = "color-mix(in oklch, var(--background) 62%, transparent)",
+      popover_surface = "color-mix(in oklch, var(--popover) 58%, transparent)"
+    ),
+    style_translucent_surface_tokens(),
+    # Glass uses the var-based foreground-ring recipe (like Rhea): the diffuse
+    # surface shadow plus a 1px foreground ring on the elevated surfaces.
+    style_foreground_ring_tokens(
+      value_box_shadow = "var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 5%, transparent)"
+    )
+  ),
   luma = c(
     list(
       control_padding_x = "0.75rem",
@@ -394,7 +453,20 @@ style_internal_token_map <- function() {
     dialog_border = "sb-dialog-border",
     dialog_shadow = "sb-dialog-shadow",
     popover_border = "sb-popover-border",
-    popover_shadow = "sb-popover-shadow"
+    popover_shadow = "sb-popover-shadow",
+    # Translucent / frosted-glass recipe (issue #46). The elevated surfaces
+    # (card, value box, dialog, popover, select menu) read a `*_surface`
+    # background that defaults to their opaque colour, so a profile can make
+    # them translucent as data. `surface_backdrop` is one shared
+    # `backdrop-filter` the default runtime CSS applies to every translucent
+    # surface; its default is `none`, a no-op, so non-glass profiles are
+    # unchanged. `glass` is the forcing function for these tokens.
+    surface_backdrop = "sb-surface-backdrop",
+    card_surface = "sb-card-surface",
+    value_box_surface = "sb-value-box-surface",
+    select_content_surface = "sb-select-content-surface",
+    dialog_surface = "sb-dialog-surface",
+    popover_surface = "sb-popover-surface"
   )
 }
 

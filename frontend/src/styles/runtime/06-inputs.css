@@ -237,6 +237,7 @@
   line-height: 1.25rem;
   color: var(--foreground);
   background-color: var(--sb-textarea-surface, var(--background));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   border: 1px solid var(--sb-textarea-border, var(--input));
   border-radius: var(--sb-textarea-radius, var(--radius-md));
   box-shadow: var(--sb-textarea-shadow, 0 1px 2px 0 rgb(0 0 0 / 0.05));
@@ -295,6 +296,7 @@
   line-height: 1.4;
   color: var(--foreground);
   background-color: var(--sb-input-surface, var(--background));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   border: 1px solid var(--sb-input-border, var(--input));
   border-radius: var(--sb-input-radius, var(--radius-md));
   box-shadow: var(--sb-input-shadow, 0 1px 2px 0 rgb(0 0 0 / 0.04));
@@ -526,6 +528,7 @@
   border: 1px solid var(--sb-select-border, var(--input));
   border-radius: var(--sb-select-radius, calc(var(--radius) * 0.8));
   background-color: var(--sb-select-surface, transparent);
+  backdrop-filter: var(--sb-surface-backdrop, none);
   color: var(--foreground);
   padding: 0.5rem 0.75rem;
   min-height: auto;
@@ -604,7 +607,8 @@
   overflow: hidden;
   border: 1px solid var(--sb-select-content-border, var(--border));
   border-radius: var(--sb-select-content-radius, calc(var(--radius) * 0.8));
-  background-color: var(--popover);
+  background-color: var(--sb-select-content-surface, var(--popover));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   color: var(--popover-foreground);
   padding: 0.25rem;
   box-shadow: var(--sb-select-content-shadow, var(--sb-overlay-shadow));

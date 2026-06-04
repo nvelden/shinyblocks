@@ -8,9 +8,11 @@
 ## States
 
 - **default** — returns the supported built-in style-profile names as a
-  character vector. Currently `c("default", "luma", "rhea")`. The `default`
-  profile preserves the current visuals; `luma` is the upstream Radix Luma
-  visual profile and `rhea` is its denser sibling (see
+  character vector. Currently
+  `c("default", "mono", "soft", "brutal", "glass", "luma", "rhea")`. The
+  `default` profile preserves the current visuals; `mono`, `soft`, `brutal`,
+  and `glass` are shinyblocks-owned token packs; `luma` is the upstream Radix
+  Luma visual profile and `rhea` is its denser sibling (see
   [`style.md`](style.md) for token and per-family coverage).
 
 ## R API

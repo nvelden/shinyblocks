@@ -1,5 +1,26 @@
 # shinyblocks (development version)
 
+## New features
+
+* Added a built-in `glass` style profile (issue #46, deferred from #42): a
+  translucent, overlay-heavy "frosted glass" visual feel selectable with
+  `block_page(style = block_style("glass"))`. Like `mono`/`soft`/`brutal` it
+  ships as token **data** (no `[data-sb-style="glass"]` CSS), composing the
+  shared `style_translucent_surface_tokens()` and `style_foreground_ring_tokens()`
+  recipes (issue #47) plus generous rounded radii and soft diffuse shadows.
+  `glass` is the forcing function for a new translucency token tier in
+  `style_internal_token_map()`: one shared `surface_backdrop`
+  (`--sb-surface-backdrop`, default `none`) that the default runtime CSS reads as
+  a `backdrop-filter` on every translucent surface, plus per-surface background
+  tokens (`card_surface`, `value_box_surface`, `select_content_surface`,
+  `dialog_surface`, `popover_surface`) that default to each surface's historical
+  opaque colour. The defaults are no-ops, so `default`/`mono`/`soft`/`brutal`/
+  `luma`/`rhea` are byte-for-byte unchanged; the leanness gate stays green
+  because the backdrop and surface hooks live in the default runtime CSS, not in
+  profile-scoped rules. Provenance and the deferred per-surface-backdrop / data
+  scrim follow-ups are recorded in
+  `docs/research/2026-06-04-style-profile-sources.md`.
+
 ## Internal
 
 * Factored the shared flat/translucent-surface recipe duplicated by the `luma` and `rhea` style profiles into two internal helpers in `R/style-profiles.R` (issue #47): `style_translucent_surface_tokens()` (borderless controls on a color-mixed `--input` surface) and `style_foreground_ring_tokens()` (transparent borders plus the 1px foreground-ring elevation). Both profiles now compose them via `c(list(...), helper(), helper())` instead of copy-pasting the recipe a second time; the per-profile `value_box_shadow` (Luma's explicit drop shadow vs Rhea's var-based recipe) is a required argument of `style_foreground_ring_tokens()`, so a profile that composes the recipe cannot forget to set it. The emitted `--sb-*` token set for both profiles is unchanged. Taught the style-registry parser (`tools/theme/style-registry.mjs`) to resolve these spliced helper calls so the profile-parity sweep still sees every token, and added browser-free unit tests for the parser (`tools/theme/style-registry.test.mjs`, `npm run test:style-registry`, wired into `make check-slice`) so a parser regression is caught without the showcase browser gate. A future translucent profile reuses the helpers rather than copy-pasting a third time.
