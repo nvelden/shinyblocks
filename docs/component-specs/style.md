@@ -3,8 +3,7 @@
 > Shinyblocks function: `block_style()` (consumed by `block_page(style = )`)
 > Shadcn reference: official v4 style registry at
 > <https://github.com/shadcn-ui/ui/tree/main/apps/v4/registry/styles>
-> Status: Slice 5 plus official-profile alignment (issues #33, #48,
-> [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)). Ships the
+> Status: Slice 5 plus official-profile alignment (issues #33, #48). Ships the
 > `default`, `luma`, `lyra`, `maia`, `mira`, `nova`, `rhea`, `sera`, and `vega`
 > profiles, the public `--sb-*` token layer, the internal
 > geometry/translucency token layer, the profile-scoped component CSS, and the
@@ -235,7 +234,7 @@ the right layer:
   a curated, stable public surface; internal CSS stays free to evolve and raw
   CSS-variable names are not a public API.
 - No universal spacing or hover multiplier: profiles change related components
-  selectively (per ADR 0021 and the runtime token inventory).
+  selectively according to the runtime token inventory.
 - Fonts stay local and application-owned; profiles ship system stacks only.
 - Slice 3 is page-wide; subtree-scoped *style* profiles are deferred. Colour
   `block_theme(scope = )` remains supported.

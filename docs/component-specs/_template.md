@@ -3,9 +3,8 @@
 > Shinyblocks function: `block_<name>()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/<slug>>
 >
-> Per [ADR 0015](../decisions/0015-component-specs.md), every exported
-> `block_*()` has a spec at this shape. Keep it tight — five sections,
-> ~30 lines. Verbosity defeats the purpose.
+> Every exported `block_*()` has a spec at this shape. Keep it tight — five
+> sections, ~30 lines. Verbosity defeats the purpose.
 
 ## States
 

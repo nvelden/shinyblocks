@@ -3,8 +3,7 @@
 One file per exported `block_*()`. Each spec captures the shadcn
 reference, the visual states the component must render, the token
 contract, and any deliberate divergences. See
-[ADR 0015](../decisions/0015-component-specs.md) for the design
-rationale.
+[`AGENTS.md`](../../AGENTS.md) for the current architecture summary.
 
 ## Adding a spec
 

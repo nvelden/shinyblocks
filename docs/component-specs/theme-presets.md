@@ -2,8 +2,7 @@
 
 > Shinyblocks function: `block_theme_presets()`
 > Status: discovery helper for the built-in colour palettes consumed by
-> `block_theme(preset = )` (issue #33,
-> [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)).
+> `block_theme(preset = )` (issue #33).
 
 ## States
 

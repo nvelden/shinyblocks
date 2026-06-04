@@ -2,8 +2,7 @@
 
 > Shinyblocks function: `block_style_profiles()`
 > Status: discovery helper for the built-in visual style profiles consumed by
-> [`block_style()`](style.md) (issue #33,
-> [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)).
+> [`block_style()`](style.md) (issue #33).
 
 ## States
 

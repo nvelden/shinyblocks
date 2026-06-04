@@ -8,10 +8,10 @@ runtime, R API, and assets, not React source dropped into the package.
 
 - Maintainer-owned **React/TS runtime** in `frontend/src`, built with Vite to
   `inst/www/shinyblocks-runtime.{js,css}`. R emits a payload rendered under
-  `[data-shinyblocks-root]` (ADR 0017).
+  `[data-shinyblocks-root]`.
 - CSS source in `inst/www/src/` builds to `inst/www/shinyblocks.css` and
-  `preflight.scoped.css`; app styles scoped under `.sb-app` (ADR 0022).
-- Next.js docs site in `docs-site/` (ADR 0018).
+  `preflight.scoped.css`; app styles scoped under `.sb-app`.
+- Next.js docs site in `docs-site/`.
 - `inst/www/*.js|*.css`, `man/`, and the icon sprite are generated — edit the
   source and rebuild, never the output.
 - `components.json` / root `package.json` exist only for shadcn CLI/agent
@@ -33,7 +33,8 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 
 ## Working style
 
-- Read the relevant ADR before implementing.
+- Read the Architecture section above and the relevant component spec before
+  implementing. Historical ADR files are not present in this checkout.
 - Keep changes small and vertical: one component or planning artifact at a time.
 - App-author code stays `htmltools`/`shiny`; never push a frontend build onto
   users. A new framework or a reversal of the runtime port needs a new ADR.
@@ -69,7 +70,8 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 
 ## Important files
 
-- `docs/decisions/` — architecture decision records (ADRs).
+- `AGENTS.md` — current architecture summary; historical ADR files are
+  intentionally absent from this checkout.
 - `HANDOFF.md` — in-flight work / current issue context.
 - `R/` — exported R API. `frontend/src/` — runtime. `inst/www/src/` — CSS source.
 - `inst/templates/` — starter app templates. `tests/testthat/` — package tests.
