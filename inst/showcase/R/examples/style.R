@@ -16,9 +16,6 @@ htmltools::tagList(
             ),
             selected = "luma",
             size = "sm"
-          ),
-          block_field_description(
-            "block_style() visual profile. Pass to block_page(style = ). Overrides below layer on top."
           )
         )
       ),
@@ -65,7 +62,7 @@ htmltools::tagList(
     preview_output_id = "showcase_style_preview_ui",
     code_output_id = "showcase_style_preview_code",
     preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
+      "position: relative; display: block;",
       "padding: 1.5rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
       "border: 0; border-radius: 0.75rem; min-height: 330px; box-sizing: border-box;"
     )

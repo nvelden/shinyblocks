@@ -42,7 +42,7 @@ register_style_showcase <- function(input, output, session) {
         class = "sb-style-demo-scope",
         `data-sb-style` = profile,
         style = paste(
-          "position: relative; isolation: isolate; overflow: hidden;",
+          "position: relative; isolation: isolate; min-width: 0;",
           "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem);",
           "width: 100%; border-radius: var(--sb-card-radius, 1rem);"
         ),

@@ -69,9 +69,6 @@ ui <- block_page(
               ),
               selected = "luma",
               size = "sm"
-            ),
-            block_field_description(
-              "block_style() visual profile. Pass to block_page(style = ). Overrides below layer on top."
             )
           )
         ),
@@ -123,7 +120,7 @@ ui <- block_page(
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
           htmltools::div(
             style = paste(
-              "position: relative;",
+              "position: relative; display: block;",
               "padding: 1.5rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
               "border: 0; border-radius: 0.75rem; min-height: 330px; box-sizing: border-box;"
             ),
@@ -179,7 +176,7 @@ server <- function(input, output, session) {
       htmltools::div(
         class = "sb-style-demo-scope",
         `data-sb-style` = profile,
-        style = "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem); width: 100%;",
+        style = "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem); min-width: 0; width: 100%;",
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.35rem;",
           htmltools::span(style = label_style, "Buttons: control height, radius, focus ring follow the profile"),
