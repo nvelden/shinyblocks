@@ -85,7 +85,8 @@ export const STYLE_REGISTRY = {
   switch: {
     section: "switch",
     neutralProfiles: {
-      mono: "Mono is data-only for switch: it flattens the control shadow but does not change switch-specific border width or track/thumb metrics."
+      mono: "Mono is data-only for switch: it flattens the control shadow but does not change switch-specific border width or track/thumb metrics.",
+      soft: "Soft is data-only for switch: it softens radii and shadows page-wide but does not change switch-specific border width or track/thumb metrics."
     },
     bindings: [
       { selector: ".sb-parity-switch-checked [data-slot='switch-control']", property: "borderTopWidth" }
@@ -94,7 +95,8 @@ export const STYLE_REGISTRY = {
   slider: {
     section: "slider",
     neutralProfiles: {
-      mono: "Mono is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS."
+      mono: "Mono is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS.",
+      soft: "Soft is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS."
     },
     bindings: [
       { selector: ".sb-parity-slider-default [data-slot='slider-track']", property: "height" }
@@ -103,7 +105,8 @@ export const STYLE_REGISTRY = {
   "radio-group": {
     section: "radio-group",
     neutralProfiles: {
-      mono: "Mono keeps the default radio-group gap and checked-fill model; only token-driven surface/border/shadow values differ."
+      mono: "Mono keeps the default radio-group gap and checked-fill model; only token-driven surface/border/shadow values differ.",
+      soft: "Soft keeps the default radio-group gap and checked-fill model; it does not change control_gap, so radio-group spacing stays at the default."
     },
     bindings: [{ selector: ".sb-parity-radio-group-checked", property: "gap" }]
   },
@@ -114,7 +117,8 @@ export const STYLE_REGISTRY = {
   empty: {
     section: "empty",
     neutralProfiles: {
-      mono: "Mono keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only."
+      mono: "Mono keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only.",
+      soft: "Soft keeps the default solid empty-state border; its empty-state profile difference is the token-driven (larger) radius only."
     },
     bindings: [{ selector: ".sb-parity-empty-default", property: "borderStyle" }]
   },
@@ -163,7 +167,8 @@ export const STYLE_REGISTRY = {
   nav: {
     section: "nav-item",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; nav item geometry stays at the default shell treatment."
+      mono: "Mono does not add shell-family structural CSS; nav item geometry stays at the default shell treatment.",
+      soft: "Soft does not add shell-family structural CSS; nav item geometry stays at the default shell treatment."
     },
     bindings: [
       { selector: ".sb-parity-nav-baseline .sb-nav-item", property: "borderRadius" }
@@ -172,14 +177,16 @@ export const STYLE_REGISTRY = {
   sidebar: {
     section: "layout",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment."
+      mono: "Mono does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment.",
+      soft: "Soft does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment."
     },
     bindings: [{ selector: ".sb-sidebar-toggle", property: "borderRadius" }]
   },
   tabs: {
     section: "tabs",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; tabs keep the default flat list geometry."
+      mono: "Mono does not add shell-family structural CSS; tabs keep the default flat list geometry.",
+      soft: "Soft does not add shell-family structural CSS; tabs keep the default flat list geometry."
     },
     bindings: [
       { selector: ".sb-parity-tabs-default .sb-tabs-list", property: "borderRadius" }
@@ -188,14 +195,16 @@ export const STYLE_REGISTRY = {
   field: {
     section: "field",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; field spacing stays at the default shell treatment."
+      mono: "Mono does not add shell-family structural CSS; field spacing stays at the default shell treatment.",
+      soft: "Soft does not add shell-family structural CSS; field spacing stays at the default shell treatment."
     },
     bindings: [{ selector: ".sb-parity-field-default", property: "gap" }]
   },
   "input-group": {
     section: "input-group",
     neutralProfiles: {
-      mono: "Mono does not add shell-family structural CSS; input-group radius stays at the default shell treatment."
+      mono: "Mono does not add shell-family structural CSS; input-group radius stays at the default shell treatment.",
+      soft: "Soft does not add shell-family structural CSS; input-group radius stays at the default shell treatment."
     },
     bindings: [
       { selector: ".sb-parity-input-group-leading", property: "borderRadius" }

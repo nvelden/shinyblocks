@@ -1,5 +1,8 @@
 test_that("block_style_profiles returns the supported profiles", {
-  expect_identical(block_style_profiles(), c("default", "mono", "luma", "rhea"))
+  expect_identical(
+    block_style_profiles(),
+    c("default", "mono", "soft", "luma", "rhea")
+  )
   expect_identical(
     block_style_profiles(),
     shinyblocks:::style_profile_names()
@@ -15,6 +18,7 @@ test_that("block_style validates the profile name", {
   expect_error(block_style(""), "single supported style-profile")
   expect_silent(block_style("default"))
   expect_silent(block_style("mono"))
+  expect_silent(block_style("soft"))
   expect_silent(block_style("luma"))
   expect_silent(block_style("rhea"))
 })
@@ -35,6 +39,23 @@ test_that("block_style('mono') emits the mono profile tokens page-wide", {
   expect_match(css, "--sb-card-radius: 0.25rem;", fixed = TRUE)
   expect_match(css, "--sb-input-border: var(--border);", fixed = TRUE)
   expect_match(css, "--sb-dialog-shadow: none;", fixed = TRUE)
+})
+
+test_that("block_style('soft') emits the soft profile tokens page-wide", {
+  css <- as.character(block_style("soft")$style)
+
+  expect_match(css, "sb-style-overrides", fixed = TRUE)
+  expect_match(css, '.sb-app[data-sb-style="soft"]{', fixed = TRUE)
+  # Airier spacing and softer shadows (public tokens).
+  expect_match(css, "--sb-surface-padding: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-surface-gap: 2rem;", fixed = TRUE)
+  expect_match(css, "--sb-surface-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.06);", fixed = TRUE)
+  expect_match(css, "--sb-focus-ring-opacity: 35%;", fixed = TRUE)
+  # Softer/larger radii (internal geometry tokens).
+  expect_match(css, "--sb-card-radius: 1.5rem;", fixed = TRUE)
+  expect_match(css, "--sb-badge-radius: 0.75rem;", fixed = TRUE)
+  expect_match(css, "--sb-input-radius: 0.75rem;", fixed = TRUE)
+  expect_match(css, "--sb-dialog-radius: 1.5rem;", fixed = TRUE)
 })
 
 test_that("block_style('luma') emits the luma profile tokens page-wide", {

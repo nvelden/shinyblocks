@@ -82,6 +82,38 @@ style_profiles <- list(
     dialog_shadow = "none",
     popover_shadow = "none"
   ),
+  soft = list(
+    # shinyblocks-owned profile. Visual target: airy rounded dashboard;
+    # source audit in docs/research/2026-06-04-style-profile-sources.md.
+    # Data-first like mono: no soft-scoped [data-sb-style] CSS. Roomier
+    # surfaces, softer/larger radii, lighter diffuse shadows than the default.
+    surface_padding = "2rem",
+    surface_gap = "2rem",
+    overlay_padding = "1.75rem",
+    overlay_gap = "1.25rem",
+    control_shadow = "0 1px 2px 0 rgb(0 0 0 / 0.04)",
+    surface_shadow = "0 2px 8px -2px rgb(0 0 0 / 0.06)",
+    overlay_shadow = "0 12px 32px -8px rgb(0 0 0 / 0.12)",
+    focus_ring_opacity = "35%",
+    transition_duration = "0.2s",
+    card_radius = "1.5rem",
+    value_box_radius = "1.5rem",
+    button_radius = "0.75rem",
+    badge_radius = "0.75rem",
+    input_radius = "0.75rem",
+    textarea_radius = "0.75rem",
+    select_radius = "0.75rem",
+    select_content_radius = "1rem",
+    select_item_radius = "0.5rem",
+    checkbox_radius = "0.375rem",
+    alert_radius = "1rem",
+    empty_radius = "1.25rem",
+    skeleton_radius = "0.75rem",
+    code_radius = "1rem",
+    dialog_radius = "1.5rem",
+    popover_radius = "1rem",
+    tooltip_radius = "0.625rem"
+  ),
   luma = list(
     control_padding_x = "0.75rem",
     control_gap = "0.375rem",
