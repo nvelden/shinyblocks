@@ -13,7 +13,7 @@
 //
 // Mechanism (per "profile" binding): measure the profile-sensitive computed
 // property in the default profile, then toggle the page into each non-default
-// profile exactly as block_page(style = block_style("<profile>")) would — stamp
+// profile exactly as block_page(style = block_style("<profile>")) would: stamp
 // data-sb-style="<profile>" on .sb-app and inject the --sb-* token overrides
 // parsed from that profile's list in R/style-profiles.R — and assert the
 // property *changes*. If a component stopped responding to the profile (e.g. a
@@ -22,11 +22,11 @@
 // Profiles are swept generically (styleProfileNames()), so a new profile is
 // checked with no edits here — mirroring the colour-preset sweep in
 // check-theme-response.mjs. Each registry binding names a property the profile
-// is expected to shift (radii/surfaces are token-driven; switch/slider/radio
-// geometry is CSS-driven), so "changed from default" is the portable invariant
-// that proves the profile reaches every component. (A future per-(profile,
-// binding) expected-value table could tighten this once a second profile that
-// intentionally keeps some defaults exists.)
+// is expected to shift for most profiles (radii/surfaces are token-driven;
+// switch/slider/radio geometry is CSS-driven), so "changed from default" is the
+// portable invariant that proves the profile reaches every component. A
+// registry entry can declare `neutralProfiles` for a specific profile that
+// intentionally leaves a measured structural binding unchanged.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -185,6 +185,12 @@ async function run() {
       console.log(`\n--- profile: ${profile} ---`);
 
       for (const [name, config] of Object.entries(STYLE_REGISTRY)) {
+        const neutralReason = config.neutralProfiles?.[profile];
+        if (neutralReason) {
+          neutrals.push(`${profile} :: ${name} (profile-neutral: ${neutralReason})`);
+          continue;
+        }
+
         const mode = config.mode || "profile";
         if (mode === "overlay") {
           const a = overlayAffected(profile, name);
@@ -247,11 +253,11 @@ async function run() {
       `across ${profiles.length} profile(s): ${profiles.join(", ")}.`
   );
   if (overlays.length) {
-    console.log("Overlay (Luma CSS present, rendered on interaction):");
+    console.log("Overlay (rendered on interaction):");
     for (const s of overlays) console.log(`  - ${s}`);
   }
   if (neutrals.length) {
-    console.log("Profile-neutral (Luma intentionally leaves these unchanged):");
+    console.log("Profile-neutral:");
     for (const s of neutrals) console.log(`  - ${s}`);
   }
   if (failures > 0) {

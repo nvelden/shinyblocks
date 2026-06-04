@@ -12,20 +12,22 @@
 // names the right layer: a colour regression vs a profile regression.
 //
 // For each component we declare a `mode`:
-//   "profile"         -> Luma visibly changes the component. Each binding is a
+//   "profile"         -> A visual profile visibly changes the component. Each binding is a
 //                        stable showcase selector + a profile-sensitive computed
 //                        property (radius, padding, gap, height, border width,
 //                        shadow, ...). The runtime check toggles the page into
-//                        Luma and asserts the property *changes* from its
+//                        each profile and asserts the property *changes* from its
 //                        default value, proving the profile actually reaches the
-//                        component.
+//                        component. If a specific profile intentionally leaves
+//                        a measured component unchanged, add `neutralProfiles`
+//                        with a reason keyed by profile name.
 //   "overlay"         -> The profile changes the component, but the themed
 //                        surface only renders after interaction (portal
 //                        overlays). Instead of a runtime measurement, the parity
 //                        check asserts the profile actually affects it: it sets
 //                        at least one `<component>_*` token and/or has a
 //                        [data-sb-style] rule for it. Requires a `reason`.
-//   "profile-neutral" -> Luma intentionally does not change the component.
+//   "profile-neutral" -> No shipped profile intentionally changes the component.
 //                        Requires a `reason`. The completeness gate still
 //                        requires the entry so a component is never silently
 //                        uncovered when a profile later starts affecting it.
@@ -82,18 +84,27 @@ export const STYLE_REGISTRY = {
   },
   switch: {
     section: "switch",
+    neutralProfiles: {
+      mono: "Mono is data-only for switch: it flattens the control shadow but does not change switch-specific border width or track/thumb metrics."
+    },
     bindings: [
       { selector: ".sb-parity-switch-checked [data-slot='switch-control']", property: "borderTopWidth" }
     ]
   },
   slider: {
     section: "slider",
+    neutralProfiles: {
+      mono: "Mono is data-only for slider: it does not introduce slider-specific track or thumb geometry CSS."
+    },
     bindings: [
       { selector: ".sb-parity-slider-default [data-slot='slider-track']", property: "height" }
     ]
   },
   "radio-group": {
     section: "radio-group",
+    neutralProfiles: {
+      mono: "Mono keeps the default radio-group gap and checked-fill model; only token-driven surface/border/shadow values differ."
+    },
     bindings: [{ selector: ".sb-parity-radio-group-checked", property: "gap" }]
   },
   alert: {
@@ -102,6 +113,9 @@ export const STYLE_REGISTRY = {
   },
   empty: {
     section: "empty",
+    neutralProfiles: {
+      mono: "Mono keeps the default solid empty-state border; its empty-state profile difference is token-driven radius only."
+    },
     bindings: [{ selector: ".sb-parity-empty-default", property: "borderStyle" }]
   },
   skeleton: {
@@ -148,26 +162,41 @@ export const STYLE_REGISTRY = {
   // --- R-side shell families: Luma ported (compiled into inst/www/shinyblocks.css) ---
   nav: {
     section: "nav-item",
+    neutralProfiles: {
+      mono: "Mono does not add shell-family structural CSS; nav item geometry stays at the default shell treatment."
+    },
     bindings: [
       { selector: ".sb-parity-nav-baseline .sb-nav-item", property: "borderRadius" }
     ]
   },
   sidebar: {
     section: "layout",
+    neutralProfiles: {
+      mono: "Mono does not add shell-family structural CSS; sidebar toggle geometry stays at the default shell treatment."
+    },
     bindings: [{ selector: ".sb-sidebar-toggle", property: "borderRadius" }]
   },
   tabs: {
     section: "tabs",
+    neutralProfiles: {
+      mono: "Mono does not add shell-family structural CSS; tabs keep the default flat list geometry."
+    },
     bindings: [
       { selector: ".sb-parity-tabs-default .sb-tabs-list", property: "borderRadius" }
     ]
   },
   field: {
     section: "field",
+    neutralProfiles: {
+      mono: "Mono does not add shell-family structural CSS; field spacing stays at the default shell treatment."
+    },
     bindings: [{ selector: ".sb-parity-field-default", property: "gap" }]
   },
   "input-group": {
     section: "input-group",
+    neutralProfiles: {
+      mono: "Mono does not add shell-family structural CSS; input-group radius stays at the default shell treatment."
+    },
     bindings: [
       { selector: ".sb-parity-input-group-leading", property: "borderRadius" }
     ]

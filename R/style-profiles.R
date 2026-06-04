@@ -28,6 +28,60 @@
 # metrics).
 style_profiles <- list(
   default = list(),
+  mono = list(
+    # shinyblocks-owned profile. Visual target: monospace developer console;
+    # source audit in docs/research/2026-06-04-style-profile-sources.md.
+    font_body = "var(--sb-font-mono)",
+    font_heading = "var(--sb-font-mono)",
+    control_font_size = "0.8125rem",
+    control_height = "2rem",
+    control_height_sm = "1.75rem",
+    control_height_lg = "2.25rem",
+    control_padding_x = "0.625rem",
+    control_gap = "0.375rem",
+    surface_padding = "1rem",
+    surface_gap = "1rem",
+    overlay_padding = "1rem",
+    overlay_gap = "0.75rem",
+    control_shadow = "none",
+    surface_shadow = "none",
+    overlay_shadow = "none",
+    focus_ring_width = "2px",
+    focus_ring_opacity = "40%",
+    transition_duration = "0.1s",
+    card_radius = "0.25rem",
+    value_box_radius = "0.25rem",
+    button_radius = "0.25rem",
+    badge_radius = "0.25rem",
+    input_radius = "0.25rem",
+    textarea_radius = "0.25rem",
+    select_radius = "0.25rem",
+    select_content_radius = "0.25rem",
+    select_item_radius = "0.125rem",
+    checkbox_radius = "2px",
+    alert_radius = "0.25rem",
+    empty_radius = "0.25rem",
+    skeleton_radius = "0.125rem",
+    code_radius = "0.25rem",
+    dialog_radius = "0.375rem",
+    popover_radius = "0.25rem",
+    tooltip_radius = "0.25rem",
+    input_border = "var(--border)",
+    input_shadow = "none",
+    textarea_border = "var(--border)",
+    textarea_shadow = "none",
+    select_border = "var(--border)",
+    checkbox_border = "var(--border)",
+    checkbox_shadow = "none",
+    switch_shadow = "none",
+    radio_border = "var(--border)",
+    radio_shadow = "none",
+    card_shadow = "none",
+    value_box_shadow = "none",
+    select_content_shadow = "none",
+    dialog_shadow = "none",
+    popover_shadow = "none"
+  ),
   luma = list(
     control_padding_x = "0.75rem",
     control_gap = "0.375rem",
@@ -257,7 +311,10 @@ style_override_names <- function() {
 
 validate_style_profile <- function(profile) {
   if (!is.character(profile) || length(profile) != 1 || !nzchar(profile)) {
-    stop("`profile` must be a single supported style-profile name.", call. = FALSE)
+    stop(
+      "`profile` must be a single supported style-profile name.",
+      call. = FALSE
+    )
   }
   if (!profile %in% style_profile_names()) {
     stop(
