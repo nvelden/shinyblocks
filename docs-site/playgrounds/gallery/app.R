@@ -21,6 +21,8 @@ do.call(library, list("shinyblocks", character.only = TRUE))
 
 gallery_style_profiles <- block_style_profiles()
 gallery_theme_presets <- block_theme_presets()
+gallery_default_style_profile <- "luma"
+gallery_default_theme_preset <- "stone"
 
 panel <- function(...) {
   htmltools::div(style = "display: flex; flex-direction: column; gap: 1rem; min-width: 0;", ...)
@@ -85,7 +87,7 @@ metric_box <- function(...) {
 ui <- block_page(
   title = "shinyblocks - Live gallery",
   theme = htmltools::tagList(
-    block_theme(preset = "neutral"),
+    block_theme(preset = gallery_default_theme_preset),
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$script(htmltools::HTML(
       "(function registerGalleryStyleHandler() {
@@ -100,7 +102,7 @@ ui <- block_page(
       })();"
     ))
   ),
-  style = block_style("default"),
+  style = block_style(gallery_default_style_profile),
   htmltools::div(style = "display: none;", uiOutput("gallery_theme_assets")),
   htmltools::div(
     `data-shinyblocks-root` = "",
@@ -132,8 +134,8 @@ ui <- block_page(
         "display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap;",
         "padding-bottom: 0.25rem;"
       ),
-      appearance_control("Style", "gallery_style_profile", gallery_style_profiles, "default"),
-      appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, "neutral")
+      appearance_control("Style", "gallery_style_profile", gallery_style_profiles, gallery_default_style_profile),
+      appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, gallery_default_theme_preset)
     ),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
@@ -308,13 +310,13 @@ server <- function(input, output, session) {
   saved <- reactiveVal(FALSE)
 
   selected_style_profile <- reactive({
-    value <- input$gallery_style_profile %||% "default"
-    if (!value %in% gallery_style_profiles) "default" else value
+    value <- input$gallery_style_profile %||% gallery_default_style_profile
+    if (!value %in% gallery_style_profiles) gallery_default_style_profile else value
   })
 
   selected_theme_preset <- reactive({
-    value <- input$gallery_theme_preset %||% "neutral"
-    if (!value %in% gallery_theme_presets) "neutral" else value
+    value <- input$gallery_theme_preset %||% gallery_default_theme_preset
+    if (!value %in% gallery_theme_presets) gallery_default_theme_preset else value
   })
 
   observe({
