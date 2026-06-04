@@ -1,6 +1,6 @@
 Package: shinyblocks
 Title: Composable Modern UI Blocks for Shiny
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R:
     person("Niels", "van der Velden", , "n.s.j.vandervelden@gmail.com",
            role = c("aut", "cre"))

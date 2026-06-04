@@ -1,5 +1,7 @@
 # shinyblocks (development version)
 
+## 0.0.0.9002
+
 ## New features
 
 * Aligned built-in `block_style()` profiles with the official shadcn/ui v4
