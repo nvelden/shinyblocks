@@ -1,13 +1,14 @@
 # Style
 
 > Shinyblocks function: `block_style()` (consumed by `block_page(style = )`)
-> Shadcn reference: Luma and Rhea style models at
-> <https://ui.shadcn.com/docs/changelog/2026-03-luma> and
-> <https://ui.shadcn.com/docs/changelog/2026-05-rhea>
-> Status: Slice 5 (issue #33,
+> Shadcn reference: official v4 style registry at
+> <https://github.com/shadcn-ui/ui/tree/main/apps/v4/registry/styles>
+> Status: Slice 5 plus official-profile alignment (issues #33, #48,
 > [ADR 0021](../decisions/0021-theme-presets-and-style-profiles.md)). Ships the
-> `default`, `luma`, and `rhea` profiles, the public `--sb-*` token layer, the
-> profile-scoped component CSS, and the style-profile
+> `default`, `luma`, `lyra`, `maia`, `mira`, `nova`, `rhea`, `sera`, and `vega`
+> profiles, the public `--sb-*` token layer, the internal
+> geometry/translucency token layer, the profile-scoped component CSS, and the
+> style-profile
 > parity harness (`tools/theme/check-style-parity.mjs` + `style-registry.mjs`).
 > Luma now covers the shell families too (input group, field, tabs, sidebar,
 > nav); all five are measured `profile` bindings in the parity registry.
@@ -34,7 +35,7 @@ are emitted as `--sb-*` custom properties.
 
 | Argument | Purpose |
 | --- | --- |
-| `profile` | Built-in profile name. Slice 3 ships only `default`. |
+| `profile` | Built-in profile name. Supported values come from `block_style_profiles()`. |
 | `...` | Named overrides from the fixed allowlist (below). Values emit as `--<mapped-token>: <value>;`. Override values win over profile values. |
 | `scope` | Optional CSS selector confining emitted rules to one subtree. |
 
@@ -82,6 +83,13 @@ is visually identical to pre-Slice-3 shinyblocks.
   `...` (passing one errors as an unknown override). The default runtime CSS
   reads each as `var(--sb-<token>, <historical default>)`, so an unset token is a
   no-op and the default profile is unchanged.
+- **Internal translucency tokens** — `--sb-surface-backdrop` plus elevated
+  surface backgrounds (`--sb-card-surface`, `--sb-value-box-surface`,
+  `--sb-select-content-surface`, `--sb-dialog-surface`,
+  `--sb-popover-surface`). They default to `none` or the historical opaque
+  colour. They remain internal infrastructure for future user-defined custom
+  styles/themes; no built-in `glass` profile ships because shadcn has no
+  official `style-glass.css`.
 
 `style_emit_token_map()` is the union (public + internal) that `block_style()`
 actually emits; `...` validates against the public tier only. This lets a profile
@@ -177,6 +185,29 @@ surface gaps, card density, switch width, slider thickness, and shell spacing.
 The repeated recipes are profile data in `R/style-profiles.R`; scoped CSS is
 limited to structural geometry that cannot be represented by one token.
 
+### `lyra`, `maia`, `mira`, `nova`, `sera`, `vega`
+
+These profiles map to the corresponding official upstream files:
+`style-lyra.css`, `style-maia.css`, `style-mira.css`, `style-nova.css`,
+`style-sera.css`, and `style-vega.css`.
+
+The first issue #48 port expresses each style as token data:
+
+| Profile | Primary treatment |
+| --- | --- |
+| `lyra` | compact square controls and surfaces, 1px focus rings |
+| `maia` | rounded/pill controls, translucent inputs, ringed surfaces |
+| `mira` | extra-compact controls, small radii, subdued focus rings |
+| `nova` | balanced compact rounded controls and cards |
+| `sera` | editorial square geometry, semibold controls, roomier surfaces |
+| `vega` | md-scale radii with subtle shadowed controls and surfaces |
+
+Full structural parity for switch/slider metrics, radio checked-fill models,
+shell-family geometry, text transform/letter spacing, and border-width
+differences remains follow-up work. The parity registry records those
+token-only gaps as explicit neutral entries so they are visible rather than
+silently skipped.
+
 ## Conformance and parity (Slice 5)
 
 Profile parity is checked separately from colour conformance so a failure names
@@ -188,8 +219,9 @@ the right layer:
   light differs from dark. R is the single source of truth for the emitted
   tokens.
 - **Style-profile parity** — `tools/theme/check-style-parity.mjs` (`npm run
-  test:style-parity`, `make style-parity`) toggles the page into Luma like
-  `block_page(style = block_style("luma"))` and asserts each component's
+  test:style-parity`, `make style-parity`) toggles the page into each
+  non-default profile like `block_page(style = block_style("<profile>"))` and
+  asserts each component's
   profile-sensitive computed property (radius, padding, gap, height, border
   width) changes.
 - **Completeness gate** — `tools/theme/style-registry.mjs` requires every

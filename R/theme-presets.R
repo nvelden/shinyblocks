@@ -1,5 +1,12 @@
-# Vendored from the official shadcn/create base-color registry:
+# Theme preset scales.
+#
+# `neutral`, `stone`, and `zinc` are vendored from the official shadcn/create
+# base-color registry:
 # https://github.com/shadcn-ui/ui/tree/main/apps/v4/public/r/colors
+# `mauve`, `olive`, `mist`, and `taupe` are shinyblocks compatibility palettes
+# derived with the same token recipe. They remain `block_theme()` presets for
+# now because theme-palette migration is separate from issue #48's style-profile
+# built-in alignment.
 #
 # Keep these as package-owned R data. End users do not load JSON at runtime.
 theme_preset_scales <- list(

@@ -37,7 +37,8 @@
   overflow: auto;
   border: 1px solid var(--sb-dialog-border, var(--border));
   border-radius: var(--sb-dialog-radius, calc(var(--radius) * 1.4));
-  background-color: var(--background);
+  background-color: var(--sb-dialog-surface, var(--background));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   color: var(--foreground);
   padding: var(--sb-overlay-padding);
   box-shadow: var(--sb-dialog-shadow, var(--sb-overlay-shadow));
@@ -120,7 +121,8 @@
   max-width: 20rem;
   border: 1px solid var(--sb-popover-border, var(--border));
   border-radius: var(--sb-popover-radius, calc(var(--radius) * 0.8));
-  background-color: var(--popover);
+  background-color: var(--sb-popover-surface, var(--popover));
+  backdrop-filter: var(--sb-surface-backdrop, none);
   color: var(--popover-foreground);
   padding: 1rem;
   font-size: 0.875rem;

@@ -41,7 +41,11 @@ register_style_showcase <- function(input, output, session) {
       htmltools::div(
         class = "sb-style-demo-scope",
         `data-sb-style` = profile,
-        style = "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem); width: 100%;",
+        style = paste(
+          "position: relative; isolation: isolate; overflow: hidden;",
+          "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem);",
+          "width: 100%; border-radius: var(--sb-card-radius, 1rem);"
+        ),
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.35rem;",
           htmltools::span(style = label_style, "Buttons: control height, radius, focus ring follow the profile"),

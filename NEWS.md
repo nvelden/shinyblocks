@@ -1,5 +1,16 @@
 # shinyblocks (development version)
 
+## New features
+
+* Aligned built-in `block_style()` profiles with the official shadcn/ui v4
+  style registry (issue #48). `block_style_profiles()` now returns only
+  `default`, `luma`, `lyra`, `maia`, `mira`, `nova`, `rhea`, `sera`, and `vega`;
+  shinyblocks-owned `mono`, `soft`, `brutal`, and `glass` are no longer shipped
+  as built-in profile names. The internal translucency hooks added during the
+  `glass` exploration remain as future custom-style infrastructure, but no
+  built-in `glass` profile ships because there is no official upstream
+  `style-glass.css`.
+
 ## Internal
 
 * Factored the shared flat/translucent-surface recipe duplicated by the `luma` and `rhea` style profiles into two internal helpers in `R/style-profiles.R` (issue #47): `style_translucent_surface_tokens()` (borderless controls on a color-mixed `--input` surface) and `style_foreground_ring_tokens()` (transparent borders plus the 1px foreground-ring elevation). Both profiles now compose them via `c(list(...), helper(), helper())` instead of copy-pasting the recipe a second time; the per-profile `value_box_shadow` (Luma's explicit drop shadow vs Rhea's var-based recipe) is a required argument of `style_foreground_ring_tokens()`, so a profile that composes the recipe cannot forget to set it. The emitted `--sb-*` token set for both profiles is unchanged. Taught the style-registry parser (`tools/theme/style-registry.mjs`) to resolve these spliced helper calls so the profile-parity sweep still sees every token, and added browser-free unit tests for the parser (`tools/theme/style-registry.test.mjs`, `npm run test:style-registry`, wired into `make check-slice`) so a parser regression is caught without the showcase browser gate. A future translucent profile reuses the helpers rather than copy-pasting a third time.
@@ -27,9 +38,6 @@
 
 ## Other changes
 
-* `block_style()` gained a built-in `mono` profile for compact, mono-forward developer-console interfaces (issue #42).
-* `block_style()` gained a built-in `soft` profile for airy rounded dashboard interfaces — roomier surface padding/gaps, softer/larger component radii, lighter diffuse shadows, and a softer focus ring (issue #42). Like `mono`, it ships as pure profile token data with no `[data-sb-style="soft"]` CSS, so the leanness gate is unaffected.
-* `block_style()` gained a built-in `brutal` profile for dense, high-contrast, square-edged product interfaces — zero-radius geometry, compact controls/surfaces, flat (shadow-less) elevation, an instant transition, and a crisp fully-opaque focus ring (issue #42). Like `mono`/`soft`, it ships as pure profile token data with no `[data-sb-style="brutal"]` CSS, so the leanness gate is unaffected. The brutalist "thick border" look is deferred: it needs a border-width token (border width is a hardcoded 1px in the runtime CSS), so `brutal` nudges contrast via the existing border-colour tokens instead.
 * Added `update_block_tabs()` so Shiny servers can select the active `block_tabs()` value, and exposed the new server-update flow in the Tabs showcase.
 * Added Rhea and feedback-state theme extensions (issue #36). `block_style("rhea")` ports the official compact-Luma Radix profile through the lean profile-data model, with scoped CSS limited to structural geometry. `block_alert()` and `block_badge()` now accept `success`, `warning`, and `info` variants backed by additive shinyblocks surface/foreground/border tokens; `block_theme()` accepts those tokens plus `destructive-border`. Synced the vendored neutral dark scaffold to the official shadcn theming docs as of 2026-06-02, completed chart/radius Tailwind mappings, and added a deterministic shell/runtime token-drift audit.
 * Added `block_style()` and a `style` argument to `block_page()`, the foundation of the layered theming contract from ADR 0021 (issue #33, Slice 3). A *style profile* owns visual feel (control sizing, spacing, surface/overlay metrics, elevation, focus/disabled treatment, motion) through a curated, stable public `--sb-*` token layer, separate from `block_theme()`'s semantic colours. The runtime stylesheet now consumes those tokens, and the `default` profile preserves the current visuals exactly. `block_page(style = block_style("default", control_height = "2.5rem"))` places `data-sb-style` on `.sb-app` and injects scoped overrides; profile tokens inherit into portal overlays. Overrides use a fixed snake-case allowlist (e.g. `control_height`, `surface_padding`, `focus_ring_width`); raw `--sb-*` names are rejected. Also added the discovery helpers `block_theme_presets()` and `block_style_profiles()`. This slice ships the style foundation only — the Luma profile, profile-scoped component CSS, showcase/playground style controls, and the profile-parity matrix remain deferred to later slices.
