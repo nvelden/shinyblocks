@@ -25,13 +25,37 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   quoted <- substitute(expr)
   force(env)
   renderUI({
+    value <- eval(quoted, envir = env)
+    if (is.null(value) || !length(value)) value <- ""
     block_code(
-      paste(as.character(eval(quoted, envir = env)), collapse = "\n"),
+      paste(as.character(value), collapse = "\n"),
       language = "r",
       copyable = TRUE,
       line_numbers = TRUE
     )
   })
+}
+
+showcase_render_value <- function(expr, env = parent.frame()) {
+  quoted <- substitute(expr)
+  force(env)
+  renderUI({
+    value <- eval(quoted, envir = env)
+    htmltools::tags$pre(
+      class = "sb-code-block sb-code-block-default",
+      style = "margin: 0; padding: 0.75rem 1rem; font-size: 0.8125rem;",
+      htmltools::tags$code(paste(as.character(value), collapse = "\n"))
+    )
+  })
+}
+
+showcase_action_button <- function(input_id, label) {
+  block_button(
+    label,
+    id = input_id,
+    variant = "outline",
+    size = "sm"
+  )
 }
 
 ui <- block_page(
@@ -55,12 +79,28 @@ htmltools::div(
             "Tab Styles"
           ),
           block_field(
+            block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
+            block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
+          ),
+          block_field(
             block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
             block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
           ),
           block_field(
             block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
             block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
+          )
+        ),
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          htmltools::tags$h4(
+            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
+            "Actions (Server Update)"
+          ),
+          htmltools::tags$div(
+            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+            showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
+            showcase_action_button("showcase_tabs_select_settings", "Select Settings")
           )
         )
       ),
@@ -79,16 +119,23 @@ htmltools::div(
             uiOutput("showcase_tabs_preview_ui")
           )
         ),
+        uiOutput("showcase_tabs_preview_value"),
         htmltools::div(
-          style = "font-size: 0.875rem; font-weight: 500; padding: 0.5rem; background: var(--secondary); border-radius: 0.25rem;",
-          textOutput("showcase_tabs_reactive_log")
-        ),
-        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 1rem;",
           htmltools::div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            htmltools::div(
+              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              "UI Definition"
+            ),
+            uiOutput("showcase_tabs_preview_code")
           ),
-          uiOutput("showcase_tabs_preview_code")
+          htmltools::div(
+            htmltools::div(
+              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              "Server Action"
+            ),
+            uiOutput("showcase_tabs_reactive_code")
+          )
         )
       )
     )
@@ -96,14 +143,23 @@ htmltools::div(
 )
 
 server <- function(input, output, session) {
-  output$showcase_tabs_reactive_log <- renderText({
-    current <- input$showcase_tabs_interactive %||% "overview"
-    paste0("Active tab reported by server: \"", current, "\"")
+  output$showcase_tabs_preview_value <- showcase_render_value({
+    value <- input$showcase_tabs_interactive
+    val_str <- if (is.null(value)) {
+      "<NULL>"
+    } else if (!nzchar(value)) {
+      "<EMPTY>"
+    } else {
+      paste0('"', value, '"')
+    }
+    paste0("input$showcase_tabs_interactive = ", val_str)
   })
+  outputOptions(output, "showcase_tabs_preview_value", suspendWhenHidden = FALSE)
 
   output$showcase_tabs_preview_ui <- renderUI({
     block_tabs(
       id = "showcase_tabs_interactive",
+      selected = input$showcase_tabs_doc_selected %||% "overview",
       variant = input$showcase_tabs_doc_variant %||% "default",
       orientation = input$showcase_tabs_doc_orientation %||% "horizontal",
       block_tab(
@@ -123,13 +179,16 @@ server <- function(input, output, session) {
       )
     )
   })
+  outputOptions(output, "showcase_tabs_preview_ui", suspendWhenHidden = FALSE)
 
   output$showcase_tabs_preview_code <- showcase_render_code({
+    selected <- input$showcase_tabs_doc_selected %||% "overview"
     variant <- input$showcase_tabs_doc_variant %||% "default"
     orientation <- input$showcase_tabs_doc_orientation %||% "horizontal"
     paste0(
       "block_tabs(\n",
       "  id = \"showcase_tabs_interactive\",\n",
+      "  selected = \"", selected, "\",\n",
       "  variant = \"", variant, "\",\n",
       "  orientation = \"", orientation, "\",\n",
       "  block_tab(\"Overview\", value = \"overview\", ...),\n",
@@ -137,6 +196,26 @@ server <- function(input, output, session) {
       "  block_tab(\"Settings\", value = \"settings\", ...)\n",
       ")"
     )
+  })
+  outputOptions(output, "showcase_tabs_preview_code", suspendWhenHidden = FALSE)
+
+  reactive_code <- reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_tabs() code here."
+  ))
+  output$showcase_tabs_reactive_code <- showcase_render_code({ reactive_code() })
+  outputOptions(output, "showcase_tabs_reactive_code", suspendWhenHidden = FALSE)
+
+  observeEvent(input$showcase_tabs_select_usage, {
+    update_block_tabs(session, "showcase_tabs_interactive", selected = "usage")
+    update_block_select(session, "showcase_tabs_doc_selected", selected = "usage")
+    reactive_code('update_block_tabs(\n  session = session,\n  input_id = "showcase_tabs_interactive",\n  selected = "usage"\n)')
+  })
+
+  observeEvent(input$showcase_tabs_select_settings, {
+    update_block_tabs(session, "showcase_tabs_interactive", selected = "settings")
+    update_block_select(session, "showcase_tabs_doc_selected", selected = "settings")
+    reactive_code('update_block_tabs(\n  session = session,\n  input_id = "showcase_tabs_interactive",\n  selected = "settings"\n)')
   })
 }
 
