@@ -114,12 +114,12 @@ block_skeleton <- function(class = NULL, ...) {
 block_spinner <- function(
   label = "Loading",
   size = c("default", "sm", "lg"),
-  color = c("default", "muted", "destructive"),
+  color = c("default", "muted", "primary", "destructive", "success", "warning", "info"),
   class = NULL,
   style = NULL
 ) {
   size <- match_arg(size, c("default", "sm", "lg"))
-  color <- match_arg(color, c("default", "muted", "destructive"))
+  color <- match_arg(color, semantic_color_choices())
 
   runtime_component(
     component = "spinner",
@@ -131,6 +131,10 @@ block_spinner <- function(
     class = class,
     style = style
   )
+}
+
+semantic_color_choices <- function() {
+  c("default", "muted", "primary", "destructive", "success", "warning", "info")
 }
 
 #' Create an empty state

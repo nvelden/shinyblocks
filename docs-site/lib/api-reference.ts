@@ -561,7 +561,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Optimized SVG vectors referencing Lucide glyph elements.",
       arguments: [
         { argument: "name", type: "character", defaultVal: "required", description: "Lucide icon glyph preset name." },
+        { argument: "size", type: "'default' | 'sm' | 'lg' | 'xl'", defaultVal: "'default'", description: "Icon dimensions mapped to package size classes." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Styling classes to apply." },
+        { argument: "color", type: "'default' | 'muted' | 'primary' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Semantic foreground color token." },
         { argument: "...", type: "character", defaultVal: "NULL", description: "Additional attribute parameters." }
       ]
     }
@@ -593,7 +595,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Rotating spinner icons indicating asynchronous progress.",
       arguments: [
         { argument: "label", type: "character", defaultVal: "'Loading'", description: "Screenreader loading announcement label." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Styling animation/color custom classes." }
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Spinner dimensions mapped to package size classes." },
+        { argument: "color", type: "'default' | 'muted' | 'primary' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Semantic foreground color token." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Styling animation/color custom classes." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Optional inline styles." }
       ]
     }
   ],

@@ -4,6 +4,14 @@
 
 ## New features
 
+* Added a shared semantic foreground color API for icons and spinners.
+  `block_icon()` now accepts `color = c("default", "muted", "primary",
+  "destructive", "success", "warning", "info")`, and `block_spinner()` accepts
+  the same color set instead of only `default`, `muted`, and `destructive`.
+  The local showcase and docs-site playgrounds now expose those color choices
+  and generate `color = ...` examples instead of inline `style = "color: ..."`
+  snippets.
+
 * Aligned built-in `block_style()` profiles with the official shadcn/ui v4
   style registry (issue #48). `block_style_profiles()` now returns only
   `default`, `luma`, `lyra`, `maia`, `mira`, `nova`, `rhea`, `sera`, and `vega`;

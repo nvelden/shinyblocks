@@ -58,7 +58,7 @@ register_spinner_showcase <- function(input, output, session) {
       Description = c(
         "Accessible screen-reader label for the spinner.",
         "Visual size. One of sm, default, or lg.",
-        "Semantic color. One of default, muted, or destructive.",
+        "Semantic color. One of default, muted, primary, destructive, success, warning, or info.",
         "Additional CSS class merged onto the spinner element.",
         "Optional inline styles applied to the spinner element."
       )

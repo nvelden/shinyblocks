@@ -240,6 +240,30 @@
     @apply size-9;
   }
 
+  .sb-icon-color-muted {
+    color: var(--muted-foreground);
+  }
+
+  .sb-icon-color-primary {
+    color: var(--primary);
+  }
+
+  .sb-icon-color-destructive {
+    color: var(--destructive);
+  }
+
+  .sb-icon-color-success {
+    color: var(--success-foreground);
+  }
+
+  .sb-icon-color-warning {
+    color: var(--warning-foreground);
+  }
+
+  .sb-icon-color-info {
+    color: var(--info-foreground);
+  }
+
   .sb-nav-item > [data-icon] {
     @apply size-4 shrink-0;
   }

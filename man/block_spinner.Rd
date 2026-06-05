@@ -7,7 +7,7 @@
 block_spinner(
   label = "Loading",
   size = c("default", "sm", "lg"),
-  color = c("default", "muted", "destructive"),
+  color = c("default", "muted", "primary", "destructive", "success", "warning", "info"),
   class = NULL,
   style = NULL
 )

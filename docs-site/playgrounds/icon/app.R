@@ -50,16 +50,7 @@ string_literal <- function(value) {
 }
 
 icon_names <- sort(getFromNamespace("shinyblocks_icon_names", "shinyblocks")())
-
-icon_color_style <- function(color) {
-  switch(
-    color,
-    muted = "color: var(--muted-foreground);",
-    primary = "color: var(--primary);",
-    destructive = "color: var(--destructive);",
-    NULL
-  )
-}
+semantic_colors <- getFromNamespace("semantic_color_choices", "shinyblocks")()
 
 ui <- block_page(
   title = "shinyblocks - Icon playground",
@@ -107,11 +98,11 @@ htmltools::div(
             )
           ),
           block_field(
-            block_field_label("color theme", `for` = "showcase_icon_doc_color"),
+            block_field_label("color", `for` = "showcase_icon_doc_color"),
             block_select(
               "showcase_icon_doc_color",
-              choices = c("foreground", "muted", "primary", "destructive"),
-              selected = "foreground",
+              choices = semantic_colors,
+              selected = "default",
               size = "sm"
             )
           )
@@ -150,17 +141,16 @@ htmltools::div(
 
 server <- function(input, output, session) {
   preview_args <- reactive({
-    color <- input$showcase_icon_doc_color %||% "foreground"
     list(
       name = input$showcase_icon_doc_name %||% "home",
       size = input$showcase_icon_doc_size %||% "default",
-      style = icon_color_style(color)
+      color = input$showcase_icon_doc_color %||% "default"
     )
   })
 
   output$showcase_icon_preview_ui <- renderUI({
     args <- preview_args()
-    block_icon(args$name, size = args$size, style = args$style)
+    block_icon(args$name, size = args$size, color = args$color)
   })
   outputOptions(output, "showcase_icon_preview_ui", suspendWhenHidden = FALSE)
 
@@ -170,8 +160,8 @@ server <- function(input, output, session) {
     if (!identical(args$size, "default")) {
       lines <- c(lines, paste0("  size = ", string_literal(args$size)))
     }
-    if (!is.null(args$style)) {
-      lines <- c(lines, paste0("  style = ", string_literal(args$style)))
+    if (!identical(args$color, "default")) {
+      lines <- c(lines, paste0("  color = ", string_literal(args$color)))
     }
     paste0("block_icon(\n", paste(lines, collapse = ",\n"), "\n)")
   })
