@@ -58,18 +58,71 @@ register_table_showcase <- function(input, output, session) {
   rv_striped <- shiny::reactiveVal(FALSE)
   rv_bordered <- shiny::reactiveVal(FALSE)
 
+  # Shows the update_block_table() call behind the most recent server action,
+  # mirroring the select playground's "Server Action" panel.
+  reactive_code <- shiny::reactiveVal(paste0(
+    "# Click a server action button to see\n",
+    "# the update_block_table() code here."
+  ))
+
+  reactive_action <- function(arg_line) {
+    paste0(
+      "update_block_table(\n",
+      "  session = session,\n",
+      "  id = \"showcase_table_live\",\n",
+      "  ", arg_line, "\n",
+      ")"
+    )
+  }
+
   shiny::observeEvent(input$showcase_table_act_loading, {
     rv_loading(!rv_loading())
+    reactive_code(reactive_action(paste0("loading = ", if (rv_loading()) "TRUE" else "FALSE")))
   }, ignoreInit = TRUE)
   shiny::observeEvent(input$showcase_table_act_filter, {
     rv_filtered(!rv_filtered())
+    reactive_code(reactive_action(
+      if (rv_filtered()) "data = head(latest_data(), 2)" else "data = latest_data()"
+    ))
   }, ignoreInit = TRUE)
   shiny::observeEvent(input$showcase_table_act_striped, {
     rv_striped(!rv_striped())
+    reactive_code(reactive_action(paste0(
+      "data = latest_data(),\n  striped = ", if (rv_striped()) "TRUE" else "FALSE"
+    )))
   }, ignoreInit = TRUE)
   shiny::observeEvent(input$showcase_table_act_bordered, {
     rv_bordered(!rv_bordered())
+    reactive_code(reactive_action(paste0(
+      "data = latest_data(),\n  bordered = ", if (rv_bordered()) "TRUE" else "FALSE"
+    )))
   }, ignoreInit = TRUE)
+
+  # Receive-only (output-style) table: the runtime binding forwards payloads to
+  # the DOM but exposes no input value, so input$showcase_table_live is NULL.
+  output$showcase_table_preview_value <- showcase_render_code({
+    value <- input$showcase_table_live
+    val_str <- if (is.null(value)) "<NULL>" else paste0('"', value, '"')
+    paste0(
+      "input$showcase_table_live = ", val_str, "\n",
+      "# Tables are receive-only; they render server\n",
+      "# pushes but report no input value."
+    )
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_table_preview_value",
+    suspendWhenHidden = FALSE
+  )
+
+  output$showcase_table_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_table_reactive_code",
+    suspendWhenHidden = FALSE
+  )
 
   # Single source of truth for the data + formatting payload. Drives both the
   # one-time mount (block_table) and every server push (update_block_table), so

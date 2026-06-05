@@ -152,11 +152,16 @@ test_that("row_format produces per-row rowMeta", {
   expect_null(payload$props$rowMeta[[2]])
 })
 
-test_that("block_table() omits rowMeta when no row_format", {
-  table <- block_table(data.frame(item = "A"))
+test_that("block_table() emits empty per-row rowMeta when no row_format", {
+  # rowMeta is always present (one empty entry per rendered row) so a
+  # data-bearing update_block_table() payload authoritatively clears any prior
+  # per-row formatting instead of leaving it stale in the runtime merge.
+  table <- block_table(data.frame(item = c("A", "B")))
   payload <- runtime_payload_from(table)
 
-  expect_null(payload$props$rowMeta)
+  expect_length(payload$props$rowMeta, 2L)
+  expect_null(payload$props$rowMeta[[1]])
+  expect_null(payload$props$rowMeta[[2]])
   expect_false(payload$props$striped)
   expect_true(payload$props$hover)
 })

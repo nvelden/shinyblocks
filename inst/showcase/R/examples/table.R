@@ -140,6 +140,16 @@ htmltools::tagList(
       "border: 1px solid var(--border); border-radius: 0.75rem;",
       "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);",
       "overflow-x: auto;"
+    ),
+    extra_outputs = htmltools::tagList(
+      shiny::uiOutput("showcase_table_preview_value"),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_table_reactive_code")
+      )
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

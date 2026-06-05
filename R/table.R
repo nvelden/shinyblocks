@@ -273,8 +273,14 @@ table_build_payload <- function(
     bordered = isTRUE(bordered)
   )
 
-  if (!is.null(row_format)) {
-    props$rowMeta <- table_build_row_meta(data, row_format, display_rows)
+  # Always emit `rowMeta` so a data-bearing payload is authoritative: the runtime
+  # merges partial updates over current props, so omitting the key would let
+  # stale per-row formatting persist after `row_format` is cleared. An empty
+  # per-row list (serialized as `[{}, ...]`) overwrites and clears prior styling.
+  props$rowMeta <- if (is.null(row_format)) {
+    vector("list", display_rows)
+  } else {
+    table_build_row_meta(data, row_format, display_rows)
   }
 
   props
