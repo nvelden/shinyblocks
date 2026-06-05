@@ -145,7 +145,10 @@ passed, live `#table` striped/bordered/loading toggles OK.
 48→49 KB. Gzipped (7 KB) unchanged and still binding. Reversible in the PR if a
 different call is preferred (e.g. defer a variant).
 
-Remaining for slice 7: open the PR for #51 against `main` (outward-facing).
+**Slice 7 — DONE. PR #52 open** (https://github.com/nvelden/shinyblocks/pull/52),
+`table-reactive-formatting` → `main`, closes #51. All slices complete; `make
+gate` green. Awaiting review/merge — the budget recalibration is called out in
+the PR body for maintainer sign-off.
 
 ---
 
