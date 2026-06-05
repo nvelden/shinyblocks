@@ -94,14 +94,38 @@ table now genuinely dogfoods `update_block_table()`:
   striped/bordered class toggles + loading skeleton appear/clear via
   `update_block_table()`, no console errors.
 
-**Slice 5 — NEXT (docs playground + spec + NEWS + document()).** Extend
-`docs-site/playgrounds/table/app.R` with a reactive example (dataset selector +
-loading toggle) dogfooding `update_block_table()`; regenerate the Shinylive
-export (`generate-playgrounds.R`). Update `docs/component-specs/table.md`: remove
-the "no `update_block_table()`" divergence (table.md:75-77), document the reactive
-model / `rowMeta` / loading / unified pipeline. `devtools::document()` (already
-done for the R API in slice 1 — re-run if anything changed). `NEWS.md` entry.
-Restart + confirm. Then slice 6 (`make check-slice`) and slice 7 (`make gate`).
+**Slice 5 — DONE (docs playground + spec + NEWS + document()).**
+
+- `docs-site/playgrounds/table/app.R`: converted to the persistent-mount +
+  `observe()` -> `update_block_table()` pattern (matches the showcase). Added a
+  "Server actions" section with a **Toggle loading** `block_button`; dataset/
+  caption/align/max_rows changes now push via `update_block_table()`. class/style
+  remain remount-only.
+- `docs-site/public/playgrounds/table/app.json`: regenerated via
+  `scripts/generate-playgrounds.R` to embed the new app.R. **Release dependency:**
+  the bundled WASM `library.data.gz` comes from the latest *release*, so the live
+  playground's `update_block_table()` only resolves once a release containing it
+  ships and CI restages `playgrounds/_wasm` (same model as #49). Reverted the
+  generator's unrelated noise: `lib/preview-manifest.json` re-highlighting (58
+  html/codeHtml entries) and `index.html` trailing-whitespace. Kept
+  `public/shinyblocks-runtime-override.css` (now carries the slice-3 table
+  variant/skeleton CSS).
+- `docs/component-specs/table.md`: dropped the "no `update_block_table()`"
+  divergence, added a Reactive model section, the loading/striped/bordered/row
+  format states, full arg tables for `block_table()` / `update_block_table()` /
+  `table_column()`, and the new runtime-mapping + token-contract rows.
+- `docs-site/lib/api-reference.ts`: added all new `block_table()` args, an
+  `update_block_table()` entry, and per-column `digits`/`na`.
+- `NEWS.md`: issue #51 feature entry.
+- `devtools::document()`: no man/NAMESPACE changes (slice 1 already documented the
+  R API).
+- Verification: `make check-fast` — passed; docs playground app builds
+  (`inherits(app, "shiny.appobj")`); `npm exec tsc --noEmit` (docs-site) — passed.
+  No runtime/CSS/showcase R changed this slice, so no showcase restart needed.
+
+**Slice 6 — NEXT (slice gate).** `make check-slice`; light/dark + a couple style
+profiles via the theme/style browser harness (`npm run test:themes-browser`).
+Then slice 7: `make gate` before opening the PR.
 
 ---
 
