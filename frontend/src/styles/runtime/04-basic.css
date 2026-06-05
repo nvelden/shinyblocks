@@ -131,8 +131,24 @@
   color: var(--muted-foreground);
 }
 
+[data-shinyblocks-root] .sb-spinner-color-primary {
+  color: var(--primary);
+}
+
 [data-shinyblocks-root] .sb-spinner-color-destructive {
   color: var(--destructive);
+}
+
+[data-shinyblocks-root] .sb-spinner-color-success {
+  color: var(--success-foreground);
+}
+
+[data-shinyblocks-root] .sb-spinner-color-warning {
+  color: var(--warning-foreground);
+}
+
+[data-shinyblocks-root] .sb-spinner-color-info {
+  color: var(--info-foreground);
 }
 
 @media (prefers-reduced-motion: reduce) {

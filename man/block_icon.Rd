@@ -4,7 +4,13 @@
 \alias{block_icon}
 \title{Create an icon}
 \usage{
-block_icon(name, size = c("default", "sm", "lg", "xl"), class = NULL, ...)
+block_icon(
+  name,
+  size = c("default", "sm", "lg", "xl"),
+  class = NULL,
+  ...,
+  color = c("default", "muted", "primary", "destructive", "success", "warning", "info")
+)
 }
 \arguments{
 \item{name}{Icon name from the vendored Lucide sprite, or a custom
@@ -17,6 +23,8 @@ block_icon(name, size = c("default", "sm", "lg", "xl"), class = NULL, ...)
 \item{class}{Additional classes.}
 
 \item{...}{Additional attributes passed to the root \code{svg} tag.}
+
+\item{color}{Semantic foreground color.}
 }
 \value{
 An \code{htmltools} tag.

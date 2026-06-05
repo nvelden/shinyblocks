@@ -9,6 +9,8 @@
 
 - **default** — inline `<svg>` symbol referenced from the vendored
   Lucide sprite via `<use href="…#sb-icon-<name>">`.
+- **semantic colors** — optional foreground color class using the same
+  semantic color choices as `block_spinner()`.
 - **custom-tag** — when `name` is itself an `htmltools` tag, the helper
   passes it through, merging extra classes and attributes onto the
   supplied tag.
@@ -23,6 +25,7 @@
 | `name` | Icon name from the curated manifest, or a custom `htmltools` tag to pass through. Unknown names error with a pointer to `inst/www/icons/MANIFEST.json`. |
 | `size` | Icon size: `"default"` (1rem, the shadcn `size-4` default), `"sm"` (0.875rem), `"lg"` (1.5rem), `"xl"` (2.25rem). Maps to the `sb-icon-size-*` class. Ignored for custom-tag passthrough. |
 | `class` | Additional classes merged onto the rendered tag. |
+| `color` | Semantic foreground color: `"default"`, `"muted"`, `"primary"`, `"destructive"`, `"success"`, `"warning"`, or `"info"`. |
 | `...` | Additional attributes passed to the root `<svg>` (or merged onto a custom passthrough tag). |
 
 ## Asset contract
@@ -48,6 +51,12 @@
 | Visual role | Token |
 | --- | --- |
 | Icon color | `currentColor` |
+| Muted icon color | `--muted-foreground` |
+| Primary icon color | `--primary` |
+| Destructive icon color | `--destructive` |
+| Success icon color | `--success-foreground` |
+| Warning icon color | `--warning-foreground` |
+| Info icon color | `--info-foreground` |
 
 ## Deliberate divergences from shadcn
 

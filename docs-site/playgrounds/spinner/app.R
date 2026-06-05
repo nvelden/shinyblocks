@@ -30,6 +30,8 @@ do.call(library, list("shinyblocks", character.only = TRUE))
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
+semantic_colors <- getFromNamespace("semantic_color_choices", "shinyblocks")()
+
 showcase_render_code <- function(expr, env = parent.frame()) {
   quoted <- substitute(expr)
   force(env)
@@ -96,7 +98,7 @@ htmltools::div(
             block_field_label("color", `for` = "showcase_spinner_doc_color"),
             block_select(
               "showcase_spinner_doc_color",
-              choices = c("default", "destructive", "muted"),
+              choices = semantic_colors,
               selected = "default",
               size = "sm"
             )

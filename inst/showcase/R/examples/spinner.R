@@ -26,7 +26,7 @@ htmltools::tagList(
             block_field_label("color", `for` = "showcase_spinner_doc_color"),
             block_select(
               "showcase_spinner_doc_color",
-              choices = c("default", "destructive", "muted"),
+              choices = shinyblocks:::semantic_color_choices(),
               selected = "default",
               size = "sm"
             )

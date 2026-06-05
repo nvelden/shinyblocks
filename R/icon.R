@@ -6,14 +6,23 @@
 #'   `"sm"` (0.875rem), `"lg"` (1.5rem), or `"xl"` (2.25rem). Ignored when
 #'   `name` is a custom `htmltools` tag.
 #' @param class Additional classes.
+#' @param color Semantic foreground color.
 #' @param ... Additional attributes passed to the root `svg` tag.
 #'
 #' @return An `htmltools` tag.
 #' @family icon
 #' @export
-block_icon <- function(name, size = c("default", "sm", "lg", "xl"), class = NULL, ...) {
+block_icon <- function(
+  name,
+  size = c("default", "sm", "lg", "xl"),
+  class = NULL,
+  ...,
+  color = c("default", "muted", "primary", "destructive", "success", "warning", "info")
+) {
   size <- match_arg(size, c("default", "sm", "lg", "xl"))
   size_class <- if (identical(size, "default")) NULL else paste0("sb-icon-size-", size)
+  color <- match_arg(color, semantic_color_choices())
+  color_class <- if (identical(color, "default")) NULL else paste0("sb-icon-color-", color)
 
   icon_tag <- if (inherits(name, "shiny.tag")) {
     name
@@ -21,7 +30,7 @@ block_icon <- function(name, size = c("default", "sm", "lg", "xl"), class = NULL
     validate_icon_name(name)
 
     htmltools::tags$svg(
-      class = merge_classes("sb-icon", size_class, class),
+      class = merge_classes("sb-icon", size_class, color_class, class),
       `aria-hidden` = "true",
       focusable = "false",
       ...,
@@ -32,7 +41,7 @@ block_icon <- function(name, size = c("default", "sm", "lg", "xl"), class = NULL
   }
 
   if (inherits(name, "shiny.tag")) {
-    icon_tag$attribs$class <- merge_classes(icon_tag$attribs$class, class)
+    icon_tag$attribs$class <- merge_classes(icon_tag$attribs$class, color_class, class)
     icon_tag <- do.call(
       htmltools::tagAppendAttributes,
       c(list(tag = icon_tag), list(...))

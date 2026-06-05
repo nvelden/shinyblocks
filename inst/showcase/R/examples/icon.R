@@ -19,8 +19,13 @@ htmltools::tagList(
           block_select("showcase_icon_doc_size", choices = c("sm", "default", "lg", "xl"), selected = "default", size = "sm")
         ),
         block_field(
-          block_field_label("Color Theme", `for` = "showcase_icon_doc_color"),
-          block_select("showcase_icon_doc_color", choices = c("foreground", "muted", "primary", "destructive"), selected = "foreground")
+          block_field_label("color", `for` = "showcase_icon_doc_color"),
+          block_select(
+            "showcase_icon_doc_color",
+            choices = shinyblocks:::semantic_color_choices(),
+            selected = "default",
+            size = "sm"
+          )
         )
       )
     ),

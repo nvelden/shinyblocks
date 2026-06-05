@@ -235,6 +235,20 @@ test_that("skeletons and spinners expose expected attributes", {
   expect_match(spinner_html, 'data-sb-component="spinner"', fixed = TRUE)
 })
 
+test_that("spinner and icon accept the same semantic colors", {
+  colors <- shinyblocks:::semantic_color_choices()
+
+  for (color in colors) {
+    expect_identical(
+      runtime_payload_from(block_spinner(color = color))$props$color,
+      color
+    )
+    expect_s3_class(block_icon("home", color = color), "shiny.tag")
+  }
+
+  expect_error(block_spinner(color = "urgent"))
+})
+
 test_that("empty states render icon, description, and action", {
   empty <- runtime_payload_from(
     block_empty(
@@ -338,16 +352,18 @@ test_that("block_code handles defaults correctly", {
   expect_identical(payload$props$variant, "default")
 })
 
-test_that("block_icon size maps to a real size class", {
+test_that("block_icon size and color map to real classes", {
   default_icon <- block_icon("home")
   expect_match(tag_attr(default_icon, "class"), "sb-icon", fixed = TRUE)
   expect_false(grepl("sb-icon-size-", tag_attr(default_icon, "class"), fixed = TRUE))
+  expect_false(grepl("sb-icon-color-", tag_attr(default_icon, "class"), fixed = TRUE))
 
   lg_icon <- block_icon("home", size = "lg")
   expect_match(tag_attr(lg_icon, "class"), "sb-icon-size-lg", fixed = TRUE)
 
-  sm_icon <- block_icon("home", size = "sm", class = "extra")
+  sm_icon <- block_icon("home", size = "sm", color = "success", class = "extra")
   expect_match(tag_attr(sm_icon, "class"), "sb-icon-size-sm", fixed = TRUE)
+  expect_match(tag_attr(sm_icon, "class"), "sb-icon-color-success", fixed = TRUE)
   expect_match(tag_attr(sm_icon, "class"), "extra", fixed = TRUE)
 })
 
@@ -355,8 +371,13 @@ test_that("block_icon rejects an unknown size", {
   expect_error(block_icon("home", size = "huge"))
 })
 
-test_that("block_icon ignores size for tag passthrough", {
+test_that("block_icon rejects an unknown color", {
+  expect_error(block_icon("home", color = "urgent"))
+})
+
+test_that("block_icon ignores size for tag passthrough and applies color", {
   custom <- htmltools::tags$svg(class = "my-icon")
-  passthrough <- block_icon(custom, size = "lg")
+  passthrough <- block_icon(custom, size = "lg", color = "warning")
   expect_false(grepl("sb-icon-size-", tag_attr(passthrough, "class") %||% "", fixed = TRUE))
+  expect_match(tag_attr(passthrough, "class"), "sb-icon-color-warning", fixed = TRUE)
 })

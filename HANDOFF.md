@@ -1,59 +1,88 @@
-# Handoff: Issue #48 - Official shadcn style alignment
+# Handoff: Issue #49 - Add block_table() (shadcn table port)
 
-## Status (2026-06-04)
+## Status (2026-06-05)
 
-Issue: https://github.com/nvelden/shinyblocks/issues/48
-Plan: `docs/agent-plans/2026-06-04-official-shadcn-styles-themes.md`
-Branch: `issue-48-official-shadcn-styles`
+Issue: https://github.com/nvelden/shinyblocks/issues/49
+Plan: `docs/agent-plans/2026-06-05-table-component.md`
+Branch: not created yet — start with `issue-49-block-table`.
 
-Issue #48 supersedes the issue #42 direction that added shinyblocks-owned
-profiles. Built-in `block_style()` profiles should now be official shadcn/ui v4
-registry styles only, plus the no-op `default`.
+Nothing implemented yet. Plan and issue are written; this is the kickoff
+handoff. Read the plan first — it has the full payload shape, CSS token map,
+file list, and slice breakdown.
 
-## Implemented
+## Decisions (locked 2026-06-05)
 
-- `R/style-profiles.R`: removed shinyblocks-owned `mono`, `soft`, `brutal`, and
-  `glass`; kept `luma`/`rhea`; added official `lyra`, `maia`, `mira`, `nova`,
-  `sera`, and `vega` as token-data profile ports.
-- Internal translucency infrastructure remains available:
-  `--sb-surface-backdrop`, `--sb-card-surface`, `--sb-value-box-surface`,
-  `--sb-select-content-surface`, `--sb-dialog-surface`, and
-  `--sb-popover-surface`.
-- Runtime CSS now reads the per-surface translucency hooks with opaque
-  fallbacks, preserving default visuals.
-- `R/theme-presets.R` documents theme-preset provenance: `neutral`, `stone`, and
-  `zinc` are official shadcn/create base-color scales; `mauve`, `olive`,
-  `mist`, and `taupe` remain shinyblocks compatibility palettes for now.
-- Tests, style-registry parser tests, parity registry, component specs,
-  showcase style preview wrapping, and `NEWS.md` are updated for the official
-  profile set.
-- Source/provenance notes live in
-  `docs/research/2026-06-04-style-profile-sources.md`.
+- **Data API:** data.frame-driven. `block_table(data, columns, caption,
+  max_rows, class, style)` + `table_column(label, align, format, width)`. R
+  formats every cell to a string and serializes a strict
+  `{columns, rows, caption, truncated, totalRows}` payload.
+- **v1 scope:** static / presentational only. No `input$` binding, no
+  `update_block_table()`.
+- **Ownership:** runtime React component (`frontend/src/components/table.jsx`),
+  not R-side htmltools — phase-2 interactivity reuses the same mount path
+  (ADR 0017).
+- **Faithful shadcn port:** mirror `table.tsx` 1:1 (`data-slot` set + token
+  classes). No invented variants (no striped/bordered/dense). `max_rows` is the
+  only shinyblocks-only affordance; it renders in `tfoot`.
+- **Selection styling hook in v1:** `TableRow` emits `hover:bg-muted/50` +
+  `data-[state=selected]:bg-muted` now (nothing sets selected yet) so phase-2
+  selection only toggles the attribute.
+- **No DT / host widget.**
 
-## Verified
+## Phase 1 — static component + both playgrounds (do this first)
 
-- Upstream shadcn registry checked on 2026-06-04:
-  `apps/v4/registry/styles` contains `style-luma.css`, `style-lyra.css`,
-  `style-maia.css`, `style-mira.css`, `style-nova.css`, `style-rhea.css`,
-  `style-sera.css`, and `style-vega.css`; no `style-glass.css`.
-- `Rscript -e "devtools::test(filter = 'style|theme')"`: 194 pass.
-- `npm run test:style-registry`: 7 pass.
-- `npm run test:style-leanness`: pass.
-- Restarted showcase outside the sandbox and confirmed `make showcase-health`
-  returns HTTP 200.
-- `npm run test:themes-runtime`: 82 pass, 0 fail.
-- `npm run test:style-parity`: 116 pass, 0 fail across `luma`, `lyra`, `maia`,
-  `mira`, `nova`, `rhea`, `sera`, and `vega`.
-- `make check-slice`: pass, with 1063 R tests passing and one expected
-  doc-coverage skip for missing `_pkgdown.yml`.
-- `make gate`: pass when rerun outside the command sandbox. The first sandboxed
-  attempt failed at Playwright/Chromium launch with the known macOS Mach-port
-  IPC permission error; the escalated rerun completed all automated gate steps.
+Slice order (each slice ends with rebuild + showcase restart + manual confirm):
 
-## Remaining Before PR Exit
+1. **R API + payload** — `R/table.R` (`block_table()` + `table_column()`),
+   validation, R-side formatting, strict payload. Add `"table"` to
+   `RUNTIME_COMPONENT_NAMES` in `R/runtime.R`. Tests in
+   `tests/testthat/test-table.R`. `make check-fast`.
+2. **Runtime render + CSS** — `frontend/src/components/table.jsx`, register in
+   `frontend/src/index.jsx` COMPONENTS, `frontend/src/styles/runtime/09-table.css`
+   (semantic tokens, mirror shadcn class strings), theme-registry entry in
+   `tools/theme/theme-registry.mjs` + `.sb-parity-table` fixture.
+   `npm run build:runtime`, `npm run test:themes`.
+3. **Showcase playground** — `inst/showcase/R/examples/table.R` +
+   `server_table.R`, register in `inst/showcase/app.R`.
+4. **Docs playground + spec** — `docs-site/playgrounds/table/app.R`, manifest /
+   metadata / `lib/api-reference.ts`, `generate-playgrounds.R` webR assets,
+   `docs/component-specs/table.md`, `devtools::document()`, NEWS.
+5. **Slice gate** — `make check-slice`, browser/parity light+dark.
 
-- Manual phase-exit items printed by `make gate`: shinytest2 showcase smoke if
-  applicable, manual a11y sweep, critical-code-reviewer on the diff, NEWS and
-  DESCRIPTION version bump, phase-exit checklist, and phase tag.
+## Phase 2 — actions (later, separate ADR)
 
-Do not include `.vscode/` unless explicitly requested.
+Reference is the shadcn TanStack `data-table` example (not the `table`
+component). Lightweight runtime reimplementation, no TanStack dep. Order:
+row selection (binding `shinyblocks.table` + `update_block_table()`), then
+sorting, pagination, row action buttons. See plan "Phase 2" section.
+
+## Phase 3 — migrate existing tables (dogfooding)
+
+- **Showcase: 28 API-reference tables** — `shiny::renderTable()` +
+  `shiny::tableOutput()` in `inst/showcase/R/server_<name>.R` /
+  `examples/<name>.R` (output ids `showcase_<name>_api_table`). Add a shared
+  `showcase_api_table()` helper wrapping `block_table()`, migrate in batches of
+  ~5-6 per slice. Retire the old renderTable CSS in
+  `inst/showcase/www/showcase.css`.
+- **Docs-site: 1 React `<table>`** at
+  `docs-site/app/components/[slug]/page.tsx:136`. Docs-site is a separate
+  Next.js app and can't call R `block_table()`. **Open decision:** restyle the
+  `<table>` with matching `data-slot`/token classes (option 1, recommended) or
+  extract a parallel React `<Table>` (option 2). Confirm with maintainer before
+  implementing. Shinylive playgrounds already dogfood the real component.
+
+## Working rules (do not skip)
+
+- After **every** slice: `make build-css build-runtime`, restart showcase on
+  port 4321, `make showcase-health`, then point the user at
+  `http://127.0.0.1:4321/#table` for manual confirmation before the next slice.
+  Run the restart/health outside the command sandbox.
+- Verification gates: `make check-fast` during edits, `make check-slice` per
+  slice, `make gate` before PR.
+- Do not include `.vscode/` unless explicitly requested.
+- Never hand-edit generated `inst/www/*.js|*.css` or `man/` — rebuild.
+
+## Open questions to resolve
+
+- Docs-site migration approach (option 1 vs 2 above).
+- NA cell rendering: em-dash vs empty (decide in slice 1, document in spec).
