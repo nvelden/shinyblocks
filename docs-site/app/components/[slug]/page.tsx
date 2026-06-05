@@ -132,29 +132,80 @@ export default async function ComponentDetailPage({ params }: PageProps) {
                         <h3 className="font-mono text-base font-bold text-foreground">{fn.name}()</h3>
                         <p className="text-muted-foreground text-sm">{fn.description}</p>
                       </div>
-                      <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-                        <table className="w-full text-left border-collapse text-sm">
-                          <thead>
-                            <tr className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                              <th className="px-4 py-3 font-medium">Argument</th>
-                              <th className="px-4 py-3 font-medium">Type</th>
-                              <th className="px-4 py-3 font-medium">Default</th>
-                              <th className="px-4 py-3 font-medium">Description</th>
+                      <div
+                        data-slot="table-container"
+                        className="relative w-full overflow-x-auto rounded-xl border border-border bg-card shadow-sm"
+                      >
+                        <table
+                          data-slot="table"
+                          className="w-full caption-bottom border-collapse text-sm text-foreground"
+                        >
+                          <thead data-slot="table-header">
+                            <tr
+                              data-slot="table-row"
+                              className="border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                            >
+                              <th
+                                data-slot="table-head"
+                                className="h-10 whitespace-nowrap px-2 py-2 text-left align-middle font-medium text-muted-foreground"
+                              >
+                                Argument
+                              </th>
+                              <th
+                                data-slot="table-head"
+                                className="h-10 whitespace-nowrap px-2 py-2 text-left align-middle font-medium text-muted-foreground"
+                              >
+                                Type
+                              </th>
+                              <th
+                                data-slot="table-head"
+                                className="h-10 whitespace-nowrap px-2 py-2 text-left align-middle font-medium text-muted-foreground"
+                              >
+                                Default
+                              </th>
+                              <th
+                                data-slot="table-head"
+                                className="h-10 whitespace-nowrap px-2 py-2 text-left align-middle font-medium text-muted-foreground"
+                              >
+                                Description
+                              </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-border/60">
+                          <tbody data-slot="table-body">
                             {fn.arguments.map((arg) => (
-                              <tr key={arg.argument} className="hover:bg-muted/10 transition-colors">
-                                <td className="px-4 py-3 font-mono font-bold text-foreground">{arg.argument}</td>
-                                <td className="px-4 py-3 font-mono text-muted-foreground text-xs">{arg.type}</td>
-                                <td className="px-4 py-3 font-mono text-xs">
+                              <tr
+                                key={arg.argument}
+                                data-slot="table-row"
+                                className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/50 data-[state=selected]:bg-muted"
+                              >
+                                <td
+                                  data-slot="table-cell"
+                                  className="whitespace-nowrap px-2 py-2 align-middle font-mono font-bold text-foreground"
+                                >
+                                  {arg.argument}
+                                </td>
+                                <td
+                                  data-slot="table-cell"
+                                  className="whitespace-nowrap px-2 py-2 align-middle font-mono text-xs text-muted-foreground"
+                                >
+                                  {arg.type}
+                                </td>
+                                <td
+                                  data-slot="table-cell"
+                                  className="whitespace-nowrap px-2 py-2 align-middle font-mono text-xs"
+                                >
                                   {arg.defaultVal === "required" ? (
-                                    <span className="font-semibold text-rose-500 bg-rose-50 dark:bg-rose-950/20 dark:text-rose-400 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider">required</span>
+                                    <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-destructive">required</span>
                                   ) : (
                                     <code className="text-muted-foreground">{arg.defaultVal}</code>
                                   )}
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground leading-relaxed">{arg.description}</td>
+                                <td
+                                  data-slot="table-cell"
+                                  className="whitespace-normal px-2 py-2 align-middle leading-relaxed text-muted-foreground"
+                                >
+                                  {arg.description}
+                                </td>
                               </tr>
                             ))}
                           </tbody>

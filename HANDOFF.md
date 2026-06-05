@@ -10,9 +10,11 @@ Phase 1 / slices 1-5 are complete: R API + strict payload + tests + roxygen,
 runtime render + CSS + theme/style registry coverage, the full showcase
 playground, docs-site playground/spec sync, and the slice gate.
 
-Phase 3 dogfooding has started. All showcase API-reference tables have been
-migrated locally to `block_table()` with standardized headings; the required
-live showcase health/browser check is still pending after restart.
+Phase 3 dogfooding is complete for the showcase and docs-site API-reference
+tables. Showcase API-reference tables now render through `block_table()` with
+standardized headings, live showcase health/browser smoke passed after restart,
+and the docs-site React API table has been restyled with matching shadcn table
+slots/token classes.
 
 Implemented:
 
@@ -43,6 +45,9 @@ Implemented:
   and playground metadata.
 - `docs-site/lib/api-reference.ts`: Table API metadata.
 - `docs-site/public/playgrounds/table/`: generated Shinylive playground export.
+- `docs-site/app/components/[slug]/page.tsx`: docs-site API-reference table
+  restyled with matching shadcn `data-slot` attributes and semantic token
+  classes.
 - `docs-site/public/shinyblocks-runtime-override.css`: regenerated runtime
   override bundle with table CSS + showcase custom hook.
 - `docs/component-specs/table.md`: component spec documenting the static v1
@@ -91,10 +96,19 @@ Verification:
   passed; `git diff --check` — passed; `make build-css build-runtime` —
   passed. No `shiny::tableOutput()` / `shiny::renderTable()` API-reference
   calls remain under `inst/showcase/R/examples` or
-  `inst/showcase/R/server_*.R`. Showcase was restarted and logged
-  `Listening on http://127.0.0.1:4321`, but `make showcase-health` and browser
-  smoke are still pending because the required unsandboxed health probe could
-  not be approved in the Codex session.
+  `inst/showcase/R/server_*.R`.
+- `make showcase-health` against the restarted live showcase on
+  `http://127.0.0.1:4321/` — passed with HTTP 200.
+- `npm run test:showcase` — passed outside the sandbox.
+- Targeted Playwright smoke against the live showcase API-reference tables —
+  passed for all 29 sections; each `showcase_*_api_table` output rendered
+  runtime table slots (`data-slot="table"`, `table-head`, `table-cell`) and the
+  standardized `Argument` heading.
+- `npm exec tsc -- --noEmit` in `docs-site/` — passed after the docs-site API
+  table restyle.
+- `./node_modules/.bin/next build` in `docs-site/` — passed outside the
+  sandbox. A sandboxed first attempt failed with Turbopack's process/port
+  permission error before rerun.
 
 ## Decisions (locked 2026-06-05)
 
@@ -155,17 +169,17 @@ sorting, pagination, row action buttons. See plan "Phase 2" section.
   `showcase_api_table()` helper wrapping `block_table()`, migrate in batches of
   ~5-6 per slice. Retire the old renderTable CSS in
   `inst/showcase/www/showcase.css`.
-  - **Local migration complete:** added `showcase_api_table()`, migrated all
+  - **Done:** added `showcase_api_table()`, migrated all
     showcase API-reference tables to `block_table()`, standardized headings to
     `Argument`, `Type`, `Default`, and `Description`, and retired the old
-    native Shiny table CSS. Pending live showcase health/browser verification
-    before considering this batch fully complete.
+    native Shiny table CSS. Live showcase health and browser smoke passed after
+    restart.
 - **Docs-site: 1 React `<table>`** at
   `docs-site/app/components/[slug]/page.tsx:136`. Docs-site is a separate
-  Next.js app and can't call R `block_table()`. **Open decision:** restyle the
-  `<table>` with matching `data-slot`/token classes (option 1, recommended) or
-  extract a parallel React `<Table>` (option 2). Confirm with maintainer before
-  implementing. Shinylive playgrounds already dogfood the real component.
+  Next.js app and can't call R `block_table()`. Shinylive playgrounds already
+  dogfood the real component.
+  - **Done:** used option 1 and restyled the docs-site API table in place with
+    matching `data-slot` attributes and semantic token classes.
 
 ## Working rules (do not skip)
 
@@ -180,7 +194,7 @@ sorting, pagination, row action buttons. See plan "Phase 2" section.
 
 ## Open questions to resolve
 
-- Docs-site migration approach (option 1 vs 2 above).
+- None for Phase 3 dogfooding.
 
 ## Resolved during slice 1
 

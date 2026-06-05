@@ -2,32 +2,6 @@
 
 
 /* Showcase custom overrides appended during build */
-/* Custom styles for the API Reference table */
-[id$="_api_table"] table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-[id$="_api_table"] th,
-[id$="_api_table"] td {
-  border-bottom: 1px solid var(--border);
-  padding: 0.75rem;
-  text-align: left;
-  vertical-align: top;
-}
-[id$="_api_table"] th {
-  color: var(--muted-foreground);
-  font-weight: 600;
-}
-[id$="_api_table"] td:nth-child(1),
-[id$="_api_table"] td:nth-child(2),
-[id$="_api_table"] td:nth-child(3) {
-  white-space: nowrap;
-  width: 1%;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  font-size: 0.875em;
-}
-
 /* Custom dashed border for playground style overrides */
 .showcase-action-button {
   appearance: none;
@@ -173,6 +147,12 @@
   border: 2px dashed var(--ring) !important;
   border-radius: 0.5rem !important;
   padding: 0.25rem !important;
+}
+
+.showcase-api-table [data-slot="table-head"],
+.showcase-api-table [data-slot="table-cell"] {
+  white-space: normal;
+  vertical-align: top;
 }
 
 /* Custom modern utility classes used by showcase dropdown selects */
