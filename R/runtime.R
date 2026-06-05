@@ -9,7 +9,7 @@ runtime_mount_state$next_id <- 0L
 RUNTIME_COMPONENT_NAMES <- c(
   "alert", "badge", "button", "card", "checkbox", "code", "dialog",
   "empty", "input", "popover", "radio-group", "select", "separator",
-  "skeleton", "slider", "spinner", "switch", "textarea", "tooltip",
+  "skeleton", "slider", "spinner", "switch", "table", "textarea", "tooltip",
   "value-box"
 )
 

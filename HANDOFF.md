@@ -4,11 +4,26 @@
 
 Issue: https://github.com/nvelden/shinyblocks/issues/49
 Plan: `docs/agent-plans/2026-06-05-table-component.md`
-Branch: not created yet — start with `issue-49-block-table`.
+Branch: `issue-49-block-table`
 
-Nothing implemented yet. Plan and issue are written; this is the kickoff
-handoff. Read the plan first — it has the full payload shape, CSS token map,
-file list, and slice breakdown.
+Slice 1 is complete: R API + strict payload + tests + roxygen. Next slice is
+runtime render + CSS + theme registry.
+
+Implemented:
+
+- `R/table.R`: exported `block_table()` and `table_column()`.
+- `R/runtime.R`: added `"table"` to `RUNTIME_COMPONENT_NAMES`.
+- `tests/testthat/test-table.R`: validation, column overrides, formatting,
+  missing values, truncation, zero-row tables, payload shape.
+- `NAMESPACE`, `man/block_table.Rd`, `man/table_column.Rd`, and content-family
+  Rd links regenerated with `devtools::document()`.
+
+Verification:
+
+- `Rscript -e "devtools::test(filter = 'table')"` — 23 passed.
+- `make check-fast` — passed.
+- `make build-css build-runtime` — passed.
+- Showcase restarted on port 4321; `make showcase-health` returned HTTP 200.
 
 ## Decisions (locked 2026-06-05)
 
@@ -36,7 +51,7 @@ Slice order (each slice ends with rebuild + showcase restart + manual confirm):
 1. **R API + payload** — `R/table.R` (`block_table()` + `table_column()`),
    validation, R-side formatting, strict payload. Add `"table"` to
    `RUNTIME_COMPONENT_NAMES` in `R/runtime.R`. Tests in
-   `tests/testthat/test-table.R`. `make check-fast`.
+   `tests/testthat/test-table.R`. `make check-fast`. **Done 2026-06-05.**
 2. **Runtime render + CSS** — `frontend/src/components/table.jsx`, register in
    `frontend/src/index.jsx` COMPONENTS, `frontend/src/styles/runtime/09-table.css`
    (semantic tokens, mirror shadcn class strings), theme-registry entry in
@@ -85,4 +100,8 @@ sorting, pagination, row action buttons. See plan "Phase 2" section.
 ## Open questions to resolve
 
 - Docs-site migration approach (option 1 vs 2 above).
-- NA cell rendering: em-dash vs empty (decide in slice 1, document in spec).
+
+## Resolved during slice 1
+
+- **NA cell rendering:** render missing values as empty strings in the payload.
+  Document this in `docs/component-specs/table.md` when the spec slice lands.

@@ -69,8 +69,10 @@ Other content:
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
+\code{\link{block_table}()},
 \code{\link{block_tooltip}()},
 \code{\link{block_value_box}()},
+\code{\link{table_column}()},
 \code{\link{update_block_dialog}()}
 }
 \concept{content}
