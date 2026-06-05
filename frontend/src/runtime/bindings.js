@@ -52,10 +52,10 @@ function makeRuntimeBinding(config) {
     }
     getId(el) { return el.dataset.sbInputId; }
     getType() { return type; }
-    getValue(el) { return getValue(el); }
-    setValue(el, value) { setValue(el, value); }
-    subscribe(el, callback) { subscribe(el, callback); }
-    unsubscribe(el) { unsubscribe(el); }
+    getValue(el) { return getValue ? getValue(el) : null; }
+    setValue(el, value) { if (setValue) setValue(el, value); }
+    subscribe(el, callback) { if (subscribe) subscribe(el, callback); }
+    unsubscribe(el) { if (unsubscribe) unsubscribe(el); }
     receiveMessage(el, data) {
       if (receiveMessage) {
         receiveMessage(el, data || {});
@@ -300,15 +300,10 @@ const BINDING_CONFIGS = [
     // value — `getValue` returns null and there is no `subscribe`, so the only
     // visible side effect is a null `input$<id>` (acceptable; no author reads
     // it). `receiveMessage` forwards the fresh payload to React via the
-    // `__sbTableReceive` expando the mount installs.
+    // `__sbTableReceive` expando the mount installs. With no `getValue`/
+    // `subscribe`/etc. the factory supplies receive-only defaults.
     component: "table",
-    receiveProp: "__sbTableReceive",
-    getValue() {
-      return null;
-    },
-    setValue() {},
-    subscribe() {},
-    unsubscribe() {}
+    receiveProp: "__sbTableReceive"
   }
 ];
 
