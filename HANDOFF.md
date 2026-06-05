@@ -6,9 +6,9 @@ Issue: https://github.com/nvelden/shinyblocks/issues/49
 Plan: `docs/agent-plans/2026-06-05-table-component.md`
 Branch: `issue-49-block-table`
 
-Slices 1-2 are complete: R API + strict payload + tests + roxygen, then runtime
-render + CSS + theme/style registry coverage. Next slice is the full showcase
-playground.
+Slices 1-3 are complete: R API + strict payload + tests + roxygen, runtime
+render + CSS + theme/style registry coverage, and the full showcase playground.
+Next slice is the docs-site playground + component spec.
 
 Implemented:
 
@@ -26,8 +26,13 @@ Implemented:
   tokens.
 - `tools/theme/theme-registry.mjs`: table theme response bindings.
 - `tools/theme/style-registry.mjs`: table style-profile parity binding.
-- `inst/showcase/R/examples/code.R`: temporary `.sb-parity-table` fixture until
-  the dedicated table showcase page lands.
+- `inst/showcase/R/examples/table.R`: full table playground and stable
+  `.sb-parity-table` fixture.
+- `inst/showcase/R/server_table.R`: table preview, generated code, and API
+  reference wiring.
+- `inst/showcase/app.R`: registered the Table showcase page.
+- `inst/showcase/R/examples/code.R`: removed the temporary table parity fixture.
+- `inst/showcase/www/showcase.css`: table custom-class showcase hook.
 
 Verification:
 
@@ -39,6 +44,12 @@ Verification:
 - `Rscript -e "devtools::test(filter = 'table|runtime-css|runtime-js')"` —
   100 passed.
 - `npm run test:themes` — passed outside the sandbox.
+- `Rscript -e "devtools::test(filter = 'showcase|table')"` — 227 passed.
+- `make build-css build-runtime` — passed.
+- Showcase restarted on port 4321; `make showcase-health` returned HTTP 200.
+- `make check-fast` — passed.
+- `npm run test:themes` — passed outside the sandbox after moving the table
+  parity fixture.
 
 ## Decisions (locked 2026-06-05)
 
@@ -73,7 +84,7 @@ Slice order (each slice ends with rebuild + showcase restart + manual confirm):
    `tools/theme/theme-registry.mjs` + `.sb-parity-table` fixture.
    `npm run build:runtime`, `npm run test:themes`. **Done 2026-06-05.**
 3. **Showcase playground** — `inst/showcase/R/examples/table.R` +
-   `server_table.R`, register in `inst/showcase/app.R`.
+   `server_table.R`, register in `inst/showcase/app.R`. **Done 2026-06-05.**
 4. **Docs playground + spec** — `docs-site/playgrounds/table/app.R`, manifest /
    metadata / `lib/api-reference.ts`, `generate-playgrounds.R` webR assets,
    `docs/component-specs/table.md`, `devtools::document()`, NEWS.

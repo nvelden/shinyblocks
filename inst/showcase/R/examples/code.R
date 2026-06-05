@@ -89,18 +89,6 @@ htmltools::tagList(
       header = TRUE,
       variant = "default",
       class = "sb-parity-code-default"
-    ),
-    htmltools::tags$div(style = "height: 1rem;"),
-    block_table(
-      data.frame(
-        metric = c("Revenue", "Orders"),
-        value = c("$42k", "128")
-      ),
-      columns = list(
-        value = table_column(label = "Value", align = "right")
-      ),
-      caption = "Temporary table parity fixture.",
-      class = "sb-parity-table"
     )
   )
 )

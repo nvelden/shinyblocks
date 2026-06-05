@@ -164,6 +164,13 @@
   background-color: color-mix(in oklch, var(--muted) 80%, var(--primary) 20%) !important;
 }
 
+.showcase-table-preview-custom,
+.sb-table-container.showcase-table-preview-custom {
+  border: 2px dashed var(--ring) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.25rem !important;
+}
+
 /* Custom modern utility classes used by showcase dropdown selects */
 .border-dashed {
   border: 2px dashed var(--ring) !important;

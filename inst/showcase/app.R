@@ -18,6 +18,7 @@ source(file.path("R", "server_tooltip.R"), local = TRUE)
 source(file.path("R", "server_code.R"), local = TRUE)
 source(file.path("R", "server_badge.R"), local = TRUE)
 source(file.path("R", "server_alert.R"), local = TRUE)
+source(file.path("R", "server_table.R"), local = TRUE)
 source(file.path("R", "server_icon.R"), local = TRUE)
 source(file.path("R", "server_separator.R"), local = TRUE)
 source(file.path("R", "server_skeleton.R"), local = TRUE)
@@ -109,6 +110,17 @@ sections <- list(
       "copy-to-clipboard button, and optional editor header."
     ),
     file = "code.R"
+  ),
+  list(
+    id = "table",
+    label = "Table",
+    icon = "table",
+    title = "Tables",
+    lead = paste(
+      "Runtime-rendered data frames with shadcn table slots,",
+      "R-side cell formatting, captions, and truncation notes."
+    ),
+    file = "table.R"
   ),
   list(
     id = "button",
@@ -448,6 +460,7 @@ server <- function(input, output, session) {
   register_popover_showcase(input, output, session)
   register_badge_showcase(input, output, session)
   register_alert_showcase(input, output, session)
+  register_table_showcase(input, output, session)
   register_icon_showcase(input, output, session)
   register_separator_showcase(input, output, session)
   register_skeleton_showcase(input, output, session)
