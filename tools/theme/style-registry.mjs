@@ -176,6 +176,12 @@ export const STYLE_REGISTRY = {
     },
     bindings: [{ selector: ".sb-parity-code-default", property: "borderRadius" }]
   },
+  table: {
+    section: "table",
+    bindings: [
+      { selector: ".sb-parity-table [data-slot='table-cell']", property: "paddingLeft" }
+    ]
+  },
 
   // --- Runtime components: overlay (rendered on interaction) --------------
   dialog: {

@@ -36,6 +36,7 @@ import { RadioGroup } from "./components/radio-group.jsx";
 import { Select } from "./components/select.jsx";
 import { Slider } from "./components/slider.jsx";
 import { Switch } from "./components/switch.jsx";
+import { Table } from "./components/table.jsx";
 import { Textarea } from "./components/textarea.jsx";
 import { Tooltip } from "./components/tooltip.jsx";
 
@@ -65,7 +66,8 @@ const COMPONENTS = {
   input: Input,
   "radio-group": RadioGroup,
   slider: Slider,
-  select: Select
+  select: Select,
+  table: Table
 };
 
 function RuntimeMount({ payload, root }) {

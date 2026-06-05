@@ -1,0 +1,87 @@
+[data-shinyblocks-root] .sb-table-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+}
+
+[data-sb-style="luma"] [data-shinyblocks-root].sb-table,
+[data-sb-style="lyra"] [data-shinyblocks-root].sb-table,
+[data-sb-style="maia"] [data-shinyblocks-root].sb-table,
+[data-sb-style="mira"] [data-shinyblocks-root].sb-table,
+[data-sb-style="nova"] [data-shinyblocks-root].sb-table,
+[data-sb-style="rhea"] [data-shinyblocks-root].sb-table,
+[data-sb-style="sera"] [data-shinyblocks-root].sb-table,
+[data-sb-style="vega"] [data-shinyblocks-root].sb-table {
+  --sb-control-font-size: inherit;
+  --sb-control-height-lg: inherit;
+  --sb-control-padding-x: inherit;
+  --sb-control-gap: inherit;
+}
+
+[data-shinyblocks-root] .sb-table-element {
+  width: 100%;
+  caption-side: bottom;
+  border-collapse: collapse;
+  color: var(--foreground);
+  font-size: var(--sb-control-font-size, 0.875rem);
+  line-height: 1.25rem;
+}
+
+[data-shinyblocks-root] .sb-table-header .sb-table-row {
+  border-bottom: 1px solid var(--border);
+}
+
+[data-shinyblocks-root] .sb-table-body .sb-table-row:last-child {
+  border-bottom: 0;
+}
+
+[data-shinyblocks-root] .sb-table-row {
+  border-bottom: 1px solid var(--border);
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+[data-shinyblocks-root] .sb-table-row:hover {
+  background-color: color-mix(in oklch, var(--muted) 50%, transparent);
+}
+
+[data-shinyblocks-root] .sb-table-row[data-state="selected"] {
+  background-color: var(--muted);
+}
+
+[data-shinyblocks-root] .sb-table-head {
+  height: var(--sb-control-height-lg, 2.5rem);
+  padding-inline: calc(var(--sb-control-padding-x, 1rem) / 2);
+  padding-block: var(--sb-control-gap, 0.5rem);
+  color: var(--muted-foreground);
+  font-weight: 500;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+[data-shinyblocks-root] .sb-table-cell {
+  padding-inline: calc(var(--sb-control-padding-x, 1rem) / 2);
+  padding-block: var(--sb-control-gap, 0.5rem);
+  color: var(--foreground);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+[data-shinyblocks-root] .sb-table-footer {
+  border-top: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--muted) 50%, transparent);
+  font-weight: 500;
+}
+
+[data-shinyblocks-root] .sb-table-footer .sb-table-row {
+  border-bottom: 0;
+}
+
+[data-shinyblocks-root] .sb-table-caption {
+  margin-top: 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}

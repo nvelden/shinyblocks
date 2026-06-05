@@ -133,6 +133,14 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-switch-checked [data-slot='switch-control']", property: "backgroundColor", token: "--primary" }
     ]
   },
+  table: {
+    section: "table",
+    bindings: [
+      { selector: ".sb-parity-table [data-slot='table']", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-table [data-slot='table-head']", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-table [data-slot='table-row']", property: "borderBottomColor", token: "--border" }
+    ]
+  },
   textarea: {
     section: "textarea",
     bindings: [

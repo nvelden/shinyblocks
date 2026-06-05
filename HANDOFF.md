@@ -6,8 +6,9 @@ Issue: https://github.com/nvelden/shinyblocks/issues/49
 Plan: `docs/agent-plans/2026-06-05-table-component.md`
 Branch: `issue-49-block-table`
 
-Slice 1 is complete: R API + strict payload + tests + roxygen. Next slice is
-runtime render + CSS + theme registry.
+Slices 1-2 are complete: R API + strict payload + tests + roxygen, then runtime
+render + CSS + theme/style registry coverage. Next slice is the full showcase
+playground.
 
 Implemented:
 
@@ -17,6 +18,16 @@ Implemented:
   missing values, truncation, zero-row tables, payload shape.
 - `NAMESPACE`, `man/block_table.Rd`, `man/table_column.Rd`, and content-family
   Rd links regenerated with `devtools::document()`.
+- `DESCRIPTION`: added `R/table.R` to explicit `Collate:`.
+- `frontend/src/components/table.jsx`: runtime table renderer.
+- `frontend/src/index.jsx`: registered `table` in the COMPONENTS map.
+- `frontend/src/styles/runtime/09-table.css`: shadcn-style table slot CSS,
+  semantic theme tokens, and profile-sensitive spacing via shared control
+  tokens.
+- `tools/theme/theme-registry.mjs`: table theme response bindings.
+- `tools/theme/style-registry.mjs`: table style-profile parity binding.
+- `inst/showcase/R/examples/code.R`: temporary `.sb-parity-table` fixture until
+  the dedicated table showcase page lands.
 
 Verification:
 
@@ -24,6 +35,10 @@ Verification:
 - `make check-fast` — passed.
 - `make build-css build-runtime` — passed.
 - Showcase restarted on port 4321; `make showcase-health` returned HTTP 200.
+- `npm run test:runtime` — passed.
+- `Rscript -e "devtools::test(filter = 'table|runtime-css|runtime-js')"` —
+  100 passed.
+- `npm run test:themes` — passed outside the sandbox.
 
 ## Decisions (locked 2026-06-05)
 
@@ -56,7 +71,7 @@ Slice order (each slice ends with rebuild + showcase restart + manual confirm):
    `frontend/src/index.jsx` COMPONENTS, `frontend/src/styles/runtime/09-table.css`
    (semantic tokens, mirror shadcn class strings), theme-registry entry in
    `tools/theme/theme-registry.mjs` + `.sb-parity-table` fixture.
-   `npm run build:runtime`, `npm run test:themes`.
+   `npm run build:runtime`, `npm run test:themes`. **Done 2026-06-05.**
 3. **Showcase playground** — `inst/showcase/R/examples/table.R` +
    `server_table.R`, register in `inst/showcase/app.R`.
 4. **Docs playground + spec** — `docs-site/playgrounds/table/app.R`, manifest /
