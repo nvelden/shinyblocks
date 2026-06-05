@@ -150,6 +150,29 @@ different call is preferred (e.g. defer a variant).
 gate` green. Awaiting review/merge — the budget recalibration is called out in
 the PR body for maintainer sign-off.
 
+**Follow-up (2026-06-05) — row_format revert fix + playground panels.** Pushed
+to the same branch/PR:
+
+- `R/table.R`: `table_build_payload()` now *always* emits `rowMeta` (empty
+  per-row list `[{}, …]` when no `row_format`). Because the runtime merges
+  partial `update_block_table()` payloads over current props, omitting the key
+  let stale per-row styling persist after `row_format` was cleared — unchecking
+  the showcase "Highlight rows" box did not un-highlight. A data-bearing update
+  now authoritatively clears prior styling; loading-only updates still leave
+  `rowMeta` untouched. Pipeline-identity guarantee preserved (both paths emit it).
+- `tests/testthat/test-table.R`: replaced the "omits rowMeta" test with
+  "emits empty per-row rowMeta when no row_format".
+- `inst/showcase/R/examples/table.R` + `server_table.R`: showcase table
+  playground now mirrors the select playground via `extra_outputs` — an Input
+  Value panel (honest `<NULL>`; the table binding is receive-only) and a Server
+  Action panel that prints the `update_block_table()` call behind each action
+  button.
+- Verification: `test-table.R` 45 pass; `make check-fast` OK; `test:showcase`
+  pass; showcase restarted (health 200); Playwright on `#table` — enable
+  row_format → 2 styled rows, disable → 0 (revert fixed), both panels render,
+  action button populates code, 0 console errors. No runtime/CSS change (R
+  payload only), so no runtime rebuild needed.
+
 ---
 
 # Handoff: Issue #49 - Add block_table() (shadcn table port)
