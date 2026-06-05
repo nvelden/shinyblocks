@@ -71,14 +71,37 @@ binding so `update_block_table()` messages reach the DOM:
   — passed; `make check-fast` — passed. Showcase restarted on 4321;
   `make showcase-health` — HTTP 200.
 
-**Slice 4 — NEXT (showcase Server Action panel + new controls).** Extend
-`inst/showcase/R/server_table.R` + `inst/showcase/R/examples/table.R` with a
-**Server Action** panel (buttons: swap datasets, toggle `loading`, push a
-filtered subset, toggle striped/bordered) plus Content controls for `na`,
-`digits`, `rownames`, and a `row_format` demo (highlight rows over a threshold).
-Must keep the full Content/State/Styling/Actions playground + API table
-(`feedback_showcase_playground`). Restart; user confirms live reactive update +
-loading skeleton. See the plan for slices 5-7.
+**Slice 4 — DONE (showcase Server Action panel + new controls).** The showcase
+table now genuinely dogfoods `update_block_table()`:
+
+- `inst/showcase/R/examples/table.R`: added Content controls `na` (block_input),
+  `digits` (select), `rownames` + `row_format` (checkboxes), and a **Server
+  actions** group with four `block_button`s (toggle loading / filtered subset /
+  striped / bordered).
+- `inst/showcase/R/server_table.R`: rebuilt around one persistent
+  `block_table(id = "showcase_table_live")` mount. A single `table_spec()`
+  reactive feeds both the one-time mount (`do.call(block_table, ...)`, with
+  `loading` stripped — it is update-only) and an `observe()` that pushes
+  `update_block_table()` on every change. Mount-time-only props (`class`/`style`)
+  remount via `renderUI`; data/formatting/action props update in place.
+  `reactiveVal`s back the four action buttons; `row_format` highlights rows where
+  numeric `value > 100`. Simplified the revenue `value` column (dropped the custom
+  percentage formatter) so `digits`/`na` are demonstrable. API table extended with
+  the new args + `update_block_table()`.
+- Verification: `make check-fast` — passed; `test_file('test-table.R')` — passed;
+  `npm run test:showcase` — passed. Showcase restarted on 4321; `make
+  showcase-health` — 200. Targeted Playwright against the live `#table` page —
+  striped/bordered class toggles + loading skeleton appear/clear via
+  `update_block_table()`, no console errors.
+
+**Slice 5 — NEXT (docs playground + spec + NEWS + document()).** Extend
+`docs-site/playgrounds/table/app.R` with a reactive example (dataset selector +
+loading toggle) dogfooding `update_block_table()`; regenerate the Shinylive
+export (`generate-playgrounds.R`). Update `docs/component-specs/table.md`: remove
+the "no `update_block_table()`" divergence (table.md:75-77), document the reactive
+model / `rowMeta` / loading / unified pipeline. `devtools::document()` (already
+done for the R API in slice 1 — re-run if anything changed). `NEWS.md` entry.
+Restart + confirm. Then slice 6 (`make check-slice`) and slice 7 (`make gate`).
 
 ---
 
