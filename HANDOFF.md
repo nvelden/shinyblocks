@@ -183,13 +183,24 @@ per maintainer's "option 1 (trim, not budget bump)" choice:
   unsubscribe` optional in `makeRuntimeBinding()` (factory now supplies
   receive-only defaults), letting the receive-only `table` binding drop its four
   no-op stubs. Removing that *unique* stub code reclaimed gzipped headroom.
-- Rebuilt `inst/www/shinyblocks-runtime.js`. `tools/budget.R` → OK, gzipped
-  memCompress 76786 / 76800 B. **Margin is thin (14 B);** refactoring the
-  repetitive binding configs backfires (gzip rewards the repetition), so further
-  trimming risks regressing. If the budget tightens again, prefer a
-  maintainer-approved gzipped budget bump (75→76 KB) over fragile micro-trims.
-- Verified: `test:runtime`, `test:select-overflow`, `test:runtime-shiny` (table
-  receive smoke) pass. Pushed to PR #52; CI gate re-run to confirm green.
+- Rebuilt `inst/www/shinyblocks-runtime.js`. The trim reclaimed ~40 gzipped
+  bytes locally (76786 / 76800 B) — but the CI gate **still failed**. Root cause:
+  the gzipped metric is **platform-variant**. For identical build bytes (raw
+  250.6 KB on both), `memCompress` reports ~75.0 KB on macOS R 4.4.0 and ~75.1 KB
+  on Linux CI R — a ~116 B zlib difference, larger than any margin a safe trim
+  can cut. The asset is legitimately ~75 KB, sitting on the line.
+- **Resolution (maintainer-approved): bump the gzipped budget 75 → 76 KB** in
+  `tools/budget.R` (with a comment documenting the platform variance). Kept the
+  bindings trim too. Now local 75.0 / 76 KB, CI 75.1 / 76 KB — ~1 KB robust
+  margin over the cross-platform zlib variance. Raw (250.6 / 275 KB) stays the
+  headroom guard.
+- Verified: `tools/budget.R` OK; `test:runtime`, `test:select-overflow`,
+  `test:runtime-shiny` (table receive smoke) pass. Pushed to PR #52; CI gate
+  re-run to confirm green.
+- **Follow-up worth filing:** the gzipped budget gate is non-deterministic across
+  OSes (zlib build differences). A future harness fix could make it
+  platform-stable (e.g. raw as the binding budget, or a pinned compressor) so
+  sub-KB margins are measurable. Not done here.
 
 ---
 

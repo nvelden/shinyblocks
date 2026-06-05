@@ -47,8 +47,15 @@ targets <- list(
     group = "runtime"
   ),
   list(
+    # Recalibrated 75 -> 76 KB for the #51 reactive-table runtime (stateful
+    # table + receive-only binding). The asset is legitimately ~75 KB; the
+    # binding minified JS still trims the receive-only stubs. NB: this gzipped
+    # metric is platform-variant (R's memCompress zlib differs by OS — macOS
+    # reports ~75.0 KB, Linux CI ~75.1 KB for identical bytes), so a sub-100-byte
+    # margin cannot be measured reliably across local/CI. The 76 KB limit keeps a
+    # robust margin over that variance; raw (275 KB) stays the headroom guard.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 75,
+    limit_kb = 76,
     metric = "gzipped",
     group = "runtime"
   ),
