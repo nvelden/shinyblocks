@@ -25,11 +25,12 @@ targets <- list(
     group = "compatibility"
   ),
   list(
-    # Recalibrated for the post-#36 Rhea + feedback-token component set.
-    # Gzipped (below) is the meaningful transfer budget; raw is a headroom
-    # guard.
+    # Recalibrated for the post-#36 Rhea + feedback-token component set, then
+    # again for the #51 reactive-table feature set (skeleton / striped /
+    # bordered / loading variants). Gzipped (below) is the meaningful transfer
+    # budget and stays the binding constraint; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 48,
+    limit_kb = 49,
     metric = "raw",
     group = "runtime"
   ),

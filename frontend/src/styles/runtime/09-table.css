@@ -42,7 +42,7 @@
     background-color 0.15s ease;
 }
 
-[data-shinyblocks-root] .sb-table--hover .sb-table-body .sb-table-row:hover {
+[data-shinyblocks-root] .sb-table--hover .sb-table-row:hover {
   background-color: color-mix(in oklch, var(--muted) 50%, transparent);
 }
 
@@ -50,32 +50,21 @@
   background-color: var(--muted);
 }
 
-[data-shinyblocks-root] .sb-table--striped .sb-table-body .sb-table-row:nth-child(even) {
+[data-shinyblocks-root] .sb-table--striped .sb-table-row:nth-child(even) {
   background-color: color-mix(in oklch, var(--muted) 40%, transparent);
 }
 
-[data-shinyblocks-root] .sb-table--bordered .sb-table-head,
-[data-shinyblocks-root] .sb-table--bordered .sb-table-cell {
-  border-inline: 1px solid var(--border);
+/* Inter-column rules only; outer table edges stay borderless. */
+[data-shinyblocks-root] .sb-table--bordered .sb-table-head:not(:last-child),
+[data-shinyblocks-root] .sb-table--bordered .sb-table-cell:not(:last-child) {
+  border-inline-end: 1px solid var(--border);
 }
 
-[data-shinyblocks-root] .sb-table--bordered .sb-table-head:first-child,
-[data-shinyblocks-root] .sb-table--bordered .sb-table-cell:first-child {
-  border-inline-start: 0;
-}
-
-[data-shinyblocks-root] .sb-table--bordered .sb-table-head:last-child,
-[data-shinyblocks-root] .sb-table--bordered .sb-table-cell:last-child {
-  border-inline-end: 0;
-}
-
+/* Reuses the shared .sb-skeleton shimmer (background/radius/animation);
+   display:block already fills the cell width. */
 [data-shinyblocks-root] .sb-table-skeleton {
   display: block;
-  width: 100%;
   height: 0.75rem;
-  border-radius: var(--sb-skeleton-radius, calc(var(--radius) * 0.8));
-  background-color: var(--muted);
-  animation: shinyblocks-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 [data-shinyblocks-root] .sb-table-head {

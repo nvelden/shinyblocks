@@ -91,7 +91,7 @@ export function Table({ payload, root }) {
                       className="sb-table-cell"
                       style={cellStyle(column)}
                     >
-                      <span className="sb-table-skeleton" aria-hidden="true" />
+                      <span className="sb-skeleton sb-table-skeleton" aria-hidden="true" />
                     </td>
                   ))}
                 </tr>
