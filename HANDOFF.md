@@ -6,9 +6,9 @@ Issue: https://github.com/nvelden/shinyblocks/issues/49
 Plan: `docs/agent-plans/2026-06-05-table-component.md`
 Branch: `issue-49-block-table`
 
-Slices 1-3 are complete: R API + strict payload + tests + roxygen, runtime
-render + CSS + theme/style registry coverage, and the full showcase playground.
-Next slice is the docs-site playground + component spec.
+Slices 1-4 are complete: R API + strict payload + tests + roxygen, runtime
+render + CSS + theme/style registry coverage, the full showcase playground, and
+the docs-site playground/spec sync. Next slice is the slice gate.
 
 Implemented:
 
@@ -33,6 +33,19 @@ Implemented:
 - `inst/showcase/app.R`: registered the Table showcase page.
 - `inst/showcase/R/examples/code.R`: removed the temporary table parity fixture.
 - `inst/showcase/www/showcase.css`: table custom-class showcase hook.
+- `docs-site/content/previews/table.R`: docs preview snippet.
+- `docs-site/playgrounds/table/app.R`: interactive Shinylive Table playground.
+- `docs-site/lib/preview-manifest.json`: registered the Table component preview
+  and playground metadata.
+- `docs-site/lib/api-reference.ts`: Table API metadata.
+- `docs-site/public/playgrounds/table/`: generated Shinylive playground export.
+- `docs-site/public/shinyblocks-runtime-override.css`: regenerated runtime
+  override bundle with table CSS + showcase custom hook.
+- `docs/component-specs/table.md`: component spec documenting the static v1
+  contract, NA handling, payload shape, shadcn slot map, and divergences.
+- `docs/component-specs/SCREENSHOT-QUEUE.md`: queued the table reference
+  screenshot.
+- `NEWS.md`: user-facing table entry.
 
 Verification:
 
@@ -50,6 +63,17 @@ Verification:
 - `make check-fast` — passed.
 - `npm run test:themes` — passed outside the sandbox after moving the table
   parity fixture.
+- `Rscript scripts/generate-previews.R` in `docs-site/` — passed.
+- `Rscript scripts/generate-playgrounds.R` in `docs-site/` — passed; warnings
+  were from missing local `playgrounds/_wasm` staging assets in this checkout.
+- `Rscript -e "devtools::test(filter = 'doc-coverage|table')"` — 25 passed,
+  1 skip for repo-root `_pkgdown.yml` path under the test harness.
+- `npm exec tsc -- --noEmit` in `docs-site/` — passed.
+- `Rscript -e 'devtools::load_all(\".\"); app <- source(\"docs-site/playgrounds/table/app.R\")$value; stopifnot(inherits(app, \"shiny.appobj\"))'`
+  — passed.
+- `make build-css build-runtime` — passed.
+- `make check-fast` — passed.
+- Showcase restarted on port 4321; `make showcase-health` returned HTTP 200.
 
 ## Decisions (locked 2026-06-05)
 
@@ -88,6 +112,8 @@ Slice order (each slice ends with rebuild + showcase restart + manual confirm):
 4. **Docs playground + spec** — `docs-site/playgrounds/table/app.R`, manifest /
    metadata / `lib/api-reference.ts`, `generate-playgrounds.R` webR assets,
    `docs/component-specs/table.md`, `devtools::document()`, NEWS.
+   **Done 2026-06-05.** No R docs changed in this slice, so
+   `devtools::document()` was not rerun.
 5. **Slice gate** — `make check-slice`, browser/parity light+dark.
 
 ## Phase 2 — actions (later, separate ADR)

@@ -49,6 +49,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Table",
+    slug = "table",
+    file = "table.R",
+    description = "Styled data-frame tables with captions, column formatting, alignment, and truncation notes.",
+    featured = TRUE
+  ),
+  list(
     name = "Button",
     slug = "button",
     file = "button.R",

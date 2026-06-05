@@ -77,6 +77,17 @@
     "playgroundHeight": 720
   },
   {
+    "name": "Table",
+    "slug": "table",
+    "description": "Styled data-frame tables with captions, column formatting, alignment, and truncation notes.",
+    "featured": true,
+    "code": "shinyblocks::block_table(\n  data.frame(\n    metric = c(\"Revenue\", \"Orders\", \"Conversion\"),\n    value = c(\"$42k\", \"128\", \"4.8%\"),\n    delta = c(\"+12%\", \"+8%\", \"+0.6 pts\")\n  ),\n  columns = list(\n    value = shinyblocks::table_column(label = \"Value\", align = \"right\"),\n    delta = shinyblocks::table_column(label = \"Delta\", align = \"right\")\n  ),\n  caption = \"Monthly operating metrics.\"\n)",
+    "codeHtml": "<div id=\"sb-runtime-code-code-25\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_table(\\n  data.frame(\\n    metric = c(\\\"Revenue\\\", \\\"Orders\\\", \\\"Conversion\\\"),\\n    value = c(\\\"$42k\\\", \\\"128\\\", \\\"4.8%\\\"),\\n    delta = c(\\\"+12%\\\", \\\"+8%\\\", \\\"+0.6 pts\\\")\\n  ),\\n  columns = list(\\n    value = shinyblocks::table_column(label = \\\"Value\\\", align = \\\"right\\\"),\\n    delta = shinyblocks::table_column(label = \\\"Delta\\\", align = \\\"right\\\")\\n  ),\\n  caption = \\\"Monthly operating metrics.\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null,\"style\":null}</script>\n  <div data-shinyblocks-react=\"\"></div>\n  <div data-shinyblocks-children=\"\"></div>\n</div>",
+    "html": "<div id=\"sb-runtime-table-table-24\" class=\"sb-runtime-mount sb-table\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"table\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"table\",\"id\":null,\"props\":{\"columns\":[{\"key\":\"metric\",\"label\":\"metric\",\"align\":\"left\",\"width\":null},{\"key\":\"value\",\"label\":\"Value\",\"align\":\"right\",\"width\":null},{\"key\":\"delta\",\"label\":\"Delta\",\"align\":\"right\",\"width\":null}],\"rows\":[[\"Revenue\",\"$42k\",\"+12%\"],[\"Orders\",\"128\",\"+8%\"],[\"Conversion\",\"4.8%\",\"+0.6 pts\"]],\"caption\":\"Monthly operating metrics.\",\"truncated\":false,\"totalRows\":3},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null,\"style\":null}</script>\n  <div data-shinyblocks-react=\"\"></div>\n  <div data-shinyblocks-children=\"\"></div>\n</div>",
+    "hasPlayground": true,
+    "playgroundHeight": 720
+  },
+  {
     "name": "Button",
     "slug": "button",
     "description": "Interactive controls for triggers, forms, and custom actions.",

@@ -4,6 +4,14 @@
 
 ## New features
 
+* Added `block_table()` and `table_column()` (issue #49), a static
+  runtime-owned shadcn table port for rendering data frames with R-side
+  formatting, captions, column alignment/width overrides, empty-cell `NA`
+  handling, and optional `max_rows` truncation notes. The Shiny showcase and
+  docs site now include interactive Table playgrounds and the table participates
+  in theme/style parity checks. v1 is presentational only; selection, sorting,
+  pagination, and row actions are deferred to a later data-table slice.
+
 * Added a shared semantic foreground color API for icons and spinners.
   `block_icon()` now accepts `color = c("default", "muted", "primary",
   "destructive", "success", "warning", "info")`, and `block_spinner()` accepts

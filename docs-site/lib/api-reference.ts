@@ -180,6 +180,30 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  table: [
+    {
+      name: "block_table",
+      description: "Renders a data frame or tibble as a static shadcn-style table through the shinyblocks runtime.",
+      arguments: [
+        { argument: "data", type: "data.frame", defaultVal: "required", description: "Data frame or tibble to render." },
+        { argument: "columns", type: "named list", defaultVal: "NULL", description: "Optional table_column() specs keyed by data column name." },
+        { argument: "caption", type: "character", defaultVal: "NULL", description: "Caption rendered below the table." },
+        { argument: "max_rows", type: "integer", defaultVal: "NULL", description: "Optional row limit. Truncated tables render a footer note." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes applied to the runtime table container." },
+        { argument: "style", type: "character | named list", defaultVal: "NULL", description: "Inline styles applied to the runtime mount and table container." }
+      ]
+    },
+    {
+      name: "table_column",
+      description: "Defines per-column display options for block_table().",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "NULL", description: "Header label. Defaults to the column name." },
+        { argument: "align", type: "'left' | 'center' | 'right'", defaultVal: "'left'", description: "Text alignment for header and cells." },
+        { argument: "format", type: "function", defaultVal: "NULL", description: "Function applied to the full R column vector before rendering." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "Optional CSS width for the column." }
+      ]
+    }
+  ],
   button: [
     {
       name: "block_button",
