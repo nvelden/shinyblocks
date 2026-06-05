@@ -16,7 +16,6 @@ export function Badge({ payload }) {
         `sb-badge-size-${size}`,
         payload.className
       )}
-      style={payload.style}
     >
       <HtmlSlot html={props.labelHtml} />
     </span>
@@ -68,7 +67,6 @@ export function Spinner({ payload }) {
       )}
       role="status"
       aria-label={props.label || "Loading"}
-      style={payload.style}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
@@ -97,7 +95,6 @@ export function Empty({ payload }) {
     <section
       data-slot="empty"
       className={classNames("sb-empty", payload.className)}
-      style={payload.style}
     >
       {props.iconHtml && (
         <div className="sb-empty-icon">
@@ -147,7 +144,7 @@ export function ValueBox({ payload }) {
     <section
       data-slot="value-box"
       className={classNames("sb-value-box", `sb-value-box-${variant}`, payload.className)}
-      style={{ ...variantStyle, ...(payload.style || {}) }}
+      style={variantStyle}
     >
       {props.iconHtml && (
         <div className="sb-value-box-icon">
@@ -202,10 +199,7 @@ export function Alert({ payload }) {
         `sb-alert-${variant}`,
         payload.className
       )}
-      style={{
-        ...(props.actionHtml ? { paddingRight: "7rem" } : {}),
-        ...(payload.style || {})
-      }}
+      style={props.actionHtml ? { paddingRight: "7rem" } : undefined}
     >
       {props.iconHtml && (
         <div className="sb-alert-icon">

@@ -36,7 +36,6 @@ export function Code({ payload }) {
         hasHeader && "sb-code-block-with-header",
         payload.className
       )}
-      style={payload.style}
     >
       {hasHeader && (
         <div className="sb-code-block-header">

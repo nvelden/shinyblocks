@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
 	check-fast check-slice lint spell urls test docs check pkgdown budget \
-	doc-links legacy-audit theme-static theme-test style-parity parity-install parity-build-css parity-setup parity parity-stop \
+	doc-links legacy-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
 	preview-shinylive
 
@@ -80,12 +80,13 @@ check-fast:
 	npm run test:themes-static
 	npm run test:themes-drift
 	npm run test:style-leanness
+	npm run test:style-ownership
 	git diff --check
 	@echo "check-fast OK"
 
 # ---------- Slice boundary ----------
 
-check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness style-registry
+check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness style-ownership style-registry
 	git diff --check
 	@echo "check-slice OK"
 
@@ -166,6 +167,12 @@ style-parity:
 # that must instead be a profile token. Keeps profiles data, not CSS (issue #34).
 style-leanness:
 	npm run test:style-leanness
+
+# Static ownership gate (no browser): fails when a runtime renderer spreads
+# `payload.style` onto its own root, double-applying the user `style=` that the
+# mount div already owns. Keeps style on exactly one DOM node (issue #50).
+style-ownership:
+	npm run test:style-ownership
 
 # Browser-free unit tests for the style-registry R parser (resolves the profile
 # recipe-helper splices). Runs in check-slice so a parser regression is caught

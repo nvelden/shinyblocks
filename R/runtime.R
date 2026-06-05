@@ -13,6 +13,17 @@ RUNTIME_COMPONENT_NAMES <- c(
   "value-box"
 )
 
+# Style ownership (issue #50): a user `style=` argument must land on exactly one
+# DOM node. For in-flow components that node is the mount `<div>` below, and the
+# React renderer must NOT also spread `payload.style` onto its own root (enforced
+# by tools/theme/check-style-ownership.mjs). The exception is a component whose
+# visible root is rendered through a portal, outside the mount subtree: there the
+# mount div can never reach it, so the renderer owns the user style on its
+# portaled root and the mount div stays plain. `dialog` is the only such
+# component today (its content reads `payload.style`); keep this list in sync
+# with the gate's allowlist.
+RUNTIME_CONTENT_STYLE_COMPONENTS <- c("dialog")
+
 runtime_component <- function(
   component,
   props = list(),
@@ -51,11 +62,15 @@ runtime_component <- function(
   )
   mount_id <- mount_id %||% runtime_mount_id(component, input_id)
 
+  # Portaled-content components own the user style on their own root; everyone
+  # else carries it here on the mount div. See RUNTIME_CONTENT_STYLE_COMPONENTS.
+  mount_style <- if (component %in% RUNTIME_CONTENT_STYLE_COMPONENTS) NULL else style
+
   attach_shinyblocks_deps(
     htmltools::tags$div(
       id = mount_id,
       class = merge_classes("sb-runtime-mount", root_class),
-      style = style,
+      style = mount_style,
       `data-shinyblocks-root` = "",
       `data-shinyblocks-runtime` = "true",
       `data-sb-component` = component,

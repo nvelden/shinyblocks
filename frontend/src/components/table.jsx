@@ -4,12 +4,15 @@ function alignment(value) {
   return ["left", "center", "right"].includes(value) ? value : "left";
 }
 
-function columnStyle(column) {
-  const align = alignment(column && column.align);
+function headStyle(column) {
   return {
-    textAlign: align,
+    textAlign: alignment(column && column.align),
     ...(column && column.width ? { width: column.width } : {})
   };
+}
+
+function cellStyle(column) {
+  return { textAlign: alignment(column && column.align) };
 }
 
 export function Table({ payload }) {
@@ -22,7 +25,6 @@ export function Table({ payload }) {
     <div
       data-slot="table-container"
       className={classNames("sb-table-container", payload.className)}
-      style={payload.style}
     >
       <table data-slot="table" className="sb-table-element">
         {props.caption && (
@@ -38,7 +40,7 @@ export function Table({ payload }) {
                 data-slot="table-head"
                 className="sb-table-head"
                 scope="col"
-                style={columnStyle(column)}
+                style={headStyle(column)}
               >
                 {column.label || column.key || ""}
               </th>
@@ -57,7 +59,7 @@ export function Table({ payload }) {
                   key={column.key || columnIndex}
                   data-slot="table-cell"
                   className="sb-table-cell"
-                  style={columnStyle(column)}
+                  style={cellStyle(column)}
                 >
                   {Array.isArray(row) ? row[columnIndex] || "" : ""}
                 </td>
