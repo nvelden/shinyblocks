@@ -1,3 +1,50 @@
+# Handoff: Reactive block_table() + unified formatting (Issue #51)
+
+## Current work (2026-06-05)
+
+Issue: https://github.com/nvelden/shinyblocks/issues/51
+Plan: `docs/agent-plans/2026-06-05-table-reactive-formatting.md`
+Branch: `table-reactive-formatting`
+
+Follow-up to the static `block_table()` v1 (#49/#50). Goal: close the gap to
+Shiny `tableOutput()`/`renderTable()` — make the table reactive and route data
+loading, column formatting, and row formatting through one R-side serializer
+used by both the UI render and server-side updates.
+
+Decisions (locked 2026-06-05): (1) reactive surface = `update_block_table()`
+reusing `runtime_input_update`; (2) row formatting = `row_format(row, i)`
+returning `{class, style}`; (3) NA default stays `""` (opt in via `na=`).
+
+**Slice 1 — DONE.** R formatting pipeline + update helper, R-only (no
+runtime/CSS yet, so no showcase restart needed):
+
+- `R/table.R`: extracted `table_build_payload()` as the single payload source
+  for both `block_table()` and `update_block_table()`. Added `update_block_table()`.
+  `block_table()` gained `na`, `digits`, `rownames`, `row_format`, `striped`,
+  `hover`, `bordered`, `id` (all defaulted, back-compatible). `table_column()`
+  gained per-column `digits`/`na`. `row_format` -> per-row `rowMeta {class,style}`.
+- `tests/testthat/test-table.R`: na/digits/rownames, row_format->rowMeta,
+  pipeline-identity guarantee, update message target/payload, loading-only,
+  new validation. 43 pass.
+- `devtools::document()` regenerated `man/update_block_table.Rd` + content-family
+  `@family` cross-refs + NAMESPACE.
+- Verification: `Rscript -e "devtools::load_all(); testthat::test_file('tests/testthat/test-table.R')"`
+  — 43 passed. `make check-fast` — passed.
+
+**Slice 2 — NEXT (runtime delivery binding).** Shiny routes input messages by
+the mount DOM id and only to an element a registered InputBinding owns; the
+table has none, so `update_block_table()` builds/sends correctly but won't reach
+the DOM yet. Add a receive-only runtime binding for `table` in
+`frontend/src/runtime/bindings.js` (`find` matches the mount, `getValue` -> null,
+`subscribe`/`unsubscribe` no-op, `receiveMessage` -> `el.__sbTableReceive`),
+register it in `BINDING_NAMES`/`BINDING_CONFIGS`, add `"table"` to
+`RUNTIME_INPUT_COMPONENTS`. Open question: whether the null `input$<id>` value is
+acceptable or should be suppressed. Then slice 3 reads `rowMeta`/`loading`/
+`striped`/`bordered` in `table.jsx` + CSS (first slice that needs a showcase
+restart). See the plan for slices 4-7.
+
+---
+
 # Handoff: Issue #49 - Add block_table() (shadcn table port)
 
 ## Status (2026-06-05)

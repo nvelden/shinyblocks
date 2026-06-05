@@ -9,6 +9,14 @@ block_table(
   columns = NULL,
   caption = NULL,
   max_rows = NULL,
+  na = "",
+  digits = NULL,
+  rownames = FALSE,
+  row_format = NULL,
+  striped = FALSE,
+  hover = TRUE,
+  bordered = FALSE,
+  id = NULL,
   class = NULL,
   style = NULL
 )
@@ -24,6 +32,30 @@ block_table(
 \item{max_rows}{Optional non-negative integer limiting the number of rendered
 rows. When rows are truncated, a footer note reports the total row count.}
 
+\item{na}{String used to render missing values. Defaults to \code{""} (empty
+cell). Per-column overrides win via \code{table_column(na = )}.}
+
+\item{digits}{Optional non-negative integer giving the number of decimal
+places for default numeric formatting. \code{NULL} keeps R's default \code{format()}.
+Ignored for columns with a custom \code{format} function. Per-column overrides
+win via \code{table_column(digits = )}.}
+
+\item{rownames}{Whether to render \code{row.names(data)} as a leading column.}
+
+\item{row_format}{Optional \verb{function(row, i)} called once per rendered row,
+where \code{row} is the original (unformatted) row as a named list and \code{i} is the
+row index. Return \code{NULL} for no styling, or a list with optional \code{class}
+and/or \code{style} entries applied to that row's \verb{<tr>}.}
+
+\item{striped}{Whether to zebra-stripe body rows.}
+
+\item{hover}{Whether rows highlight on hover. Defaults to \code{TRUE} (shadcn base).}
+
+\item{bordered}{Whether to draw cell borders.}
+
+\item{id}{Optional input id. Required only if the table is updated from the
+server with \code{\link[=update_block_table]{update_block_table()}}; static tables can omit it.}
+
 \item{class}{Additional classes on the runtime mount.}
 
 \item{style}{Optional inline custom styles.}
@@ -34,7 +66,8 @@ An \code{htmltools} tag.
 \description{
 \code{block_table()} renders a data frame or tibble as a runtime-owned shadcn
 table. Cell formatting happens in R before the payload is sent to the
-browser.
+browser. The same formatting pipeline is reused by \code{\link[=update_block_table]{update_block_table()}},
+so a server-side refresh produces an identical payload.
 }
 \seealso{
 Other content: 
@@ -60,6 +93,7 @@ Other content:
 \code{\link{block_value_box}()},
 \code{\link{table_column}()},
 \code{\link{update_block_dialog}()},
-\code{\link{update_block_popover}()}
+\code{\link{update_block_popover}()},
+\code{\link{update_block_table}()}
 }
 \concept{content}
