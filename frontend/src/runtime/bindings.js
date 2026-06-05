@@ -15,7 +15,8 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "textarea",
   "input",
   "radio-group",
-  "slider"
+  "slider",
+  "table"
 ]);
 
 export function isRuntimeInputPayload(payload) {
@@ -291,6 +292,23 @@ const BINDING_CONFIGS = [
     },
     ...sliderEvents,
     ratePolicy: { policy: "throttle", delay: 100 }
+  },
+  {
+    // Receive-only binding: the table is presentational, but registering an
+    // InputBinding is how Shiny routes `update_block_table()` messages
+    // (`sendInputMessage`) to this mount by its DOM id. It exposes no real
+    // value — `getValue` returns null and there is no `subscribe`, so the only
+    // visible side effect is a null `input$<id>` (acceptable; no author reads
+    // it). `receiveMessage` forwards the fresh payload to React via the
+    // `__sbTableReceive` expando the mount installs.
+    component: "table",
+    receiveProp: "__sbTableReceive",
+    getValue() {
+      return null;
+    },
+    setValue() {},
+    subscribe() {},
+    unsubscribe() {}
   }
 ];
 
@@ -304,7 +322,8 @@ const BINDING_NAMES = [
   "shinyblocks.textarea",
   "shinyblocks.input",
   "shinyblocks.radio-group",
-  "shinyblocks.slider"
+  "shinyblocks.slider",
+  "shinyblocks.table"
 ];
 
 let bindingsRegistered = false;

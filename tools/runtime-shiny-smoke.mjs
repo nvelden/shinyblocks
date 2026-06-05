@@ -219,6 +219,18 @@ try {
     )?.disabled === false;
   });
 
+  await assertText(
+    page,
+    "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",
+    "alpha"
+  );
+  await page.click("#update_table");
+  await assertText(
+    page,
+    "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",
+    "beta"
+  );
+
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
   await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({

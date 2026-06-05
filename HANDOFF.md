@@ -31,17 +31,54 @@ runtime/CSS yet, so no showcase restart needed):
 - Verification: `Rscript -e "devtools::load_all(); testthat::test_file('tests/testthat/test-table.R')"`
   — 43 passed. `make check-fast` — passed.
 
-**Slice 2 — NEXT (runtime delivery binding).** Shiny routes input messages by
-the mount DOM id and only to an element a registered InputBinding owns; the
-table has none, so `update_block_table()` builds/sends correctly but won't reach
-the DOM yet. Add a receive-only runtime binding for `table` in
-`frontend/src/runtime/bindings.js` (`find` matches the mount, `getValue` -> null,
-`subscribe`/`unsubscribe` no-op, `receiveMessage` -> `el.__sbTableReceive`),
-register it in `BINDING_NAMES`/`BINDING_CONFIGS`, add `"table"` to
-`RUNTIME_INPUT_COMPONENTS`. Open question: whether the null `input$<id>` value is
-acceptable or should be suppressed. Then slice 3 reads `rowMeta`/`loading`/
-`striped`/`bordered` in `table.jsx` + CSS (first slice that needs a showcase
-restart). See the plan for slices 4-7.
+**Slice 2 — DONE (runtime delivery binding).** Added the receive-only `table`
+binding so `update_block_table()` messages reach the DOM:
+
+- `frontend/src/runtime/bindings.js`: added `"table"` to `RUNTIME_INPUT_COMPONENTS`,
+  appended a receive-only config to `BINDING_CONFIGS` (`getValue` -> null,
+  `setValue`/`subscribe`/`unsubscribe` no-op, `receiveProp: "__sbTableReceive"`),
+  and `"shinyblocks.table"` to `BINDING_NAMES` (index-matched).
+- `frontend/src/components/table.jsx`: now stateful — initializes props from
+  `payload.props`, installs `root.__sbTableReceive` in a mount effect that merges
+  the incoming (possibly partial) payload over current props and re-renders.
+- `tools/runtime-shiny-fixture.R` + `tools/runtime-shiny-smoke.mjs`: added a
+  `block_table(id="runtime_table")` + "Update table" button; the smoke test
+  asserts alpha->beta re-render after `update_block_table()`.
+- **Resolved (null input value):** keep it. `getValue` -> null means
+  `input$runtime_table` is null; acceptable for a receive-only/output-style
+  component (no author reads it), and avoids a special-case registration path.
+- Verification: `npm run build:runtime`, `npm run test:runtime-shiny` — passed
+  (alpha->beta); `npm run test:runtime` — passed; `make check-fast` — passed.
+  Showcase restarted on 4321; `make showcase-health` — 200.
+
+**Slice 3 — DONE (runtime: rowMeta + loading + variant classes).**
+
+- `frontend/src/components/table.jsx`: container now toggles `sb-table--striped`
+  / `sb-table--bordered` / `sb-table--hover` (hover on unless `props.hover ===
+  false`) / `sb-table--loading`. `loading` renders N skeleton `<tr>`s (N = current
+  row count, else 5) with `<span class="sb-table-skeleton">`, header stays,
+  `tbody aria-busy`, footer hidden while loading. Data rows read
+  `props.rowMeta[i]` -> per-`<tr>` `className` (`meta.class`) + `style`
+  (`meta.style`, already a React style object from `normalize_runtime_style`).
+- `frontend/src/styles/runtime/09-table.css`: gated the existing hover rule
+  behind `.sb-table--hover .sb-table-body`; added `.sb-table--striped` zebra
+  (`--muted` color-mix), `.sb-table--bordered` cell `border-inline` (`--border`,
+  first/last cleared), and `.sb-table-skeleton` reusing the shared
+  `shinyblocks-pulse` keyframe + `--muted` (no new `--sb-table-*` token needed,
+  so leanness gate unaffected).
+- Verification: `npm run build:runtime`; `npm run test:themes` — token-usage
+  pass, response 88/0, parity 124/0; `npm run test:runtime-shiny` + `test:runtime`
+  — passed; `make check-fast` — passed. Showcase restarted on 4321;
+  `make showcase-health` — HTTP 200.
+
+**Slice 4 — NEXT (showcase Server Action panel + new controls).** Extend
+`inst/showcase/R/server_table.R` + `inst/showcase/R/examples/table.R` with a
+**Server Action** panel (buttons: swap datasets, toggle `loading`, push a
+filtered subset, toggle striped/bordered) plus Content controls for `na`,
+`digits`, `rownames`, and a `row_format` demo (highlight rows over a threshold).
+Must keep the full Content/State/Styling/Actions playground + API table
+(`feedback_showcase_playground`). Restart; user confirms live reactive update +
+loading skeleton. See the plan for slices 5-7.
 
 ---
 
