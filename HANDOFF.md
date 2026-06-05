@@ -173,6 +173,24 @@ to the same branch/PR:
   action button populates code, 0 console errors. No runtime/CSS change (R
   payload only), so no runtime rebuild needed.
 
+**Follow-up (2026-06-05) — CI gate was RED: runtime JS gzipped over budget.**
+The HANDOFF's earlier "make gate green" claim did not hold on CI: the reactive
+table runtime pushed `inst/www/shinyblocks-runtime.js` to 75.0+ KB gzipped vs
+the 75 KB budget (the slice-7 fix only addressed CSS *raw*). Fixed by trimming,
+per maintainer's "option 1 (trim, not budget bump)" choice:
+
+- `frontend/src/runtime/bindings.js`: made `getValue/setValue/subscribe/
+  unsubscribe` optional in `makeRuntimeBinding()` (factory now supplies
+  receive-only defaults), letting the receive-only `table` binding drop its four
+  no-op stubs. Removing that *unique* stub code reclaimed gzipped headroom.
+- Rebuilt `inst/www/shinyblocks-runtime.js`. `tools/budget.R` → OK, gzipped
+  memCompress 76786 / 76800 B. **Margin is thin (14 B);** refactoring the
+  repetitive binding configs backfires (gzip rewards the repetition), so further
+  trimming risks regressing. If the budget tightens again, prefer a
+  maintainer-approved gzipped budget bump (75→76 KB) over fragile micro-trims.
+- Verified: `test:runtime`, `test:select-overflow`, `test:runtime-shiny` (table
+  receive smoke) pass. Pushed to PR #52; CI gate re-run to confirm green.
+
 ---
 
 # Handoff: Issue #49 - Add block_table() (shadcn table port)
