@@ -126,8 +126,8 @@ register_popover_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_popover_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_popover_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("trigger", "...", "id", "side", "align", "open", "style", "class"),
       Type = c("character", "tag | tagList", "character", "character", "character", "logical", "character | list", "character"),
       Default = c("required", "NULL", "NULL", "\"bottom\"", "\"center\"", "FALSE", "NULL", "NULL"),
@@ -141,8 +141,8 @@ register_popover_showcase <- function(input, output, session) {
         "Optional inline CSS applied to the popover content container.",
         "Additional class merged onto the popover content container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_popover_api_table",

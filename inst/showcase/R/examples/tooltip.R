@@ -51,7 +51,7 @@ htmltools::tagList(
   ),
   
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_tooltip_api_table"),
+  shiny::uiOutput("showcase_tooltip_api_table"),
   
   # Stable baseline patterns as parity fixtures
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "Common Patterns (Parity Fixtures)"),

@@ -6,9 +6,13 @@ Issue: https://github.com/nvelden/shinyblocks/issues/49
 Plan: `docs/agent-plans/2026-06-05-table-component.md`
 Branch: `issue-49-block-table`
 
-Slices 1-4 are complete: R API + strict payload + tests + roxygen, runtime
-render + CSS + theme/style registry coverage, the full showcase playground, and
-the docs-site playground/spec sync. Next slice is the slice gate.
+Phase 1 / slices 1-5 are complete: R API + strict payload + tests + roxygen,
+runtime render + CSS + theme/style registry coverage, the full showcase
+playground, docs-site playground/spec sync, and the slice gate.
+
+Phase 3 dogfooding has started. All showcase API-reference tables have been
+migrated locally to `block_table()` with standardized headings; the required
+live showcase health/browser check is still pending after restart.
 
 Implemented:
 
@@ -74,6 +78,23 @@ Verification:
 - `make build-css build-runtime` — passed.
 - `make check-fast` — passed.
 - Showcase restarted on port 4321; `make showcase-health` returned HTTP 200.
+- `make check-slice` — passed; 1110 R test expectations passed, 1 known
+  doc-coverage skip for repo-root `_pkgdown.yml` under the test harness.
+- Showcase restarted on port 4321 after the slice gate; `make showcase-health`
+  returned HTTP 200.
+- `npm run test:themes-browser` — passed outside the sandbox; table token
+  response was verified in light and dark mode, and table style-profile parity
+  passed across all style profiles.
+- Phase 3 showcase API-table dogfooding local checks:
+  `Rscript -e "devtools::test(filter = 'showcase|table')"` — 227 passed;
+  `npm run test:themes-static` — passed; `npm run test:style-leanness` —
+  passed; `git diff --check` — passed; `make build-css build-runtime` —
+  passed. No `shiny::tableOutput()` / `shiny::renderTable()` API-reference
+  calls remain under `inst/showcase/R/examples` or
+  `inst/showcase/R/server_*.R`. Showcase was restarted and logged
+  `Listening on http://127.0.0.1:4321`, but `make showcase-health` and browser
+  smoke are still pending because the required unsandboxed health probe could
+  not be approved in the Codex session.
 
 ## Decisions (locked 2026-06-05)
 
@@ -115,6 +136,9 @@ Slice order (each slice ends with rebuild + showcase restart + manual confirm):
    **Done 2026-06-05.** No R docs changed in this slice, so
    `devtools::document()` was not rerun.
 5. **Slice gate** — `make check-slice`, browser/parity light+dark.
+   **Done 2026-06-05.** The table slice uses the theme/style browser harness
+   for light/dark parity coverage; `tools/parity/registry.mjs` does not define
+   a standalone shadcn table visual-diff entry.
 
 ## Phase 2 — actions (later, separate ADR)
 
@@ -131,6 +155,11 @@ sorting, pagination, row action buttons. See plan "Phase 2" section.
   `showcase_api_table()` helper wrapping `block_table()`, migrate in batches of
   ~5-6 per slice. Retire the old renderTable CSS in
   `inst/showcase/www/showcase.css`.
+  - **Local migration complete:** added `showcase_api_table()`, migrated all
+    showcase API-reference tables to `block_table()`, standardized headings to
+    `Argument`, `Type`, `Default`, and `Description`, and retired the old
+    native Shiny table CSS. Pending live showcase health/browser verification
+    before considering this batch fully complete.
 - **Docs-site: 1 React `<table>`** at
   `docs-site/app/components/[slug]/page.tsx:136`. Docs-site is a separate
   Next.js app and can't call R `block_table()`. **Open decision:** restyle the

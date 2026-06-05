@@ -157,8 +157,8 @@ register_code_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_code_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_code_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("code", "language", "copyable", "line_numbers", "header", "variant", "class", "style"),
       Type = c("character", "character", "logical", "logical", "logical", "character", "character", "character"),
       Default = c("required", "NULL", "TRUE", "TRUE", "FALSE", "\"default\"", "NULL", "NULL"),
@@ -172,8 +172,8 @@ register_code_showcase <- function(input, output, session) {
         "Additional CSS custom stylesheet classes to apply.",
         "Inline CSS custom stylesheet style declarations."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_code_api_table",

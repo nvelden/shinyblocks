@@ -108,18 +108,19 @@ register_field_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_field_api_table <- shiny::renderTable({
-    data.frame(
-      Function = c(
+  output$showcase_field_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
+      Argument = c(
         "block_field", "block_field_group", "block_field_label",
         "block_field_description", "block_field_set",
         "block_field_legend", "block_field_invalid"
       ),
-      Arguments = c(
+      Type = c(
         "..., class", "..., class", "..., for, class",
         "..., id, class", "..., class", "..., class",
         "field, message"
       ),
+      Default = c("none", "none", "none", "none", "none", "none", "required"),
       Description = c(
         "A layout wrapper for a single form field (label, control, description/error).",
         "Flex column grid to position multiple fields side-by-side (e.g. inside forms).",
@@ -129,8 +130,8 @@ register_field_showcase <- function(input, output, session) {
         "A legend caption detailing the purpose of the surrounding fieldset.",
         "Server-reactive validator that injects data-invalid attributes, aria descriptors, and formats red error text."
       )
-    )
-  }, width = "100%", align = "lll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_field_api_table",

@@ -137,8 +137,8 @@ register_tabs_showcase <- function(input, output, session) {
   })
 
   # API reference table
-  output$showcase_tabs_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_tabs_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("...", "id", "selected", "variant", "orientation", "class", "update_block_tabs()"),
       Type = c("block_tab() tags", "character", "character", "character", "character", "character", "function"),
       Default = c("required", "NULL", "NULL", "'default'", "'horizontal'", "NULL", "selected required"),
@@ -151,8 +151,8 @@ register_tabs_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the tabs container.",
         "Server updater for selecting an active tab by value."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_tabs_api_table",

@@ -74,8 +74,8 @@ register_separator_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_separator_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_separator_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("orientation", "decorative", "class"),
       Type = c("character", "logical", "character"),
       Default = c("\"horizontal\"", "TRUE", "NULL"),
@@ -84,8 +84,8 @@ register_separator_showcase <- function(input, output, session) {
         "Whether the separator is decorative only (TRUE hides it from accessibility tree).",
         "Additional CSS class merged onto the separator element."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_separator_api_table",

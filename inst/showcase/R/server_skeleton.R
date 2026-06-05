@@ -112,8 +112,8 @@ register_skeleton_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_skeleton_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_skeleton_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("class", "..."),
       Type = c("character", "named attributes"),
       Default = c("NULL", "none"),
@@ -121,8 +121,8 @@ register_skeleton_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the skeleton element (e.g. rounded-full).",
         "Additional attributes passed to the div tag (e.g. style for dimensions)."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_skeleton_api_table",

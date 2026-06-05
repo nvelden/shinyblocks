@@ -37,8 +37,8 @@ register_icon_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_icon_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_icon_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("name", "size", "class", "color", "..."),
       Type = c("character | tag", "character", "character", "character", "named attributes"),
       Default = c("required", "\"default\"", "NULL", "\"default\"", "none"),
@@ -49,8 +49,8 @@ register_icon_showcase <- function(input, output, session) {
         "Semantic foreground color. One of default, muted, primary, destructive, success, warning, or info.",
         "Additional attributes passed to the svg tag (e.g. style, width, height, etc.)."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_icon_api_table",

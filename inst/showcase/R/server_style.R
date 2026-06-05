@@ -114,8 +114,8 @@ register_style_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_style_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_style_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("profile", "...", "scope"),
       Type = c("character", "Named token overrides", "character"),
       Default = c("\"default\"", "none", "NULL"),
@@ -124,8 +124,8 @@ register_style_showcase <- function(input, output, session) {
         "Curated snake-case overrides, e.g. control_height, surface_gap, surface_padding.",
         "Optional CSS selector to scope the profile to a subtree instead of the whole page."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_style_api_table",

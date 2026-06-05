@@ -160,23 +160,24 @@ register_layout_showcase <- function(input, output, session) {
   )
 
   # API Reference table
-  output$showcase_layout_api_table <- shiny::renderTable({
-    data.frame(
-      Component = c("block_page", "block_sidebar", "block_header", "block_body"),
-      Arguments = c(
+  output$showcase_layout_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
+      Argument = c("block_page", "block_sidebar", "block_header", "block_body"),
+      Type = c(
         "..., title, sidebar, header, theme_mode, theme, class",
         "..., title, collapsible, collapsed, id, class",
         "..., class",
         "..., class"
       ),
+      Default = c("none", "none", "none", "none"),
       Description = c(
         "Main modern layout page shell. Injects and handles responsive sheet-drawers.",
         "Dashboard left sidebar with collapsible mode support and built-in menu toggles.",
         "Top navigation/action header shell.",
         "Central page landmark wrapper for nested sections/grids."
       )
-    )
-  }, width = "100%", align = "lll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_layout_api_table",

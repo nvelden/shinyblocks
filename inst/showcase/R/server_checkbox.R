@@ -137,8 +137,8 @@ register_checkbox_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_checkbox_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_checkbox_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("input_id", "label", "value", "disabled", "style", "class"),
       Type = c("character", "character", "logical", "logical", "character | list", "character"),
       Default = c("required", "required", "FALSE", "FALSE", "NULL", "NULL"),
@@ -150,8 +150,8 @@ register_checkbox_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the runtime checkbox wrapper.",
         "Additional class merged onto the runtime checkbox wrapper."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_checkbox_api_table",

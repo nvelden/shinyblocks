@@ -107,8 +107,8 @@ register_alert_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_alert_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_alert_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("title", "...", "description", "action", "icon", "variant", "class", "style"),
       Type = c("character | tag", "named tags", "character | tag", "character | tag", "character | tag", "character", "character", "character | named list"),
       Default = c("required", "none", "NULL", "NULL", "\"info\"", "\"default\"", "NULL", "NULL"),
@@ -122,8 +122,8 @@ register_alert_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the alert container.",
         "Optional inline styles applied to the alert container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_alert_api_table",

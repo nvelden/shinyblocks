@@ -142,8 +142,8 @@ register_table_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_table_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_table_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("data", "columns", "caption", "max_rows", "class", "style", "table_column(label)", "table_column(align)", "table_column(format)", "table_column(width)"),
       Type = c("data.frame", "named list", "character", "integer", "character", "character | named list", "character", "character", "function", "character"),
       Default = c("required", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "\"left\"", "NULL", "NULL"),
@@ -159,8 +159,8 @@ register_table_showcase <- function(input, output, session) {
         "Optional function applied to the full column vector; must return one value per row.",
         "Optional CSS width for the column."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_table_api_table",

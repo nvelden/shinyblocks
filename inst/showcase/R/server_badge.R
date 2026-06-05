@@ -68,8 +68,8 @@ register_badge_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_badge_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_badge_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("label", "variant", "size", "class", "style"),
       Type = c("character | tag", "character", "character", "character", "character | named list"),
       Default = c("required", "\"default\"", "\"default\"", "NULL", "NULL"),
@@ -80,8 +80,8 @@ register_badge_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the badge element.",
         "Optional inline styles applied to the badge element."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_badge_api_table",

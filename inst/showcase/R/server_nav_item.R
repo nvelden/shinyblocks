@@ -66,8 +66,8 @@ register_nav_item_showcase <- function(input, output, session) {
   )
 
   # API Reference table
-  output$showcase_nav_item_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_nav_item_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("label", "href", "icon", "selected", "class"),
       Type = c("character", "character", "character | tag", "logical", "character"),
       Default = c("required", "'#'", "NULL", "FALSE", "NULL"),
@@ -78,8 +78,8 @@ register_nav_item_showcase <- function(input, output, session) {
         "Whether the navigation item is active/selected.",
         "Additional CSS class merged onto the navigation item link."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_nav_item_api_table",

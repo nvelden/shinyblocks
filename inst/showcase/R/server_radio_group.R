@@ -110,8 +110,8 @@ register_radio_group_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_radio_group_reactive_code", suspendWhenHidden = FALSE)
 
-  output$showcase_radio_group_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_radio_group_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("input_id", "choices", "selected", "disabled", "invalid", "orientation", "style", "class"),
       Type = c("character", "named character | list", "character", "logical", "logical", "character", "character | list", "character"),
       Default = c("required", "required", "first choice", "FALSE", "FALSE", "\"vertical\"", "NULL", "NULL"),
@@ -125,8 +125,8 @@ register_radio_group_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the radio-group wrapper.",
         "Additional class merged onto the runtime radio-group wrapper."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(output, "showcase_radio_group_api_table", suspendWhenHidden = FALSE)
 
   shiny::observeEvent(input$showcase_radio_group_select_mentions, {

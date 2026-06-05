@@ -217,8 +217,8 @@ register_button_showcase <- function(input, output, session) {
     ))
   })
 
-  output$showcase_button_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_button_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("label", "variant", "size", "icon", "icon_position", "...", "class"),
       Type = c("character | tag", "character", "character", "character | tag", "character", "named attributes", "character"),
       Default = c("required", "\"default\"", "\"default\"", "NULL", "\"inline-start\"", "none", "NULL"),
@@ -231,8 +231,8 @@ register_button_showcase <- function(input, output, session) {
         "Additional button attributes. Pass id = \"...\" to expose input$<id> as a click count and address the button from update_block_button().",
         "Additional class merged onto the runtime button element."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_button_api_table",

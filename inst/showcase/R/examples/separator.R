@@ -24,7 +24,7 @@ htmltools::tagList(
     code_output_id = "showcase_separator_preview_code"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_separator_api_table"),
+  shiny::uiOutput("showcase_separator_api_table"),
   htmltools::tags$h3(
     style = "margin-top: 2rem; font-size: 1.125rem;",
     "Parity fixtures"

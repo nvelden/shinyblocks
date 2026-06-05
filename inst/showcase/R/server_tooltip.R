@@ -54,8 +54,8 @@ register_tooltip_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_tooltip_preview_code", suspendWhenHidden = FALSE)
 
-  output$showcase_tooltip_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_tooltip_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("trigger", "...", "side", "align", "delay_duration", "style", "class"),
       Type = c(
         "character(1)",
@@ -84,7 +84,7 @@ register_tooltip_showcase <- function(input, output, session) {
         "Inline CSS applied to the tooltip content container.",
         "Additional class merged onto the runtime tooltip content."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(output, "showcase_tooltip_api_table", suspendWhenHidden = FALSE)
 }

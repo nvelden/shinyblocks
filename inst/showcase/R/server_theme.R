@@ -217,8 +217,8 @@ register_theme_showcase <- function(input, output, session) {
   )
 
   # API Reference table
-  output$showcase_theme_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_theme_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("preset", "...", "session", "mode"),
       Type = c("character", "Named HSL/CSS token overrides", "Shiny Session", "character"),
       Default = c("NULL", "none", "getDefaultReactiveDomain()", "required"),
@@ -228,8 +228,8 @@ register_theme_showcase <- function(input, output, session) {
         "The active Shiny session domain (required for theme updates).",
         "The targeted theme mode: 'system', 'light', or 'dark'."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_theme_api_table",

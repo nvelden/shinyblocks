@@ -74,8 +74,8 @@ register_value_box_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_value_box_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_value_box_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("title", "value", "...", "description", "icon", "variant", "class", "style"),
       Type = c("character | tag", "character | tag", "named/unnamed elements", "character | tag", "character | tag", "character", "character", "character | named list"),
       Default = c("required", "required", "none", "NULL", "NULL", "\"default\"", "NULL", "NULL"),
@@ -89,8 +89,8 @@ register_value_box_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the value box container.",
         "Optional inline styles applied to the value box container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_value_box_api_table",

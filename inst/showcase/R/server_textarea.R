@@ -93,8 +93,8 @@ register_textarea_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_textarea_reactive_code", suspendWhenHidden = FALSE)
 
-  output$showcase_textarea_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_textarea_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("input_id", "value", "placeholder", "rows", "width", "disabled", "invalid", "resize", "style", "class"),
       Type = c("character", "character", "character", "integer", "character", "logical", "logical", "character", "character | list", "character"),
       Default = c("required", "\"\"", "NULL", "3", "NULL", "FALSE", "FALSE", "\"vertical\"", "NULL", "NULL"),
@@ -110,8 +110,8 @@ register_textarea_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the textarea element.",
         "Additional class merged onto the runtime textarea wrapper."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(output, "showcase_textarea_api_table", suspendWhenHidden = FALSE)
 
   shiny::observeEvent(input$showcase_textarea_set_value, {

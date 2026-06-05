@@ -68,7 +68,7 @@ htmltools::tagList(
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
-  shiny::tableOutput("showcase_style_api_table"),
+  shiny::uiOutput("showcase_style_api_table"),
   htmltools::tags$h3(
     style = "margin-top: 2rem; font-size: 1.125rem;",
     "Parity fixtures"

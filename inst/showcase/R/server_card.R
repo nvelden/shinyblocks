@@ -84,8 +84,8 @@ register_card_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_card_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_card_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("...", "title", "description", "value", "footer", "class", "style"),
       Type = c("named/unnamed elements", "character | tag", "character | tag", "character", "shiny.tag", "character", "character | named list"),
       Default = c("none", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL"),
@@ -98,8 +98,8 @@ register_card_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the card container.",
         "Optional inline styles applied to the card container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_card_api_table",

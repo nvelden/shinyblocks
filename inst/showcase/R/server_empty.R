@@ -88,8 +88,8 @@ register_empty_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_empty_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_empty_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("title", "...", "description", "icon", "action", "class"),
       Type = c("character | tag", "named tags", "character | tag", "character | tag", "shiny.tag", "character"),
       Default = c("required", "none", "NULL", "NULL", "NULL", "NULL"),
@@ -101,8 +101,8 @@ register_empty_showcase <- function(input, output, session) {
         "Primary action element, typically a block_button().",
         "Additional CSS class merged onto the empty state container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_empty_api_table",

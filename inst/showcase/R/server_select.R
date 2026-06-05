@@ -164,8 +164,8 @@ register_select_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_select_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_select_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("choices", "selected", "placeholder", "disabled", "width", "class", "size", "style", "invalid"),
       Type = c("character | list", "character", "character", "logical", "character", "character", "character", "character", "logical"),
       Default = c("required", "NULL", "NULL", "FALSE", "NULL", "NULL", "\"default\"", "NULL", "FALSE"),
@@ -180,8 +180,8 @@ register_select_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the runtime select wrapper.",
         "Applies aria-invalid and destructive border/ring styling."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_select_api_table",

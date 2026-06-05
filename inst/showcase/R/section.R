@@ -67,3 +67,16 @@ showcase_render_code <- function(expr, env = parent.frame()) {
     )
   })
 }
+
+showcase_api_table <- function(data) {
+  block_table(
+    data,
+    columns = list(
+      Argument = table_column(width = "11rem"),
+      Type = table_column(width = "16rem"),
+      Default = table_column(width = "8rem"),
+      Description = table_column(width = "28rem")
+    ),
+    class = "showcase-api-table"
+  )
+}

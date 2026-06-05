@@ -74,8 +74,8 @@ register_switch_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_switch_reactive_code", suspendWhenHidden = FALSE)
 
-  output$showcase_switch_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_switch_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("input_id", "label", "value", "disabled", "size", "style", "class"),
       Type = c("character", "character", "logical", "logical", "character", "character | list", "character"),
       Default = c("required", "required", "FALSE", "FALSE", "\"default\"", "NULL", "NULL"),
@@ -88,8 +88,8 @@ register_switch_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the switch wrapper.",
         "Additional class merged onto the runtime switch wrapper."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(output, "showcase_switch_api_table", suspendWhenHidden = FALSE)
 
   shiny::observeEvent(input$showcase_switch_turn_on, {

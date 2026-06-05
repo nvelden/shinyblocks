@@ -239,8 +239,8 @@ register_dialog_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_dialog_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_dialog_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("id", "title", "description", "footer", "trigger", "open", "size", "hide_title", "class", "style"),
       Type = c("character", "character | tag", "character | tag", "tag | tagList", "character", "logical", "character", "logical", "character", "character | named list"),
       Default = c("required", "required", "NULL", "NULL", "NULL", "FALSE", "\"default\"", "FALSE", "NULL", "NULL"),
@@ -256,8 +256,8 @@ register_dialog_showcase <- function(input, output, session) {
         "Additional class merged onto the dialog content container.",
         "Optional inline CSS styles for the dialog content container."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_dialog_api_table",

@@ -50,8 +50,8 @@ register_spinner_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
-  output$showcase_spinner_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_spinner_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("label", "size", "color", "class", "style"),
       Type = c("character", "character", "character", "character", "character | named list"),
       Default = c("\"Loading\"", "\"default\"", "\"default\"", "NULL", "NULL"),
@@ -62,8 +62,8 @@ register_spinner_showcase <- function(input, output, session) {
         "Additional CSS class merged onto the spinner element.",
         "Optional inline styles applied to the spinner element."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(
     output,
     "showcase_spinner_api_table",

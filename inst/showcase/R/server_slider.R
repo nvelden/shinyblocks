@@ -152,8 +152,8 @@ register_slider_showcase <- function(input, output, session) {
   })
   shiny::outputOptions(output, "showcase_slider_reactive_code", suspendWhenHidden = FALSE)
 
-  output$showcase_slider_api_table <- shiny::renderTable({
-    data.frame(
+  output$showcase_slider_api_table <- shiny::renderUI({
+    showcase_api_table(data.frame(
       Argument = c("input_id", "value", "min", "max", "step", "ticks", "orientation", "show_value", "min_label", "max_label", "width", "disabled", "invalid", "style", "class"),
       Type = c("character", "numeric", "numeric", "numeric", "numeric | NULL", "logical", "character", "logical", "character", "character", "character", "logical", "logical", "character | list", "character"),
       Default = c("required", "required", "required", "required", "NULL", "FALSE", "\"horizontal\"", "FALSE", "NULL", "NULL", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
@@ -174,8 +174,8 @@ register_slider_showcase <- function(input, output, session) {
         "Inline CSS styles applied to the slider element.",
         "Additional class merged onto the runtime slider wrapper."
       )
-    )
-  }, width = "100%", align = "llll", striped = FALSE, hover = FALSE, bordered = FALSE, sanitize.text.function = function(x) x)
+    ))
+  })
   shiny::outputOptions(output, "showcase_slider_api_table", suspendWhenHidden = FALSE)
 
   shiny::observeEvent(input$showcase_slider_set_low, {
