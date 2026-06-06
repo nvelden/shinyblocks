@@ -222,6 +222,22 @@ ui <- block_page(
               block_badge("Synced", variant = "secondary"),
               block_badge("Verified", variant = "outline")
             )
+          ),
+          block_separator(),
+          stack(
+            htmltools::strong(style = "font-size: 0.875rem; font-weight: 600;", "Cost breakdown"),
+            block_table(
+              data.frame(
+                item = c("Compute", "Storage", "Network"),
+                cost = c("$3,100", "$1,400", "$700"),
+                check.names = FALSE,
+                stringsAsFactors = FALSE
+              ),
+              columns = list(
+                item = table_column(label = "Item"),
+                cost = table_column(label = "Cost", align = "right")
+              )
+            )
           )
         )
       ),
