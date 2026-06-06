@@ -1,3 +1,47 @@
+# Handoff: block_table() styling via theme-safe intents (Issue #53)
+
+## Next up (planned 2026-06-06) — NOT STARTED
+
+Issue: https://github.com/nvelden/shinyblocks/issues/53
+Plan: `docs/agent-plans/2026-06-06-table-styling-intents.md`
+Branch: `table-styling-intents` (create from `main` when work starts)
+
+Follow-up to the reactive table (#51 / PR #52, merged). Goal: per-**header / row /
+column / single-cell** styling for `block_table()`, plus **value** styling, in a way
+that stays correct across every theme preset, light/dark, and style profile.
+
+Why: today the only styling hook is `row_format()` (per-`<tr>` class/style) +
+`table_column(align/width)`. No per-column class/style, no header styling, no
+single-cell styling, and values render as plain escaped text. shadcn does this with
+a `className` (token) on every element (author writes JSX); Shiny `renderTable` does
+it only via raw HTML + `sanitize=identity` (XSS + theme-blind). We can't copy either
+verbatim — author writes R, and we must stay theme-safe.
+
+Decisions (locked 2026-06-06): (1) headline API = an **intent enum**
+(`muted/primary/secondary/destructive/success/warning/accent` — the existing token
+families) rendered as `data-intent` + token-only CSS, never a literal color;
+(2) `emphasis = text|soft|solid` axis (colored text vs tint vs solid chip, via
+`color-mix`); (3) `class`/`style` kept as a documented escape hatch; (4) cell/value
+styling = **vectorized per-column** `cell_intent/cell_class/cell_style` callbacks,
+not per-cell closures; (5) new `cellMeta` payload layer parallel to `rowMeta`,
+**always emitted** on data-bearing payloads (clear-on-merge, same bug class fixed for
+`rowMeta`); (6) `row_format` also returns `intent`.
+
+**Examples are part of the deliverable** (user requested): demonstrate the styling in
+**both** the showcase playground (`inst/showcase`) and the docs-site Shinylive
+playground (`docs-site/playgrounds/table`) — intent column, conditional cell intents
+(negative → destructive, positive → success) with an emphasis toggle, styled header,
+and the escape hatch — plus the component spec / API reference. Verify light/dark +
+a couple of style profiles.
+
+7 slices in the plan: (1) R column+header static styling, (2) R cellMeta +
+vectorized `cell_*` + `row_format` intent, (3) runtime + token-only CSS (watch the
+asset budget — the reactive-table work already sat on the budget lines),
+(4) showcase Styling group, (5) docs-site playground + spec + api-reference + NEWS +
+`document()`, (6) slice gate, (7) PR gate.
+
+---
+
 # Handoff: Reactive block_table() + unified formatting (Issue #51)
 
 ## Current work (2026-06-05)
