@@ -12,6 +12,7 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="data-theme"
+      storageKey="sb-theme"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
