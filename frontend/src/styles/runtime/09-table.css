@@ -102,3 +102,51 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+
+/* Theme-safe styling intents (data-intent/data-emphasis on th/td/tr). Each intent
+   declares an ink text color (--sb-ti); the solid surface (--sb-ts) and on-chip
+   text (--sb-tf) default to it, set only where the token family splits. Token-only
+   so intents track the preset, light/dark, and style profile. Scoped to the
+   runtime root so the data-intent contract (and its --sb-* vars) never leaks onto
+   host/app elements that happen to carry data-intent. */
+[data-shinyblocks-root] [data-intent="primary"] {
+  --sb-ti: var(--primary);
+  --sb-tf: var(--primary-foreground);
+}
+[data-shinyblocks-root] [data-intent="destructive"] {
+  --sb-ti: var(--destructive);
+  --sb-tf: var(--destructive-foreground);
+}
+[data-shinyblocks-root] [data-intent="success"] {
+  --sb-ti: var(--success-foreground);
+  --sb-ts: var(--success);
+}
+[data-shinyblocks-root] [data-intent="warning"] {
+  --sb-ti: var(--warning-foreground);
+  --sb-ts: var(--warning);
+}
+[data-shinyblocks-root] [data-intent="secondary"] {
+  --sb-ti: var(--secondary-foreground);
+  --sb-ts: var(--secondary);
+}
+[data-shinyblocks-root] [data-intent="accent"] {
+  --sb-ti: var(--accent-foreground);
+  --sb-ts: var(--accent);
+}
+[data-shinyblocks-root] [data-intent="muted"] {
+  --sb-ti: var(--muted-foreground);
+  --sb-ts: var(--muted);
+}
+
+/* text=colored text, soft=faint tint, solid=filled chip. Only table th/td/tr
+   carry data-intent, so root scope keeps this contract local. */
+[data-shinyblocks-root] [data-intent] {
+  color: var(--sb-ti);
+}
+[data-shinyblocks-root] [data-intent][data-emphasis="soft"] {
+  background-color: color-mix(in oklch, var(--sb-ti) 12%, transparent);
+}
+[data-shinyblocks-root] [data-intent][data-emphasis="solid"] {
+  background-color: var(--sb-ts, var(--sb-ti));
+  color: var(--sb-tf, var(--sb-ti));
+}

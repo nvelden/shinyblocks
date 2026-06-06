@@ -192,7 +192,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "na", type: "character", defaultVal: "\"\"", description: "String used to render missing values. Per-column overrides win." },
         { argument: "digits", type: "integer", defaultVal: "NULL", description: "Decimal places for default numeric formatting. NULL keeps R's format()." },
         { argument: "rownames", type: "logical", defaultVal: "FALSE", description: "Render row.names(data) as a leading column." },
-        { argument: "row_format", type: "function", defaultVal: "NULL", description: "function(row, i) returning list(class=, style=) applied to that row's <tr>." },
+        { argument: "row_format", type: "function", defaultVal: "NULL", description: "function(row, i) returning list(intent=, emphasis=, class=, style=) applied to that row's <tr>." },
         { argument: "striped", type: "logical", defaultVal: "FALSE", description: "Zebra-stripe body rows." },
         { argument: "hover", type: "logical", defaultVal: "TRUE", description: "Highlight rows on hover (shadcn base behavior)." },
         { argument: "bordered", type: "logical", defaultVal: "FALSE", description: "Draw cell borders." },
@@ -221,7 +221,12 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "format", type: "function", defaultVal: "NULL", description: "Function applied to the full R column vector before rendering. When set, digits is ignored for this column." },
         { argument: "width", type: "character", defaultVal: "NULL", description: "Optional CSS width for the column." },
         { argument: "digits", type: "integer", defaultVal: "NULL", description: "Per-column decimal places, overriding the table-level digits." },
-        { argument: "na", type: "character", defaultVal: "NULL", description: "Per-column missing-value string, overriding the table-level na." }
+        { argument: "na", type: "character", defaultVal: "NULL", description: "Per-column missing-value string, overriding the table-level na." },
+        { argument: "intent", type: "intent enum", defaultVal: "NULL", description: "Token-backed styling intent for every cell in the column: muted, primary, secondary, destructive, success, warning, or accent. Theme-safe." },
+        { argument: "emphasis", type: "'text' | 'soft' | 'solid'", defaultVal: "'text'", description: "How an intent renders: colored text, tinted background, or filled chip." },
+        { argument: "class, style", type: "character | named list", defaultVal: "NULL", description: "Escape hatch: class / inline style on each <td>. You own theme-correctness." },
+        { argument: "header_intent, header_emphasis, header_class, header_style", type: "intent enum | character", defaultVal: "NULL / 'text'", description: "Same styling controls applied to the column's <th> header cell." },
+        { argument: "cell_intent, cell_emphasis, cell_class, cell_style", type: "function", defaultVal: "NULL", description: "function(value) callbacks over the column vector returning one entry per row; per-cell results win over the column-level styling." }
       ]
     }
   ],

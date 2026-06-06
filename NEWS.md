@@ -4,6 +4,21 @@
 
 ## New features
 
+* Added theme-safe styling intents to `block_table()` (issue #53). Header,
+  column, row, and single cells can carry an `intent`
+  (`muted`/`primary`/`secondary`/`destructive`/`success`/`warning`/`accent`) with
+  an `emphasis` (`text`/`soft`/`solid`), rendered as token-only CSS that tracks
+  the active preset, light/dark, and style profile — never a literal color.
+  `table_column()` gained `intent`/`emphasis`/`class`/`style`, the matching
+  `header_*` controls, and vectorized `cell_intent`/`cell_emphasis`/`cell_class`/
+  `cell_style` callbacks (per-cell results win over the column default).
+  `row_format()` may now also return `intent`/`emphasis`. Raw `class`/`style`
+  remain as a documented escape hatch; cell values stay escaped text (no raw-HTML
+  injection). The Shiny showcase and docs-site Table playgrounds demonstrate
+  conditional cell intents alongside header styling via both `header_intent` and a
+  custom `header_class`. All new arguments are defaulted, so existing calls render
+  identically.
+
 * Made `block_table()` reactive (issue #51). Added `update_block_table()` to
   re-render an `id`-bound table from the server with a freshly formatted payload,
   giving `renderTable()`-equivalent reactive data refresh. `block_table()` and

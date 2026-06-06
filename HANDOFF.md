@@ -1,6 +1,70 @@
 # Handoff: block_table() styling via theme-safe intents (Issue #53)
 
-## Next up (planned 2026-06-06) — NOT STARTED
+## Status (2026-06-06) — ALL 7 SLICES DONE, `make gate` GREEN
+
+Issue: https://github.com/nvelden/shinyblocks/issues/53
+Plan: `docs/agent-plans/2026-06-06-table-styling-intents.md`
+Branch: still on `main` in this checkout (create `table-styling-intents` before
+committing). Not committed/PR'd yet — awaiting maintainer.
+
+Per-slice outcome:
+
+- **Slice 1 (R column + header static styling) — DONE.** `R/table.R`:
+  `table_column()` gained `intent`/`emphasis`/`class`/`style` + `header_*`;
+  `TABLE_INTENT_CHOICES`/`TABLE_EMPHASIS_CHOICES`, `normalize_table_intent()`,
+  and `table_append_style_fields()` emit the column-spec fields **conditionally**
+  (omitted when unset) so unstyled columns serialize byte-identically to v1.
+- **Slice 2 (cellMeta + vectorized cell_* + row_format intent) — DONE.**
+  `cell_intent/cell_emphasis/cell_class/cell_style` are `function(value)` over the
+  whole column (length-1 recycles); `table_build_cell_meta_column()` +
+  `table_eval_cell_fn()` + `normalize_table_cell_meta()`. `cellMeta` is **always
+  emitted** on data-bearing payloads (NULL→`{}`) for clear-on-merge, parallel to
+  `rowMeta`. `row_format()` may now return `intent`/`emphasis`. 72 table tests pass.
+- **Slice 3 (runtime + CSS + theme-registry) — DONE.** `table.jsx`: `data-intent`/
+  `data-emphasis` on `<th>`/`<td>`/`<tr>`, cell>column precedence, merged
+  class/style; values stay escaped. `09-table.css`: token-only intent system —
+  each intent normalizes to `--sb-ti` (ink) / `--sb-ts` (surface) / `--sb-tf`
+  (chip text), then uniform text/soft(`color-mix`)/solid rules. Two parity-fixture
+  bindings added (`--primary` cell, `--destructive` header).
+  **Budget: trimmed, NOT bumped.** Intent CSS first pushed runtime CSS over (raw
+  49.7/49, gzip 7.0/7); reclaimed via 2-var-per-intent design, shorter var names,
+  and dropping the redundant `.sb-table-element ` scope on the apply rules (only
+  the table emits `data-intent`). Final raw 49.0/49, gzip 7.0/7, JS 75.1/76 — all
+  under, `tools/budget.R` unchanged.
+- **Slice 4 (showcase Styling group) — DONE.**
+  `examples/table.R` + `server_table.R`. **Playground:** one dataset (revenue,
+  with a real negative -1500 + an NA) and a Styling group with theme-safe and
+  escape-hatch demos — **`cell_intent` by sign** (negative→destructive,
+  positive→success, default `text` emphasis), **header background via
+  `header_intent`** (`primary`, `solid` emphasis; token-only), **header background
+  via custom `header_class`** (`.showcase-table-head-accent`), plus whole-header-row
+  and table-tint class toggles and raw `class`/`style` fields. `row_format`
+  highlights rows where `value > 100`. API table + code snippet (with the matching
+  CSS for each class-based escape hatch) updated. Parity fixture carries
+  `intent`/`header_intent` for theme tests.
+- **Slice 5 (docs + playground) — DONE.** `docs-site/playgrounds/table/app.R`
+  mirrors the showcase styling demo (one dataset, cell_intent + `header_intent` +
+  `header_class`; the `.showcase-table-head-accent` class is injected via a
+  `<style>` in `block_page`'s theme since the docs site has no showcase.css);
+  `app.json` regenerated (generator noise in
+  `preview-manifest.json` + table `index.html` whitespace reverted; kept
+  `app.json` + `shinyblocks-runtime-override.css`). `docs/component-specs/table.md`
+  (Styling-intents section, precedence, token contract, runtime mapping),
+  `lib/api-reference.ts`, `NEWS.md` (#53 entry), `devtools::document()`
+  (`man/table_column.Rd`). `tsc --noEmit` passes.
+- **Slice 6 (slice gate) — DONE.** `make check-slice` OK;
+  `npm run test:themes-browser` — table intents resolve to `--primary`/
+  `--destructive` in light+dark (92/0 response), style parity 124/0 across 8
+  profiles.
+- **Slice 7 (PR gate) — DONE.** `make gate` green ("Automated gate steps green!
+  Parity tests passed"). No budget recalibration needed this time.
+
+Remaining (maintainer): branch + commit + PR, then the manual phase-exit steps
+`make gate` lists (a11y sweep, critical-code-reviewer, version/tag).
+
+---
+
+## Original plan (planned 2026-06-06)
 
 Issue: https://github.com/nvelden/shinyblocks/issues/53
 Plan: `docs/agent-plans/2026-06-06-table-styling-intents.md`

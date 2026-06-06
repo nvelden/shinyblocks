@@ -10,7 +10,19 @@ table_column(
   format = NULL,
   width = NULL,
   digits = NULL,
-  na = NULL
+  na = NULL,
+  intent = NULL,
+  emphasis = "text",
+  class = NULL,
+  style = NULL,
+  header_intent = NULL,
+  header_emphasis = "text",
+  header_class = NULL,
+  header_style = NULL,
+  cell_intent = NULL,
+  cell_emphasis = NULL,
+  cell_class = NULL,
+  cell_style = NULL
 )
 }
 \arguments{
@@ -29,6 +41,34 @@ overriding the table-level \code{digits} for this column.}
 
 \item{na}{Optional string for missing values, overriding the table-level \code{na}
 for this column.}
+
+\item{intent}{Optional semantic styling intent applied to every \verb{<td>} in the
+column. One of \code{"muted"}, \code{"primary"}, \code{"secondary"}, \code{"destructive"},
+\code{"success"}, \code{"warning"}, or \code{"accent"}. Rendered as theme tokens, never a
+literal color, so it tracks the active theme preset, light/dark, and style
+profile automatically.}
+
+\item{emphasis}{How an \code{intent} is rendered. One of \code{"text"} (colored
+foreground, the default), \code{"soft"} (tinted background + colored text), or
+\code{"solid"} (filled chip). Has no effect without an \code{intent}.}
+
+\item{class, style}{Escape hatch: additional class / inline style applied to
+every \verb{<td>} in the column. You own theme-correctness here — prefer
+\code{var(--token)} over literal colors.}
+
+\item{header_intent, header_emphasis, header_class, header_style}{Same styling
+controls applied to the column's \verb{<th>} header cell.}
+
+\item{cell_intent, cell_emphasis, cell_class, cell_style}{Vectorized per-cell
+styling. Each is a \verb{function(value)} called once with the column's full
+(unformatted) vector and must return one entry per row (length-1 results are
+recycled). \code{cell_intent} returns intents (use \code{NA} for no styling),
+\code{cell_emphasis} returns emphasis values, \code{cell_class} returns classes, and
+\code{cell_style} returns CSS declaration strings (e.g. \code{"color: red"}). A single
+fully named list (e.g. \code{list(color = "var(--primary)")}) is treated as one
+style object applied to every row; for per-row style objects return an
+unnamed list of named lists. Per-cell results win over the column-level
+\code{intent} / \code{emphasis} / \code{class} / \code{style}.}
 }
 \value{
 A table column specification.

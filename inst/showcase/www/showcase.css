@@ -145,6 +145,29 @@
   padding: 0.25rem !important;
 }
 
+/* Custom header styling via table_column(header_class = ). Deliberately does
+   things the intent enum can't (uppercase + letter-spacing) so the escape hatch
+   is visibly distinct from the built-in header_intent demo. Still token-driven so
+   it tracks the theme. */
+.sb-table-head.showcase-table-head-accent {
+  background-color: color-mix(in oklch, var(--primary) 14%, transparent);
+  color: var(--primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid var(--primary);
+}
+
+/* Whole header row: a table-level class targets every <th>. */
+.showcase-table-headrow .sb-table-head {
+  background-color: var(--primary);
+  color: var(--primary-foreground) !important;
+}
+
+/* Whole table background: fill the table element behind the (transparent) cells. */
+.showcase-table-tinted .sb-table-element {
+  background-color: color-mix(in oklch, var(--primary) 8%, var(--card));
+}
+
 .showcase-api-table [data-slot="table-head"],
 .showcase-api-table [data-slot="table-cell"] {
   white-space: normal;

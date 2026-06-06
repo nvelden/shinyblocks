@@ -8,12 +8,25 @@ function alignment(value) {
 function headStyle(column) {
   return {
     textAlign: alignment(column && column.align),
-    ...(column && column.width ? { width: column.width } : {})
+    ...(column && column.width ? { width: column.width } : {}),
+    ...(column && column.headerStyle ? column.headerStyle : {})
   };
 }
 
-function cellStyle(column) {
-  return { textAlign: alignment(column && column.align) };
+// Theme-safe styling resolves cell-level metadata over column-level defaults; the
+// runtime only ever forwards the `data-intent`/`data-emphasis` attributes, never a
+// literal color, so the token CSS in 09-table.css tracks the active theme.
+function styleAttrs(intent, emphasis) {
+  if (!intent) return {};
+  return { "data-intent": intent, "data-emphasis": emphasis || "text" };
+}
+
+function bodyCellStyle(column, meta) {
+  return {
+    textAlign: alignment(column && column.align),
+    ...(column && column.style ? column.style : {}),
+    ...(meta && meta.style ? meta.style : {})
+  };
 }
 
 export function Table({ payload, root }) {
@@ -37,6 +50,7 @@ export function Table({ payload, root }) {
   const columns = Array.isArray(props.columns) ? props.columns : [];
   const rows = Array.isArray(props.rows) ? props.rows : [];
   const rowMeta = Array.isArray(props.rowMeta) ? props.rowMeta : [];
+  const cellMeta = Array.isArray(props.cellMeta) ? props.cellMeta : [];
   const isTruncated = props.truncated === true;
   const isLoading = props.loading === true;
   // Keep the table footprint stable while loading: reuse the current row count,
@@ -67,9 +81,10 @@ export function Table({ payload, root }) {
               <th
                 key={column.key || index}
                 data-slot="table-head"
-                className="sb-table-head"
+                className={classNames("sb-table-head", column.headerClass)}
                 scope="col"
                 style={headStyle(column)}
+                {...styleAttrs(column.headerIntent, column.headerEmphasis)}
               >
                 {column.label || column.key || ""}
               </th>
@@ -89,7 +104,7 @@ export function Table({ payload, root }) {
                       key={column.key || columnIndex}
                       data-slot="table-cell"
                       className="sb-table-cell"
-                      style={cellStyle(column)}
+                      style={bodyCellStyle(column, null)}
                     >
                       <span className="sb-skeleton sb-table-skeleton" aria-hidden="true" />
                     </td>
@@ -98,23 +113,36 @@ export function Table({ payload, root }) {
               ))
             : rows.map((row, rowIndex) => {
                 const meta = rowMeta[rowIndex] || null;
+                const rowCells = cellMeta[rowIndex] || [];
                 return (
                   <tr
                     key={rowIndex}
                     data-slot="table-row"
                     className={classNames("sb-table-row", meta && meta.class)}
                     style={meta && meta.style ? meta.style : undefined}
+                    {...(meta ? styleAttrs(meta.intent, meta.emphasis) : {})}
                   >
-                    {columns.map((column, columnIndex) => (
-                      <td
-                        key={column.key || columnIndex}
-                        data-slot="table-cell"
-                        className="sb-table-cell"
-                        style={cellStyle(column)}
-                      >
-                        {Array.isArray(row) ? row[columnIndex] || "" : ""}
-                      </td>
-                    ))}
+                    {columns.map((column, columnIndex) => {
+                      const cell = rowCells[columnIndex] || null;
+                      // Cell-level intent/emphasis/class win over the column default.
+                      const intent = (cell && cell.intent) || column.intent;
+                      const emphasis = (cell && cell.emphasis) || column.emphasis;
+                      return (
+                        <td
+                          key={column.key || columnIndex}
+                          data-slot="table-cell"
+                          className={classNames(
+                            "sb-table-cell",
+                            column.class,
+                            cell && cell.class
+                          )}
+                          style={bodyCellStyle(column, cell)}
+                          {...styleAttrs(intent, emphasis)}
+                        >
+                          {Array.isArray(row) ? row[columnIndex] || "" : ""}
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               })}

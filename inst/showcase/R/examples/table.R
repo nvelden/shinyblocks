@@ -4,19 +4,6 @@ htmltools::tagList(
       showcase_controls_group(
         "Content", first = TRUE,
         block_field(
-          block_field_label("dataset", `for` = "showcase_table_doc_dataset"),
-          block_select(
-            "showcase_table_doc_dataset",
-            choices = c(
-              "Revenue summary" = "revenue",
-              "Release queue" = "releases",
-              "Zero rows" = "empty"
-            ),
-            selected = "revenue",
-            size = "sm"
-          )
-        ),
-        block_field(
           block_field_label("caption", `for` = "showcase_table_doc_caption"),
           block_textarea(
             "showcase_table_doc_caption",
@@ -52,7 +39,7 @@ htmltools::tagList(
         block_field(
           block_checkbox(
             "showcase_table_doc_rowformat",
-            "Highlight rows where value > 100 (row_format)",
+            "Highlight rows where value > 100",
             value = FALSE
           )
         )
@@ -81,6 +68,41 @@ htmltools::tagList(
       showcase_controls_group(
         "Styling",
         block_field(
+          block_checkbox(
+            "showcase_table_doc_cellintent",
+            "Color values by sign",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_headerintent",
+            "Header background via intent",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_headerclass",
+            "Header background via custom class",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_headrow",
+            "Background on the whole header row",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_tablebg",
+            "Tint the table background",
+            value = FALSE
+          )
+        ),
+        block_field(
           block_field_label("style", `for` = "showcase_table_doc_style"),
           block_textarea(
             "showcase_table_doc_style",
@@ -100,10 +122,6 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Server actions",
-        htmltools::tags$p(
-          style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.8125rem;",
-          "Each control pushes a fresh payload with update_block_table()."
-        ),
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
           block_button(
@@ -170,7 +188,12 @@ htmltools::tagList(
         value = c("$42k", "128", "4.8%")
       ),
       columns = list(
-        value = table_column(label = "Value", align = "right")
+        value = table_column(
+          label = "Value",
+          align = "right",
+          intent = "primary",
+          header_intent = "destructive"
+        )
       ),
       caption = "Table parity fixture.",
       class = "sb-parity-table"

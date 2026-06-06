@@ -14,8 +14,13 @@
   `sb-table--hover` container class (`hover = TRUE` by default).
 - **striped / bordered** — optional zebra body rows (`sb-table--striped`) and
   cell borders (`sb-table--bordered`); both off by default.
-- **row format** — `row_format(row, i)` returns per-row `{class, style}` carried
-  in `props$rowMeta` and applied to each body `<tr>`.
+- **row format** — `row_format(row, i)` returns per-row `{intent, emphasis,
+  class, style}` carried in `props$rowMeta` and applied to each body `<tr>`.
+- **styling intent** — header, column, row, and single cells can carry a
+  theme-safe `intent` (`muted/primary/secondary/destructive/success/warning/
+  accent`) with an `emphasis` (`text/soft/solid`), rendered as `data-intent` /
+  `data-emphasis` attributes resolved entirely through theme tokens. See
+  [Styling intents](#styling-intents-issue-53).
 - **loading** — `update_block_table(loading = TRUE)` renders token-based
   skeleton rows (header stays visible, footer hidden, `tbody aria-busy`).
 - **selected hook** — `[data-state="selected"]` row styling is present
@@ -43,6 +48,33 @@ can never drift between the two paths.
 - `class` / `style` are mount-time-only and are not pushed by
   `update_block_table()`; change them by re-rendering the `block_table()`.
 
+## Styling intents (issue #53)
+
+Authors style any scope — header, column, row, single cell, and the value inside
+a cell — in pure R, without breaking the theme system.
+
+- **Intent enum** is the headline API across every scope:
+  `muted`, `primary`, `secondary`, `destructive`, `success`, `warning`, `accent`
+  — exactly the existing token families. It renders as a `data-intent` attribute
+  resolved by token-only CSS (never a literal color), so an intent tracks the
+  active preset, light/dark, and style profile automatically.
+- **Emphasis axis** `text` (default, colored text) / `soft` (tinted background) /
+  `solid` (filled chip), rendered as `data-emphasis`.
+- **Precedence** is **cell > column**: a `cellMeta[i][j]` intent/emphasis wins
+  over the column-level `intent`/`emphasis`; `class`/`style` layer on top.
+- **Vectorized cell styling** — `cell_intent` / `cell_emphasis` / `cell_class` /
+  `cell_style` are `function(value)` callbacks evaluated once over the whole
+  (unformatted) column vector and returning one entry per row (length-1 results
+  recycle). This matches the column-at-a-time formatting pipeline and avoids
+  per-cell closures.
+- **`cellMeta` clear-on-merge** — `cellMeta` is **always emitted** on any
+  data-bearing payload (empty `{}` objects where unstyled). Because the runtime
+  merges partial `update_block_table()` payloads over current props, omitting it
+  would leave stale per-cell styling — the same rule already applied to `rowMeta`.
+- **Escape hatch** — `class` / `style` (and the `header_*` / `cell_*` variants)
+  remain available. You own theme-correctness here; prefer `var(--token)` over
+  literal colors. Values stay escaped text — no raw-HTML cell injection.
+
 ## R API
 
 ### `block_table(data, columns, caption, max_rows, na, digits, rownames, row_format, striped, hover, bordered, id, class, style)`
@@ -56,7 +88,7 @@ can never drift between the two paths.
 | `na` | String for missing values. Defaults to `""`. Per-column overrides win. |
 | `digits` | Decimal places for default numeric formatting. `NULL` keeps R's `format()`. |
 | `rownames` | Render `row.names(data)` as a leading column. Default `FALSE`. |
-| `row_format` | `function(row, i)` returning `list(class=, style=)` (or `NULL`) per row. |
+| `row_format` | `function(row, i)` returning `list(intent=, emphasis=, class=, style=)` (any subset, or `NULL`) per row. |
 | `striped` / `bordered` | Zebra body rows / cell borders. Both default `FALSE`. |
 | `hover` | Highlight rows on hover (shadcn base). Default `TRUE`. |
 | `id` | Optional input id. Required only to update the table from the server. |
@@ -70,7 +102,7 @@ can never drift between the two paths.
 | `data`, `columns`, `caption`, `max_rows`, `na`, `digits`, `rownames`, `row_format`, `striped`, `hover`, `bordered` | Formatting arguments matching `block_table()`; applied when `data` is supplied. |
 | `loading` | `TRUE` shows skeleton rows; `FALSE` clears the loading state without changing data. |
 
-### `table_column(label, align, format, width, digits, na)`
+### `table_column(label, align, format, width, digits, na, intent, emphasis, class, style, header_*, cell_*)`
 
 | Argument | Purpose |
 | --- | --- |
@@ -80,6 +112,11 @@ can never drift between the two paths.
 | `width` | Optional CSS width for the column. |
 | `digits` | Per-column decimal places, overriding the table-level `digits`. |
 | `na` | Per-column missing-value string, overriding the table-level `na`. |
+| `intent` | Token-backed styling intent applied to every `<td>` in the column. One of the intent enum. |
+| `emphasis` | How `intent` renders: `text` (default), `soft`, or `solid`. |
+| `class` / `style` | Escape-hatch class / inline style on each `<td>`. |
+| `header_intent` / `header_emphasis` / `header_class` / `header_style` | Same controls applied to the column `<th>`. |
+| `cell_intent` / `cell_emphasis` / `cell_class` / `cell_style` | `function(value)` callbacks over the column vector returning one entry per row; per-cell results win over the column-level styling. |
 
 Missing values render with the `na` string (empty by default) in the payload and
 therefore matching cells in the browser.
@@ -92,7 +129,10 @@ therefore matching cells in the browser.
 | `names(data)` + `columns` | `props$columns` array of `{ key, label, align, width }`. |
 | `caption` | `props$caption` |
 | `max_rows` | `props$truncated` and `props$totalRows` |
-| `row_format` | `props$rowMeta` array of `{ class, style }` (or `null`) per row. |
+| `row_format` | `props$rowMeta` array of `{ intent, emphasis, class, style }` (or `null`) per row. |
+| `table_column(intent/emphasis/class/style)` | `props$columns[].intent / emphasis / class / style`. |
+| `table_column(header_*)` | `props$columns[].headerIntent / headerEmphasis / headerClass / headerStyle`. |
+| `table_column(cell_*)` | `props$cellMeta` matrix of `{ intent, emphasis, class, style }` (or `{}`) per cell; always emitted (clear-on-merge). |
 | `striped` / `hover` / `bordered` | `props$striped` / `props$hover` / `props$bordered` → container variant classes. |
 | `update_block_table(loading=)` | `props$loading` → skeleton rows. |
 | `class` / `style` | `className` / mount `style` (mount-time only). |
@@ -113,6 +153,7 @@ Runtime slots mirror shadcn: `table-container`, `table`,
 | Bordered cells | `--border` |
 | Loading skeleton shimmer | `--muted` (shared `shinyblocks-pulse` keyframe) |
 | Footer surface | `--muted` |
+| Intent text / soft / solid | `--<intent>` + `--<intent>-foreground` (normalized to a per-intent ink / surface / on-chip text; `soft` tints via `color-mix`) |
 | Style-profile geometry | `--sb-*` table/control spacing tokens |
 
 ## Deliberate divergences from shadcn

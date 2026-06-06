@@ -1,38 +1,38 @@
-showcase_table_data <- function(key) {
-  switch(
-    key %||% "revenue",
-    releases = data.frame(
-      package = c("shinyblocks", "runtime", "docs-site", "showcase"),
-      status = c("ready", "review", "queued", "ready"),
-      owner = c("UI", "Runtime", "Docs", "QA"),
-      stringsAsFactors = FALSE
-    ),
-    empty = data.frame(
-      metric = character(),
-      value = numeric(),
-      delta = character(),
-      stringsAsFactors = FALSE
-    ),
-    data.frame(
-      metric = c("Revenue", "Orders", "Conversion", "Refunds"),
-      value = c(42000, 128, 0.048, NA),
-      delta = c("+12%", "+8%", "+0.6 pts", NA),
-      stringsAsFactors = FALSE
-    )
+showcase_table_data <- function() {
+  data.frame(
+    metric = c("Revenue", "Orders", "Refunds", "Forecast"),
+    value = c(42000, 128, -1500, NA),
+    delta = c("+12%", "+8%", "-3%", NA),
+    stringsAsFactors = FALSE
   )
 }
 
-showcase_table_columns <- function(key, align) {
-  if (identical(key, "releases")) {
-    return(list(
-      status = table_column(label = "Status", align = align),
-      owner = table_column(label = "Owner")
-    ))
-  }
+# Theme-safe styling demo: color a value by sign (negative -> destructive,
+# positive -> success). cell_intent is a vectorized callback over the whole
+# `value` column; emphasis stays the default "text" (colored numbers).
+showcase_table_value_intent <- function() {
+  function(v) ifelse(is.na(v), NA, ifelse(v < 0, "destructive", "success"))
+}
+
+showcase_table_columns <- function(align, styling = list()) {
+  cell_intent <- if (isTRUE(styling$cell)) showcase_table_value_intent() else NULL
+  # Two ways to give the header a filled background:
+  #  1. Built-in intent (theme-safe, no CSS needed): header_intent + emphasis "solid".
+  #  2. Escape hatch: a custom class (.showcase-table-head-accent in showcase.css).
+  header_intent <- if (isTRUE(styling$header_intent)) "primary" else NULL
+  header_emphasis <- if (isTRUE(styling$header_intent)) "solid" else "text"
+  header_class <- if (isTRUE(styling$header_class)) "showcase-table-head-accent" else NULL
 
   list(
     metric = table_column(label = "Metric"),
-    value = table_column(label = "Value", align = align),
+    value = table_column(
+      label = "Value",
+      align = align,
+      header_intent = header_intent,
+      header_emphasis = header_emphasis,
+      header_class = header_class,
+      cell_intent = cell_intent
+    ),
     delta = table_column(label = "Delta", align = align)
   )
 }
@@ -128,20 +128,25 @@ register_table_showcase <- function(input, output, session) {
   # one-time mount (block_table) and every server push (update_block_table), so
   # the playground dogfoods the same pipeline an app author would use.
   table_spec <- shiny::reactive({
-    dataset <- input$showcase_table_doc_dataset %||% "revenue"
     align <- input$showcase_table_doc_align %||% "right"
     max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
     digits_value <- input$showcase_table_doc_digits %||% "default"
     caption <- input$showcase_table_doc_caption %||% ""
 
-    data <- showcase_table_data(dataset)
+    data <- showcase_table_data()
     if (isTRUE(rv_filtered())) {
       data <- utils::head(data, 2)
     }
 
+    styling <- list(
+      cell = isTRUE(input$showcase_table_doc_cellintent),
+      header_intent = isTRUE(input$showcase_table_doc_headerintent),
+      header_class = isTRUE(input$showcase_table_doc_headerclass)
+    )
+
     list(
       data = data,
-      columns = showcase_table_columns(dataset, align),
+      columns = showcase_table_columns(align, styling),
       caption = if (nzchar(caption)) caption else NULL,
       max_rows = if (identical(max_rows_value, "all")) NULL else as.integer(max_rows_value),
       na = input$showcase_table_doc_na %||% "",
@@ -158,7 +163,14 @@ register_table_showcase <- function(input, output, session) {
   # so a change to them remounts the table; everything else updates in place.
   output$showcase_table_preview_ui <- shiny::renderUI({
     style <- input$showcase_table_doc_style %||% ""
-    use_class <- isTRUE(input$showcase_table_doc_class)
+
+    # Table-level classes are mount-time only; combine the toggles that target the
+    # whole table (custom border, whole header row, tinted background).
+    classes <- c(
+      if (isTRUE(input$showcase_table_doc_class)) "showcase-table-preview-custom",
+      if (isTRUE(input$showcase_table_doc_headrow)) "showcase-table-headrow",
+      if (isTRUE(input$showcase_table_doc_tablebg)) "showcase-table-tinted"
+    )
 
     # `loading` is an update_block_table()-only arg; block_table() does not take
     # it. The reactive observe below re-applies the loading state after mount.
@@ -170,7 +182,7 @@ register_table_showcase <- function(input, output, session) {
       c(
         list(
           id = "showcase_table_live",
-          class = if (use_class) "showcase-table-preview-custom" else NULL,
+          class = if (length(classes)) paste(classes, collapse = " ") else NULL,
           style = if (nzchar(style)) style else NULL
         ),
         mount_spec
@@ -197,7 +209,6 @@ register_table_showcase <- function(input, output, session) {
       paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
     }
 
-    dataset <- input$showcase_table_doc_dataset %||% "revenue"
     align <- input$showcase_table_doc_align %||% "right"
     max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
     digits_value <- input$showcase_table_doc_digits %||% "default"
@@ -207,30 +218,32 @@ register_table_showcase <- function(input, output, session) {
     use_rowformat <- isTRUE(input$showcase_table_doc_rowformat)
     style <- input$showcase_table_doc_style %||% ""
     use_class <- isTRUE(input$showcase_table_doc_class)
+    use_cellintent <- isTRUE(input$showcase_table_doc_cellintent)
+    use_headerintent <- isTRUE(input$showcase_table_doc_headerintent)
+    use_headerclass <- isTRUE(input$showcase_table_doc_headerclass)
+    use_headrow <- isTRUE(input$showcase_table_doc_headrow)
+    use_tablebg <- isTRUE(input$showcase_table_doc_tablebg)
 
-    data_expr <- switch(
-      dataset,
-      releases = 'data.frame(package = c("shinyblocks", "runtime", "docs-site", "showcase"), status = c("ready", "review", "queued", "ready"), owner = c("UI", "Runtime", "Docs", "QA"))',
-      empty = 'data.frame(metric = character(), value = numeric(), delta = character())',
-      'data.frame(metric = c("Revenue", "Orders", "Conversion", "Refunds"), value = c(42000, 128, 0.048, NA), delta = c("+12%", "+8%", "+0.6 pts", NA))'
+    data_expr <- 'data.frame(metric = c("Revenue", "Orders", "Refunds", "Forecast"), value = c(42000, 128, -1500, NA), delta = c("+12%", "+8%", "-3%", NA))'
+
+    header_arg <- paste0(
+      if (use_headerintent) ", header_intent = \"primary\", header_emphasis = \"solid\"" else "",
+      if (use_headerclass) ", header_class = \"showcase-table-head-accent\"" else ""
     )
-
-    columns_expr <- if (identical(dataset, "releases")) {
-      paste0(
-        "list(\n",
-        "    status = table_column(label = \"Status\", align = \"", align, "\"),\n",
-        "    owner = table_column(label = \"Owner\")\n",
-        "  )"
-      )
+    cell_arg <- if (use_cellintent) {
+      ",\n      cell_intent = function(v) ifelse(is.na(v), NA, ifelse(v < 0, \"destructive\", \"success\"))"
     } else {
-      paste0(
-        "list(\n",
-        "    metric = table_column(label = \"Metric\"),\n",
-        "    value = table_column(label = \"Value\", align = \"", align, "\"),\n",
-        "    delta = table_column(label = \"Delta\", align = \"", align, "\")\n",
-        "  )"
-      )
+      ""
     }
+
+    columns_expr <- paste0(
+      "list(\n",
+      "    metric = table_column(label = \"Metric\"),\n",
+      "    value = table_column(label = \"Value\", align = \"", align, "\"",
+      header_arg, cell_arg, "),\n",
+      "    delta = table_column(label = \"Delta\", align = \"", align, "\")\n",
+      "  )"
+    )
 
     args <- c(
       'id = "tbl"',
@@ -258,14 +271,53 @@ register_table_showcase <- function(input, output, session) {
         "row_format = function(row, i) if (is.numeric(row$value) && !is.na(row$value) && row$value > 100) list(style = \"font-weight: 600; color: var(--primary);\")"
       )
     }
-    if (use_class) {
-      args <- c(args, 'class = "showcase-table-preview-custom"')
+    table_classes <- c(
+      if (use_class) "showcase-table-preview-custom",
+      if (use_headrow) "showcase-table-headrow",
+      if (use_tablebg) "showcase-table-tinted"
+    )
+    if (length(table_classes)) {
+      args <- c(args, paste0("class = ", string_literal(paste(table_classes, collapse = " "))))
     }
     if (nzchar(style)) {
       args <- c(args, paste0("style = ", string_literal(style)))
     }
 
+    # The class-based options (header_class / whole header row / table tint) are
+    # escape hatches: the class only does something if the app also ships matching
+    # CSS, so emit that CSS alongside the snippet.
+    css_rules <- c(
+      if (use_headerclass) paste0(
+        "  .sb-table-head.showcase-table-head-accent {\n",
+        "    background-color: color-mix(in oklch, var(--primary) 14%, transparent);\n",
+        "    color: var(--primary); text-transform: uppercase;\n",
+        "    letter-spacing: 0.08em; border-bottom: 2px solid var(--primary);\n",
+        "  }"
+      ),
+      if (use_headrow) paste0(
+        "  .showcase-table-headrow .sb-table-head {\n",
+        "    background-color: var(--primary); color: var(--primary-foreground);\n",
+        "  }"
+      ),
+      if (use_tablebg) paste0(
+        "  .showcase-table-tinted .sb-table-element {\n",
+        "    background-color: color-mix(in oklch, var(--primary) 8%, var(--card));\n",
+        "  }"
+      )
+    )
+    css_block <- if (length(css_rules)) {
+      paste0(
+        "# These classes need matching CSS in your app (any rule works):\n",
+        "tags$style(HTML('\n",
+        paste(css_rules, collapse = "\n"),
+        "\n'))\n\n"
+      )
+    } else {
+      ""
+    }
+
     paste0(
+      css_block,
       "block_table(\n  ", paste(args, collapse = ",\n  "), "\n)\n\n",
       "# Push a reactive refresh from the server:\n",
       "observeEvent(input$reload, {\n",
@@ -286,18 +338,25 @@ register_table_showcase <- function(input, output, session) {
         "row_format", "striped", "hover", "bordered", "id", "class", "style",
         "update_block_table()", "table_column(label)", "table_column(align)",
         "table_column(format)", "table_column(digits)", "table_column(na)",
-        "table_column(width)"
+        "table_column(width)", "table_column(intent)", "table_column(emphasis)",
+        "table_column(class / style)", "table_column(header_intent)",
+        "table_column(header_emphasis)", "table_column(header_class / header_style)",
+        "table_column(cell_intent)", "table_column(cell_emphasis)",
+        "table_column(cell_class / cell_style)"
       ),
       Type = c(
         "data.frame", "named list", "character", "integer", "character",
         "integer", "logical", "function", "logical", "logical", "logical",
         "character", "character", "character | named list", "function",
-        "character", "character", "function", "integer", "character", "character"
+        "character", "character", "function", "integer", "character", "character",
+        "character", "character", "character | named list", "character",
+        "character", "character | named list", "function", "function", "function"
       ),
       Default = c(
         "required", "NULL", "NULL", "NULL", "\"\"", "NULL", "FALSE", "NULL",
         "FALSE", "TRUE", "FALSE", "NULL", "NULL", "NULL", "-", "NULL",
-        "\"left\"", "NULL", "NULL", "NULL", "NULL"
+        "\"left\"", "NULL", "NULL", "NULL", "NULL", "NULL", "\"text\"", "NULL",
+        "NULL", "\"text\"", "NULL", "NULL", "NULL", "NULL"
       ),
       Description = c(
         "Data frame or tibble to render. Cell values are formatted in R before runtime rendering.",
@@ -307,7 +366,7 @@ register_table_showcase <- function(input, output, session) {
         "String used to render missing values. Per-column overrides win.",
         "Decimal places for default numeric formatting. NULL keeps R's format().",
         "Render row.names(data) as a leading column.",
-        "function(row, i) returning list(class=, style=) applied to that row's <tr>.",
+        "function(row, i) returning list(intent=, class=, style=) applied to that row's <tr>.",
         "Zebra-stripe body rows.",
         "Highlight rows on hover (shadcn base behavior).",
         "Draw cell borders.",
@@ -320,7 +379,16 @@ register_table_showcase <- function(input, output, session) {
         "Optional function applied to the full column vector; must return one value per row.",
         "Per-column decimal places, overriding the table-level digits.",
         "Per-column missing-value string, overriding the table-level na.",
-        "Optional CSS width for the column."
+        "Optional CSS width for the column.",
+        "Token-backed styling intent for every cell in the column: muted, primary, secondary, destructive, success, warning, or accent. Theme-safe.",
+        "How an intent renders: text (colored text), soft (tint), or solid (chip).",
+        "Escape hatch: class / inline style on each <td>. You own theme-correctness.",
+        "Styling intent applied to the column's <th> header cell.",
+        "Emphasis for header_intent: text, soft, or solid.",
+        "Escape-hatch class / style applied to the column's <th>.",
+        "function(value) over the column vector returning a per-row intent (NA for none). Wins over the column intent.",
+        "function(value) returning a per-row emphasis value.",
+        "function(value) returning per-row class / style escape-hatch values."
       )
     ))
   })

@@ -138,7 +138,9 @@ export const THEME_REGISTRY = {
     bindings: [
       { selector: ".sb-parity-table [data-slot='table']", property: "color", token: "--foreground" },
       { selector: ".sb-parity-table [data-slot='table-head']", property: "color", token: "--muted-foreground" },
-      { selector: ".sb-parity-table [data-slot='table-row']", property: "borderBottomColor", token: "--border" }
+      { selector: ".sb-parity-table [data-slot='table-row']", property: "borderBottomColor", token: "--border" },
+      { selector: ".sb-parity-table .sb-table-cell[data-intent='primary']", property: "color", token: "--primary" },
+      { selector: ".sb-parity-table .sb-table-head[data-intent='destructive']", property: "color", token: "--destructive" }
     ]
   },
   textarea: {

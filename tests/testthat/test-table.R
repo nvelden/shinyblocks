@@ -61,6 +61,59 @@ test_that("table_column() applies labels, alignment, width, and formatting", {
   )
 })
 
+test_that("table_column() emits theme-safe column and header styling", {
+  table <- block_table(
+    data.frame(metric = c("Revenue"), cost = c(-700)),
+    columns = list(
+      cost = table_column(
+        align = "right",
+        intent = "muted",
+        class = "tabular-nums",
+        header_intent = "primary",
+        header_emphasis = "soft",
+        header_style = "letter-spacing: 0.05em;"
+      )
+    )
+  )
+  payload <- runtime_payload_from(table)
+
+  spec <- payload$props$columns[[2]]
+  expect_identical(spec$intent, "muted")
+  expect_identical(spec$emphasis, "text")
+  expect_identical(spec$class, "tabular-nums")
+  expect_identical(spec$headerIntent, "primary")
+  expect_identical(spec$headerEmphasis, "soft")
+  expect_identical(spec$headerStyle$letterSpacing, "0.05em")
+})
+
+test_that("table_column() omits styling fields when unset (back-compat)", {
+  table <- block_table(
+    data.frame(item = c("Alpha"), count = c(1)),
+    columns = list(count = table_column(align = "right"))
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(
+    payload$props$columns,
+    list(
+      list(key = "item", label = "item", align = "left", width = NULL),
+      list(key = "count", label = "count", align = "right", width = NULL)
+    )
+  )
+})
+
+test_that("table_column() validates intent and emphasis", {
+  expect_error(table_column(intent = "danger"), "`intent` must be one of")
+  expect_error(
+    table_column(intent = "primary", emphasis = "bold"),
+    "`emphasis` must be one of"
+  )
+  expect_error(
+    table_column(header_intent = "nope"),
+    "`header_intent` must be one of"
+  )
+})
+
 test_that("block_table() renders missing values as empty cells", {
   table <- block_table(
     data.frame(
@@ -164,6 +217,120 @@ test_that("block_table() emits empty per-row rowMeta when no row_format", {
   expect_null(payload$props$rowMeta[[2]])
   expect_false(payload$props$striped)
   expect_true(payload$props$hover)
+})
+
+test_that("cell_intent callbacks produce a cellMeta matrix", {
+  table <- block_table(
+    data.frame(metric = c("Profit", "Loss"), value = c(120, -40)),
+    columns = list(
+      value = table_column(
+        cell_intent = function(v) ifelse(v < 0, "destructive", "success"),
+        cell_emphasis = function(v) "soft"
+      )
+    )
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_length(payload$props$cellMeta, 2L)
+  # Two columns per row; only the `value` column (index 2) is styled.
+  expect_null(payload$props$cellMeta[[1]][[1]])
+  expect_identical(payload$props$cellMeta[[1]][[2]]$intent, "success")
+  expect_identical(payload$props$cellMeta[[1]][[2]]$emphasis, "soft")
+  expect_identical(payload$props$cellMeta[[2]][[2]]$intent, "destructive")
+})
+
+test_that("cell_style accepts a single named list as one style object", {
+  # A fully named list is one style applied to every row, not per-row entries.
+  table <- block_table(
+    data.frame(value = c(10, 20, 30)),
+    columns = list(
+      value = table_column(cell_style = function(v) list(color = "var(--primary)"))
+    )
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_length(payload$props$cellMeta, 3L)
+  for (i in seq_len(3)) {
+    expect_identical(payload$props$cellMeta[[i]][[1]]$style, list(color = "var(--primary)"))
+  }
+})
+
+test_that("cell_style accepts CSS strings and per-row named lists", {
+  table <- block_table(
+    data.frame(value = c(1, 2)),
+    columns = list(
+      value = table_column(
+        cell_style = function(v) list(list(color = "red"), "font-weight: 600")
+      )
+    )
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(payload$props$cellMeta[[1]][[1]]$style, list(color = "red"))
+  expect_identical(payload$props$cellMeta[[2]][[1]]$style, list(fontWeight = "600"))
+})
+
+test_that("block_table() always emits cellMeta for clear-on-merge", {
+  table <- block_table(data.frame(item = c("A", "B")))
+  payload <- runtime_payload_from(table)
+
+  expect_length(payload$props$cellMeta, 2L)
+  expect_identical(payload$props$cellMeta[[1]], list(NULL))
+  expect_identical(payload$props$cellMeta[[2]], list(NULL))
+})
+
+test_that("rownames adds a leading empty cellMeta slot", {
+  table <- block_table(
+    data.frame(value = c(5), row.names = "a"),
+    rownames = TRUE,
+    columns = list(value = table_column(cell_intent = function(v) "primary"))
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_null(payload$props$cellMeta[[1]][[1]])
+  expect_identical(payload$props$cellMeta[[1]][[2]]$intent, "primary")
+})
+
+test_that("cell_* callbacks validate length and intent", {
+  expect_error(
+    block_table(
+      data.frame(x = c(1, 2)),
+      columns = list(x = table_column(cell_intent = function(v) c("primary")))
+    ),
+    NA
+  )
+  expect_error(
+    block_table(
+      data.frame(x = c(1, 2)),
+      columns = list(x = table_column(cell_class = function(v) c("a", "b", "c")))
+    ),
+    "`cell_class` for column .* must return one value per row"
+  )
+  expect_error(
+    block_table(
+      data.frame(x = c(1, 2)),
+      columns = list(x = table_column(cell_intent = function(v) c("primary", "bad")))
+    ),
+    "must be one of"
+  )
+  expect_error(
+    table_column(cell_intent = "primary"),
+    "`cell_intent` must be NULL or a function"
+  )
+})
+
+test_that("row_format can return an intent", {
+  table <- block_table(
+    data.frame(amount = c(2000, 10)),
+    row_format = function(row, i) {
+      if (row$amount > 1000) list(intent = "warning", emphasis = "soft")
+    }
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(payload$props$rowMeta[[1]]$intent, "warning")
+  expect_identical(payload$props$rowMeta[[1]]$emphasis, "soft")
+  expect_null(payload$props$rowMeta[[2]])
 })
 
 test_that("table_build_payload is the single source for UI and updates", {
