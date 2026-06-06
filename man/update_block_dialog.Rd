@@ -74,6 +74,7 @@ Other content:
 \code{\link{block_tooltip}()},
 \code{\link{block_value_box}()},
 \code{\link{table_column}()},
-\code{\link{update_block_popover}()}
+\code{\link{update_block_popover}()},
+\code{\link{update_block_table}()}
 }
 \concept{content}

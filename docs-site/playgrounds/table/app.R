@@ -191,6 +191,23 @@ ui <- block_page(
               value = FALSE
             )
           )
+        ),
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          htmltools::tags$h4(
+            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+            "Server actions"
+          ),
+          htmltools::tags$p(
+            style = "color: var(--muted-foreground); margin: 0; font-size: 0.8125rem;",
+            "The dataset selector and this button push fresh payloads with update_block_table()."
+          ),
+          block_button(
+            "Toggle loading",
+            id = "showcase_table_act_loading",
+            variant = "outline",
+            size = "sm"
+          )
         )
       ),
       htmltools::div(
@@ -224,49 +241,77 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
-  preview_args <- reactive({
+  rv_loading <- reactiveVal(FALSE)
+  observeEvent(input$showcase_table_act_loading, {
+    rv_loading(!rv_loading())
+  }, ignoreInit = TRUE)
+
+  # Shared data + formatting spec. Feeds both the one-time block_table() mount
+  # and every update_block_table() push, so the playground dogfoods the reactive
+  # refresh path an app author would use.
+  table_spec <- reactive({
+    dataset <- input$showcase_table_doc_dataset %||% "metrics"
+    align <- input$showcase_table_doc_align %||% "right"
+    max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
+    caption <- input$showcase_table_doc_caption %||% ""
+
+    list(
+      data = table_demo_data(dataset),
+      columns = table_demo_columns(dataset, align),
+      caption = if (nzchar(caption)) caption else NULL,
+      max_rows = if (identical(max_rows_value, "all")) NULL else as.integer(max_rows_value),
+      loading = isTRUE(rv_loading())
+    )
+  })
+
+  # class/style are mount-time only and cannot be pushed by update_block_table(),
+  # so a change to them remounts the table; everything else updates in place.
+  output$showcase_table_preview_ui <- renderUI({
+    style <- input$showcase_table_doc_style %||% ""
+    use_class <- isTRUE(input$showcase_table_doc_class)
+
+    mount_spec <- isolate(table_spec())
+    mount_spec$loading <- NULL
+
+    do.call(
+      block_table,
+      c(
+        list(
+          id = "showcase_table_live",
+          class = if (use_class) "showcase-table-preview-custom" else NULL,
+          style = if (nzchar(style)) style else NULL
+        ),
+        mount_spec
+      )
+    )
+  })
+  outputOptions(output, "showcase_table_preview_ui", suspendWhenHidden = FALSE)
+
+  observe({
+    do.call(
+      update_block_table,
+      c(list(session = session, id = "showcase_table_live"), table_spec())
+    )
+  })
+
+  output$showcase_table_preview_code <- showcase_render_code({
     dataset <- input$showcase_table_doc_dataset %||% "metrics"
     align <- input$showcase_table_doc_align %||% "right"
     max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
     caption <- input$showcase_table_doc_caption %||% ""
     style <- input$showcase_table_doc_style %||% ""
+    use_class <- isTRUE(input$showcase_table_doc_class)
 
-    list(
-      dataset = dataset,
-      align = align,
-      max_rows_value = max_rows_value,
-      max_rows = if (identical(max_rows_value, "all")) NULL else as.integer(max_rows_value),
-      caption = if (nzchar(caption)) caption else NULL,
-      style = if (nzchar(style)) style else NULL,
-      class = if (isTRUE(input$showcase_table_doc_class)) "showcase-table-preview-custom" else NULL
-    )
-  })
-
-  output$showcase_table_preview_ui <- renderUI({
-    args <- preview_args()
-    block_table(
-      table_demo_data(args$dataset),
-      columns = table_demo_columns(args$dataset, args$align),
-      caption = args$caption,
-      max_rows = args$max_rows,
-      class = args$class,
-      style = args$style
-    )
-  })
-  outputOptions(output, "showcase_table_preview_ui", suspendWhenHidden = FALSE)
-
-  output$showcase_table_preview_code <- showcase_render_code({
-    args <- preview_args()
     data_expr <- switch(
-      args$dataset,
+      dataset,
       releases = 'data.frame(package = c("shinyblocks", "runtime", "docs-site", "showcase"), status = c("ready", "review", "queued", "ready"), owner = c("UI", "Runtime", "Docs", "QA"))',
       empty = 'data.frame(metric = character(), value = numeric(), delta = character())',
       'data.frame(metric = c("Revenue", "Orders", "Conversion", "Refunds"), value = c(42000, 128, 0.048, NA), delta = c("+12%", "+8%", "+0.6 pts", NA))'
     )
-    columns_expr <- if (identical(args$dataset, "releases")) {
+    columns_expr <- if (identical(dataset, "releases")) {
       paste0(
         "list(\n",
-        "    status = table_column(label = \"Status\", align = \"", args$align, "\"),\n",
+        "    status = table_column(label = \"Status\", align = \"", align, "\"),\n",
         "    owner = table_column(label = \"Owner\")\n",
         "  )"
       )
@@ -274,30 +319,37 @@ server <- function(input, output, session) {
       paste0(
         "list(\n",
         "    metric = table_column(label = \"Metric\"),\n",
-        "    value = table_column(label = \"Value\", align = \"", args$align, "\"),\n",
-        "    delta = table_column(label = \"Delta\", align = \"", args$align, "\")\n",
+        "    value = table_column(label = \"Value\", align = \"", align, "\"),\n",
+        "    delta = table_column(label = \"Delta\", align = \"", align, "\")\n",
         "  )"
       )
     }
 
     code_args <- c(
+      'id = "tbl"',
       paste0("data = ", data_expr),
       paste0("columns = ", columns_expr)
     )
-    if (!is.null(args$caption)) {
-      code_args <- c(code_args, paste0("caption = ", string_literal(args$caption)))
+    if (nzchar(caption)) {
+      code_args <- c(code_args, paste0("caption = ", string_literal(caption)))
     }
-    if (!is.null(args$max_rows)) {
-      code_args <- c(code_args, paste0("max_rows = ", args$max_rows))
+    if (!identical(max_rows_value, "all")) {
+      code_args <- c(code_args, paste0("max_rows = ", max_rows_value))
     }
-    if (!is.null(args$class)) {
-      code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    if (use_class) {
+      code_args <- c(code_args, paste0("class = ", string_literal("showcase-table-preview-custom")))
     }
-    if (!is.null(args$style)) {
-      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
+    if (nzchar(style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(style)))
     }
 
-    paste0("block_table(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
+    paste0(
+      "block_table(\n  ", paste(code_args, collapse = ",\n  "), "\n)\n\n",
+      "# Refresh reactively from the server:\n",
+      "observeEvent(input$reload, {\n",
+      "  update_block_table(session, \"tbl\", data = latest_data(), loading = FALSE)\n",
+      "})"
+    )
   })
   outputOptions(output, "showcase_table_preview_code", suspendWhenHidden = FALSE)
 }

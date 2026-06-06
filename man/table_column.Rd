@@ -8,7 +8,9 @@ table_column(
   label = NULL,
   align = c("left", "center", "right"),
   format = NULL,
-  width = NULL
+  width = NULL,
+  digits = NULL,
+  na = NULL
 )
 }
 \arguments{
@@ -17,9 +19,16 @@ table_column(
 \item{align}{Text alignment. One of \code{"left"}, \code{"center"}, or \code{"right"}.}
 
 \item{format}{Optional function applied to the full column vector. The result
-must have the same length as the input and is coerced to character.}
+must have the same length as the input and is coerced to character. When
+supplied, \code{digits} is ignored for this column.}
 
 \item{width}{Optional CSS width for the column.}
+
+\item{digits}{Optional non-negative integer for default numeric formatting,
+overriding the table-level \code{digits} for this column.}
+
+\item{na}{Optional string for missing values, overriding the table-level \code{na}
+for this column.}
 }
 \value{
 A table column specification.
@@ -51,6 +60,7 @@ Other content:
 \code{\link{block_tooltip}()},
 \code{\link{block_value_box}()},
 \code{\link{update_block_dialog}()},
-\code{\link{update_block_popover}()}
+\code{\link{update_block_popover}()},
+\code{\link{update_block_table}()}
 }
 \concept{content}

@@ -42,12 +42,29 @@
     background-color 0.15s ease;
 }
 
-[data-shinyblocks-root] .sb-table-row:hover {
+[data-shinyblocks-root] .sb-table--hover .sb-table-row:hover {
   background-color: color-mix(in oklch, var(--muted) 50%, transparent);
 }
 
 [data-shinyblocks-root] .sb-table-row[data-state="selected"] {
   background-color: var(--muted);
+}
+
+[data-shinyblocks-root] .sb-table--striped .sb-table-row:nth-child(even) {
+  background-color: color-mix(in oklch, var(--muted) 40%, transparent);
+}
+
+/* Inter-column rules only; outer table edges stay borderless. */
+[data-shinyblocks-root] .sb-table--bordered .sb-table-head:not(:last-child),
+[data-shinyblocks-root] .sb-table--bordered .sb-table-cell:not(:last-child) {
+  border-inline-end: 1px solid var(--border);
+}
+
+/* Reuses the shared .sb-skeleton shimmer (background/radius/animation);
+   display:block already fills the cell width. */
+[data-shinyblocks-root] .sb-table-skeleton {
+  display: block;
+  height: 0.75rem;
 }
 
 [data-shinyblocks-root] .sb-table-head {

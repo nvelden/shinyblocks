@@ -103,6 +103,112 @@ test_that("block_table() keeps zero-row tables serializable", {
   expect_identical(payload$props$totalRows, 0L)
 })
 
+test_that("block_table() renders na, digits, and rownames", {
+  table <- block_table(
+    data.frame(
+      revenue = c(1250.5, NA, 88),
+      row.names = c("a", "b", "c")
+    ),
+    na = "n/a",
+    digits = 1,
+    rownames = TRUE
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(payload$props$columns[[1]]$key, "_rownames")
+  expect_identical(
+    payload$props$rows,
+    list(
+      list("a", "1250.5"),
+      list("b", "n/a"),
+      list("c", "88.0")
+    )
+  )
+})
+
+test_that("table_column() overrides table-level na and digits", {
+  table <- block_table(
+    data.frame(score = c(1.234, NA)),
+    na = "n/a",
+    digits = 0,
+    columns = list(score = table_column(digits = 2, na = "—"))
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(payload$props$rows, list(list("1.23"), list("—")))
+})
+
+test_that("row_format produces per-row rowMeta", {
+  table <- block_table(
+    data.frame(amount = c(2000, 10)),
+    row_format = function(row, i) {
+      if (row$amount > 1000) list(class = "is-warning", style = "font-weight:600")
+    }
+  )
+  payload <- runtime_payload_from(table)
+
+  expect_identical(payload$props$rowMeta[[1]]$class, "is-warning")
+  expect_identical(payload$props$rowMeta[[1]]$style$fontWeight, "600")
+  expect_null(payload$props$rowMeta[[2]])
+})
+
+test_that("block_table() emits empty per-row rowMeta when no row_format", {
+  # rowMeta is always present (one empty entry per rendered row) so a
+  # data-bearing update_block_table() payload authoritatively clears any prior
+  # per-row formatting instead of leaving it stale in the runtime merge.
+  table <- block_table(data.frame(item = c("A", "B")))
+  payload <- runtime_payload_from(table)
+
+  expect_length(payload$props$rowMeta, 2L)
+  expect_null(payload$props$rowMeta[[1]])
+  expect_null(payload$props$rowMeta[[2]])
+  expect_false(payload$props$striped)
+  expect_true(payload$props$hover)
+})
+
+test_that("table_build_payload is the single source for UI and updates", {
+  build <- local_internal()$table_build_payload
+  df <- data.frame(amount = c(2000, 10))
+  args <- list(data = df, digits = 1, striped = TRUE)
+
+  ui_props <- runtime_payload_from(
+    do.call(block_table, args)
+  )$props
+  direct_props <- do.call(build, args)
+
+  # The UI payload round-trips through JSON (lists, no integer class), so compare
+  # the JSON-stable shape rather than R object identity.
+  expect_identical(
+    jsonlite::fromJSON(runtime_payload_json(list(direct_props)), simplifyVector = FALSE)[[1]],
+    ui_props
+  )
+})
+
+test_that("update_block_table() sends a formatted payload to the mount", {
+  capture <- local_input_message_session()
+  update_block_table(
+    capture$session,
+    "tbl",
+    data = data.frame(amount = c(2000, 10)),
+    striped = TRUE
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-table-tbl")
+  expect_identical(message$payload$rows, list(list("2000"), list("10")))
+  expect_true(message$payload$striped)
+  expect_null(message$payload$notify)
+})
+
+test_that("update_block_table() can push only a loading flag", {
+  capture <- local_input_message_session()
+  update_block_table(capture$session, "tbl", loading = TRUE)
+
+  payload <- capture$last_payload()
+  expect_true(payload$loading)
+  expect_null(payload$rows)
+})
+
 test_that("block_table() validates inputs", {
   expect_error(block_table(list(item = "A")), "`data` must be a data frame")
   expect_error(
@@ -131,5 +237,24 @@ test_that("block_table() validates inputs", {
       columns = list(item = table_column(format = function(value) "A"))
     ),
     "`format` for column"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), digits = -1),
+    "`digits` must be NULL or a non-negative integer"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), na = c("a", "b")),
+    "`na` must be a single character string"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), row_format = "x"),
+    "`row_format` must be NULL or a function"
+  )
+  expect_error(
+    block_table(
+      data.frame(item = c("A", "B")),
+      row_format = function(row, i) "nope"
+    ),
+    "`row_format` must return NULL or a list"
   )
 })

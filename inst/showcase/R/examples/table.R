@@ -24,6 +24,37 @@ htmltools::tagList(
             rows = 2,
             resize = "none"
           )
+        ),
+        block_field(
+          block_field_label("na", `for` = "showcase_table_doc_na"),
+          block_input(
+            "showcase_table_doc_na",
+            value = "",
+            placeholder = "e.g. —"
+          )
+        ),
+        block_field(
+          block_field_label("digits", `for` = "showcase_table_doc_digits"),
+          block_select(
+            "showcase_table_doc_digits",
+            choices = c("default" = "default", "0" = "0", "1" = "1", "2" = "2"),
+            selected = "default",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_rownames",
+            "Show row names",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_checkbox(
+            "showcase_table_doc_rowformat",
+            "Highlight rows where value > 100 (row_format)",
+            value = FALSE
+          )
         )
       ),
       showcase_controls_group(
@@ -60,11 +91,44 @@ htmltools::tagList(
           )
         ),
         block_field(
-          block_field_label("class", `for` = "showcase_table_doc_class"),
           block_checkbox(
             "showcase_table_doc_class",
             "Use custom dashed-border class",
             value = FALSE
+          )
+        )
+      ),
+      showcase_controls_group(
+        "Server actions",
+        htmltools::tags$p(
+          style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.8125rem;",
+          "Each control pushes a fresh payload with update_block_table()."
+        ),
+        htmltools::div(
+          style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+          block_button(
+            "Toggle loading",
+            id = "showcase_table_act_loading",
+            variant = "outline",
+            size = "sm"
+          ),
+          block_button(
+            "Toggle filtered subset",
+            id = "showcase_table_act_filter",
+            variant = "outline",
+            size = "sm"
+          ),
+          block_button(
+            "Toggle striped",
+            id = "showcase_table_act_striped",
+            variant = "outline",
+            size = "sm"
+          ),
+          block_button(
+            "Toggle bordered",
+            id = "showcase_table_act_bordered",
+            variant = "outline",
+            size = "sm"
           )
         )
       )
@@ -76,6 +140,16 @@ htmltools::tagList(
       "border: 1px solid var(--border); border-radius: 0.75rem;",
       "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);",
       "overflow-x: auto;"
+    ),
+    extra_outputs = htmltools::tagList(
+      shiny::uiOutput("showcase_table_preview_value"),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_table_reactive_code")
+      )
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

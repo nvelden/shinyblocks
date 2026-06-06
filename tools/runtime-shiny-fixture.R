@@ -153,6 +153,11 @@ ui <- shiny::fluidPage(
     id = "runtime_button",
     class = "runtime-button-fixture"
   ),
+  block_table(
+    data.frame(name = "alpha", value = 1, stringsAsFactors = FALSE),
+    id = "runtime_table",
+    class = "runtime-table-fixture"
+  ),
   block_popover(
     id = "runtime_popover",
     trigger = "Open popover",
@@ -174,6 +179,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_popover_value"),
+  shiny::actionButton("update_table", "Update table"),
   shiny::actionButton("set_select_pro", "Set select Pro"),
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
@@ -276,6 +282,14 @@ server <- function(input, output, session) {
   })
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
+
+  shiny::observeEvent(input$update_table, {
+    update_block_table(
+      session = session,
+      id = "runtime_table",
+      data = data.frame(name = "beta", value = 2, stringsAsFactors = FALSE)
+    )
+  })
 
   shiny::observeEvent(input$set_select_pro, {
     update_block_select(

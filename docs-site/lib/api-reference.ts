@@ -183,14 +183,33 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
   table: [
     {
       name: "block_table",
-      description: "Renders a data frame or tibble as a static shadcn-style table through the shinyblocks runtime.",
+      description: "Renders a data frame or tibble as a shadcn-style table through the shinyblocks runtime, with R-side formatting and a reactive server-side update path.",
       arguments: [
         { argument: "data", type: "data.frame", defaultVal: "required", description: "Data frame or tibble to render." },
         { argument: "columns", type: "named list", defaultVal: "NULL", description: "Optional table_column() specs keyed by data column name." },
         { argument: "caption", type: "character", defaultVal: "NULL", description: "Caption rendered below the table." },
         { argument: "max_rows", type: "integer", defaultVal: "NULL", description: "Optional row limit. Truncated tables render a footer note." },
+        { argument: "na", type: "character", defaultVal: "\"\"", description: "String used to render missing values. Per-column overrides win." },
+        { argument: "digits", type: "integer", defaultVal: "NULL", description: "Decimal places for default numeric formatting. NULL keeps R's format()." },
+        { argument: "rownames", type: "logical", defaultVal: "FALSE", description: "Render row.names(data) as a leading column." },
+        { argument: "row_format", type: "function", defaultVal: "NULL", description: "function(row, i) returning list(class=, style=) applied to that row's <tr>." },
+        { argument: "striped", type: "logical", defaultVal: "FALSE", description: "Zebra-stripe body rows." },
+        { argument: "hover", type: "logical", defaultVal: "TRUE", description: "Highlight rows on hover (shadcn base behavior)." },
+        { argument: "bordered", type: "logical", defaultVal: "FALSE", description: "Draw cell borders." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Input id. Required only to update the table from the server." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes applied to the runtime table container." },
         { argument: "style", type: "character | named list", defaultVal: "NULL", description: "Inline styles applied to the runtime mount and table container." }
+      ]
+    },
+    {
+      name: "update_block_table",
+      description: "Re-renders an id-bound block_table() from the server with a freshly formatted payload (the same pipeline as the initial render).",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Shiny session." },
+        { argument: "id", type: "character", defaultVal: "required", description: "Input id passed to block_table(id = )." },
+        { argument: "data", type: "data.frame", defaultVal: "NULL", description: "Replacement data frame. Re-renders with the formatting arguments below." },
+        { argument: "columns, caption, max_rows, na, digits, rownames, row_format, striped, hover, bordered", type: "matching block_table()", defaultVal: "block_table() defaults", description: "Formatting arguments applied when data is supplied." },
+        { argument: "loading", type: "logical", defaultVal: "NULL", description: "TRUE shows skeleton rows; FALSE clears the loading state without changing data." }
       ]
     },
     {
@@ -199,8 +218,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "label", type: "character", defaultVal: "NULL", description: "Header label. Defaults to the column name." },
         { argument: "align", type: "'left' | 'center' | 'right'", defaultVal: "'left'", description: "Text alignment for header and cells." },
-        { argument: "format", type: "function", defaultVal: "NULL", description: "Function applied to the full R column vector before rendering." },
-        { argument: "width", type: "character", defaultVal: "NULL", description: "Optional CSS width for the column." }
+        { argument: "format", type: "function", defaultVal: "NULL", description: "Function applied to the full R column vector before rendering. When set, digits is ignored for this column." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "Optional CSS width for the column." },
+        { argument: "digits", type: "integer", defaultVal: "NULL", description: "Per-column decimal places, overriding the table-level digits." },
+        { argument: "na", type: "character", defaultVal: "NULL", description: "Per-column missing-value string, overriding the table-level na." }
       ]
     }
   ],

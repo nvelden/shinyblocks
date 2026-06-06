@@ -4,6 +4,18 @@
 
 ## New features
 
+* Made `block_table()` reactive (issue #51). Added `update_block_table()` to
+  re-render an `id`-bound table from the server with a freshly formatted payload,
+  giving `renderTable()`-equivalent reactive data refresh. `block_table()` and
+  `update_block_table()` now share one R-side serializer so the initial render
+  and every server update produce identical payloads. `block_table()` gained
+  `na`, `digits`, `rownames`, `row_format` (per-row `{class, style}`), `striped`,
+  `hover`, `bordered`, and `id` arguments, and `table_column()` gained per-column
+  `digits` / `na`; all defaulted so existing calls render identically. The
+  runtime adds a token-based loading skeleton (`update_block_table(loading =
+  TRUE)`) and striped/bordered/hover variants. The Shiny showcase and docs-site
+  Table playgrounds now dogfood the reactive update path.
+
 * Added `block_table()` and `table_column()` (issue #49), a static
   runtime-owned shadcn table port for rendering data frames with R-side
   formatting, captions, column alignment/width overrides, empty-cell `NA`

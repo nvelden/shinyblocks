@@ -2,7 +2,8 @@
 #'
 #' `block_table()` renders a data frame or tibble as a runtime-owned shadcn
 #' table. Cell formatting happens in R before the payload is sent to the
-#' browser.
+#' browser. The same formatting pipeline is reused by [update_block_table()],
+#' so a server-side refresh produces an identical payload.
 #'
 #' @param data A data frame or tibble.
 #' @param columns Optional named list of per-column overrides created with
@@ -10,6 +11,22 @@
 #' @param caption Optional caption rendered below the table.
 #' @param max_rows Optional non-negative integer limiting the number of rendered
 #'   rows. When rows are truncated, a footer note reports the total row count.
+#' @param na String used to render missing values. Defaults to `""` (empty
+#'   cell). Per-column overrides win via `table_column(na = )`.
+#' @param digits Optional non-negative integer giving the number of decimal
+#'   places for default numeric formatting. `NULL` keeps R's default `format()`.
+#'   Ignored for columns with a custom `format` function. Per-column overrides
+#'   win via `table_column(digits = )`.
+#' @param rownames Whether to render `row.names(data)` as a leading column.
+#' @param row_format Optional `function(row, i)` called once per rendered row,
+#'   where `row` is the original (unformatted) row as a named list and `i` is the
+#'   row index. Return `NULL` for no styling, or a list with optional `class`
+#'   and/or `style` entries applied to that row's `<tr>`.
+#' @param striped Whether to zebra-stripe body rows.
+#' @param hover Whether rows highlight on hover. Defaults to `TRUE` (shadcn base).
+#' @param bordered Whether to draw cell borders.
+#' @param id Optional input id. Required only if the table is updated from the
+#'   server with [update_block_table()]; static tables can omit it.
 #' @param class Additional classes on the runtime mount.
 #' @param style Optional inline custom styles.
 #'
@@ -21,58 +38,107 @@ block_table <- function(
   columns = NULL,
   caption = NULL,
   max_rows = NULL,
+  na = "",
+  digits = NULL,
+  rownames = FALSE,
+  row_format = NULL,
+  striped = FALSE,
+  hover = TRUE,
+  bordered = FALSE,
+  id = NULL,
   class = NULL,
   style = NULL
 ) {
-  if (!is.data.frame(data)) {
-    stop("`data` must be a data frame.", call. = FALSE)
+  if (!is.null(id)) {
+    validate_input_id(id)
   }
 
-  column_names <- names(data)
-  if (is.null(column_names) || any(!nzchar(column_names))) {
-    stop("`data` must have non-empty column names.", call. = FALSE)
-  }
-
-  columns <- normalize_table_columns(columns, column_names)
-  row_count <- nrow(data)
-  max_rows <- normalize_table_max_rows(max_rows, row_count)
-  display_rows <- if (is.null(max_rows)) row_count else min(row_count, max_rows)
-
-  formatted_columns <- Map(
-    function(name, spec) {
-      table_format_column(data[[name]], spec$format, name)
-    },
-    column_names,
-    columns
+  props <- table_build_payload(
+    data = data,
+    columns = columns,
+    caption = caption,
+    max_rows = max_rows,
+    na = na,
+    digits = digits,
+    rownames = rownames,
+    row_format = row_format,
+    striped = striped,
+    hover = hover,
+    bordered = bordered
   )
-
-  rows <- lapply(seq_len(display_rows), function(row_index) {
-    unname(lapply(formatted_columns, function(column) column[[row_index]]))
-  })
 
   runtime_component(
     component = "table",
-    props = list(
-      columns = unname(Map(
-        function(name, spec) {
-          list(
-            key = name,
-            label = spec$label %||% name,
-            align = spec$align,
-            width = spec$width
-          )
-        },
-        column_names,
-        columns
-      )),
-      rows = rows,
-      caption = normalize_table_optional_string(caption, "caption"),
-      truncated = !is.null(max_rows) && display_rows < row_count,
-      totalRows = row_count
-    ),
+    props = props,
+    input_id = id,
     class = class,
     style = style,
     root_class = "sb-table"
+  )
+}
+
+#' Update a runtime table from the server
+#'
+#' Re-renders a [block_table()] (created with an `id`) by pushing a freshly
+#' formatted payload to the browser. Every argument runs through the same
+#' formatting pipeline as `block_table()`, so the refreshed table is identical
+#' to one rendered with the same arguments at UI time.
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param id Input id passed to `block_table(id = )`.
+#' @param data Optional replacement data frame. When supplied, the table re-renders
+#'   with the formatting arguments below.
+#' @param columns,caption,max_rows,na,digits,rownames,row_format,striped,hover,bordered
+#'   Optional formatting arguments, matching [block_table()]. Used only when
+#'   `data` is supplied.
+#' @param loading Optional flag. `TRUE` shows skeleton rows; `FALSE` clears the
+#'   loading state without changing data.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family content
+#' @export
+update_block_table <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  id,
+  data = NULL,
+  columns = NULL,
+  caption = NULL,
+  max_rows = NULL,
+  na = "",
+  digits = NULL,
+  rownames = FALSE,
+  row_format = NULL,
+  striped = FALSE,
+  hover = TRUE,
+  bordered = FALSE,
+  loading = NULL
+) {
+  payload <- list()
+
+  if (!is.null(data)) {
+    props <- table_build_payload(
+      data = data,
+      columns = columns,
+      caption = caption,
+      max_rows = max_rows,
+      na = na,
+      digits = digits,
+      rownames = rownames,
+      row_format = row_format,
+      striped = striped,
+      hover = hover,
+      bordered = bordered
+    )
+    payload <- utils::modifyList(payload, props)
+  }
+
+  if (!is.null(loading)) {
+    payload$loading <- isTRUE(loading)
+  }
+
+  runtime_input_update(
+    session, id, "table", payload,
+    notify_key = NULL
   )
 }
 
@@ -81,8 +147,13 @@ block_table <- function(
 #' @param label Header label. Defaults to the data column name.
 #' @param align Text alignment. One of `"left"`, `"center"`, or `"right"`.
 #' @param format Optional function applied to the full column vector. The result
-#'   must have the same length as the input and is coerced to character.
+#'   must have the same length as the input and is coerced to character. When
+#'   supplied, `digits` is ignored for this column.
 #' @param width Optional CSS width for the column.
+#' @param digits Optional non-negative integer for default numeric formatting,
+#'   overriding the table-level `digits` for this column.
+#' @param na Optional string for missing values, overriding the table-level `na`
+#'   for this column.
 #'
 #' @return A table column specification.
 #' @family content
@@ -91,7 +162,9 @@ table_column <- function(
   label = NULL,
   align = c("left", "center", "right"),
   format = NULL,
-  width = NULL
+  width = NULL,
+  digits = NULL,
+  na = NULL
 ) {
   align <- match_arg(align, c("left", "center", "right"))
 
@@ -103,8 +176,147 @@ table_column <- function(
     label = normalize_table_optional_string(label, "label"),
     align = align,
     format = format,
-    width = normalize_table_optional_string(width, "width")
+    width = normalize_table_optional_string(width, "width"),
+    digits = normalize_table_digits(digits),
+    na = normalize_table_optional_string(na, "na")
   )
+}
+
+# Single source of truth for the table payload. Called by both block_table()
+# (UI time) and update_block_table() (server time) so the two paths can never
+# drift. Returns the `props` list for the runtime component.
+table_build_payload <- function(
+  data,
+  columns = NULL,
+  caption = NULL,
+  max_rows = NULL,
+  na = "",
+  digits = NULL,
+  rownames = FALSE,
+  row_format = NULL,
+  striped = FALSE,
+  hover = TRUE,
+  bordered = FALSE
+) {
+  if (!is.data.frame(data)) {
+    stop("`data` must be a data frame.", call. = FALSE)
+  }
+
+  column_names <- names(data)
+  if (is.null(column_names) || any(!nzchar(column_names))) {
+    stop("`data` must have non-empty column names.", call. = FALSE)
+  }
+
+  na <- normalize_table_na(na)
+  digits <- normalize_table_digits(digits)
+  if (!is.null(row_format) && !is.function(row_format)) {
+    stop("`row_format` must be NULL or a function.", call. = FALSE)
+  }
+
+  columns <- normalize_table_columns(columns, column_names)
+  row_count <- nrow(data)
+  max_rows <- normalize_table_max_rows(max_rows, row_count)
+  display_rows <- if (is.null(max_rows)) row_count else min(row_count, max_rows)
+
+  formatted_columns <- Map(
+    function(name, spec) {
+      table_format_column(
+        data[[name]],
+        spec$format,
+        name,
+        digits = spec$digits %||% digits,
+        na = spec$na %||% na
+      )
+    },
+    column_names,
+    columns
+  )
+
+  column_specs <- Map(
+    function(name, spec) {
+      list(
+        key = name,
+        label = spec$label %||% name,
+        align = spec$align,
+        width = spec$width
+      )
+    },
+    column_names,
+    columns
+  )
+
+  include_rownames <- isTRUE(rownames)
+  if (include_rownames) {
+    row_labels <- as.character(row.names(data))
+    column_specs <- c(
+      list(list(key = "_rownames", label = "", align = "left", width = NULL)),
+      column_specs
+    )
+  }
+
+  rows <- lapply(seq_len(display_rows), function(row_index) {
+    cells <- lapply(formatted_columns, function(column) column[[row_index]])
+    if (include_rownames) {
+      cells <- c(list(row_labels[[row_index]]), cells)
+    }
+    unname(cells)
+  })
+
+  props <- list(
+    columns = unname(column_specs),
+    rows = rows,
+    caption = normalize_table_optional_string(caption, "caption"),
+    truncated = !is.null(max_rows) && display_rows < row_count,
+    totalRows = row_count,
+    striped = isTRUE(striped),
+    hover = isTRUE(hover),
+    bordered = isTRUE(bordered)
+  )
+
+  # Always emit `rowMeta` so a data-bearing payload is authoritative: the runtime
+  # merges partial updates over current props, so omitting the key would let
+  # stale per-row formatting persist after `row_format` is cleared. An empty
+  # per-row list (serialized as `[{}, ...]`) overwrites and clears prior styling.
+  props$rowMeta <- if (is.null(row_format)) {
+    vector("list", display_rows)
+  } else {
+    table_build_row_meta(data, row_format, display_rows)
+  }
+
+  props
+}
+
+table_build_row_meta <- function(data, row_format, display_rows) {
+  lapply(seq_len(display_rows), function(i) {
+    row <- as.list(data[i, , drop = FALSE])
+    meta <- row_format(row, i)
+    normalize_table_row_meta(meta, i)
+  })
+}
+
+normalize_table_row_meta <- function(meta, i) {
+  if (is.null(meta)) {
+    return(NULL)
+  }
+  if (!is.list(meta)) {
+    stop(
+      sprintf("`row_format` must return NULL or a list for row %d.", i),
+      call. = FALSE
+    )
+  }
+
+  out <- list()
+  if (!is.null(meta$class)) {
+    out$class <- normalize_table_optional_string(meta$class, "row_format class")
+  }
+  if (!is.null(meta$style)) {
+    out$style <- normalize_runtime_style(meta$style)
+  }
+
+  if (length(out) == 0) {
+    return(NULL)
+  }
+  out
 }
 
 normalize_table_columns <- function(columns, column_names) {
@@ -156,7 +368,9 @@ normalize_table_column_spec <- function(spec, name) {
     label = spec$label,
     align = spec$align %||% "left",
     format = spec$format,
-    width = spec$width
+    width = spec$width,
+    digits = spec$digits,
+    na = spec$na
   )
 }
 
@@ -169,6 +383,34 @@ normalize_table_optional_string <- function(value, arg) {
   }
 
   value
+}
+
+normalize_table_na <- function(na) {
+  if (is.null(na)) {
+    return("")
+  }
+  if (!is.character(na) || length(na) != 1 || is.na(na)) {
+    stop("`na` must be a single character string.", call. = FALSE)
+  }
+
+  na
+}
+
+normalize_table_digits <- function(digits) {
+  if (is.null(digits)) {
+    return(NULL)
+  }
+  if (
+    !is.numeric(digits) ||
+      length(digits) != 1 ||
+      is.na(digits) ||
+      digits < 0 ||
+      digits != floor(digits)
+  ) {
+    stop("`digits` must be NULL or a non-negative integer.", call. = FALSE)
+  }
+
+  as.integer(digits)
 }
 
 normalize_table_max_rows <- function(max_rows, row_count) {
@@ -188,9 +430,9 @@ normalize_table_max_rows <- function(max_rows, row_count) {
   as.integer(min(max_rows, row_count))
 }
 
-table_format_column <- function(value, formatter, name) {
+table_format_column <- function(value, formatter, name, digits = NULL, na = "") {
   formatted <- if (is.null(formatter)) {
-    table_default_format(value)
+    table_default_format(value, digits)
   } else {
     formatter(value)
   }
@@ -206,13 +448,16 @@ table_format_column <- function(value, formatter, name) {
   }
 
   formatted <- as.character(formatted)
-  formatted[is.na(value) | is.na(formatted)] <- ""
+  formatted[is.na(value) | is.na(formatted)] <- na
   formatted
 }
 
-table_default_format <- function(value) {
+table_default_format <- function(value, digits = NULL) {
   if (is.numeric(value)) {
-    return(format(value, trim = TRUE, na.encode = FALSE))
+    if (is.null(digits)) {
+      return(format(value, trim = TRUE, na.encode = FALSE))
+    }
+    return(format(round(value, digits), trim = TRUE, nsmall = digits, na.encode = FALSE))
   }
 
   as.character(value)
