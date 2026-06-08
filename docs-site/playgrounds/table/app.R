@@ -252,13 +252,6 @@ ui <- block_page(
             uiOutput("showcase_table_preview_ui")
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
-          ),
-          uiOutput("showcase_table_preview_code")
-        ),
         uiOutput("showcase_table_preview_value"),
         htmltools::tags$div(
           htmltools::tags$div(
@@ -266,6 +259,13 @@ ui <- block_page(
             "Server Action"
           ),
           uiOutput("showcase_table_reactive_code")
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "UI Definition"
+          ),
+          uiOutput("showcase_table_preview_code")
         )
       )
     )
