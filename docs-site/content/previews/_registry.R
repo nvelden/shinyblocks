@@ -84,6 +84,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "File Input",
+    slug = "file-input",
+    file = "file-input.R",
+    description = "Styled file uploads backed by Shiny's native upload binding.",
+    featured = TRUE
+  ),
+  list(
     name = "Input",
     slug = "input",
     file = "input.R",

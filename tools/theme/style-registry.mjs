@@ -76,6 +76,16 @@ export const STYLE_REGISTRY = {
     },
     bindings: [{ selector: ".sb-parity-input-default", property: "borderRadius" }]
   },
+  "file-input": {
+    section: "file_input",
+    neutralProfiles: {
+      lyra: "Lyra's official style uses square inputs; the default shinyblocks file input is already square, so this radius binding is unchanged in this token-only slice.",
+      sera: "Sera's official style uses square inputs; the default shinyblocks file input is already square, so this radius binding is unchanged in this token-only slice."
+    },
+    bindings: [
+      { selector: ".sb-parity-file-input[data-slot='file-input-control']", property: "borderRadius" }
+    ]
+  },
   textarea: {
     section: "textarea",
     neutralProfiles: {

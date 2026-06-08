@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { chromium } from "playwright";
 
 const port = Number(process.env.PORT_RUNTIME_SHINY || 4325);
@@ -219,6 +222,33 @@ try {
     )?.disabled === false;
   });
 
+  const uploadPath = path.join(os.tmpdir(), "shinyblocks-runtime-upload.txt");
+  fs.writeFileSync(uploadPath, "runtime upload fixture\n");
+  await assertText(page, "#runtime_file_input_value", "<NULL>");
+  await page.setInputFiles("#runtime_file_input", uploadPath);
+  await assertText(
+    page,
+    "#runtime_file_input_value",
+    "name=shinyblocks-runtime-upload.txt cols=name,size,type,datapath rows=1"
+  );
+  await assertText(
+    page,
+    "[data-sb-component='file-input'] [data-slot='file-input-text']",
+    "shinyblocks-runtime-upload.txt"
+  );
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_file_disabled")?.disabled),
+    true,
+    "disabled file input should disable the native file input"
+  );
+  assert.equal(
+    await page.evaluate(() =>
+      document.querySelector(".runtime-file-disabled-fixture [data-slot='file-input-button']")?.disabled
+    ),
+    true,
+    "disabled file input should disable the visible trigger"
+  );
+
   await assertText(
     page,
     "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",
@@ -371,6 +401,9 @@ try {
   );
 
   await assertText(page, "#mod-value", "m0");
+  await assertText(page, "#mod-upload_value", "<NULL>");
+  await page.setInputFiles("#mod-upload", uploadPath);
+  await assertText(page, "#mod-upload_value", "shinyblocks-runtime-upload.txt");
 
   console.log("Runtime Shiny smoke test passed.");
 } catch (error) {

@@ -4,6 +4,8 @@
 
 ## New features
 
+* Added `block_file_input()` (issue #54), a shadcn-styled file picker that reuses Shiny's native file upload binding so `input$<id>` remains the standard upload data frame with `name`, `size`, `type`, and `datapath`. The v1 control supports `multiple`, `accept`, disabled/invalid states, custom button/placeholder text, and the showcase/docs-site playgrounds.
+
 * `block_table()` gained optional DT-style row selection. Set
   `selection = "single"` or `"multiple"` (default `"none"`) to make rows
   clickable; the table then reports its selection to the server through

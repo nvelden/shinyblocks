@@ -26,6 +26,10 @@ export function nativeInput(root) {
   return root.querySelector("input.sb-input-native");
 }
 
+export function nativeFileInput(root) {
+  return root ? root.querySelector("input.shiny-input-file") : null;
+}
+
 export function setNativeInputValue(root, value, notify) {
   const native = nativeInput(root);
   if (!native) return;

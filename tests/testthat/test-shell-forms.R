@@ -91,6 +91,50 @@ test_that("block_input emits a runtime payload and hidden native input", {
   expect_identical(payload$binding$type, "shinyblocks.input")
 })
 
+test_that("block_file_input emits bindable native file input markup", {
+  file_input <- block_file_input(
+    "upload",
+    multiple = TRUE,
+    accept = c(".csv", "text/csv"),
+    button_label = "Choose",
+    placeholder = "No CSV selected",
+    invalid = TRUE,
+    style = "min-height: 3rem;",
+    class = "custom"
+  )
+  html <- render_html(file_input)
+  payload <- runtime_payload_from(file_input)
+
+  expect_identical(
+    tag_attr(file_input, "class"),
+    "sb-runtime-mount sb-file-input"
+  )
+  expect_identical(payload$component, "file-input")
+  expect_null(payload$id)
+  expect_identical(payload$className, "custom")
+  expect_match(html, 'data-sb-component="file-input"', fixed = TRUE)
+  expect_match(
+    html,
+    '<input id="upload" type="file" class="shiny-input-file sb-file-input-native"',
+    fixed = TRUE
+  )
+  expect_match(html, 'multiple accept=".csv,text/csv"', fixed = TRUE)
+  expect_match(html, 'id="upload_progress"', fixed = TRUE)
+  expect_match(html, "progress active shiny-file-input-progress", fixed = TRUE)
+  expect_no_match(html, "data-shiny-no-bind-input", fixed = TRUE)
+  expect_identical(payload$props$buttonLabel, "Choose")
+  expect_identical(payload$props$placeholder, "No CSV selected")
+  expect_identical(payload$props$multiple, TRUE)
+  expect_identical(payload$props$accept, ".csv,text/csv")
+  expect_identical(payload$props$invalid, TRUE)
+  expect_identical(payload$props$style$minHeight, "3rem")
+})
+
+test_that("block_file_input validates input id and accept values", {
+  expect_error(block_file_input(""), "`input_id` must be a non-empty string")
+  expect_error(block_file_input("upload", accept = 1), "`accept` must be NULL or a character vector")
+})
+
 test_that("textarea emits a runtime payload and hidden native textarea", {
   textarea <- block_textarea(
     "notes",

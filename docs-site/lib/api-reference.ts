@@ -345,6 +345,24 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "file-input": [
+    {
+      name: "block_file_input",
+      description: "Renders a styled file picker while preserving Shiny's native file upload data frame.",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Input identifier returned as input$<id>." },
+        { argument: "multiple", type: "logical", defaultVal: "FALSE", description: "Allow selecting multiple files." },
+        { argument: "accept", type: "character", defaultVal: "NULL", description: "Accepted MIME types or file extensions." },
+        { argument: "button_label", type: "character", defaultVal: "\"Browse\"", description: "Text shown inside the visible picker button." },
+        { argument: "placeholder", type: "character", defaultVal: "\"No file selected\"", description: "Text shown before files are selected." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width applied to the wrapper." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable the visible picker and native file input." },
+        { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply invalid visual highlights." },
+        { argument: "style", type: "character | object", defaultVal: "NULL", description: "Inline styles applied to the visible control." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class applied to the visible control." }
+      ]
+    }
+  ],
   input: [
     {
       name: "block_input",

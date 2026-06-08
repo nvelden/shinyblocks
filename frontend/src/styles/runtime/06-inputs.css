@@ -329,6 +329,105 @@
   opacity: var(--sb-disabled-opacity);
 }
 
+[data-shinyblocks-root] .sb-file-input {
+  display: block;
+  width: 100%;
+}
+
+[data-shinyblocks-root] .sb-file-input-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  opacity: 0;
+}
+
+[data-shinyblocks-root] .sb-file-input-progress {
+  display: none;
+}
+
+[data-shinyblocks-root] .sb-file-input-control {
+  display: flex;
+  width: 100%;
+  min-height: var(--sb-control-height);
+  align-items: center;
+  gap: var(--sb-control-gap);
+  padding: 0.25rem;
+  color: var(--foreground);
+  background-color: var(--sb-input-surface, var(--background));
+  backdrop-filter: var(--sb-surface-backdrop, none);
+  border: 1px solid var(--sb-input-border, var(--input));
+  border-radius: var(--sb-input-radius, var(--radius-md));
+  box-shadow: var(--sb-input-shadow, 0 1px 2px 0 rgb(0 0 0 / 0.04));
+  outline: none;
+  transition:
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
+}
+
+[data-shinyblocks-root] .sb-file-input-control:focus-within {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
+}
+
+[data-shinyblocks-root] .sb-file-input-control[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+[data-theme="dark"] [data-shinyblocks-root] .sb-file-input-control[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent);
+}
+
+[data-shinyblocks-root] .sb-file-input-control[data-disabled="true"] {
+  opacity: var(--sb-disabled-opacity);
+}
+
+[data-shinyblocks-root] .sb-file-input-button {
+  display: inline-flex;
+  height: calc(var(--sb-control-height) - 0.5rem);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--sb-input-radius, var(--radius-md)) - 2px);
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: var(--sb-control-font-size);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--sb-transition-duration),
+    color var(--sb-transition-duration);
+}
+
+[data-shinyblocks-root] .sb-file-input-button:hover {
+  background-color: color-mix(in oklch, var(--secondary) 82%, var(--foreground));
+}
+
+[data-shinyblocks-root] .sb-file-input-button:disabled {
+  cursor: not-allowed;
+}
+
+[data-shinyblocks-root] .sb-file-input-text {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--sb-control-font-size);
+  line-height: 1.25rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-shinyblocks-root] .sb-file-input-text[data-placeholder="true"] {
+  color: var(--muted-foreground);
+}
+
 [data-shinyblocks-root] .sb-slider {
   position: relative;
   display: flex;

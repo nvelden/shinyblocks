@@ -92,3 +92,21 @@ hidden_native_textarea <- function(input_id, class, value = "", style = "display
     value
   )
 }
+
+native_file_input <- function(input_id, multiple = FALSE, accept = NULL, disabled = FALSE) {
+  htmltools::tagList(
+    htmltools::tags$input(
+      id = input_id,
+      type = "file",
+      class = "shiny-input-file sb-file-input-native",
+      multiple = if (isTRUE(multiple)) NA else NULL,
+      accept = accept,
+      disabled = if (isTRUE(disabled)) NA else NULL
+    ),
+    htmltools::tags$div(
+      id = paste0(input_id, "_progress"),
+      class = "progress active shiny-file-input-progress sb-file-input-progress",
+      htmltools::tags$div(class = "progress-bar")
+    )
+  )
+}

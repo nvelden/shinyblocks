@@ -53,6 +53,7 @@ Other forms:
 \code{\link{block_field_label}()},
 \code{\link{block_field_legend}()},
 \code{\link{block_field_set}()},
+\code{\link{block_file_input}()},
 \code{\link{block_input_group}()},
 \code{\link{block_input_group_addon}()},
 \code{\link{block_radio_group}()},
