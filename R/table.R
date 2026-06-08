@@ -78,7 +78,15 @@ block_table <- function(
     validate_input_id(id)
   }
   selection <- normalize_table_selection(selection)
-  selected <- normalize_table_selected(selected, selection)
+  # Row selection reports through Shiny inputs, which require an id; without one
+  # the table would render clickable rows that report no value. Enforce the
+  # documented contract rather than silently producing a dead UI.
+  if (!identical(selection, "none") && is.null(id)) {
+    stop(
+      "`id` is required when `selection` is \"single\" or \"multiple\".",
+      call. = FALSE
+    )
+  }
 
   props <- table_build_payload(
     data = data,
@@ -93,6 +101,10 @@ block_table <- function(
     hover = hover,
     bordered = bordered
   )
+
+  # Validate the initial selection against the rendered (post-`max_rows`) row
+  # count: indices refer to displayed rows, so an out-of-range index is an error.
+  selected <- normalize_table_selected(selected, selection, n_rows = length(props$rows))
 
   # Conditionally appended so a non-selectable table serializes byte-identically
   # to the pre-selection payload (the runtime defaults to "none" when absent).
@@ -187,7 +199,10 @@ update_block_table <- function(
     # Validate against the resulting mode when supplied, else against any
     # non-"none" mode (the runtime keeps its current mode when none is pushed).
     mode <- if (!is.null(selection)) payload$selection else "multiple"
-    payload$selected <- as.list(normalize_table_selected(selected, mode))
+    # When `data` is pushed too, the rendered row count is known, so bound the
+    # indices to it; without new data we can't know the current row count.
+    n_rows <- if (!is.null(data)) length(payload$rows) else NULL
+    payload$selected <- as.list(normalize_table_selected(selected, mode, n_rows = n_rows))
   }
 
   runtime_input_update(
@@ -200,9 +215,10 @@ update_block_table <- function(
 #'
 #' @param label Header label. Defaults to the data column name.
 #' @param align Text alignment. One of `"left"`, `"center"`, or `"right"`.
-#' @param format Optional function applied to the full column vector. The result
-#'   must have the same length as the input and is coerced to character. When
-#'   supplied, `digits` is ignored for this column.
+#' @param format Optional function applied to the rendered column vector (after
+#'   any `max_rows` clipping). The result must have the same length as the input
+#'   and is coerced to character. When supplied, `digits` is ignored for this
+#'   column.
 #' @param width Optional CSS width for the column.
 #' @param digits Optional non-negative integer for default numeric formatting,
 #'   overriding the table-level `digits` for this column.
@@ -222,9 +238,10 @@ update_block_table <- function(
 #' @param header_intent,header_emphasis,header_class,header_style Same styling
 #'   controls applied to the column's `<th>` header cell.
 #' @param cell_intent,cell_emphasis,cell_class,cell_style Vectorized per-cell
-#'   styling. Each is a `function(value)` called once with the column's full
-#'   (unformatted) vector and must return one entry per row (length-1 results are
-#'   recycled). `cell_intent` returns intents (use `NA` for no styling),
+#'   styling. Each is a `function(value)` called once with the rendered
+#'   (unformatted) column vector after any `max_rows` clipping and must return
+#'   one entry per rendered row (length-1 results are recycled). `cell_intent`
+#'   returns intents (use `NA` for no styling),
 #'   `cell_emphasis` returns emphasis values, `cell_class` returns classes, and
 #'   `cell_style` returns CSS declaration strings (e.g. `"color: red"`). A single
 #'   fully named list (e.g. `list(color = "var(--primary)")`) is treated as one
@@ -298,7 +315,9 @@ normalize_table_selection <- function(selection) {
 
 # 1-based row indices. Returns an integer vector (possibly length 0) or errors.
 # `mode` gates whether selection is allowed at all and how many rows may be set.
-normalize_table_selected <- function(selected, mode) {
+# `n_rows`, when supplied, is the rendered row count; indices beyond it are
+# rejected because selection indices refer to displayed (post-`max_rows`) rows.
+normalize_table_selected <- function(selected, mode, n_rows = NULL) {
   if (is.null(selected)) {
     return(integer(0))
   }
@@ -314,6 +333,15 @@ normalize_table_selected <- function(selected, mode) {
   selected <- as.integer(selected)
   if (identical(mode, "single") && length(selected) > 1) {
     stop("`selected` must have length <= 1 when `selection` is \"single\".", call. = FALSE)
+  }
+  if (!is.null(n_rows) && any(selected > n_rows)) {
+    stop(
+      sprintf(
+        "`selected` contains row indices greater than the number of rendered rows (%d).",
+        n_rows
+      ),
+      call. = FALSE
+    )
   }
   selected
 }
@@ -388,6 +416,17 @@ table_build_payload <- function(
   row_count <- nrow(data)
   max_rows <- normalize_table_max_rows(max_rows, row_count)
   display_rows <- if (is.null(max_rows)) row_count else min(row_count, max_rows)
+
+  # Clip to the rendered rows up front so column formatting and per-cell metadata
+  # only run over what is displayed. For a large frame with a small `max_rows`
+  # this avoids formatting the entire data frame just to discard most of it.
+  # `row_count` (captured above) still feeds `totalRows`/`truncated` so the
+  # footer reports the full size. Formatting callbacks therefore see the
+  # displayed rows only, matching the documented "indices refer to rendered
+  # rows" contract.
+  if (display_rows < row_count) {
+    data <- data[seq_len(display_rows), , drop = FALSE]
+  }
 
   formatted_columns <- Map(
     function(name, spec) {

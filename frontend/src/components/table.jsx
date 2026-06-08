@@ -17,6 +17,33 @@ function toSelectedSet(value) {
   return out;
 }
 
+// Reconcile a selection set against the effective mode and rendered row count so
+// stale indices can't survive a server update. A non-selectable mode clears the
+// set; indices past the current row count are dropped (data shrank/filtered);
+// "single" collapses to a single index (lowest) after a mode flip from
+// "multiple". `rowCount == null` means the row count is unknown — leave it be.
+function reconcileSelected(set, mode, rowCount) {
+  if (mode !== "single" && mode !== "multiple") return new Set();
+  const out = new Set();
+  set.forEach((n) => {
+    if (n >= 1 && (rowCount == null || n <= rowCount)) out.add(n);
+  });
+  if (mode === "single" && out.size > 1) {
+    const first = Array.from(out).sort((a, b) => a - b)[0];
+    out.clear();
+    out.add(first);
+  }
+  return out;
+}
+
+function sameSet(a, b) {
+  if (a.size !== b.size) return false;
+  for (const n of a) {
+    if (!b.has(n)) return false;
+  }
+  return true;
+}
+
 function headStyle(column) {
   return {
     textAlign: alignment(column && column.align),
@@ -48,6 +75,15 @@ export function Table({ payload, root }) {
   const [selected, setSelected] = useState(() =>
     toSelectedSet((payload.props || {}).selected)
   );
+  // Refs mirror the latest selected set and props so the receive handler (which
+  // is installed once, on mount) can read current state without re-subscribing.
+  // `commitSelected` keeps the ref in lockstep with the state for that reason.
+  const selectedRef = useRef(selected);
+  const propsRef = useRef(props);
+  function commitSelected(next) {
+    selectedRef.current = next;
+    setSelected(next);
+  }
 
   const selectionMode = props.selection || "none";
   const selectable =
@@ -80,15 +116,25 @@ export function Table({ payload, root }) {
     }
     root.__sbTableReceive = (data) => {
       const next = data || {};
-      if (Object.prototype.hasOwnProperty.call(next, "selected")) {
-        const set = toSelectedSet(next.selected);
-        setSelected(set);
-        publish(set, null, null, true);
-      } else if (next.selection === "none") {
-        root.__sbTableValue = { selected: [], lastClicked: null, cell: null };
-        root.dispatchEvent(new CustomEvent("sb:table-change"));
+      const hasSelected = Object.prototype.hasOwnProperty.call(next, "selected");
+      const merged = { ...propsRef.current, ...next };
+      propsRef.current = merged;
+
+      // Reconcile selection on every receive, not only when `selected` is sent.
+      // An update that flips the mode, swaps/filters rows, or sets "none" without
+      // a `selected` field must still drop indices that no longer apply, so the
+      // base set is reconciled against the merged mode + row count. Explicit
+      // `selected` wins as the base; otherwise we carry the current selection.
+      const mode = merged.selection || "none";
+      const rowCount = Array.isArray(merged.rows) ? merged.rows.length : null;
+      const base = hasSelected ? toSelectedSet(next.selected) : selectedRef.current;
+      const reconciled = reconcileSelected(base, mode, rowCount);
+      if (hasSelected || !sameSet(reconciled, selectedRef.current)) {
+        commitSelected(reconciled);
+        publish(reconciled, null, null, true);
       }
-      setProps((prev) => ({ ...prev, ...next }));
+
+      setProps(merged);
     };
     return () => {
       delete root.__sbTableReceive;
@@ -109,7 +155,7 @@ export function Table({ payload, root }) {
     } else {
       nextSet.add(row1);
     }
-    setSelected(nextSet);
+    commitSelected(nextSet);
     const cell =
       columnIndex == null
         ? null

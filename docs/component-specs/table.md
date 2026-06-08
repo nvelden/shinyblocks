@@ -92,10 +92,10 @@ a cell — in pure R, without breaking the theme system.
 - **Precedence** is **cell > column**: a `cellMeta[i][j]` intent/emphasis wins
   over the column-level `intent`/`emphasis`; `class`/`style` layer on top.
 - **Vectorized cell styling** — `cell_intent` / `cell_emphasis` / `cell_class` /
-  `cell_style` are `function(value)` callbacks evaluated once over the whole
-  (unformatted) column vector and returning one entry per row (length-1 results
-  recycle). This matches the column-at-a-time formatting pipeline and avoids
-  per-cell closures.
+  `cell_style` are `function(value)` callbacks evaluated once over the rendered
+  (unformatted) column vector after any `max_rows` clipping and returning one
+  entry per rendered row (length-1 results recycle). This matches the
+  column-at-a-time formatting pipeline and avoids per-cell closures.
 - **`cellMeta` clear-on-merge** — `cellMeta` is **always emitted** on any
   data-bearing payload (empty `{}` objects where unstyled). Because the runtime
   merges partial `update_block_table()` payloads over current props, omitting it
@@ -141,7 +141,7 @@ a cell — in pure R, without breaking the theme system.
 | --- | --- |
 | `label` | Optional header label. Defaults to the data column name. |
 | `align` | One of `left`, `center`, or `right`. |
-| `format` | Optional function applied to the full R column vector. Must return one value per row. When set, `digits` is ignored for this column. |
+| `format` | Optional function applied to the rendered R column vector after any `max_rows` clipping. Must return one value per rendered row. When set, `digits` is ignored for this column. |
 | `width` | Optional CSS width for the column. |
 | `digits` | Per-column decimal places, overriding the table-level `digits`. |
 | `na` | Per-column missing-value string, overriding the table-level `na`. |

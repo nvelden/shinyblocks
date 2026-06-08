@@ -463,13 +463,58 @@ test_that("block_table() validates selection and selected", {
     "`selected` requires `selection`"
   )
   expect_error(
-    block_table(data.frame(item = "A"), selection = "single", selected = c(1, 2)),
+    block_table(
+      data.frame(item = "A"),
+      selection = "single", selected = c(1, 2), id = "tbl"
+    ),
     "length <= 1"
   )
   expect_error(
-    block_table(data.frame(item = "A"), selection = "multiple", selected = c(0, 1)),
+    block_table(
+      data.frame(item = "A"),
+      selection = "multiple", selected = c(0, 1), id = "tbl"
+    ),
     "positive whole numbers"
   )
+})
+
+test_that("block_table() requires an id when selection is enabled", {
+  expect_error(
+    block_table(data.frame(item = c("A", "B")), selection = "single"),
+    "`id` is required"
+  )
+  expect_error(
+    block_table(data.frame(item = c("A", "B")), selection = "multiple"),
+    "`id` is required"
+  )
+  # A presentational table still needs no id.
+  expect_silent(block_table(data.frame(item = c("A", "B"))))
+})
+
+test_that("block_table() rejects selected beyond the rendered row count", {
+  expect_error(
+    block_table(
+      data.frame(item = c("A", "B")),
+      selection = "single", selected = 999, id = "tbl"
+    ),
+    "greater than the number of rendered rows"
+  )
+  # `max_rows` shrinks the rendered set, so an index into a clipped row errors.
+  expect_error(
+    block_table(
+      data.frame(item = c("A", "B", "C")),
+      selection = "multiple", selected = 3, max_rows = 2, id = "tbl"
+    ),
+    "greater than the number of rendered rows"
+  )
+  # An index within the rendered rows is accepted.
+  payload <- runtime_payload_from(
+    block_table(
+      data.frame(item = c("A", "B", "C")),
+      selection = "multiple", selected = 2, max_rows = 2, id = "tbl"
+    )
+  )
+  expect_identical(payload$props$selected, list(2L))
 })
 
 test_that("update_block_table() pushes selection and selected", {

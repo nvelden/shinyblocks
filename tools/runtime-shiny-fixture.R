@@ -187,6 +187,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_popover_value"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
+  shiny::actionButton("shrink_select_table", "Shrink select table"),
   shiny::actionButton("set_select_pro", "Set select Pro"),
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
@@ -306,6 +307,17 @@ server <- function(input, output, session) {
       session = session,
       id = "runtime_table",
       data = data.frame(name = "beta", value = 2, stringsAsFactors = FALSE)
+    )
+  })
+
+  # Pushes new data with fewer rows but deliberately omits `selected`, exercising
+  # the runtime's stale-selection reconciliation: a previously selected row that
+  # no longer exists must be dropped.
+  shiny::observeEvent(input$shrink_select_table, {
+    update_block_table(
+      session = session,
+      id = "runtime_table_sel",
+      data = data.frame(name = "only", value = 9, stringsAsFactors = FALSE)
     )
   })
 

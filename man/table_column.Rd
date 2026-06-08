@@ -30,9 +30,10 @@ table_column(
 
 \item{align}{Text alignment. One of \code{"left"}, \code{"center"}, or \code{"right"}.}
 
-\item{format}{Optional function applied to the full column vector. The result
-must have the same length as the input and is coerced to character. When
-supplied, \code{digits} is ignored for this column.}
+\item{format}{Optional function applied to the rendered column vector (after
+any \code{max_rows} clipping). The result must have the same length as the input
+and is coerced to character. When supplied, \code{digits} is ignored for this
+column.}
 
 \item{width}{Optional CSS width for the column.}
 
@@ -60,9 +61,10 @@ every \verb{<td>} in the column. You own theme-correctness here — prefer
 controls applied to the column's \verb{<th>} header cell.}
 
 \item{cell_intent, cell_emphasis, cell_class, cell_style}{Vectorized per-cell
-styling. Each is a \verb{function(value)} called once with the column's full
-(unformatted) vector and must return one entry per row (length-1 results are
-recycled). \code{cell_intent} returns intents (use \code{NA} for no styling),
+styling. Each is a \verb{function(value)} called once with the rendered
+(unformatted) column vector after any \code{max_rows} clipping and must return
+one entry per rendered row (length-1 results are recycled). \code{cell_intent}
+returns intents (use \code{NA} for no styling),
 \code{cell_emphasis} returns emphasis values, \code{cell_class} returns classes, and
 \code{cell_style} returns CSS declaration strings (e.g. \code{"color: red"}). A single
 fully named list (e.g. \code{list(color = "var(--primary)")}) is treated as one

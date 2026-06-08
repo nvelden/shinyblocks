@@ -254,6 +254,33 @@ try {
     "selected row should expose aria-selected"
   );
 
+  // Stale-selection reconciliation: row 2 is selected, then the server pushes a
+  // single-row data update WITHOUT a `selected` field. The dropped row must not
+  // linger in component state or keep reporting through the Shiny input.
+  await page.click("#shrink_select_table");
+  // `_rows_selected`/bare clear; `_row_last_clicked` is historical (last set to 1)
+  // and the binding never resets it, so it stays put.
+  await assertText(page, "#runtime_table_sel_value", "rows=- bare=- last=1");
+  assert.equal(
+    await page.evaluate(
+      () =>
+        document.querySelectorAll(
+          "[data-sb-input-id='runtime_table_sel'] tbody tr"
+        ).length
+    ),
+    1,
+    "shrunk selection table should render a single row"
+  );
+  assert.equal(
+    await page.evaluate(() =>
+      document
+        .querySelector("[data-sb-input-id='runtime_table_sel'] tbody tr:nth-child(1)")
+        ?.getAttribute("aria-selected")
+    ),
+    "false",
+    "no stale row should remain selected after the data shrinks"
+  );
+
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
   await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({
