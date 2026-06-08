@@ -318,6 +318,14 @@ ui <- block_page(
             block_badge("Loading surface", variant = "secondary"),
             loading_lines(),
             block_separator(),
+            block_file_input(
+              "gallery_pipeline_upload",
+              button_label = "Upload",
+              placeholder = "Attach pipeline artifact",
+              accept = c(".csv", "text/csv"),
+              width = "100%"
+            ),
+            block_separator(),
             block_badge("Checks", variant = "outline"),
             mini_label("Runtime CSS", "OK"),
             mini_label("Shiny binding", "OK"),
