@@ -38,8 +38,12 @@ targets <- list(
     group = "runtime"
   ),
   list(
+    # 7 -> 7.5 KB for DT-style row selection (selectable cursor, themed focus
+    # ring, and selection-wins-over-hover/striped backgrounds). Gzipped is the
+    # binding transfer budget; the bump is a tight ~0.2 KB over the pre-feature
+    # 7.0 KB with ~0.5 KB headroom, not a full-KB jump.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 7,
+    limit_kb = 7.5,
     metric = "gzipped",
     group = "runtime"
   ),
@@ -125,7 +129,7 @@ for (r in results) {
   limit <- if (is.null(r$limit_kb)) {
     "baseline pending"
   } else {
-    sprintf("%d KB", r$limit_kb)
+    sprintf("%s KB", format(r$limit_kb))
   }
   cat(sprintf(
     "  %-40s %-13s %8s  /  %s  [%s, %s]\n",

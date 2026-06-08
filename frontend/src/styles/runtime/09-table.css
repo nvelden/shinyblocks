@@ -46,8 +46,20 @@
   background-color: color-mix(in oklch, var(--muted) 50%, transparent);
 }
 
-[data-shinyblocks-root] .sb-table-row[data-state="selected"] {
-  background-color: var(--muted);
+[data-shinyblocks-root] .sb-table-row--selectable {
+  cursor: pointer;
+}
+
+[data-shinyblocks-root] .sb-table-row--selectable:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+/* Selection wins over hover and striped backgrounds. */
+[data-shinyblocks-root] .sb-table-row--selected,
+[data-shinyblocks-root] .sb-table--striped .sb-table-row--selected:nth-child(even),
+[data-shinyblocks-root] .sb-table--hover .sb-table-row--selected:hover {
+  background-color: color-mix(in oklch, var(--accent) 60%, transparent);
 }
 
 [data-shinyblocks-root] .sb-table--striped .sb-table-row:nth-child(even) {

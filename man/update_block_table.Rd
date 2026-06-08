@@ -18,7 +18,9 @@ update_block_table(
   striped = FALSE,
   hover = TRUE,
   bordered = FALSE,
-  loading = NULL
+  loading = NULL,
+  selection = NULL,
+  selected = NULL
 )
 }
 \arguments{
@@ -34,6 +36,13 @@ with the formatting arguments below.}
 
 \item{loading}{Optional flag. \code{TRUE} shows skeleton rows; \code{FALSE} clears the
 loading state without changing data.}
+
+\item{selection}{Optional new row-selection mode (\code{"none"}, \code{"single"}, or
+\code{"multiple"}). \code{NULL} leaves the current mode unchanged.}
+
+\item{selected}{Optional integer vector of 1-based row indices to select.
+Pass \code{integer(0)} to clear the current selection. \code{NULL} leaves it
+unchanged.}
 }
 \value{
 Invisibly returns \code{NULL}.

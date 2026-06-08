@@ -294,16 +294,49 @@ const BINDING_CONFIGS = [
     ratePolicy: { policy: "throttle", delay: 100 }
   },
   {
-    // Receive-only binding: the table is presentational, but registering an
+    // The table is receive-only until `selection` is enabled. Registering an
     // InputBinding is how Shiny routes `update_block_table()` messages
-    // (`sendInputMessage`) to this mount by its DOM id. It exposes no real
-    // value — `getValue` returns null and there is no `subscribe`, so the only
-    // visible side effect is a null `input$<id>` (acceptable; no author reads
-    // it). `receiveMessage` forwards the fresh payload to React via the
-    // `__sbTableReceive` expando the mount installs. With no `getValue`/
-    // `subscribe`/etc. the factory supplies receive-only defaults.
+    // (`sendInputMessage`) to this mount by its DOM id; `receiveMessage`
+    // forwards the fresh payload to React via the `__sbTableReceive` expando.
+    // When rows are selectable the mount also installs `__sbTableValue` and
+    // dispatches `sb:table-change`, so the binding reports the selection.
+    //
+    // `getValue` mirrors DT: the bare `input$<id>` is the selected row indices
+    // (null when non-selectable, preserving legacy behavior). `subscribe` also
+    // publishes the DT-compatible derived inputs `<id>_rows_selected`,
+    // `<id>_row_last_clicked`, and `<id>_cell_clicked`.
     component: "table",
-    receiveProp: "__sbTableReceive"
+    receiveProp: "__sbTableReceive",
+    getValue(el) {
+      const value = el.__sbTableValue;
+      return value ? value.selected : null;
+    },
+    subscribe(el, callback) {
+      const handler = () => {
+        callback(false);
+        const id = el.dataset.sbInputId;
+        const value = el.__sbTableValue;
+        if (!id || !value || !window.Shiny || !window.Shiny.setInputValue) return;
+        window.Shiny.setInputValue(`${id}_rows_selected`, value.selected);
+        if (value.lastClicked != null) {
+          window.Shiny.setInputValue(`${id}_row_last_clicked`, value.lastClicked, {
+            priority: "event"
+          });
+        }
+        if (value.cell) {
+          window.Shiny.setInputValue(`${id}_cell_clicked`, value.cell, {
+            priority: "event"
+          });
+        }
+      };
+      el.addEventListener("sb:table-change", handler);
+      el.__sbTableChangeHandler = handler;
+    },
+    unsubscribe(el) {
+      if (!el.__sbTableChangeHandler) return;
+      el.removeEventListener("sb:table-change", el.__sbTableChangeHandler);
+      delete el.__sbTableChangeHandler;
+    }
   }
 ];
 

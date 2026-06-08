@@ -196,7 +196,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "striped", type: "logical", defaultVal: "FALSE", description: "Zebra-stripe body rows." },
         { argument: "hover", type: "logical", defaultVal: "TRUE", description: "Highlight rows on hover (shadcn base behavior)." },
         { argument: "bordered", type: "logical", defaultVal: "FALSE", description: "Draw cell borders." },
-        { argument: "id", type: "character", defaultVal: "NULL", description: "Input id. Required only to update the table from the server." },
+        { argument: "selection", type: "character", defaultVal: "\"none\"", description: "DT-style row selection mode: none, single, or multiple. Enables clickable rows reporting input$id_rows_selected, _row_last_clicked, and _cell_clicked." },
+        { argument: "selected", type: "integer", defaultVal: "NULL", description: "1-based row indices to select on load (requires selection != none)." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Input id. Required to update the table from the server or to use row selection." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes applied to the runtime table container." },
         { argument: "style", type: "character | named list", defaultVal: "NULL", description: "Inline styles applied to the runtime mount and table container." }
       ]
@@ -209,7 +211,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "id", type: "character", defaultVal: "required", description: "Input id passed to block_table(id = )." },
         { argument: "data", type: "data.frame", defaultVal: "NULL", description: "Replacement data frame. Re-renders with the formatting arguments below." },
         { argument: "columns, caption, max_rows, na, digits, rownames, row_format, striped, hover, bordered", type: "matching block_table()", defaultVal: "block_table() defaults", description: "Formatting arguments applied when data is supplied." },
-        { argument: "loading", type: "logical", defaultVal: "NULL", description: "TRUE shows skeleton rows; FALSE clears the loading state without changing data." }
+        { argument: "loading", type: "logical", defaultVal: "NULL", description: "TRUE shows skeleton rows; FALSE clears the loading state without changing data." },
+        { argument: "selection", type: "character", defaultVal: "NULL", description: "Optional new row-selection mode (none, single, multiple). NULL leaves it unchanged." },
+        { argument: "selected", type: "integer", defaultVal: "NULL", description: "1-based row indices to select; integer(0) clears. NULL leaves it unchanged." }
       ]
     },
     {

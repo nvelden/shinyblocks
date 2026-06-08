@@ -4,6 +4,18 @@
 
 ## New features
 
+* `block_table()` gained optional DT-style row selection. Set
+  `selection = "single"` or `"multiple"` (default `"none"`) to make rows
+  clickable; the table then reports its selection to the server through
+  `input$<id>` and the DT-compatible `input$<id>_rows_selected` (1-based row
+  indices), `input$<id>_row_last_clicked`, and `input$<id>_cell_clicked`
+  (`list(row, col, value)`). Seed an initial selection with
+  `block_table(selected = )` or push one from the server with
+  `update_block_table(selected = )`, and change the mode with
+  `update_block_table(selection = )`. Non-selectable tables are unchanged and
+  still report no value. Selected rows use the semantic `--accent` token, with
+  keyboard activation (Enter/Space) and a themed focus ring.
+
 * Added theme-safe styling intents to `block_table()` (issue #53). Header,
   column, row, and single cells can carry an `intent`
   (`muted`/`primary`/`secondary`/`destructive`/`success`/`warning`/`accent`) with
