@@ -16,6 +16,8 @@ block_table(
   striped = FALSE,
   hover = TRUE,
   bordered = FALSE,
+  selection = c("none", "single", "multiple"),
+  selected = NULL,
   id = NULL,
   class = NULL,
   style = NULL
@@ -53,8 +55,17 @@ and/or \code{style} entries applied to that row's \verb{<tr>}.}
 
 \item{bordered}{Whether to draw cell borders.}
 
-\item{id}{Optional input id. Required only if the table is updated from the
-server with \code{\link[=update_block_table]{update_block_table()}}; static tables can omit it.}
+\item{selection}{Row-selection mode, following the DT idiom. One of \code{"none"}
+(default; the table is presentational and reports no value), \code{"single"}
+(one row selectable at a time), or \code{"multiple"} (any number of rows). When
+enabled the table reports its selection to the server (see \emph{Selection}).}
+
+\item{selected}{Optional integer vector of 1-based row indices to select on
+load. Only valid when \code{selection} is \code{"single"} or \code{"multiple"}.}
+
+\item{id}{Optional input id. Required if the table is updated from the
+server with \code{\link[=update_block_table]{update_block_table()}} or uses row \code{selection}; static,
+non-selectable tables can omit it.}
 
 \item{class}{Additional classes on the runtime mount.}
 
@@ -69,6 +80,24 @@ table. Cell formatting happens in R before the payload is sent to the
 browser. The same formatting pipeline is reused by \code{\link[=update_block_table]{update_block_table()}},
 so a server-side refresh produces an identical payload.
 }
+\section{Selection}{
+
+With \code{selection} set to \code{"single"} or \code{"multiple"}, rows become clickable and
+the table reports its selection through Shiny inputs, mirroring the DT
+package so existing DT code ports over:
+\itemize{
+\item \verb{input$<id>} and \verb{input$<id>_rows_selected} -- integer vector of the
+selected 1-based row indices (the bare id is a shinyblocks convenience;
+\verb{_rows_selected} is the DT-compatible name).
+\item \verb{input$<id>_row_last_clicked} -- the 1-based index of the most
+recently clicked row.
+\item \verb{input$<id>_cell_clicked} -- a list with \code{row} (1-based), \code{col}
+(1-based rendered column index), and \code{value} (the displayed cell text)
+for the most recent click.
+}
+Push a selection from the server with \code{update_block_table(selected = )}.
+}
+
 \seealso{
 Other content: 
 \code{\link{block_alert}()},

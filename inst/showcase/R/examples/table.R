@@ -47,6 +47,15 @@ htmltools::tagList(
       showcase_controls_group(
         "State",
         block_field(
+          block_field_label("selection", `for` = "showcase_table_doc_selection"),
+          block_select(
+            "showcase_table_doc_selection",
+            choices = c("none", "single", "multiple"),
+            selected = "none",
+            size = "sm"
+          )
+        ),
+        block_field(
           block_field_label("max_rows", `for` = "showcase_table_doc_max_rows"),
           block_select(
             "showcase_table_doc_max_rows",

@@ -158,6 +158,12 @@ ui <- shiny::fluidPage(
     id = "runtime_table",
     class = "runtime-table-fixture"
   ),
+  block_table(
+    data.frame(name = c("one", "two"), value = c(1, 2), stringsAsFactors = FALSE),
+    id = "runtime_table_sel",
+    selection = "multiple",
+    class = "runtime-table-sel-fixture"
+  ),
   block_popover(
     id = "runtime_popover",
     trigger = "Open popover",
@@ -179,6 +185,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_popover_value"),
+  shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
   shiny::actionButton("set_select_pro", "Set select Pro"),
   shiny::actionButton("clear_select", "Clear select"),
@@ -279,6 +286,17 @@ server <- function(input, output, session) {
       return("TRUE")
     }
     "FALSE"
+  })
+  output$runtime_table_sel_value <- shiny::renderText({
+    rows <- input$runtime_table_sel_rows_selected
+    bare <- input$runtime_table_sel
+    last <- input$runtime_table_sel_row_last_clicked
+    sprintf(
+      "rows=%s bare=%s last=%s",
+      if (length(rows)) paste(rows, collapse = ",") else "-",
+      if (length(bare)) paste(bare, collapse = ",") else "-",
+      if (is.null(last)) "-" else as.character(last)
+    )
   })
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")

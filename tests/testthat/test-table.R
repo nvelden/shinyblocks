@@ -425,3 +425,68 @@ test_that("block_table() validates inputs", {
     "`row_format` must return NULL or a list"
   )
 })
+
+test_that("block_table() omits selection fields by default (back-compat)", {
+  payload <- runtime_payload_from(block_table(data.frame(item = c("A", "B"))))
+  expect_null(payload$props$selection)
+  expect_null(payload$props$selected)
+})
+
+test_that("block_table() emits selection mode and initial selection", {
+  payload <- runtime_payload_from(
+    block_table(
+      data.frame(item = c("A", "B", "C")),
+      selection = "multiple",
+      selected = c(1, 3),
+      id = "tbl"
+    )
+  )
+  expect_identical(payload$props$selection, "multiple")
+  expect_identical(payload$props$selected, list(1L, 3L))
+})
+
+test_that("block_table() emits selection without an initial selection", {
+  payload <- runtime_payload_from(
+    block_table(data.frame(item = c("A", "B")), selection = "single", id = "tbl")
+  )
+  expect_identical(payload$props$selection, "single")
+  expect_null(payload$props$selected)
+})
+
+test_that("block_table() validates selection and selected", {
+  expect_error(
+    block_table(data.frame(item = "A"), selection = "many"),
+    "`selection` must be one of"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), selected = 1),
+    "`selected` requires `selection`"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), selection = "single", selected = c(1, 2)),
+    "length <= 1"
+  )
+  expect_error(
+    block_table(data.frame(item = "A"), selection = "multiple", selected = c(0, 1)),
+    "positive whole numbers"
+  )
+})
+
+test_that("update_block_table() pushes selection and selected", {
+  capture <- local_input_message_session()
+  update_block_table(
+    capture$session, "tbl",
+    selection = "single", selected = 2
+  )
+  payload <- capture$last_payload()
+  expect_identical(payload$selection, "single")
+  expect_identical(payload$selected, list(2L))
+  expect_null(payload$rows)
+})
+
+test_that("update_block_table() clears selection with integer(0)", {
+  capture <- local_input_message_session()
+  update_block_table(capture$session, "tbl", selected = integer(0))
+  payload <- capture$last_payload()
+  expect_identical(payload$selected, list())
+})

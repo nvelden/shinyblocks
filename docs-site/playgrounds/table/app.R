@@ -133,6 +133,15 @@ ui <- block_page(
             "State"
           ),
           block_field(
+            block_field_label("selection", `for` = "showcase_table_doc_selection"),
+            block_select(
+              "showcase_table_doc_selection",
+              choices = c("none", "single", "multiple"),
+              selected = "none",
+              size = "sm"
+            )
+          ),
+          block_field(
             block_field_label("max_rows", `for` = "showcase_table_doc_max_rows"),
             block_select(
               "showcase_table_doc_max_rows",
@@ -280,6 +289,7 @@ server <- function(input, output, session) {
       columns = table_demo_columns(align, styling),
       caption = if (nzchar(caption)) caption else NULL,
       max_rows = if (identical(max_rows_value, "all")) NULL else as.integer(max_rows_value),
+      selection = input$showcase_table_doc_selection %||% "none",
       loading = isTRUE(rv_loading())
     )
   })
@@ -322,6 +332,7 @@ server <- function(input, output, session) {
   output$showcase_table_preview_code <- showcase_render_code({
     align <- input$showcase_table_doc_align %||% "right"
     max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
+    selection_value <- input$showcase_table_doc_selection %||% "none"
     caption <- input$showcase_table_doc_caption %||% ""
     style <- input$showcase_table_doc_style %||% ""
     use_class <- isTRUE(input$showcase_table_doc_class)
@@ -360,6 +371,9 @@ server <- function(input, output, session) {
     }
     if (!identical(max_rows_value, "all")) {
       code_args <- c(code_args, paste0("max_rows = ", max_rows_value))
+    }
+    if (!identical(selection_value, "none")) {
+      code_args <- c(code_args, paste0("selection = ", string_literal(selection_value)))
     }
     table_classes <- c(
       if (use_class) "showcase-table-preview-custom",

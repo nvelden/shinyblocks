@@ -25,10 +25,33 @@
 #' @param striped Whether to zebra-stripe body rows.
 #' @param hover Whether rows highlight on hover. Defaults to `TRUE` (shadcn base).
 #' @param bordered Whether to draw cell borders.
-#' @param id Optional input id. Required only if the table is updated from the
-#'   server with [update_block_table()]; static tables can omit it.
+#' @param selection Row-selection mode, following the DT idiom. One of `"none"`
+#'   (default; the table is presentational and reports no value), `"single"`
+#'   (one row selectable at a time), or `"multiple"` (any number of rows). When
+#'   enabled the table reports its selection to the server (see *Selection*).
+#' @param selected Optional integer vector of 1-based row indices to select on
+#'   load. Only valid when `selection` is `"single"` or `"multiple"`.
+#' @param id Optional input id. Required if the table is updated from the
+#'   server with [update_block_table()] or uses row `selection`; static,
+#'   non-selectable tables can omit it.
 #' @param class Additional classes on the runtime mount.
 #' @param style Optional inline custom styles.
+#'
+#' @section Selection:
+#' With `selection` set to `"single"` or `"multiple"`, rows become clickable and
+#' the table reports its selection through Shiny inputs, mirroring the DT
+#' package so existing DT code ports over:
+#' \itemize{
+#'   \item `input$<id>` and `input$<id>_rows_selected` -- integer vector of the
+#'     selected 1-based row indices (the bare id is a shinyblocks convenience;
+#'     `_rows_selected` is the DT-compatible name).
+#'   \item `input$<id>_row_last_clicked` -- the 1-based index of the most
+#'     recently clicked row.
+#'   \item `input$<id>_cell_clicked` -- a list with `row` (1-based), `col`
+#'     (1-based rendered column index), and `value` (the displayed cell text)
+#'     for the most recent click.
+#' }
+#' Push a selection from the server with `update_block_table(selected = )`.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -45,6 +68,8 @@ block_table <- function(
   striped = FALSE,
   hover = TRUE,
   bordered = FALSE,
+  selection = c("none", "single", "multiple"),
+  selected = NULL,
   id = NULL,
   class = NULL,
   style = NULL
@@ -52,6 +77,8 @@ block_table <- function(
   if (!is.null(id)) {
     validate_input_id(id)
   }
+  selection <- normalize_table_selection(selection)
+  selected <- normalize_table_selected(selected, selection)
 
   props <- table_build_payload(
     data = data,
@@ -66,6 +93,15 @@ block_table <- function(
     hover = hover,
     bordered = bordered
   )
+
+  # Conditionally appended so a non-selectable table serializes byte-identically
+  # to the pre-selection payload (the runtime defaults to "none" when absent).
+  if (!identical(selection, "none")) {
+    props$selection <- selection
+    if (length(selected)) {
+      props$selected <- as.list(selected)
+    }
+  }
 
   runtime_component(
     component = "table",
@@ -93,6 +129,11 @@ block_table <- function(
 #'   `data` is supplied.
 #' @param loading Optional flag. `TRUE` shows skeleton rows; `FALSE` clears the
 #'   loading state without changing data.
+#' @param selection Optional new row-selection mode (`"none"`, `"single"`, or
+#'   `"multiple"`). `NULL` leaves the current mode unchanged.
+#' @param selected Optional integer vector of 1-based row indices to select.
+#'   Pass `integer(0)` to clear the current selection. `NULL` leaves it
+#'   unchanged.
 #'
 #' @return Invisibly returns `NULL`.
 #' @family content
@@ -111,7 +152,9 @@ update_block_table <- function(
   striped = FALSE,
   hover = TRUE,
   bordered = FALSE,
-  loading = NULL
+  loading = NULL,
+  selection = NULL,
+  selected = NULL
 ) {
   payload <- list()
 
@@ -134,6 +177,17 @@ update_block_table <- function(
 
   if (!is.null(loading)) {
     payload$loading <- isTRUE(loading)
+  }
+
+  if (!is.null(selection)) {
+    payload$selection <- normalize_table_selection(selection)
+  }
+
+  if (!is.null(selected)) {
+    # Validate against the resulting mode when supplied, else against any
+    # non-"none" mode (the runtime keeps its current mode when none is pushed).
+    mode <- if (!is.null(selection)) payload$selection else "multiple"
+    payload$selected <- as.list(normalize_table_selected(selected, mode))
   }
 
   runtime_input_update(
@@ -235,6 +289,34 @@ TABLE_INTENT_CHOICES <- c(
   "muted", "primary", "secondary", "destructive", "success", "warning", "accent"
 )
 TABLE_EMPHASIS_CHOICES <- c("text", "soft", "solid")
+
+TABLE_SELECTION_CHOICES <- c("none", "single", "multiple")
+
+normalize_table_selection <- function(selection) {
+  match_arg(selection, TABLE_SELECTION_CHOICES, arg_name = "selection")
+}
+
+# 1-based row indices. Returns an integer vector (possibly length 0) or errors.
+# `mode` gates whether selection is allowed at all and how many rows may be set.
+normalize_table_selected <- function(selected, mode) {
+  if (is.null(selected)) {
+    return(integer(0))
+  }
+  if (identical(mode, "none")) {
+    stop("`selected` requires `selection` to be \"single\" or \"multiple\".", call. = FALSE)
+  }
+  if (!is.numeric(selected) || anyNA(selected)) {
+    stop("`selected` must be a numeric vector of 1-based row indices.", call. = FALSE)
+  }
+  if (any(selected < 1) || any(selected != floor(selected))) {
+    stop("`selected` must contain positive whole numbers.", call. = FALSE)
+  }
+  selected <- as.integer(selected)
+  if (identical(mode, "single") && length(selected) > 1) {
+    stop("`selected` must have length <= 1 when `selection` is \"single\".", call. = FALSE)
+  }
+  selected
+}
 
 normalize_table_intent <- function(intent, arg) {
   if (is.null(intent)) {

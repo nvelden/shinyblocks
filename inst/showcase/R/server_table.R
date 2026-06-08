@@ -98,15 +98,37 @@ register_table_showcase <- function(input, output, session) {
     )))
   }, ignoreInit = TRUE)
 
-  # Receive-only (output-style) table: the runtime binding forwards payloads to
-  # the DOM but exposes no input value, so input$showcase_table_live is NULL.
+  # With selection = "none" the table is presentational and reports no value
+  # (input$showcase_table_live is NULL). With "single"/"multiple" it reports the
+  # selected rows plus the DT-compatible derived inputs.
   output$showcase_table_preview_value <- showcase_render_code({
-    value <- input$showcase_table_live
-    val_str <- if (is.null(value)) "<NULL>" else paste0('"', value, '"')
+    fmt <- function(v) {
+      if (is.null(v) || length(v) == 0) {
+        return("integer(0)")
+      }
+      paste0("c(", paste(v, collapse = ", "), ")")
+    }
+    selection <- input$showcase_table_doc_selection %||% "none"
+    if (identical(selection, "none")) {
+      return(paste0(
+        "input$showcase_table_live = <NULL>\n",
+        "# selection = \"none\": the table is receive-only\n",
+        "# and reports no input value. Switch selection\n",
+        "# to \"single\" or \"multiple\" to make it reactive."
+      ))
+    }
+    cell <- input$showcase_table_live_cell_clicked
+    cell_str <- if (is.null(cell)) {
+      "NULL"
+    } else {
+      sprintf("list(row = %s, col = %s, value = \"%s\")", cell$row, cell$col, cell$value)
+    }
     paste0(
-      "input$showcase_table_live = ", val_str, "\n",
-      "# Tables are receive-only; they render server\n",
-      "# pushes but report no input value."
+      "input$showcase_table_live = ", fmt(input$showcase_table_live), "\n",
+      "input$showcase_table_live_rows_selected = ", fmt(input$showcase_table_live_rows_selected), "\n",
+      "input$showcase_table_live_row_last_clicked = ",
+      input$showcase_table_live_row_last_clicked %||% "NULL", "\n",
+      "input$showcase_table_live_cell_clicked = ", cell_str
     )
   })
   shiny::outputOptions(
@@ -155,6 +177,7 @@ register_table_showcase <- function(input, output, session) {
       row_format = if (isTRUE(input$showcase_table_doc_rowformat)) showcase_table_row_format() else NULL,
       striped = isTRUE(rv_striped()),
       bordered = isTRUE(rv_bordered()),
+      selection = input$showcase_table_doc_selection %||% "none",
       loading = isTRUE(rv_loading())
     )
   })
@@ -212,6 +235,7 @@ register_table_showcase <- function(input, output, session) {
     align <- input$showcase_table_doc_align %||% "right"
     max_rows_value <- input$showcase_table_doc_max_rows %||% "all"
     digits_value <- input$showcase_table_doc_digits %||% "default"
+    selection_value <- input$showcase_table_doc_selection %||% "none"
     caption <- input$showcase_table_doc_caption %||% ""
     na_value <- input$showcase_table_doc_na %||% ""
     use_rownames <- isTRUE(input$showcase_table_doc_rownames)
@@ -255,6 +279,9 @@ register_table_showcase <- function(input, output, session) {
     }
     if (!identical(max_rows_value, "all")) {
       args <- c(args, paste0("max_rows = ", max_rows_value))
+    }
+    if (!identical(selection_value, "none")) {
+      args <- c(args, paste0("selection = ", string_literal(selection_value)))
     }
     if (nzchar(na_value)) {
       args <- c(args, paste0("na = ", string_literal(na_value)))
@@ -316,13 +343,26 @@ register_table_showcase <- function(input, output, session) {
       ""
     }
 
+    selection_block <- if (!identical(selection_value, "none")) {
+      paste0(
+        "\n\n# Read the selection (DT-compatible inputs):\n",
+        "observeEvent(input$tbl_rows_selected, {\n",
+        "  print(input$tbl_rows_selected)        # 1-based row indices\n",
+        "  print(input$tbl_row_last_clicked)     # last clicked row\n",
+        "})"
+      )
+    } else {
+      ""
+    }
+
     paste0(
       css_block,
       "block_table(\n  ", paste(args, collapse = ",\n  "), "\n)\n\n",
       "# Push a reactive refresh from the server:\n",
       "observeEvent(input$reload, {\n",
       "  update_block_table(session, \"tbl\", data = latest_data(), loading = FALSE)\n",
-      "})"
+      "})",
+      selection_block
     )
   })
   shiny::outputOptions(
@@ -335,7 +375,8 @@ register_table_showcase <- function(input, output, session) {
     showcase_api_table(data.frame(
       Argument = c(
         "data", "columns", "caption", "max_rows", "na", "digits", "rownames",
-        "row_format", "striped", "hover", "bordered", "id", "class", "style",
+        "row_format", "striped", "hover", "bordered", "selection", "selected",
+        "id", "class", "style",
         "update_block_table()", "table_column(label)", "table_column(align)",
         "table_column(format)", "table_column(digits)", "table_column(na)",
         "table_column(width)", "table_column(intent)", "table_column(emphasis)",
@@ -347,14 +388,16 @@ register_table_showcase <- function(input, output, session) {
       Type = c(
         "data.frame", "named list", "character", "integer", "character",
         "integer", "logical", "function", "logical", "logical", "logical",
-        "character", "character", "character | named list", "function",
+        "character", "integer", "character", "character",
+        "character | named list", "function",
         "character", "character", "function", "integer", "character", "character",
         "character", "character", "character | named list", "character",
         "character", "character | named list", "function", "function", "function"
       ),
       Default = c(
         "required", "NULL", "NULL", "NULL", "\"\"", "NULL", "FALSE", "NULL",
-        "FALSE", "TRUE", "FALSE", "NULL", "NULL", "NULL", "-", "NULL",
+        "FALSE", "TRUE", "FALSE", "\"none\"", "NULL", "NULL", "NULL", "NULL",
+        "-", "NULL",
         "\"left\"", "NULL", "NULL", "NULL", "NULL", "NULL", "\"text\"", "NULL",
         "NULL", "\"text\"", "NULL", "NULL", "NULL", "NULL"
       ),
@@ -370,7 +413,9 @@ register_table_showcase <- function(input, output, session) {
         "Zebra-stripe body rows.",
         "Highlight rows on hover (shadcn base behavior).",
         "Draw cell borders.",
-        "Optional input id. Required only to update the table from the server.",
+        "Row-selection mode (DT idiom): none, single, or multiple. Enables clickable rows reporting input$id_rows_selected, _row_last_clicked, _cell_clicked.",
+        "Integer vector of 1-based row indices to select on load (requires selection != none).",
+        "Optional input id. Required to update the table from the server or to use row selection.",
         "Additional CSS class merged into the runtime table container.",
         "Optional inline styles applied to the runtime mount and table container.",
         "Re-render an id-bound table from the server with a freshly formatted payload.",

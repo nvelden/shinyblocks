@@ -231,6 +231,29 @@ try {
     "beta"
   );
 
+  // DT-style row selection: clicking rows reports bare id, _rows_selected, and
+  // _row_last_clicked; clicking a selected row toggles it off (multiple mode).
+  const selTable =
+    "[data-sb-component='table'][data-sb-input-id='runtime_table_sel'] tbody tr";
+  await assertText(page, "#runtime_table_sel_value", "rows=- bare=- last=-");
+  await page.click(`${selTable}:nth-child(1) td`);
+  await assertText(page, "#runtime_table_sel_value", "rows=1 bare=1 last=1");
+  await page.click(`${selTable}:nth-child(2) td`);
+  await assertText(page, "#runtime_table_sel_value", "rows=1,2 bare=1,2 last=2");
+  await page.click(`${selTable}:nth-child(1) td`);
+  await assertText(page, "#runtime_table_sel_value", "rows=2 bare=2 last=1");
+  assert.equal(
+    await page.evaluate(() =>
+      document
+        .querySelector(
+          "[data-sb-input-id='runtime_table_sel'] tbody tr:nth-child(2)"
+        )
+        ?.getAttribute("aria-selected")
+    ),
+    "true",
+    "selected row should expose aria-selected"
+  );
+
   await assertText(page, "#runtime_popover_value", "FALSE");
   await page.click("[data-sb-component='popover'] [data-slot='popover-trigger']");
   await page.locator("[data-shinyblocks-portal-root] [data-slot='popover-content']").waitFor({

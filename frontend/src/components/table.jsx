@@ -1,8 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { classNames } from "./shared.jsx";
 
 function alignment(value) {
   return ["left", "center", "right"].includes(value) ? value : "left";
+}
+
+// Normalize a server-supplied `selected` payload (array of 1-based row indices)
+// into a Set of positive integers, dropping anything invalid.
+function toSelectedSet(value) {
+  const out = new Set();
+  if (!Array.isArray(value)) return out;
+  value.forEach((entry) => {
+    const n = Number(entry);
+    if (Number.isInteger(n) && n >= 1) out.add(n);
+  });
+  return out;
 }
 
 function headStyle(column) {
@@ -31,21 +43,86 @@ function bodyCellStyle(column, meta) {
 
 export function Table({ payload, root }) {
   const [props, setProps] = useState(() => payload.props || {});
+  // DT-style row selection. `selected` holds 1-based row indices; the binding
+  // reads `root.__sbTableValue` and re-publishes the input on `sb:table-change`.
+  const [selected, setSelected] = useState(() =>
+    toSelectedSet((payload.props || {}).selected)
+  );
 
-  // Receive-only update path. `update_block_table()` pushes a fresh (possibly
-  // partial) props payload through the runtime `table` InputBinding, which
-  // forwards it here. Merge it over the current props so a server-side refresh
-  // re-renders without remounting.
+  const selectionMode = props.selection || "none";
+  const selectable =
+    (selectionMode === "single" || selectionMode === "multiple") &&
+    props.loading !== true;
+
+  // Single-writer (ADR 0019): the expando + dispatch are written synchronously
+  // from the mount effect, the click/keyboard setter, and the receive handler —
+  // never via a mirror useEffect. `cell` carries the last DT-style cell click.
+  function publish(nextSet, lastClicked, cell, notify) {
+    if (!root) return;
+    root.__sbTableValue = {
+      selected: Array.from(nextSet).sort((a, b) => a - b),
+      lastClicked: lastClicked == null ? null : lastClicked,
+      cell: cell || null
+    };
+    if (notify) root.dispatchEvent(new CustomEvent("sb:table-change"));
+  }
+
+  // Mount: install the receive handler and seed the value expando so the binding
+  // resolves an initial selection. Non-selectable tables set no expando, so the
+  // binding keeps reporting null (byte-identical legacy behavior).
   useEffect(() => {
     if (!root) return undefined;
+    if (
+      props.selection === "single" ||
+      props.selection === "multiple"
+    ) {
+      publish(toSelectedSet(props.selected), null, null, false);
+    }
     root.__sbTableReceive = (data) => {
       const next = data || {};
+      if (Object.prototype.hasOwnProperty.call(next, "selected")) {
+        const set = toSelectedSet(next.selected);
+        setSelected(set);
+        publish(set, null, null, true);
+      } else if (next.selection === "none") {
+        root.__sbTableValue = { selected: [], lastClicked: null, cell: null };
+        root.dispatchEvent(new CustomEvent("sb:table-change"));
+      }
       setProps((prev) => ({ ...prev, ...next }));
     };
     return () => {
       delete root.__sbTableReceive;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [root]);
+
+  function activate(rowIndex, columnIndex, value) {
+    if (!selectable) return;
+    const row1 = rowIndex + 1;
+    const nextSet = new Set(selected);
+    if (selectionMode === "single") {
+      const had = nextSet.has(row1);
+      nextSet.clear();
+      if (!had) nextSet.add(row1);
+    } else if (nextSet.has(row1)) {
+      nextSet.delete(row1);
+    } else {
+      nextSet.add(row1);
+    }
+    setSelected(nextSet);
+    const cell =
+      columnIndex == null
+        ? null
+        : { row: row1, col: columnIndex + 1, value: value == null ? null : value };
+    publish(nextSet, row1, cell, true);
+  }
+
+  function onRowKeyDown(event, rowIndex) {
+    if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+      event.preventDefault();
+      activate(rowIndex, null, null);
+    }
+  }
 
   const columns = Array.isArray(props.columns) ? props.columns : [];
   const rows = Array.isArray(props.rows) ? props.rows : [];
@@ -114,12 +191,21 @@ export function Table({ payload, root }) {
             : rows.map((row, rowIndex) => {
                 const meta = rowMeta[rowIndex] || null;
                 const rowCells = cellMeta[rowIndex] || [];
+                const isSelected = selectable && selected.has(rowIndex + 1);
                 return (
                   <tr
                     key={rowIndex}
                     data-slot="table-row"
-                    className={classNames("sb-table-row", meta && meta.class)}
+                    className={classNames(
+                      "sb-table-row",
+                      selectable && "sb-table-row--selectable",
+                      isSelected && "sb-table-row--selected",
+                      meta && meta.class
+                    )}
                     style={meta && meta.style ? meta.style : undefined}
+                    aria-selected={selectable ? isSelected : undefined}
+                    tabIndex={selectable ? 0 : undefined}
+                    onKeyDown={selectable ? (event) => onRowKeyDown(event, rowIndex) : undefined}
                     {...(meta ? styleAttrs(meta.intent, meta.emphasis) : {})}
                   >
                     {columns.map((column, columnIndex) => {
@@ -127,6 +213,7 @@ export function Table({ payload, root }) {
                       // Cell-level intent/emphasis/class win over the column default.
                       const intent = (cell && cell.intent) || column.intent;
                       const emphasis = (cell && cell.emphasis) || column.emphasis;
+                      const value = Array.isArray(row) ? row[columnIndex] || "" : "";
                       return (
                         <td
                           key={column.key || columnIndex}
@@ -137,9 +224,10 @@ export function Table({ payload, root }) {
                             cell && cell.class
                           )}
                           style={bodyCellStyle(column, cell)}
+                          onClick={selectable ? () => activate(rowIndex, columnIndex, value) : undefined}
                           {...styleAttrs(intent, emphasis)}
                         >
-                          {Array.isArray(row) ? row[columnIndex] || "" : ""}
+                          {value}
                         </td>
                       );
                     })}
