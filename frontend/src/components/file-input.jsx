@@ -3,74 +3,115 @@ import { labelIdForInput } from "../runtime/dom.js";
 import { nativeFileInput } from "../runtime/native-inputs.js";
 import { classNames } from "./shared.jsx";
 
-function selectedFileText(nativeInput, placeholder) {
+function selectedFileText(nativeInput) {
   const files = nativeInput?.files ? Array.from(nativeInput.files) : [];
-  if (!files.length) return placeholder || "";
+  if (!files.length) return "";
   if (files.length === 1) return files[0].name;
-  return files.map((file) => file.name).join(", ");
+  return `${files.length} files`;
 }
 
 export function FileInput({ payload, root }) {
   const props = payload.props || {};
-  const [fileText, setFileText] = useState(props.placeholder || "");
-  const disabled = Boolean(props.disabled);
-  const invalid = Boolean(props.invalid);
-  const style = props.style || {};
-  const className = payload.className || "";
   const native = nativeFileInput(root);
+  const [state, setState] = useState({
+    buttonLabel: props.buttonLabel || "Browse",
+    placeholder: props.placeholder || "",
+    disabled: Boolean(props.disabled),
+    invalid: Boolean(props.invalid),
+    style: props.style || {},
+    className: payload.className || ""
+  });
+  // Empty string means "no file selected"; the placeholder is shown instead.
+  const [selectedText, setSelectedText] = useState("");
+
   const inputId = native?.id || null;
   const labelledBy = inputId ? labelIdForInput(inputId) : null;
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
   const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
-  const isInvalid = invalid || wrapperInvalid;
+  const isInvalid = state.invalid || wrapperInvalid;
+  const hasFiles = selectedText.length > 0;
+  const displayText = hasFiles ? selectedText : state.placeholder;
 
+  // Keep the native input's disabled state in sync with React state.
   useEffect(() => {
-    if (!root || !native) return undefined;
+    if (native) native.disabled = state.disabled;
+  }, [native, state.disabled]);
 
-    native.disabled = disabled;
-    const handleChange = () => {
-      setFileText(selectedFileText(native, props.placeholder || ""));
-    };
+  // Mirror native file selection into the visible label.
+  useEffect(() => {
+    if (!native) return undefined;
+    const handleChange = () => setSelectedText(selectedFileText(native));
     native.addEventListener("change", handleChange);
     handleChange();
+    return () => native.removeEventListener("change", handleChange);
+  }, [native]);
 
-    return () => {
-      native.removeEventListener("change", handleChange);
+  // Install the receiver used by `update_block_file_input()`.
+  useEffect(() => {
+    if (!root) return undefined;
+    root.__sbFileInputReceive = (data) => {
+      setState((prev) => {
+        const next = { ...prev };
+        if ("buttonLabel" in data) next.buttonLabel = data.buttonLabel ?? "";
+        if ("placeholder" in data) next.placeholder = data.placeholder ?? "";
+        if ("disabled" in data) next.disabled = Boolean(data.disabled);
+        if ("invalid" in data) next.invalid = Boolean(data.invalid);
+        if ("style" in data) next.style = data.style || {};
+        if ("className" in data) next.className = data.className || "";
+        return next;
+      });
+      if (native) {
+        if ("accept" in data) {
+          if (data.accept == null || data.accept === "") native.removeAttribute("accept");
+          else native.setAttribute("accept", data.accept);
+        }
+        if ("multiple" in data) {
+          if (data.multiple) native.setAttribute("multiple", "");
+          else native.removeAttribute("multiple");
+        }
+        if (data.reset) {
+          native.value = "";
+          setSelectedText("");
+        }
+      }
     };
-  }, [root, native, disabled, props.placeholder]);
+    return () => {
+      if (root.__sbFileInputReceive) delete root.__sbFileInputReceive;
+    };
+  }, [root, native]);
 
   function handleClick() {
-    if (disabled || !native) return;
+    if (state.disabled || !native) return;
     native.click();
   }
 
   return (
     <div
-      className={classNames("sb-file-input-control", className)}
+      className={classNames("sb-file-input-control", state.className)}
       data-slot="file-input-control"
-      data-disabled={disabled ? "true" : undefined}
+      data-disabled={state.disabled ? "true" : undefined}
       aria-invalid={isInvalid || undefined}
-      style={style}
+      style={state.style}
     >
       <button
         type="button"
         className="sb-file-input-button"
         data-slot="file-input-button"
-        disabled={disabled}
+        disabled={state.disabled}
         aria-controls={inputId || undefined}
         aria-labelledby={labelledBy || undefined}
         aria-describedby={describedBy}
         onClick={handleClick}
       >
-        {props.buttonLabel || "Browse"}
+        {state.buttonLabel || "Browse"}
       </button>
       <span
         className="sb-file-input-text"
         data-slot="file-input-text"
-        data-placeholder={!native?.files?.length ? "true" : undefined}
+        data-placeholder={!hasFiles ? "true" : undefined}
         aria-live="polite"
       >
-        {fileText || props.placeholder || ""}
+        {displayText}
       </span>
     </div>
   );

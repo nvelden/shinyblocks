@@ -14,6 +14,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "switch",
   "textarea",
   "input",
+  "file-input",
   "radio-group",
   "slider",
   "table"
@@ -29,6 +30,7 @@ function makeRuntimeBinding(config) {
     type = null,
     requireInputId = true,
     receiveProp = null,
+    getId = null,
     getValue,
     setValue,
     subscribe,
@@ -50,7 +52,7 @@ function makeRuntimeBinding(config) {
         ? matches.filter((el) => Boolean(el.dataset.sbInputId))
         : matches;
     }
-    getId(el) { return el.dataset.sbInputId; }
+    getId(el) { return getId ? getId(el) : el.dataset.sbInputId; }
     getType() { return type; }
     getValue(el) { return getValue ? getValue(el) : null; }
     setValue(el, value) { if (setValue) setValue(el, value); }
@@ -337,6 +339,18 @@ const BINDING_CONFIGS = [
       el.removeEventListener("sb:table-change", el.__sbTableChangeHandler);
       delete el.__sbTableChangeHandler;
     }
+  },
+  {
+    // Receive-only binding. The uploaded file value belongs to Shiny's native
+    // file binding (`input$<id>`), so this mount reports nothing — it exists
+    // purely so `update_block_file_input()` (`sendInputMessage`) reaches React
+    // via `__sbFileInputReceive`. Routing is by DOM id, so `getId` returns the
+    // mount's deterministic `el.id` rather than a (absent) `data-sb-input-id`.
+    component: "file-input",
+    requireInputId: false,
+    receiveProp: "__sbFileInputReceive",
+    getId(el) { return el.id; },
+    getValue() { return null; }
   }
 ];
 
@@ -351,7 +365,8 @@ const BINDING_NAMES = [
   "shinyblocks.input",
   "shinyblocks.radio-group",
   "shinyblocks.slider",
-  "shinyblocks.table"
+  "shinyblocks.table",
+  "shinyblocks.file-input"
 ];
 
 let bindingsRegistered = false;

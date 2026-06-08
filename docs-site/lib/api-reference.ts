@@ -361,6 +361,23 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "style", type: "character | object", defaultVal: "NULL", description: "Inline styles applied to the visible control." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class applied to the visible control." }
       ]
+    },
+    {
+      name: "update_block_file_input",
+      description: "Updates picker labels and states from server handlers, or clears the current selection.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session object." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target file input component ID." },
+        { argument: "button_label", type: "character", defaultVal: "NULL", description: "Replace the visible picker button text." },
+        { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Replace the empty-state placeholder text." },
+        { argument: "accept", type: "character", defaultVal: "NULL", description: "Replace accepted MIME types or extensions." },
+        { argument: "multiple", type: "logical", defaultVal: "NULL", description: "Toggle multi-file selection." },
+        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Disable or re-enable the picker." },
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle invalid visual highlights." },
+        { argument: "style", type: "character | object", defaultVal: "NULL", description: "Replace inline styles on the visible control." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replace classes on the visible control." },
+        { argument: "reset", type: "logical", defaultVal: "FALSE", description: "Clear the current file selection (the value itself cannot be set from the server)." }
+      ]
     }
   ],
   input: [

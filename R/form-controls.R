@@ -254,12 +254,94 @@ block_file_input <- function(
       invalid = isTRUE(invalid),
       style = normalize_runtime_style(style)
     ),
+    # The file value belongs to Shiny's native file binding (`input$<id>`), so
+    # the mount itself reports no value (`input_id = NULL`). A deterministic
+    # `mount_id` keyed off `input_id` still lets `update_block_file_input()`
+    # route `sendInputMessage()` to this mount's receive-only runtime binding.
     input_id = NULL,
+    mount_id = runtime_mount_id("file-input", input_id),
     class = class,
     style = wrapper_style,
     root_class = "sb-file-input",
     children = list(native_input)
   )
+}
+
+#' Update a runtime file input
+#'
+#' Updates the cosmetic and stateful props of a [block_file_input()]. The file
+#' value itself is owned by Shiny's native file binding and, as with
+#' [shiny::fileInput()], cannot be set from the server; use `reset = TRUE` to
+#' clear the current selection client-side.
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to `block_file_input()`.
+#' @param button_label Optional replacement button text.
+#' @param placeholder Optional replacement placeholder text.
+#' @param accept Optional replacement accepted types. Use `NULL` to clear.
+#' @param multiple Optional flag for allowing multiple files.
+#' @param disabled Optional disabled state.
+#' @param invalid Optional invalid flag.
+#' @param style Optional replacement inline CSS styles for the visible control.
+#' @param class Optional replacement classes for the visible control.
+#' @param reset Whether to clear the current file selection.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family forms
+#' @export
+update_block_file_input <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  button_label,
+  placeholder,
+  accept,
+  multiple,
+  disabled,
+  invalid,
+  style,
+  class,
+  reset = FALSE
+) {
+  payload <- list()
+
+  if (!missing(button_label)) {
+    payload <- payload_set_clearable(payload, "buttonLabel", button_label, as.character)
+  }
+  if (!missing(placeholder)) {
+    payload <- payload_set_clearable(payload, "placeholder", placeholder, as.character)
+  }
+  if (!missing(accept)) {
+    if (!is.null(accept) && (!is.character(accept) || any(is.na(accept)))) {
+      stop("`accept` must be NULL or a character vector.", call. = FALSE)
+    }
+    accept_value <- if (is.null(accept)) {
+      NULL
+    } else {
+      paste(accept[nzchar(accept)], collapse = ",")
+    }
+    if (!is.null(accept_value) && !nzchar(accept_value)) accept_value <- NULL
+    payload <- payload_set_clearable(payload, "accept", accept_value)
+  }
+  if (!missing(multiple)) {
+    payload <- payload_set_if_present(payload, "multiple", multiple, isTRUE)
+  }
+  if (!missing(disabled)) {
+    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
+  }
+  if (!missing(invalid)) {
+    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
+  }
+  if (!missing(style)) {
+    payload <- payload_set_style(payload, "style", style)
+  }
+  if (!missing(class)) {
+    payload <- payload_set_clearable(payload, "className", class)
+  }
+  if (isTRUE(reset)) {
+    payload$reset <- TRUE
+  }
+
+  runtime_input_update(session, input_id, "file-input", payload, notify_key = NULL)
 }
 
 #' Update a runtime text input

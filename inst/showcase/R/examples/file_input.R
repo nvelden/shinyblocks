@@ -32,6 +32,18 @@ htmltools::tagList(
         )
       ),
       showcase_controls_group(
+        "Actions (Server Update)",
+        htmltools::div(
+          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          showcase_action_button("showcase_file_input_relabel", "Relabel button"),
+          showcase_action_button("showcase_file_input_disable", "Disable"),
+          showcase_action_button("showcase_file_input_enable", "Enable"),
+          showcase_action_button("showcase_file_input_mark_invalid", "Mark invalid"),
+          showcase_action_button("showcase_file_input_clear_invalid", "Clear invalid"),
+          showcase_action_button("showcase_file_input_reset", "Reset selection")
+        )
+      ),
+      showcase_controls_group(
         "Styling",
         block_field(
           block_field_label("width", `for` = "showcase_file_input_doc_width"),
@@ -50,7 +62,14 @@ htmltools::tagList(
     preview_output_id = "showcase_file_input_preview_ui",
     code_output_id = "showcase_file_input_preview_code",
     extra_outputs = htmltools::tagList(
-      shiny::uiOutput("showcase_file_input_preview_value")
+      shiny::uiOutput("showcase_file_input_preview_value"),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_file_input_reactive_code")
+      )
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

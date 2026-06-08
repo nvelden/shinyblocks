@@ -99,6 +99,10 @@ native_file_input <- function(input_id, multiple = FALSE, accept = NULL, disable
       id = input_id,
       type = "file",
       class = "shiny-input-file sb-file-input-native",
+      # Visually hidden but kept in the a11y tree; the styled button is the sole
+      # tab stop and forwards activation via `native.click()`, so the input
+      # itself must not be a second (invisible) tab stop.
+      tabindex = "-1",
       multiple = if (isTRUE(multiple)) NA else NULL,
       accept = accept,
       disabled = if (isTRUE(disabled)) NA else NULL

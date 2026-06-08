@@ -111,4 +111,80 @@ register_file_input_showcase <- function(input, output, session) {
     ))
   })
   shiny::outputOptions(output, "showcase_file_input_api_table", suspendWhenHidden = FALSE)
+
+  reactive_code <- shiny::reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_file_input() code here."
+  ))
+
+  output$showcase_file_input_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  shiny::outputOptions(output, "showcase_file_input_reactive_code", suspendWhenHidden = FALSE)
+
+  shiny::observeEvent(input$showcase_file_input_relabel, {
+    update_block_file_input(session, "showcase_file_input_preview", button_label = "Pick a file")
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  button_label = \"Pick a file\"\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_file_input_disable, {
+    update_block_file_input(session, "showcase_file_input_preview", disabled = TRUE)
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  disabled = TRUE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_file_input_enable, {
+    update_block_file_input(session, "showcase_file_input_preview", disabled = FALSE)
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  disabled = FALSE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_file_input_mark_invalid, {
+    update_block_file_input(session, "showcase_file_input_preview", invalid = TRUE)
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  invalid = TRUE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_file_input_clear_invalid, {
+    update_block_file_input(session, "showcase_file_input_preview", invalid = FALSE)
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  invalid = FALSE\n",
+      ")"
+    ))
+  })
+
+  shiny::observeEvent(input$showcase_file_input_reset, {
+    update_block_file_input(session, "showcase_file_input_preview", reset = TRUE)
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  reset = TRUE\n",
+      ")"
+    ))
+  })
 }

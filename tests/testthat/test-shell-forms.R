@@ -113,11 +113,15 @@ test_that("block_file_input emits bindable native file input markup", {
   expect_null(payload$id)
   expect_identical(payload$className, "custom")
   expect_match(html, 'data-sb-component="file-input"', fixed = TRUE)
+  # Deterministic mount id lets update_block_file_input() route messages here.
+  expect_match(html, 'id="sb-runtime-file-input-upload"', fixed = TRUE)
   expect_match(
     html,
     '<input id="upload" type="file" class="shiny-input-file sb-file-input-native"',
     fixed = TRUE
   )
+  # Native input is kept out of the tab order; the button is the sole tab stop.
+  expect_match(html, 'tabindex="-1"', fixed = TRUE)
   expect_match(html, 'multiple accept=".csv,text/csv"', fixed = TRUE)
   expect_match(html, 'id="upload_progress"', fixed = TRUE)
   expect_match(html, "progress active shiny-file-input-progress", fixed = TRUE)

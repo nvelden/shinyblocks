@@ -210,3 +210,50 @@ test_that("cosmetic update_block_slider messages do not notify", {
   expect_identical(message$notify, FALSE)
   expect_null(message$value)
 })
+
+test_that("update_block_file_input targets the file-input mount and never notifies", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_file_input(
+      capture$session,
+      "upload",
+      button_label = "Choose",
+      placeholder = "Pick a file",
+      accept = c(".csv", "text/csv"),
+      multiple = TRUE,
+      disabled = TRUE,
+      invalid = TRUE,
+      style = "max-width: 20rem;",
+      class = "custom-file",
+      reset = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-file-input-upload")
+  expect_identical(message$payload$buttonLabel, "Choose")
+  expect_identical(message$payload$placeholder, "Pick a file")
+  expect_identical(message$payload$accept, ".csv,text/csv")
+  expect_identical(message$payload$multiple, TRUE)
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$invalid, TRUE)
+  expect_identical(message$payload$style$maxWidth, "20rem")
+  expect_identical(message$payload$className, "custom-file")
+  expect_identical(message$payload$reset, TRUE)
+  # File inputs carry no runtime value, so they never emit a notify flag.
+  expect_null(message$payload$notify)
+})
+
+test_that("update_block_file_input clears accept and validates it", {
+  capture <- local_input_message_session()
+
+  update_block_file_input(capture$session, "upload", accept = NULL)
+  expect_true("accept" %in% names(capture$last_payload()))
+  expect_null(capture$last_payload()$accept)
+
+  expect_error(
+    update_block_file_input(capture$session, "upload", accept = 1),
+    "`accept` must be NULL or a character vector"
+  )
+})
