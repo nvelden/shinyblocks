@@ -48,8 +48,12 @@ docs-site/HANDOFF-PROMPT.md
 # Compiled package docs
 inst/doc/
 
-# Local planning, ADRs, agent notes, and internal component specs
-docs/
+# Local planning, ADRs, and agent notes. Component specs are repository
+# artifacts and must stay visible to doc-coverage tests.
+docs/*
+!docs/component-specs/
+docs/component-specs/*
+!docs/component-specs/*.md
 
 # Local generated Shinylive/package smoke-test artifacts
 site/

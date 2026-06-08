@@ -29,11 +29,11 @@ targets <- list(
     # again for the #51 reactive-table feature set (skeleton / striped /
     # bordered / loading variants), then 49 -> 50 for the #53 table styling
     # intents being scoped to [data-shinyblocks-root] (the descendant prefix
-    # costs ~0.2 KB raw; the gzipped budget below is unaffected). Gzipped is the
-    # meaningful transfer budget and stays the binding constraint; raw is a
-    # headroom guard.
+    # costs ~0.2 KB raw). The #54 file-input picker/progress styling brings the
+    # built asset to ~53 KB raw while keeping gzip under its transfer budget.
+    # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 50,
+    limit_kb = 54,
     metric = "raw",
     group = "runtime"
   ),
@@ -55,14 +55,12 @@ targets <- list(
   ),
   list(
     # Recalibrated 75 -> 76 KB for the #51 reactive-table runtime (stateful
-    # table + receive-only binding). The asset is legitimately ~75 KB; the
-    # binding minified JS still trims the receive-only stubs. NB: this gzipped
-    # metric is platform-variant (R's memCompress zlib differs by OS — macOS
-    # reports ~75.0 KB, Linux CI ~75.1 KB for identical bytes), so a sub-100-byte
-    # margin cannot be measured reliably across local/CI. The 76 KB limit keeps a
-    # robust margin over that variance; raw (275 KB) stays the headroom guard.
+    # table + receive-only binding), then 76 -> 77 KB for the #54 file-input
+    # runtime picker/update path. NB: this gzipped metric is platform-variant
+    # (R's memCompress zlib differs by OS), so sub-100-byte margins cannot be
+    # measured reliably across local/CI. Raw (275 KB) stays the headroom guard.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 76,
+    limit_kb = 77,
     metric = "gzipped",
     group = "runtime"
   ),

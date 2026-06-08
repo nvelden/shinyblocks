@@ -2,7 +2,7 @@
 
 ## 0.0.0.9002
 
-## New features
+### New features
 
 * Added `block_file_input()` (issue #54), a shadcn-styled file picker that reuses Shiny's native file upload binding so `input$<id>` remains the standard upload data frame with `name`, `size`, `type`, and `datapath`. The v1 control supports `multiple`, `accept`, disabled/invalid states, custom button/placeholder text, an upload progress bar, and the showcase/docs-site playgrounds. The native input is kept out of the tab order so the styled button is the sole tab stop.
 
@@ -79,7 +79,7 @@
   Lyra shell rules remain explicit neutral entries because the current shared
   shell radius bindings already compute to `0px` under the default profile.
 
-## Internal
+### Internal
 
 * Factored the shared flat/translucent-surface recipe duplicated by the `luma` and `rhea` style profiles into two internal helpers in `R/style-profiles.R` (issue #47): `style_translucent_surface_tokens()` (borderless controls on a color-mixed `--input` surface) and `style_foreground_ring_tokens()` (transparent borders plus the 1px foreground-ring elevation). Both profiles now compose them via `c(list(...), helper(), helper())` instead of copy-pasting the recipe a second time; the per-profile `value_box_shadow` (Luma's explicit drop shadow vs Rhea's var-based recipe) is a required argument of `style_foreground_ring_tokens()`, so a profile that composes the recipe cannot forget to set it. The emitted `--sb-*` token set for both profiles is unchanged. Taught the style-registry parser (`tools/theme/style-registry.mjs`) to resolve these spliced helper calls so the profile-parity sweep still sees every token, and added browser-free unit tests for the parser (`tools/theme/style-registry.test.mjs`, `npm run test:style-registry`, wired into `make check-slice`) so a parser regression is caught without the showcase browser gate. A future translucent profile reuses the helpers rather than copy-pasting a third time.
 * Began issue #41's refactor slice by adding shared `local_input_message_session()` and `local_custom_message_session()` test helpers, then converting `test-utils.R` updater tests away from repeated fake Shiny session capture blocks. This keeps updater assertions focused on the message target and payload while preserving the existing public API behavior.
@@ -104,7 +104,7 @@
 * Collapsed the ten copy-pasted Shiny input bindings in `frontend/src/runtime/bindings.js` into a single `makeRuntimeBinding()` factory driven by a config array (issue #26). Adding a new runtime input component is now a config entry rather than ~70 lines of boilerplate; the per-component `register*Binding`, `bind*Root`, and `unbind*Root` helpers are gone, and the dispatcher if-ladders collapse to a single `Shiny.bindAll` / `unbindAll` call.
 * Extracted the session validation, `runtime_mount_id()` lookup, and `sendInputMessage()` boilerplate from every `update_block_*()` into a shared `runtime_input_update()` helper (issue #27). Each updater now only assembles its own payload fields.
 
-## Other changes
+### Other changes
 
 * Added `update_block_tabs()` so Shiny servers can select the active `block_tabs()` value, and exposed the new server-update flow in the Tabs showcase.
 * Added Rhea and feedback-state theme extensions (issue #36). `block_style("rhea")` ports the official compact-Luma Radix profile through the lean profile-data model, with scoped CSS limited to structural geometry. `block_alert()` and `block_badge()` now accept `success`, `warning`, and `info` variants backed by additive shinyblocks surface/foreground/border tokens; `block_theme()` accepts those tokens plus `destructive-border`. Synced the vendored neutral dark scaffold to the official shadcn theming docs as of 2026-06-02, completed chart/radius Tailwind mappings, and added a deterministic shell/runtime token-drift audit.
