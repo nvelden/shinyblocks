@@ -258,6 +258,14 @@ ui <- block_page(
             "UI Definition"
           ),
           uiOutput("showcase_table_preview_code")
+        ),
+        uiOutput("showcase_table_preview_value"),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "Server Action"
+          ),
+          uiOutput("showcase_table_reactive_code")
         )
       )
     )
@@ -266,9 +274,58 @@ ui <- block_page(
 
 server <- function(input, output, session) {
   rv_loading <- reactiveVal(FALSE)
+  reactive_code <- reactiveVal(paste0(
+    "# Click a server action button to see\n",
+    "# the update_block_table() code here."
+  ))
+
   observeEvent(input$showcase_table_act_loading, {
     rv_loading(!rv_loading())
+    reactive_code(paste0(
+      "update_block_table(\n",
+      "  session = session,\n",
+      "  id = \"showcase_table_live\",\n",
+      "  loading = ", if (rv_loading()) "TRUE" else "FALSE", "\n",
+      ")"
+    ))
   }, ignoreInit = TRUE)
+
+  output$showcase_table_preview_value <- showcase_render_code({
+    fmt <- function(v) {
+      if (is.null(v) || length(v) == 0) {
+        return("integer(0)")
+      }
+      paste0("c(", paste(v, collapse = ", "), ")")
+    }
+    selection <- input$showcase_table_doc_selection %||% "none"
+    if (identical(selection, "none")) {
+      return(paste0(
+        "input$showcase_table_live = <NULL>\n",
+        "# selection = \"none\": the table is receive-only\n",
+        "# and reports no input value. Switch selection\n",
+        "# to \"single\" or \"multiple\" to make it reactive."
+      ))
+    }
+    cell <- input$showcase_table_live_cell_clicked
+    cell_str <- if (is.null(cell)) {
+      "NULL"
+    } else {
+      sprintf("list(row = %s, col = %s, value = \"%s\")", cell$row, cell$col, cell$value)
+    }
+    paste0(
+      "input$showcase_table_live = ", fmt(input$showcase_table_live), "\n",
+      "input$showcase_table_live_rows_selected = ", fmt(input$showcase_table_live_rows_selected), "\n",
+      "input$showcase_table_live_row_last_clicked = ",
+      input$showcase_table_live_row_last_clicked %||% "NULL", "\n",
+      "input$showcase_table_live_cell_clicked = ", cell_str
+    )
+  })
+  outputOptions(output, "showcase_table_preview_value", suspendWhenHidden = FALSE)
+
+  output$showcase_table_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  outputOptions(output, "showcase_table_reactive_code", suspendWhenHidden = FALSE)
 
   # Shared data + formatting spec. Feeds both the one-time block_table() mount
   # and every update_block_table() push, so the playground dogfoods the reactive
