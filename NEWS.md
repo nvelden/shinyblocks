@@ -4,6 +4,8 @@
 
 ## New features
 
+* Added `block_file_input()` (issue #54), a shadcn-styled file picker that reuses Shiny's native file upload binding so `input$<id>` remains the standard upload data frame with `name`, `size`, `type`, and `datapath`. The v1 control supports `multiple`, `accept`, disabled/invalid states, custom button/placeholder text, and the showcase/docs-site playgrounds.
+
 * `block_table()` gained optional DT-style row selection. Set
   `selection = "single"` or `"multiple"` (default `"none"`) to make rows
   clickable; the table then reports its selection to the server through
@@ -67,6 +69,13 @@
   `glass` exploration remain as future custom-style infrastructure, but no
   built-in `glass` profile ships because there is no official upstream
   `style-glass.css`.
+
+* Improved Lyra style-profile structural parity. The compact official
+  `style-lyra.css` profile now applies slider track/thumb geometry and compact
+  square shell-family rules for tabs, nav, sidebar toggle, fieldset, and input
+  groups. The style-profile parity registry now measures Lyra slider response;
+  Lyra shell rules remain explicit neutral entries because the current shared
+  shell radius bindings already compute to `0px` under the default profile.
 
 ## Internal
 

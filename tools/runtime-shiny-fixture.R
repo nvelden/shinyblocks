@@ -39,7 +39,9 @@ module_ui <- function(id) {
       binding = list(input = TRUE),
       mount_id = ns("runtime-choice")
     ),
-    shiny::verbatimTextOutput(ns("value"))
+    block_file_input(ns("upload"), button_label = "Module upload"),
+    shiny::verbatimTextOutput(ns("value")),
+    shiny::verbatimTextOutput(ns("upload_value"))
   )
 }
 
@@ -153,6 +155,19 @@ ui <- shiny::fluidPage(
     id = "runtime_button",
     class = "runtime-button-fixture"
   ),
+  block_file_input(
+    "runtime_file_input",
+    accept = c(".txt", "text/plain"),
+    button_label = "Upload fixture",
+    placeholder = "No fixture selected",
+    class = "runtime-file-input-fixture"
+  ),
+  block_file_input(
+    "runtime_file_disabled",
+    button_label = "Disabled upload",
+    disabled = TRUE,
+    class = "runtime-file-disabled-fixture"
+  ),
   block_table(
     data.frame(name = "alpha", value = 1, stringsAsFactors = FALSE),
     id = "runtime_table",
@@ -184,6 +199,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_slider_value"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
+  shiny::verbatimTextOutput("runtime_file_input_value"),
   shiny::verbatimTextOutput("runtime_popover_value"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
@@ -277,6 +293,18 @@ server <- function(input, output, session) {
       return("<NULL>")
     }
     paste(class(value), collapse = ",")
+  })
+  output$runtime_file_input_value <- shiny::renderText({
+    value <- input$runtime_file_input
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    sprintf(
+      "name=%s cols=%s rows=%s",
+      paste(value$name, collapse = ","),
+      paste(names(value), collapse = ","),
+      nrow(value)
+    )
   })
   output$runtime_popover_value <- shiny::renderText({
     value <- input$runtime_popover
@@ -502,6 +530,13 @@ server <- function(input, output, session) {
 
   shiny::moduleServer("mod", function(input, output, session) {
     output$value <- shiny::renderText(input$choice %||% "<NULL>")
+    output$upload_value <- shiny::renderText({
+      value <- input$upload
+      if (is.null(value)) {
+        return("<NULL>")
+      }
+      paste(value$name, collapse = ",")
+    })
   })
 }
 

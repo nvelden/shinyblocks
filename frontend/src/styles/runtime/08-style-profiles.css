@@ -228,3 +228,24 @@
   width: 1rem;
   height: 1rem;
 }
+
+/*
+ * Lyra style profile. Radius/sizing/elevation values live in R/style-profiles.R;
+ * these rules cover structural slider geometry from official style-lyra.css
+ * that cannot yet be represented by a shared token.
+ */
+[data-sb-style="lyra"] [data-shinyblocks-root] .sb-slider-track {
+  height: 0.25rem;
+}
+
+[data-sb-style="lyra"] [data-shinyblocks-root] .sb-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-color: var(--ring);
+  box-shadow: none;
+}
+
+[data-sb-style="lyra"] [data-shinyblocks-root] .sb-slider-thumb:hover,
+[data-sb-style="lyra"] [data-shinyblocks-root] .sb-slider-thumb:focus-visible {
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--ring) 50%, transparent);
+}

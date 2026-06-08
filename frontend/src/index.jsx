@@ -31,6 +31,7 @@ import { Code } from "./components/code.jsx";
 import { Dialog } from "./components/dialog.jsx";
 import { Popover } from "./components/popover.jsx";
 import { Checkbox } from "./components/checkbox.jsx";
+import { FileInput } from "./components/file-input.jsx";
 import { Input } from "./components/input.jsx";
 import { RadioGroup } from "./components/radio-group.jsx";
 import { Select } from "./components/select.jsx";
@@ -61,6 +62,7 @@ const COMPONENTS = {
   popover: Popover,
   tooltip: Tooltip,
   checkbox: Checkbox,
+  "file-input": FileInput,
   switch: Switch,
   textarea: Textarea,
   input: Input,

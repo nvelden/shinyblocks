@@ -102,6 +102,14 @@ htmltools::div(
       shinyblocks::block_badge("Updating", variant = "secondary"),
       shinyblocks::block_badge("Loading", variant = "outline")
     ),
+
+    # File upload
+    shinyblocks::block_file_input(
+      input_id = "gallery_upload",
+      button_label = "Upload",
+      placeholder = "Attach CSV",
+      accept = c(".csv", "text/csv")
+    ),
     
     # Send message input
     shinyblocks::block_input(input_id = "msg_input", placeholder = "+ Send a message..."),

@@ -80,6 +80,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-empty-default", property: "color", token: "--card-foreground" }
     ]
   },
+  "file-input": {
+    section: "file_input",
+    bindings: [
+      { selector: ".sb-parity-file-input[data-slot='file-input-control']", property: "backgroundColor", token: "--background" },
+      { selector: ".sb-parity-file-input [data-slot='file-input-text']", property: "color", token: "--muted-foreground" }
+    ]
+  },
   input: {
     section: "input",
     bindings: [

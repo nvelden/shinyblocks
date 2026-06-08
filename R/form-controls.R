@@ -189,6 +189,79 @@ block_input <- function(
   )
 }
 
+#' Create a styled file input
+#'
+#' Runtime-rendered file picker that delegates upload transport and progress to
+#' Shiny's native file upload binding. The server receives the same
+#' `input$<id>` data frame as `shiny::fileInput()`.
+#'
+#' @param input_id Input id.
+#' @param multiple Whether to allow selecting more than one file.
+#' @param accept Optional character vector of accepted MIME types or file
+#'   extensions. Values are comma-joined for the native `accept` attribute.
+#' @param button_label Text shown on the picker button.
+#' @param placeholder Text shown before a file is selected.
+#' @param width Optional CSS width value (applied to the wrapper).
+#' @param disabled Whether the control is disabled.
+#' @param invalid Whether the control should show invalid styling
+#'   (sets `aria-invalid="true"`).
+#' @param style Inline CSS styles for the visible control.
+#' @param class Additional classes for the visible control.
+#'
+#' @return An `htmltools` tag.
+#' @family forms
+#' @export
+block_file_input <- function(
+  input_id,
+  multiple = FALSE,
+  accept = NULL,
+  button_label = "Browse",
+  placeholder = "No file selected",
+  width = NULL,
+  disabled = FALSE,
+  invalid = FALSE,
+  style = NULL,
+  class = NULL
+) {
+  validate_input_id(input_id)
+  if (!is.null(accept) && (!is.character(accept) || any(is.na(accept)))) {
+    stop("`accept` must be NULL or a character vector.", call. = FALSE)
+  }
+
+  accept_value <- if (is.null(accept)) {
+    NULL
+  } else {
+    paste(accept[nzchar(accept)], collapse = ",")
+  }
+  if (!is.null(accept_value) && !nzchar(accept_value)) accept_value <- NULL
+
+  wrapper_style <- normalize_width_style(width)
+  native_input <- native_file_input(
+    input_id,
+    multiple = isTRUE(multiple),
+    accept = accept_value,
+    disabled = isTRUE(disabled)
+  )
+
+  runtime_component(
+    component = "file-input",
+    props = list(
+      buttonLabel = as.character(button_label %||% ""),
+      placeholder = as.character(placeholder %||% ""),
+      multiple = isTRUE(multiple),
+      accept = accept_value,
+      disabled = isTRUE(disabled),
+      invalid = isTRUE(invalid),
+      style = normalize_runtime_style(style)
+    ),
+    input_id = NULL,
+    class = class,
+    style = wrapper_style,
+    root_class = "sb-file-input",
+    children = list(native_input)
+  )
+}
+
 #' Update a runtime text input
 #'
 #' @param session Shiny session. Defaults to the current reactive domain.

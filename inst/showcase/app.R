@@ -9,6 +9,7 @@ source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
 source(file.path("R", "server_popover.R"), local = TRUE)
 source(file.path("R", "server_textarea.R"), local = TRUE)
+source(file.path("R", "server_file_input.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
@@ -173,6 +174,17 @@ sections <- list(
       "placeholder/rows/disabled/invalid state, and update_block_textarea() server updates."
     ),
     file = "textarea.R"
+  ),
+  list(
+    id = "file_input",
+    label = "File input",
+    icon = "upload",
+    title = "File input",
+    lead = paste(
+      "Styled file picker that delegates upload transport to Shiny's native",
+      "file upload binding, preserving the standard input data frame."
+    ),
+    file = "file_input.R"
   ),
   list(
     id = "input",
@@ -450,6 +462,7 @@ server <- function(input, output, session) {
   register_select_showcase(input, output, session)
   register_checkbox_showcase(input, output, session)
   register_textarea_showcase(input, output, session)
+  register_file_input_showcase(input, output, session)
   register_input_showcase(input, output, session)
   register_radio_group_showcase(input, output, session)
   register_switch_showcase(input, output, session)

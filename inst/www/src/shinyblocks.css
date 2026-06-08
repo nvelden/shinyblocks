@@ -637,6 +637,56 @@
   }
 
   /*
+   * Lyra shell families. Lyra is compact and square; shared sizing/radius tokens
+   * come from R/style-profiles.R, while shell-only primitives need scoped CSS.
+   */
+  [data-sb-style="lyra"] .sb-tabs-list {
+    height: 2rem;
+    border-radius: 0;
+    padding: 3px;
+  }
+
+  [data-sb-style="lyra"] .sb-tabs-trigger {
+    height: 1.625rem;
+    border-radius: 0;
+    padding-left: 0.375rem;
+    padding-right: 0.375rem;
+  }
+
+  [data-sb-style="lyra"] .sb-tabs-list[data-variant="line"],
+  [data-sb-style="lyra"] .sb-tabs-trigger[data-variant="line"] {
+    border-radius: 0;
+  }
+
+  [data-sb-style="lyra"] .sb-nav-item {
+    border-radius: 0;
+    min-height: 2rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  [data-sb-style="lyra"] .sb-sidebar-toggle {
+    border-radius: 0;
+  }
+
+  [data-sb-style="lyra"] .sb-field-set {
+    border-radius: 0;
+    padding: 1rem;
+  }
+
+  [data-sb-style="lyra"] .sb-input-group {
+    min-height: 2rem;
+    border-radius: 0;
+  }
+
+  [data-sb-style="lyra"] .sb-input-group-addon {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /*
    * Rhea shell families. Rhea keeps Luma's soft surfaces but tightens density
    * for focused product interfaces.
    */
