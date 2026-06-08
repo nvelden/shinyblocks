@@ -70,6 +70,13 @@
   built-in `glass` profile ships because there is no official upstream
   `style-glass.css`.
 
+* Improved Lyra style-profile structural parity. The compact official
+  `style-lyra.css` profile now applies slider track/thumb geometry and compact
+  square shell-family rules for tabs, nav, sidebar toggle, fieldset, and input
+  groups. The style-profile parity registry now measures Lyra slider response;
+  Lyra shell rules remain explicit neutral entries because the current shared
+  shell radius bindings already compute to `0px` under the default profile.
+
 ## Internal
 
 * Factored the shared flat/translucent-surface recipe duplicated by the `luma` and `rhea` style profiles into two internal helpers in `R/style-profiles.R` (issue #47): `style_translucent_surface_tokens()` (borderless controls on a color-mixed `--input` surface) and `style_foreground_ring_tokens()` (transparent borders plus the 1px foreground-ring elevation). Both profiles now compose them via `c(list(...), helper(), helper())` instead of copy-pasting the recipe a second time; the per-profile `value_box_shadow` (Luma's explicit drop shadow vs Rhea's var-based recipe) is a required argument of `style_foreground_ring_tokens()`, so a profile that composes the recipe cannot forget to set it. The emitted `--sb-*` token set for both profiles is unchanged. Taught the style-registry parser (`tools/theme/style-registry.mjs`) to resolve these spliced helper calls so the profile-parity sweep still sees every token, and added browser-free unit tests for the parser (`tools/theme/style-registry.test.mjs`, `npm run test:style-registry`, wired into `make check-slice`) so a parser regression is caught without the showcase browser gate. A future translucent profile reuses the helpers rather than copy-pasting a third time.

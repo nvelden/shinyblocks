@@ -205,7 +205,12 @@ Full structural parity for switch/slider metrics, radio checked-fill models,
 shell-family geometry, text transform/letter spacing, and border-width
 differences remains follow-up work. The parity registry records those
 token-only gaps as explicit neutral entries so they are visible rather than
-silently skipped.
+silently skipped. Lyra has started moving beyond token-only coverage: slider
+track/thumb geometry is now measured in the parity registry, and compact square
+shell-family rules for tabs, nav, sidebar toggle, fieldset, and input groups are
+ported as scoped CSS. The shell rules stay neutral in the current registry
+because its shared shell radius bindings already compute to `0px` under the
+default profile.
 
 ## Conformance and parity (Slice 5)
 

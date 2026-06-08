@@ -131,7 +131,6 @@ export const STYLE_REGISTRY = {
   slider: {
     section: "slider",
     neutralProfiles: {
-      lyra: "Lyra is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
       maia: "Maia is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
       mira: "Mira is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
       nova: "Nova is token-only for slider in this slice; slider-specific track/thumb geometry CSS is not ported yet.",
@@ -229,7 +228,7 @@ export const STYLE_REGISTRY = {
   nav: {
     section: "nav-item",
     neutralProfiles: {
-      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      lyra: "Lyra shell-family structural CSS is ported for compact square nav, but this registry's shared radius binding is unchanged because the default computed shell radius is already 0px.",
       maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
       mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
       nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
@@ -243,7 +242,7 @@ export const STYLE_REGISTRY = {
   sidebar: {
     section: "layout",
     neutralProfiles: {
-      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      lyra: "Lyra shell-family structural CSS is ported for compact square sidebar toggle, but this registry's shared radius binding is unchanged because the default computed shell radius is already 0px.",
       maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
       mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
       nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
@@ -255,7 +254,7 @@ export const STYLE_REGISTRY = {
   tabs: {
     section: "tabs",
     neutralProfiles: {
-      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      lyra: "Lyra shell-family structural CSS is ported for compact square tabs, but this registry's shared radius binding is unchanged because the default computed shell radius is already 0px.",
       maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
       mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
       nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
@@ -281,7 +280,7 @@ export const STYLE_REGISTRY = {
   "input-group": {
     section: "input-group",
     neutralProfiles: {
-      lyra: "Lyra shell-family structural CSS is not ported in this token-only slice.",
+      lyra: "Lyra shell-family structural CSS is ported for compact square input groups, but this registry's shared radius binding is unchanged because the default computed shell radius is already 0px.",
       maia: "Maia shell-family structural CSS is not ported in this token-only slice.",
       mira: "Mira shell-family structural CSS is not ported in this token-only slice.",
       nova: "Nova shell-family structural CSS is not ported in this token-only slice.",
