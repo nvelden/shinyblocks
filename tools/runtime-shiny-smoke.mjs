@@ -249,6 +249,139 @@ try {
     "disabled file input should disable the visible trigger"
   );
 
+  // Dropzone variant: a synthetic drop builds a DataTransfer, assigns
+  // native.files, and dispatches `change` so Shiny's upload binding fires.
+  const dropFiles = (selector, files) =>
+    page.evaluate(
+      ({ selector, files }) => {
+        const el = document.querySelector(selector);
+        if (!el) throw new Error(`drop target not found: ${selector}`);
+        const dt = new DataTransfer();
+        files.forEach((f) => dt.items.add(new File([f.content], f.name, { type: f.type })));
+        el.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
+      },
+      { selector, files }
+    );
+
+  await assertText(page, "#runtime_file_dropzone_value", "<NULL>");
+  await dropFiles(".runtime-file-dropzone-fixture", [
+    { name: "dropped.txt", type: "text/plain", content: "dropzone fixture\n" }
+  ]);
+  await assertText(
+    page,
+    "#runtime_file_dropzone_value",
+    "name=dropped.txt cols=name,size,type,datapath rows=1"
+  );
+  await assertText(
+    page,
+    ".runtime-file-dropzone-fixture [data-slot='file-input-text']",
+    "dropped.txt"
+  );
+
+  // Rejected drop (accept mismatch) leaves the prior value unchanged and pulses
+  // the reject state instead of dispatching a new upload.
+  await dropFiles(".runtime-file-dropzone-fixture", [
+    { name: "nope.png", type: "image/png", content: "x" }
+  ]);
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector(".runtime-file-dropzone-fixture")?.getAttribute("data-reject")
+    ),
+    "true",
+    "rejected drop should flash the reject state"
+  );
+  await assertText(
+    page,
+    "#runtime_file_dropzone_value",
+    "name=dropped.txt cols=name,size,type,datapath rows=1"
+  );
+
+  // Disabled dropzone ignores drops entirely (no native file assignment).
+  await dropFiles(".runtime-file-dropzone-disabled-fixture", [
+    { name: "ignored.txt", type: "text/plain", content: "y" }
+  ]);
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector("#runtime_file_dropzone_disabled")?.files?.length ?? -1
+    ),
+    0,
+    "disabled dropzone drop should be a no-op"
+  );
+
+  // dragover must always cancel the browser default — otherwise a real OS file
+  // drop navigates the page instead of being safely ignored. The drop handler
+  // bypasses this requirement, so assert it directly. A disabled dropzone still
+  // cancels the default but does NOT enter the dragover (highlight) state.
+  const dispatchDragOver = (selector) =>
+    page.evaluate((selector) => {
+      const el = document.querySelector(selector);
+      if (!el) throw new Error(`dragover target not found: ${selector}`);
+      const evt = new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer()
+      });
+      // defaultPrevented is observable synchronously; the data-dragover
+      // attribute lags a React render tick, so callers poll for it separately.
+      return !el.dispatchEvent(evt);
+    }, selector);
+
+  assert.equal(
+    await dispatchDragOver(".runtime-file-dropzone-fixture"),
+    true,
+    "enabled dropzone dragover should cancel default"
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".runtime-file-dropzone-fixture")?.getAttribute("data-dragover") ===
+      "true"
+  );
+
+  assert.equal(
+    await dispatchDragOver(".runtime-file-dropzone-disabled-fixture"),
+    true,
+    "disabled dropzone dragover should still cancel default"
+  );
+  assert.equal(
+    await page.evaluate(
+      () =>
+        document
+          .querySelector(".runtime-file-dropzone-disabled-fixture")
+          ?.getAttribute("data-dragover")
+    ),
+    null,
+    "disabled dropzone dragover should not set data-dragover"
+  );
+
+  // Custom-content dropzone: the drop bridge still reaches input$<id> while the
+  // surface is a drop region rather than a button.
+  await assertText(page, "#runtime_file_dropzone_custom_value", "<NULL>");
+  await dropFiles(".runtime-file-dropzone-custom-fixture", [
+    { name: "custom.txt", type: "text/plain", content: "custom drop\n" }
+  ]);
+  await assertText(
+    page,
+    "#runtime_file_dropzone_custom_value",
+    "name=custom.txt cols=name,size,type,datapath rows=1"
+  );
+
+  // Browse opens only from the explicit [data-dropzone-trigger]; a plain surface
+  // click is inert (no nested-button double-trigger). Spy on native.click().
+  const triggerClicks = await page.evaluate(() => {
+    const native = document.querySelector("#runtime_file_dropzone_custom");
+    let count = 0;
+    native.click = () => {
+      count += 1;
+    };
+    const surface = document.querySelector(".runtime-file-dropzone-custom-fixture");
+    surface.querySelector("strong").click(); // non-trigger element -> inert
+    const afterInert = count;
+    document.querySelector("#runtime_file_dropzone_custom_trigger").click(); // trigger -> opens picker
+    return { afterInert, afterTrigger: count };
+  });
+  assert.equal(triggerClicks.afterInert, 0, "non-trigger surface click should not open the picker");
+  assert.equal(triggerClicks.afterTrigger, 1, "clicking [data-dropzone-trigger] should open the picker");
+
   await assertText(
     page,
     "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",

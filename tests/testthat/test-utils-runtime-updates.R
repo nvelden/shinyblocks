@@ -218,8 +218,11 @@ test_that("update_block_file_input targets the file-input mount and never notifi
     update_block_file_input(
       capture$session,
       "upload",
+      variant = "dropzone",
       button_label = "Choose",
       placeholder = "Pick a file",
+      dropzone_label = "Drop it",
+      dropzone_hint = "CSV only",
       accept = c(".csv", "text/csv"),
       multiple = TRUE,
       disabled = TRUE,
@@ -232,8 +235,11 @@ test_that("update_block_file_input targets the file-input mount and never notifi
 
   message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-file-input-upload")
+  expect_identical(message$payload$variant, "dropzone")
   expect_identical(message$payload$buttonLabel, "Choose")
   expect_identical(message$payload$placeholder, "Pick a file")
+  expect_identical(message$payload$dropzoneLabel, "Drop it")
+  expect_identical(message$payload$dropzoneHint, "CSV only")
   expect_identical(message$payload$accept, ".csv,text/csv")
   expect_identical(message$payload$multiple, TRUE)
   expect_identical(message$payload$disabled, TRUE)
@@ -256,4 +262,36 @@ test_that("update_block_file_input clears accept and validates it", {
     update_block_file_input(capture$session, "upload", accept = 1),
     "`accept` must be NULL or a character vector"
   )
+})
+
+test_that("update_block_file_input sets dropzone icon name and content html", {
+  capture <- local_input_message_session()
+
+  update_block_file_input(
+    capture$session,
+    "upload",
+    dropzone_icon = "upload",
+    dropzone_content = htmltools::tags$strong("Drop")
+  )
+  payload <- capture$last_payload()
+  expect_identical(payload$dropzoneIconName, "upload")
+  expect_null(payload$dropzoneIconHtml)
+  expect_true(nzchar(payload$spriteHref))
+  expect_match(payload$dropzoneContentHtml, "<strong>Drop</strong>", fixed = TRUE)
+})
+
+test_that("update_block_file_input clears dropzone icon and content", {
+  capture <- local_input_message_session()
+
+  update_block_file_input(
+    capture$session,
+    "upload",
+    dropzone_icon = NULL,
+    dropzone_content = NULL
+  )
+  payload <- capture$last_payload()
+  expect_true("dropzoneIconName" %in% names(payload))
+  expect_null(payload$dropzoneIconName)
+  expect_true("dropzoneContentHtml" %in% names(payload))
+  expect_null(payload$dropzoneContentHtml)
 })

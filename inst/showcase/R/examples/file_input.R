@@ -4,12 +4,42 @@ htmltools::tagList(
       showcase_controls_group(
         "Content", first = TRUE,
         block_field(
+          block_field_label("variant", `for` = "showcase_file_input_doc_variant"),
+          block_select(
+            "showcase_file_input_doc_variant",
+            choices = c(button = "button", dropzone = "dropzone"),
+            selected = "button",
+            size = "sm"
+          )
+        ),
+        block_field(
           block_field_label("button label", `for` = "showcase_file_input_doc_button_label"),
           block_input("showcase_file_input_doc_button_label", value = "Browse")
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
           block_input("showcase_file_input_doc_placeholder", value = "No file selected")
+        ),
+        block_field(
+          block_field_label("dropzone label", `for` = "showcase_file_input_doc_dropzone_label"),
+          block_input("showcase_file_input_doc_dropzone_label", value = "Drag files here or click to browse")
+        ),
+        block_field(
+          block_field_label("dropzone hint", `for` = "showcase_file_input_doc_dropzone_hint"),
+          block_input("showcase_file_input_doc_dropzone_hint", value = "CSV up to 10MB", placeholder = "optional hint")
+        ),
+        block_field(
+          block_field_label("dropzone icon", `for` = "showcase_file_input_doc_dropzone_icon"),
+          block_select(
+            "showcase_file_input_doc_dropzone_icon",
+            choices = c(none = "none", upload = "upload", file = "file", image = "image"),
+            selected = "upload",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("custom content", `for` = "showcase_file_input_doc_dropzone_content"),
+          block_checkbox("showcase_file_input_doc_dropzone_content", "Use custom dropzone_content (icon + title + button)", value = FALSE)
         ),
         block_field(
           block_field_label("accept", `for` = "showcase_file_input_doc_accept"),
@@ -35,7 +65,11 @@ htmltools::tagList(
         "Actions (Server Update)",
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
+          showcase_action_button("showcase_file_input_to_button", "Switch to button"),
           showcase_action_button("showcase_file_input_relabel", "Relabel button"),
+          showcase_action_button("showcase_file_input_set_content", "Set custom content"),
+          showcase_action_button("showcase_file_input_clear_content", "Clear custom content"),
           showcase_action_button("showcase_file_input_disable", "Disable"),
           showcase_action_button("showcase_file_input_enable", "Enable"),
           showcase_action_button("showcase_file_input_mark_invalid", "Mark invalid"),
@@ -89,6 +123,17 @@ htmltools::tagList(
       button_label = "Upload",
       placeholder = "No upload",
       class = "sb-parity-file-input"
+    )
+  ),
+  htmltools::div(
+    style = "max-width: 320px; margin-top: 0.75rem;",
+    block_file_input(
+      "sb_parity_file_dropzone",
+      variant = "dropzone",
+      dropzone_icon = "upload",
+      dropzone_label = "Drop files",
+      dropzone_hint = "Parity fixture",
+      class = "sb-parity-file-dropzone"
     )
   )
 )

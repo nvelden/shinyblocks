@@ -7,8 +7,13 @@
 update_block_file_input(
   session = shiny::getDefaultReactiveDomain(),
   input_id,
+  variant,
   button_label,
   placeholder,
+  dropzone_label,
+  dropzone_hint,
+  dropzone_icon,
+  dropzone_content,
   accept,
   multiple,
   disabled,
@@ -23,9 +28,25 @@ update_block_file_input(
 
 \item{input_id}{Input id passed to \code{block_file_input()}.}
 
+\item{variant}{Optional replacement variant. One of \code{"button"} or
+\code{"dropzone"}.}
+
 \item{button_label}{Optional replacement button text.}
 
 \item{placeholder}{Optional replacement placeholder text.}
+
+\item{dropzone_label}{Optional replacement dropzone label. Use \code{NULL} to
+clear.}
+
+\item{dropzone_hint}{Optional replacement dropzone hint. Use \code{NULL} to
+clear.}
+
+\item{dropzone_icon}{Optional replacement dropzone icon (name string or
+\code{htmltools} tag). Use \code{NULL} to clear.}
+
+\item{dropzone_content}{Optional replacement dropzone interior
+(\code{htmltools} tag/\code{tagList}). Use \code{NULL} to clear and restore the default
+icon/label/hint stack.}
 
 \item{accept}{Optional replacement accepted types. Use \code{NULL} to clear.}
 
