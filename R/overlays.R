@@ -112,26 +112,17 @@ update_block_dialog <- function(
   style,
   notify = TRUE
 ) {
-  payload <- list()
+  html_or_null <- function(value) if (is.null(value)) NULL else html_fragment(value)
 
-  if (!missing(open)) {
-    payload <- payload_set_if_present(payload, "open", open, isTRUE)
-  }
-  if (!missing(title)) {
-    payload <- payload_set_if_present(
-      payload, "titleHtml", title,
-      function(value) if (is.null(value)) NULL else html_fragment(value)
-    )
-  }
-  if (!missing(description)) {
-    payload <- payload_set_if_present(
-      payload, "descriptionHtml", description,
-      function(value) if (is.null(value)) NULL else html_fragment(value)
-    )
-  }
-  if (!missing(footer)) {
-    payload <- payload_set_clearable(payload, "footerHtml", footer, html_fragment)
-  }
+  payload <- apply_update_fields(list(), list(
+    field("open", transform = isTRUE),
+    field("titleHtml", "title", html_or_null),
+    field("descriptionHtml", "description", html_or_null),
+    field_clearable("footerHtml", "footer", html_fragment),
+    field_clearable("className", "class"),
+    field_style("style")
+  ))
+
   if (!missing(size)) {
     allowed <- c("default", "sm", "lg", "xl")
     if (!is.character(size) || length(size) != 1 || !(size %in% allowed)) {
@@ -144,12 +135,6 @@ update_block_dialog <- function(
       )
     }
     payload$size <- size
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "className", class)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
   }
 
   runtime_input_update(
@@ -258,31 +243,24 @@ update_block_popover <- function(
   class,
   notify = TRUE
 ) {
-  payload <- list()
+  payload <- apply_update_fields(list(), list(
+    field("open", transform = isTRUE),
+    field_clearable("bodyHtml", "body", html_fragment),
+    field_style("contentStyle", "style"),
+    field_clearable("contentClass", "class")
+  ))
 
-  if (!missing(open)) {
-    payload <- payload_set_if_present(payload, "open", open, isTRUE)
-  }
   if (!missing(trigger)) {
     if (is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
       stop("`trigger` must be a single string label.", call. = FALSE)
     }
     payload$triggerLabel <- trigger
   }
-  if (!missing(body)) {
-    payload <- payload_set_clearable(payload, "bodyHtml", body, html_fragment)
-  }
   if (!missing(side)) {
     payload$side <- match.arg(side, c("bottom", "top", "left", "right"))
   }
   if (!missing(align)) {
     payload$align <- match.arg(align, c("center", "start", "end"))
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "contentStyle", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "contentClass", class)
   }
 
   runtime_input_update(

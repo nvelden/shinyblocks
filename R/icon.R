@@ -96,16 +96,6 @@ icon_manifest_path <- function() {
   path
 }
 
-icon_sprite_path <- function() {
-  path <- system.file("www", "icons", "sprite.svg", package = "shinyblocks")
-
-  if (!nzchar(path)) {
-    path <- file.path("inst", "www", "icons", "sprite.svg")
-  }
-
-  path
-}
-
 sprite_href <- function() {
   if (identical(getOption("shinyblocks.asset_mode"), "app")) {
     return("shinyblocks/icons/sprite.svg")
