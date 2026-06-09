@@ -13,5 +13,8 @@ run_showcase(...)
 The result of \code{shiny::runApp()}.
 }
 \description{
-Run the shinyblocks showcase app
+The showcase is a development-only asset: it ships in the source tree but is
+excluded from the built package tarball, so this function only works from a
+source checkout (e.g. via \code{\link[devtools:load_all]{devtools::load_all()}}). It errors with a clear
+message when the app cannot be found.
 }

@@ -2,6 +2,13 @@
 
 ## 0.0.0.9002
 
+### Other changes
+
+* The showcase app is now excluded from the built package tarball, shrinking the
+  shipped package. `run_showcase()` is a development-only helper: it works from a
+  source checkout (e.g. via `devtools::load_all()`) and errors with a clear
+  message when the asset is absent.
+
 ### New features
 
 * Added `block_file_input()` (issue #54), a shadcn-styled file picker that reuses Shiny's native file upload binding so `input$<id>` remains the standard upload data frame with `name`, `size`, `type`, and `datapath`. The v1 control supports `multiple`, `accept`, disabled/invalid states, custom button/placeholder text, an upload progress bar, and the showcase/docs-site playgrounds. The native input is kept out of the tab order so the styled button is the sole tab stop.
