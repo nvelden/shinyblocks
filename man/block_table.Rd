@@ -46,8 +46,8 @@ win via \code{table_column(digits = )}.}
 
 \item{row_format}{Optional \verb{function(row, i)} called once per rendered row,
 where \code{row} is the original (unformatted) row as a named list and \code{i} is the
-row index. Return \code{NULL} for no styling, or a list with optional \code{class}
-and/or \code{style} entries applied to that row's \verb{<tr>}.}
+row index. Return \code{NULL} for no styling, or a list with optional \code{intent},
+\code{emphasis}, \code{class}, and/or \code{style} entries applied to that row's \verb{<tr>}.}
 
 \item{striped}{Whether to zebra-stripe body rows.}
 
