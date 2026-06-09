@@ -178,11 +178,19 @@ block_input <- function(
 #' `input$<id>` data frame as `shiny::fileInput()`.
 #'
 #' @param input_id Input id.
+#' @param variant Picker variant. One of `"button"` (a styled trigger button
+#'   with filename text) or `"dropzone"` (a focusable drag-and-drop surface).
+#'   The dropzone is cosmetic chrome over the same native Shiny upload binding;
+#'   `input$<id>` is identical for both variants.
 #' @param multiple Whether to allow selecting more than one file.
 #' @param accept Optional character vector of accepted MIME types or file
 #'   extensions. Values are comma-joined for the native `accept` attribute.
 #' @param button_label Text shown on the picker button.
 #' @param placeholder Text shown before a file is selected.
+#' @param dropzone_label Primary text shown inside the dropzone surface (only
+#'   used when `variant = "dropzone"`).
+#' @param dropzone_hint Secondary hint text shown beneath `dropzone_label`
+#'   (only used when `variant = "dropzone"`).
 #' @param width Optional CSS width value (applied to the wrapper).
 #' @param disabled Whether the control is disabled.
 #' @param invalid Whether the control should show invalid styling
@@ -195,10 +203,13 @@ block_input <- function(
 #' @export
 block_file_input <- function(
   input_id,
+  variant = c("button", "dropzone"),
   multiple = FALSE,
   accept = NULL,
   button_label = "Browse",
   placeholder = "No file selected",
+  dropzone_label = "Drag files here or click to browse",
+  dropzone_hint = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -206,6 +217,7 @@ block_file_input <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
+  variant <- match_arg(variant, c("button", "dropzone"))
   check_character(
     accept, "accept", null_ok = TRUE,
     msg = "`accept` must be NULL or a character vector."
@@ -229,8 +241,11 @@ block_file_input <- function(
   runtime_component(
     component = "file-input",
     props = list(
+      variant = variant,
       buttonLabel = as.character(button_label %||% ""),
       placeholder = as.character(placeholder %||% ""),
+      dropzoneLabel = if (is.null(dropzone_label)) NULL else as.character(dropzone_label),
+      dropzoneHint = if (is.null(dropzone_hint)) NULL else as.character(dropzone_hint),
       multiple = isTRUE(multiple),
       accept = accept_value,
       disabled = isTRUE(disabled),
@@ -259,8 +274,14 @@ block_file_input <- function(
 #'
 #' @param session Shiny session. Defaults to the current reactive domain.
 #' @param input_id Input id passed to `block_file_input()`.
+#' @param variant Optional replacement variant. One of `"button"` or
+#'   `"dropzone"`.
 #' @param button_label Optional replacement button text.
 #' @param placeholder Optional replacement placeholder text.
+#' @param dropzone_label Optional replacement dropzone label. Use `NULL` to
+#'   clear.
+#' @param dropzone_hint Optional replacement dropzone hint. Use `NULL` to
+#'   clear.
 #' @param accept Optional replacement accepted types. Use `NULL` to clear.
 #' @param multiple Optional flag for allowing multiple files.
 #' @param disabled Optional disabled state.
@@ -275,8 +296,11 @@ block_file_input <- function(
 update_block_file_input <- function(
   session = shiny::getDefaultReactiveDomain(),
   input_id,
+  variant,
   button_label,
   placeholder,
+  dropzone_label,
+  dropzone_hint,
   accept,
   multiple,
   disabled,
@@ -288,6 +312,8 @@ update_block_file_input <- function(
   payload <- apply_update_fields(list(), list(
     field_clearable("buttonLabel", "button_label", as.character),
     field_clearable("placeholder", transform = as.character),
+    field_clearable("dropzoneLabel", "dropzone_label", as.character),
+    field_clearable("dropzoneHint", "dropzone_hint", as.character),
     field("multiple", transform = isTRUE),
     field("disabled", transform = isTRUE),
     field("invalid", transform = isTRUE),
@@ -295,6 +321,9 @@ update_block_file_input <- function(
     field_clearable("className", "class")
   ))
 
+  if (!missing(variant)) {
+    payload$variant <- match_arg(variant, c("button", "dropzone"))
+  }
   if (!missing(accept)) {
     check_character(
       accept, "accept", null_ok = TRUE,

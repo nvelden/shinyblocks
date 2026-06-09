@@ -218,8 +218,11 @@ test_that("update_block_file_input targets the file-input mount and never notifi
     update_block_file_input(
       capture$session,
       "upload",
+      variant = "dropzone",
       button_label = "Choose",
       placeholder = "Pick a file",
+      dropzone_label = "Drop it",
+      dropzone_hint = "CSV only",
       accept = c(".csv", "text/csv"),
       multiple = TRUE,
       disabled = TRUE,
@@ -232,8 +235,11 @@ test_that("update_block_file_input targets the file-input mount and never notifi
 
   message <- capture$last_message()
   expect_identical(message$input_id, "sb-runtime-file-input-upload")
+  expect_identical(message$payload$variant, "dropzone")
   expect_identical(message$payload$buttonLabel, "Choose")
   expect_identical(message$payload$placeholder, "Pick a file")
+  expect_identical(message$payload$dropzoneLabel, "Drop it")
+  expect_identical(message$payload$dropzoneHint, "CSV only")
   expect_identical(message$payload$accept, ".csv,text/csv")
   expect_identical(message$payload$multiple, TRUE)
   expect_identical(message$payload$disabled, TRUE)

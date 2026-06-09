@@ -134,9 +134,28 @@ test_that("block_file_input emits bindable native file input markup", {
   expect_identical(payload$props$style$minHeight, "3rem")
 })
 
-test_that("block_file_input validates input id and accept values", {
+test_that("block_file_input defaults to the button variant", {
+  payload <- runtime_payload_from(block_file_input("upload"))
+  expect_identical(payload$props$variant, "button")
+})
+
+test_that("block_file_input dropzone variant emits dropzone props", {
+  file_input <- block_file_input(
+    "upload",
+    variant = "dropzone",
+    dropzone_label = "Drop here",
+    dropzone_hint = "CSV only"
+  )
+  payload <- runtime_payload_from(file_input)
+  expect_identical(payload$props$variant, "dropzone")
+  expect_identical(payload$props$dropzoneLabel, "Drop here")
+  expect_identical(payload$props$dropzoneHint, "CSV only")
+})
+
+test_that("block_file_input validates input id, accept, and variant", {
   expect_error(block_file_input(""), "`input_id` must be a non-empty string")
   expect_error(block_file_input("upload", accept = 1), "`accept` must be NULL or a character vector")
+  expect_error(block_file_input("upload", variant = "tile"), "`variant` must be one of")
 })
 
 test_that("textarea emits a runtime payload and hidden native textarea", {

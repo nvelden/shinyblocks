@@ -168,6 +168,20 @@ ui <- shiny::fluidPage(
     disabled = TRUE,
     class = "runtime-file-disabled-fixture"
   ),
+  block_file_input(
+    "runtime_file_dropzone",
+    variant = "dropzone",
+    accept = c(".txt", "text/plain"),
+    dropzone_label = "Drop fixture",
+    class = "runtime-file-dropzone-fixture"
+  ),
+  block_file_input(
+    "runtime_file_dropzone_disabled",
+    variant = "dropzone",
+    disabled = TRUE,
+    dropzone_label = "Disabled dropzone",
+    class = "runtime-file-dropzone-disabled-fixture"
+  ),
   block_table(
     data.frame(name = "alpha", value = 1, stringsAsFactors = FALSE),
     id = "runtime_table",
@@ -200,6 +214,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_file_input_value"),
+  shiny::verbatimTextOutput("runtime_file_dropzone_value"),
   shiny::verbatimTextOutput("runtime_popover_value"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
@@ -296,6 +311,18 @@ server <- function(input, output, session) {
   })
   output$runtime_file_input_value <- shiny::renderText({
     value <- input$runtime_file_input
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    sprintf(
+      "name=%s cols=%s rows=%s",
+      paste(value$name, collapse = ","),
+      paste(names(value), collapse = ","),
+      nrow(value)
+    )
+  })
+  output$runtime_file_dropzone_value <- shiny::renderText({
+    value <- input$runtime_file_dropzone
     if (is.null(value)) {
       return("<NULL>")
     }

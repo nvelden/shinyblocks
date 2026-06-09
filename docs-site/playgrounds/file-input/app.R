@@ -67,8 +67,25 @@ ui <- block_page(
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
           block_field(
+            block_field_label("variant", `for` = "showcase_file_input_doc_variant"),
+            block_select(
+              "showcase_file_input_doc_variant",
+              choices = c(button = "button", dropzone = "dropzone"),
+              selected = "button",
+              size = "sm"
+            )
+          ),
+          block_field(
             block_field_label("button label", `for` = "showcase_file_input_doc_button_label"),
             block_input("showcase_file_input_doc_button_label", value = "Browse")
+          ),
+          block_field(
+            block_field_label("dropzone label", `for` = "showcase_file_input_doc_dropzone_label"),
+            block_input("showcase_file_input_doc_dropzone_label", value = "Drag files here or click to browse")
+          ),
+          block_field(
+            block_field_label("dropzone hint", `for` = "showcase_file_input_doc_dropzone_hint"),
+            block_input("showcase_file_input_doc_dropzone_hint", value = "", placeholder = "optional hint")
           ),
           block_field(
             block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
@@ -116,9 +133,15 @@ server <- function(input, output, session) {
     accept <- accept[nzchar(accept)]
     if (!length(accept)) accept <- NULL
 
+    dz_hint <- input$showcase_file_input_doc_dropzone_hint %||% ""
+    if (!nzchar(dz_hint)) dz_hint <- NULL
+
     list(
+      variant = input$showcase_file_input_doc_variant %||% "button",
       button_label = input$showcase_file_input_doc_button_label %||% "Browse",
       placeholder = input$showcase_file_input_doc_placeholder %||% "No file selected",
+      dropzone_label = input$showcase_file_input_doc_dropzone_label %||% "Drag files here or click to browse",
+      dropzone_hint = dz_hint,
       accept = accept,
       multiple = isTRUE(input$showcase_file_input_doc_multiple),
       disabled = isTRUE(input$showcase_file_input_doc_disabled),
@@ -130,10 +153,13 @@ server <- function(input, output, session) {
     args <- file_input_args()
     block_file_input(
       "showcase_file_input_preview",
+      variant = args$variant,
       multiple = args$multiple,
       accept = args$accept,
       button_label = args$button_label,
       placeholder = args$placeholder,
+      dropzone_label = args$dropzone_label,
+      dropzone_hint = args$dropzone_hint,
       disabled = args$disabled,
       invalid = args$invalid
     )
@@ -156,6 +182,9 @@ server <- function(input, output, session) {
   output$showcase_file_input_preview_code <- showcase_render_code({
     args <- file_input_args()
     code_args <- c('input_id = "showcase_file_input_preview"')
+    if (!identical(args$variant, "button")) {
+      code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
+    }
     if (args$multiple) code_args <- c(code_args, "multiple = TRUE")
     if (!is.null(args$accept)) {
       quoted <- paste(vapply(args$accept, string_literal, character(1)), collapse = ", ")
@@ -166,6 +195,13 @@ server <- function(input, output, session) {
     }
     if (!identical(args$placeholder, "No file selected")) {
       code_args <- c(code_args, paste0("placeholder = ", string_literal(args$placeholder)))
+    }
+    if (identical(args$variant, "dropzone") &&
+          !identical(args$dropzone_label, "Drag files here or click to browse")) {
+      code_args <- c(code_args, paste0("dropzone_label = ", string_literal(args$dropzone_label)))
+    }
+    if (identical(args$variant, "dropzone") && !is.null(args$dropzone_hint)) {
+      code_args <- c(code_args, paste0("dropzone_hint = ", string_literal(args$dropzone_hint)))
     }
     if (args$disabled) code_args <- c(code_args, "disabled = TRUE")
     if (args$invalid) code_args <- c(code_args, "invalid = TRUE")

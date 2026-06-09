@@ -249,6 +249,65 @@ try {
     "disabled file input should disable the visible trigger"
   );
 
+  // Dropzone variant: a synthetic drop builds a DataTransfer, assigns
+  // native.files, and dispatches `change` so Shiny's upload binding fires.
+  const dropFiles = (selector, files) =>
+    page.evaluate(
+      ({ selector, files }) => {
+        const el = document.querySelector(selector);
+        if (!el) throw new Error(`drop target not found: ${selector}`);
+        const dt = new DataTransfer();
+        files.forEach((f) => dt.items.add(new File([f.content], f.name, { type: f.type })));
+        el.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
+      },
+      { selector, files }
+    );
+
+  await assertText(page, "#runtime_file_dropzone_value", "<NULL>");
+  await dropFiles(".runtime-file-dropzone-fixture", [
+    { name: "dropped.txt", type: "text/plain", content: "dropzone fixture\n" }
+  ]);
+  await assertText(
+    page,
+    "#runtime_file_dropzone_value",
+    "name=dropped.txt cols=name,size,type,datapath rows=1"
+  );
+  await assertText(
+    page,
+    ".runtime-file-dropzone-fixture [data-slot='file-input-text']",
+    "dropped.txt"
+  );
+
+  // Rejected drop (accept mismatch) leaves the prior value unchanged and pulses
+  // the reject state instead of dispatching a new upload.
+  await dropFiles(".runtime-file-dropzone-fixture", [
+    { name: "nope.png", type: "image/png", content: "x" }
+  ]);
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector(".runtime-file-dropzone-fixture")?.getAttribute("data-reject")
+    ),
+    "true",
+    "rejected drop should flash the reject state"
+  );
+  await assertText(
+    page,
+    "#runtime_file_dropzone_value",
+    "name=dropped.txt cols=name,size,type,datapath rows=1"
+  );
+
+  // Disabled dropzone ignores drops entirely (no native file assignment).
+  await dropFiles(".runtime-file-dropzone-disabled-fixture", [
+    { name: "ignored.txt", type: "text/plain", content: "y" }
+  ]);
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector("#runtime_file_dropzone_disabled")?.files?.length ?? -1
+    ),
+    0,
+    "disabled dropzone drop should be a no-op"
+  );
+
   await assertText(
     page,
     "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",

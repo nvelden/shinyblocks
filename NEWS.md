@@ -13,7 +13,9 @@
 
 * Added `block_file_input()` (issue #54), a shadcn-styled file picker that reuses Shiny's native file upload binding so `input$<id>` remains the standard upload data frame with `name`, `size`, `type`, and `datapath`. The v1 control supports `multiple`, `accept`, disabled/invalid states, custom button/placeholder text, an upload progress bar, and the showcase/docs-site playgrounds. The native input is kept out of the tab order so the styled button is the sole tab stop.
 
-* Added `update_block_file_input()` to change a file picker's button label, placeholder, `accept`, `multiple`, disabled/invalid states, and styling from the server, or clear the current selection with `reset = TRUE`. As with `shiny::fileInput()`, the uploaded value itself cannot be set from the server.
+* `block_file_input()` gained a `variant` argument (issue #56). `variant = "dropzone"` renders a focusable drag-and-drop surface (with `dropzone_label`/`dropzone_hint`) over the same native upload binding, so `input$<id>` is unchanged. Dropped files honor `accept` and `multiple`, disabled dropzones ignore drops, and an all-rejected drop keeps the prior selection. The default `variant = "button"` is unchanged.
+
+* Added `update_block_file_input()` to change a file picker's variant, button label, placeholder, dropzone label/hint, `accept`, `multiple`, disabled/invalid states, and styling from the server, or clear the current selection with `reset = TRUE`. As with `shiny::fileInput()`, the uploaded value itself cannot be set from the server.
 
 * `block_table()` gained optional DT-style row selection. Set
   `selection = "single"` or `"multiple"` (default `"none"`) to make rows
