@@ -38,6 +38,9 @@
 # Tailwind source — only the compiled output ships
 ^inst/www/src$
 
+# Showcase app is a dev-only asset (run_showcase() is dev-only)
+^inst/showcase$
+
 # Docs site (Next.js)
 ^docs-site$
 ^site$

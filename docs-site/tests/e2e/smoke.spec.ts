@@ -43,7 +43,8 @@ test("no console errors on landing", async ({ page }) => {
     if (m.type() === "error") errors.push(m.text());
   });
   await page.goto(PATH.home);
-  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await page.waitForTimeout(1000);
   expect(errors).toEqual([]);
 });
 

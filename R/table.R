@@ -20,8 +20,8 @@
 #' @param rownames Whether to render `row.names(data)` as a leading column.
 #' @param row_format Optional `function(row, i)` called once per rendered row,
 #'   where `row` is the original (unformatted) row as a named list and `i` is the
-#'   row index. Return `NULL` for no styling, or a list with optional `class`
-#'   and/or `style` entries applied to that row's `<tr>`.
+#'   row index. Return `NULL` for no styling, or a list with optional `intent`,
+#'   `emphasis`, `class`, and/or `style` entries applied to that row's `<tr>`.
 #' @param striped Whether to zebra-stripe body rows.
 #' @param hover Whether rows highlight on hover. Defaults to `TRUE` (shadcn base).
 #' @param bordered Whether to draw cell borders.
