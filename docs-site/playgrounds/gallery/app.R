@@ -135,17 +135,7 @@ ui <- block_page(
         "padding-bottom: 0.25rem;"
       ),
       appearance_control("Style", "gallery_style_profile", gallery_style_profiles, gallery_default_style_profile),
-      appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, gallery_default_theme_preset),
-      htmltools::div(
-        style = "flex: 0 1 16rem; min-width: 13rem; max-width: 16rem;",
-        block_file_input(
-          "gallery_upload",
-          button_label = "Upload",
-          placeholder = "Attach CSV",
-          accept = c(".csv", "text/csv"),
-          width = "100%"
-        )
-      )
+      appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, gallery_default_theme_preset)
     ),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
