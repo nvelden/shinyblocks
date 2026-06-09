@@ -138,9 +138,9 @@ ui <- block_page(
       appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, gallery_default_theme_preset)
     ),
     htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem;",
-      uiOutput("gallery_metric", style = "height: 100%;"),
-      uiOutput("gallery_budget_metric", style = "height: 100%;"),
+      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: stretch;",
+      uiOutput("gallery_metric", style = "display: flex; flex-direction: column;"),
+      uiOutput("gallery_budget_metric", style = "display: flex; flex-direction: column;"),
       metric_box(
         title = "Members",
         value = "24",
