@@ -208,29 +208,38 @@ ui <- block_page(
       # Right Column: Preview & Code Blocks
       htmltools::div(
         class = "showcase-playground__main",
-        style = "flex: 1.4; min-width: 320px; display: flex; flex-direction: column; gap: 1rem;",
-        htmltools::div(
-          style = "border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 1.25rem; background: color-mix(in oklch, var(--muted) 18%, transparent);",
-          block_field(
-            block_field_label("Upload data", `for` = "showcase_file_input_preview"),
-            uiOutput("showcase_file_input_preview_ui"),
-            block_field_description("Server value uses Shiny's native fileInput() data frame.")
+        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+        htmltools::tags$div(
+          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+          htmltools::tags$div(
+            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
+            "Preview"
+          ),
+          htmltools::tags$div(
+            style = paste(
+              "position: relative; display: flex; align-items: center; justify-content: center;",
+              "padding: 3rem 2rem; background: var(--card);",
+              "border: 1px solid var(--border); border-radius: 0.75rem;",
+              "min-height: 160px; box-sizing: border-box;",
+              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+            ),
+            uiOutput("showcase_file_input_preview_ui")
           )
         ),
         uiOutput("showcase_file_input_preview_value"),
         htmltools::tags$div(
           htmltools::tags$div(
             style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            "Server Action"
           ),
-          uiOutput("showcase_file_input_preview_code")
+          uiOutput("showcase_file_input_reactive_code")
         ),
         htmltools::tags$div(
           htmltools::tags$div(
             style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Server Action"
+            "UI Definition"
           ),
-          uiOutput("showcase_file_input_reactive_code")
+          uiOutput("showcase_file_input_preview_code")
         )
       )
     )
@@ -315,22 +324,25 @@ server <- function(input, output, session) {
 
   output$showcase_file_input_preview_ui <- renderUI({
     args <- file_input_args()
-    block_file_input(
-      "showcase_file_input_preview",
-      variant = args$variant,
-      multiple = args$multiple,
-      accept = args$accept,
-      button_label = args$button_label,
-      placeholder = args$placeholder,
-      dropzone_label = args$dropzone_label,
-      dropzone_hint = args$dropzone_hint,
-      dropzone_icon = args$dropzone_icon,
-      dropzone_content = if (args$use_content) dropzone_content_example() else NULL,
-      width = args$width,
-      disabled = args$disabled,
-      invalid = args$invalid,
-      style = args$style,
-      class = args$class
+    block_field(
+      block_field_label("Upload data", `for` = "showcase_file_input_preview"),
+      block_file_input(
+        "showcase_file_input_preview",
+        variant = args$variant,
+        multiple = args$multiple,
+        accept = args$accept,
+        button_label = args$button_label,
+        placeholder = args$placeholder,
+        dropzone_label = args$dropzone_label,
+        dropzone_hint = args$dropzone_hint,
+        dropzone_icon = args$dropzone_icon,
+        dropzone_content = if (args$use_content) dropzone_content_example() else NULL,
+        width = args$width,
+        disabled = args$disabled,
+        invalid = args$invalid,
+        style = args$style,
+        class = args$class
+      )
     )
   })
   outputOptions(output, "showcase_file_input_preview_ui", suspendWhenHidden = FALSE)
