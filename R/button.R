@@ -156,15 +156,12 @@ update_block_button <- function(
     }
     payload$spriteHref <- sprite_href()
   }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
-  }
+
+  payload <- apply_update_fields(payload, list(
+    field("disabled", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
   runtime_input_update(session, input_id, "button", payload, notify_key = NULL)
 }

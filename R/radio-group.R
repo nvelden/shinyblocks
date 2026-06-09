@@ -103,23 +103,17 @@ update_block_radio_group <- function(
     validate_select_choice_values(choices_df$value)
     payload$choices <- runtime_choice_records(choices_df)
   }
-  if (!missing(selected)) {
-    payload <- payload_set_clearable(payload, "selected", selected, as.character)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
-  }
+
+  payload <- apply_update_fields(payload, list(
+    field_clearable("selected", transform = as.character),
+    field("disabled", transform = isTRUE),
+    field("invalid", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
+
   if (!missing(orientation)) {
     payload$orientation <- match.arg(orientation, c("vertical", "horizontal"))
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(

@@ -94,37 +94,23 @@ update_block_textarea <- function(
   class,
   notify = TRUE
 ) {
-  payload <- list()
+  payload <- apply_update_fields(list(), list(
+    field("value", transform = as_text_value),
+    field_clearable("placeholder"),
+    field("disabled", transform = isTRUE),
+    field("invalid", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
-  if (!missing(value)) {
-    payload <- payload_set_if_present(
-      payload, "value", value,
-      function(value) if (is.null(value)) "" else as.character(value)
-    )
-  }
-  if (!missing(placeholder)) {
-    payload <- payload_set_clearable(payload, "placeholder", placeholder)
-  }
   if (!missing(rows)) {
     if (!is.numeric(rows) || length(rows) != 1 || is.na(rows) || rows < 1) {
       stop("`rows` must be a positive number.", call. = FALSE)
     }
     payload$rows <- as.integer(rows)
   }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
-  }
   if (!missing(resize)) {
     payload$resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "textarea", payload, notify = notify)
@@ -302,14 +288,16 @@ update_block_file_input <- function(
   class,
   reset = FALSE
 ) {
-  payload <- list()
+  payload <- apply_update_fields(list(), list(
+    field_clearable("buttonLabel", "button_label", as.character),
+    field_clearable("placeholder", transform = as.character),
+    field("multiple", transform = isTRUE),
+    field("disabled", transform = isTRUE),
+    field("invalid", transform = isTRUE),
+    field_style("style"),
+    field_clearable("className", "class")
+  ))
 
-  if (!missing(button_label)) {
-    payload <- payload_set_clearable(payload, "buttonLabel", button_label, as.character)
-  }
-  if (!missing(placeholder)) {
-    payload <- payload_set_clearable(payload, "placeholder", placeholder, as.character)
-  }
   if (!missing(accept)) {
     if (!is.null(accept) && (!is.character(accept) || any(is.na(accept)))) {
       stop("`accept` must be NULL or a character vector.", call. = FALSE)
@@ -321,21 +309,6 @@ update_block_file_input <- function(
     }
     if (!is.null(accept_value) && !nzchar(accept_value)) accept_value <- NULL
     payload <- payload_set_clearable(payload, "accept", accept_value)
-  }
-  if (!missing(multiple)) {
-    payload <- payload_set_if_present(payload, "multiple", multiple, isTRUE)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "className", class)
   }
   if (isTRUE(reset)) {
     payload$reset <- TRUE
@@ -373,31 +346,17 @@ update_block_input <- function(
   class,
   notify = TRUE
 ) {
-  payload <- list()
+  payload <- apply_update_fields(list(), list(
+    field("value", transform = as_text_value),
+    field_clearable("placeholder"),
+    field("disabled", transform = isTRUE),
+    field("invalid", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
-  if (!missing(value)) {
-    payload <- payload_set_if_present(
-      payload, "value", value,
-      function(value) if (is.null(value)) "" else as.character(value)
-    )
-  }
-  if (!missing(placeholder)) {
-    payload <- payload_set_clearable(payload, "placeholder", placeholder)
-  }
   if (!missing(type)) {
     payload$type <- match.arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(session, input_id, "input", payload, notify = notify)
@@ -473,20 +432,12 @@ update_block_checkbox <- function(
   class,
   notify = TRUE
 ) {
-  payload <- list()
-
-  if (!missing(checked)) {
-    payload <- payload_set_if_present(payload, "checked", checked, isTRUE)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
-  }
+  payload <- apply_update_fields(list(), list(
+    field("checked", transform = isTRUE),
+    field("disabled", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
   runtime_input_update(
     session, input_id, "checkbox", payload,
@@ -570,22 +521,15 @@ update_block_switch <- function(
   class,
   notify = TRUE
 ) {
-  payload <- list()
+  payload <- apply_update_fields(list(), list(
+    field("checked", transform = isTRUE),
+    field("disabled", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
-  if (!missing(checked)) {
-    payload <- payload_set_if_present(payload, "checked", checked, isTRUE)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
   if (!missing(size)) {
     payload$size <- match_arg(size, c("default", "sm", "lg"))
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
   }
 
   runtime_input_update(
@@ -778,27 +722,16 @@ update_block_slider <- function(
   if (!missing(orientation)) {
     payload$orientation <- match_arg(orientation, c("horizontal", "vertical"))
   }
-  if (!missing(show_value)) {
-    payload <- payload_set_if_present(payload, "showValue", show_value, isTRUE)
-  }
-  if (!missing(min_label)) {
-    payload <- payload_set_clearable(payload, "minLabel", min_label, as.character)
-  }
-  if (!missing(max_label)) {
-    payload <- payload_set_clearable(payload, "maxLabel", max_label, as.character)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
-  }
-  if (!missing(style)) {
-    payload <- payload_set_style(payload, "style", style)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
-  }
+
+  payload <- apply_update_fields(payload, list(
+    field("showValue", "show_value", isTRUE),
+    field_clearable("minLabel", "min_label", as.character),
+    field_clearable("maxLabel", "max_label", as.character),
+    field("disabled", transform = isTRUE),
+    field("invalid", transform = isTRUE),
+    field_style("style"),
+    field_clearable("class")
+  ))
 
   runtime_input_update(session, input_id, "slider", payload, notify = notify)
 }

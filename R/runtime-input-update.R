@@ -49,6 +49,51 @@ payload_set_style <- function(payload, name, style) {
   payload_set_clearable(payload, name, style, normalize_runtime_style)
 }
 
+# Spec-driven payload assembly for `update_block_*()` helpers.
+#
+# Every updater turns its supplied arguments into a runtime payload by running
+# the same three setters above under a `!missing()` guard. The `field*()`
+# constructors capture that mapping as data — payload key, source argument
+# (defaults to the key), setter, optional transform — so each updater lists its
+# plain fields instead of repeating the guard/setter boilerplate. Fields needing
+# bespoke validation (match.arg, range checks) stay inline in the caller.
+field <- function(key, arg = key, transform = NULL) {
+  list(key = key, arg = arg, method = "if_present", transform = transform)
+}
+field_clearable <- function(key, arg = key, transform = NULL) {
+  list(key = key, arg = arg, method = "clearable", transform = transform)
+}
+field_style <- function(key, arg = key) {
+  list(key = key, arg = arg, method = "style", transform = NULL)
+}
+
+# Apply `fields` to `payload`, reading values from the calling updater. Only
+# arguments the caller explicitly supplied are emitted: `match.call()` on the
+# parent frame lists them exactly as `missing()` would, so defaulted arguments
+# are skipped.
+apply_update_fields <- function(payload, fields, env = parent.frame()) {
+  supplied <- names(match.call(
+    definition = sys.function(-1L),
+    call = sys.call(-1L),
+    envir = env
+  ))[-1L]
+  for (f in fields) {
+    if (!f$arg %in% supplied) next
+    value <- get(f$arg, envir = env)
+    payload <- switch(
+      f$method,
+      if_present = payload_set_if_present(payload, f$key, value, f$transform),
+      clearable = payload_set_clearable(payload, f$key, value, f$transform),
+      style = payload_set_style(payload, f$key, value)
+    )
+  }
+  payload
+}
+
+# Shared transform: a text input's value coerces to a string, treating NULL as
+# an empty string rather than dropping the field.
+as_text_value <- function(value) if (is.null(value)) "" else as.character(value)
+
 normalize_width_style <- function(width, default = NULL) {
   if (is.null(width)) {
     return(default)

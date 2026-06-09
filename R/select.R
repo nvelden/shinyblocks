@@ -137,29 +137,18 @@ update_block_select <- function(
       stop("`selected` must match one of `choices`.", call. = FALSE)
     }
   }
-  if (!missing(selected)) {
-    payload <- payload_set_if_present(
-      payload, "selected", selected,
-      function(value) value %||% ""
-    )
-  }
-  if (!missing(placeholder)) {
-    payload <- payload_set_clearable(payload, "placeholder", placeholder)
-  }
-  if (!missing(disabled)) {
-    payload <- payload_set_if_present(payload, "disabled", disabled, isTRUE)
-  }
-  if (!missing(width)) {
-    payload <- payload_set_clearable(payload, "width", width, htmltools::validateCssUnit)
-  }
-  if (!missing(class)) {
-    payload <- payload_set_clearable(payload, "class", class)
-  }
+
+  payload <- apply_update_fields(payload, list(
+    field("selected", transform = function(value) value %||% ""),
+    field_clearable("placeholder"),
+    field("disabled", transform = isTRUE),
+    field_clearable("width", transform = htmltools::validateCssUnit),
+    field_clearable("class"),
+    field("invalid", transform = isTRUE)
+  ))
+
   if (!missing(size)) {
     payload$size <- match_arg(size, c("default", "sm", "lg"))
-  }
-  if (!missing(invalid)) {
-    payload <- payload_set_if_present(payload, "invalid", invalid, isTRUE)
   }
 
   runtime_input_update(
