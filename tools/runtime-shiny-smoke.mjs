@@ -308,6 +308,51 @@ try {
     "disabled dropzone drop should be a no-op"
   );
 
+  // dragover must always cancel the browser default — otherwise a real OS file
+  // drop navigates the page instead of being safely ignored. The drop handler
+  // bypasses this requirement, so assert it directly. A disabled dropzone still
+  // cancels the default but does NOT enter the dragover (highlight) state.
+  const dispatchDragOver = (selector) =>
+    page.evaluate((selector) => {
+      const el = document.querySelector(selector);
+      if (!el) throw new Error(`dragover target not found: ${selector}`);
+      const evt = new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: new DataTransfer()
+      });
+      // defaultPrevented is observable synchronously; the data-dragover
+      // attribute lags a React render tick, so callers poll for it separately.
+      return !el.dispatchEvent(evt);
+    }, selector);
+
+  assert.equal(
+    await dispatchDragOver(".runtime-file-dropzone-fixture"),
+    true,
+    "enabled dropzone dragover should cancel default"
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".runtime-file-dropzone-fixture")?.getAttribute("data-dragover") ===
+      "true"
+  );
+
+  assert.equal(
+    await dispatchDragOver(".runtime-file-dropzone-disabled-fixture"),
+    true,
+    "disabled dropzone dragover should still cancel default"
+  );
+  assert.equal(
+    await page.evaluate(
+      () =>
+        document
+          .querySelector(".runtime-file-dropzone-disabled-fixture")
+          ?.getAttribute("data-dragover")
+    ),
+    null,
+    "disabled dropzone dragover should not set data-dragover"
+  );
+
   // Custom-content dropzone: the drop bridge still reaches input$<id> while the
   // surface is a drop region rather than a button.
   await assertText(page, "#runtime_file_dropzone_custom_value", "<NULL>");

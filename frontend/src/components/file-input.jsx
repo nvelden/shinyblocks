@@ -207,8 +207,11 @@ export function FileInput({ payload, root }) {
   }
 
   function handleDragOver(event) {
-    if (state.disabled) return;
+    // Always cancel the browser default so a real file drop is ignored rather
+    // than navigated to, even when disabled. Only surface the dragover state
+    // when the dropzone can actually accept the drop.
     event.preventDefault();
+    if (state.disabled) return;
     setDragover(true);
   }
 
