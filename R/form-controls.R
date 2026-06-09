@@ -30,9 +30,7 @@ block_textarea <- function(
 ) {
   validate_input_id(input_id)
   resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
-  if (!is.numeric(rows) || length(rows) != 1 || is.na(rows) || rows < 1) {
-    stop("`rows` must be a positive number.", call. = FALSE)
-  }
+  check_number(rows, "rows", min = 1, msg = "`rows` must be a positive number.")
 
   hidden_native <- hidden_native_textarea(
     input_id,
@@ -104,9 +102,7 @@ update_block_textarea <- function(
   ))
 
   if (!missing(rows)) {
-    if (!is.numeric(rows) || length(rows) != 1 || is.na(rows) || rows < 1) {
-      stop("`rows` must be a positive number.", call. = FALSE)
-    }
+    check_number(rows, "rows", min = 1, msg = "`rows` must be a positive number.")
     payload$rows <- as.integer(rows)
   }
   if (!missing(resize)) {
@@ -210,9 +206,10 @@ block_file_input <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
-  if (!is.null(accept) && (!is.character(accept) || any(is.na(accept)))) {
-    stop("`accept` must be NULL or a character vector.", call. = FALSE)
-  }
+  check_character(
+    accept, "accept", null_ok = TRUE,
+    msg = "`accept` must be NULL or a character vector."
+  )
 
   accept_value <- if (is.null(accept)) {
     NULL
@@ -299,9 +296,10 @@ update_block_file_input <- function(
   ))
 
   if (!missing(accept)) {
-    if (!is.null(accept) && (!is.character(accept) || any(is.na(accept)))) {
-      stop("`accept` must be NULL or a character vector.", call. = FALSE)
-    }
+    check_character(
+      accept, "accept", null_ok = TRUE,
+      msg = "`accept` must be NULL or a character vector."
+    )
     accept_value <- if (is.null(accept)) {
       NULL
     } else {
@@ -600,9 +598,10 @@ block_slider <- function(
   if (min >= max) {
     stop("`min` must be strictly less than `max`.", call. = FALSE)
   }
-  if (!is.null(step) && (!is.numeric(step) || length(step) != 1 || is.na(step) || step <= 0)) {
-    stop("`step` must be a single positive numeric value.", call. = FALSE)
-  }
+  check_number(
+    step, "step", positive = TRUE, null_ok = TRUE,
+    msg = "`step` must be a single positive numeric value."
+  )
 
   hidden_native <- hidden_native_input(
     input_id,
@@ -695,15 +694,11 @@ update_block_slider <- function(
     payload <- payload_set_if_present(payload, "value", value, as.numeric)
   }
   if (!missing(min)) {
-    if (!is.numeric(min) || length(min) != 1 || is.na(min)) {
-      stop("`min` must be a single numeric value.", call. = FALSE)
-    }
+    check_number(min, "min", msg = "`min` must be a single numeric value.")
     payload <- payload_set_if_present(payload, "min", min, as.numeric)
   }
   if (!missing(max)) {
-    if (!is.numeric(max) || length(max) != 1 || is.na(max)) {
-      stop("`max` must be a single numeric value.", call. = FALSE)
-    }
+    check_number(max, "max", msg = "`max` must be a single numeric value.")
     payload <- payload_set_if_present(payload, "max", max, as.numeric)
   }
   if (!missing(min) && !missing(max) && min >= max) {
@@ -713,9 +708,10 @@ update_block_slider <- function(
     if (is.null(step)) {
       payload["step"] <- list(NULL)
     } else {
-      if (!is.numeric(step) || length(step) != 1 || is.na(step) || step <= 0) {
-        stop("`step` must be a single positive numeric value.", call. = FALSE)
-      }
+      check_number(
+        step, "step", positive = TRUE,
+        msg = "`step` must be a single positive numeric value."
+      )
       payload$step <- as.numeric(step)
     }
   }
