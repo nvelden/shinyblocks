@@ -31,22 +31,24 @@ targets <- list(
     # intents being scoped to [data-shinyblocks-root] (the descendant prefix
     # costs ~0.2 KB raw). The #54 file-input picker/progress styling brings the
     # built asset to ~53 KB raw while keeping gzip under its transfer budget,
-    # then 54 -> 55 for the #56 file-input dropzone variant (.sb-file-dropzone
-    # surface + dragover/reject/disabled/invalid states); gzip stays at 7.47 KB
-    # under its 7.5 KB transfer budget. Gzipped is the meaningful transfer
-    # budget; raw is a headroom guard.
+    # then 54 -> 57 for the #56 file-input dropzone variant: the base
+    # .sb-file-dropzone surface + dragover/reject/disabled/invalid states, then
+    # the customizable interior (icon circle, content flex wrapper, default
+    # trigger-button styling, and the custom drop-region cursor) bring the
+    # asset to ~56 KB raw. Gzipped is the meaningful transfer budget; raw is a
+    # headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 55,
+    limit_kb = 57,
     metric = "raw",
     group = "runtime"
   ),
   list(
     # 7 -> 7.5 KB for DT-style row selection (selectable cursor, themed focus
-    # ring, and selection-wins-over-hover/striped backgrounds). Gzipped is the
-    # binding transfer budget; the bump is a tight ~0.2 KB over the pre-feature
-    # 7.0 KB with ~0.5 KB headroom, not a full-KB jump.
+    # ring, and selection-wins-over-hover/striped backgrounds), then 7.5 -> 8 KB
+    # for the #56 customizable dropzone interior (icon circle, content wrapper,
+    # trigger button). Gzipped is the binding transfer budget.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 7.5,
+    limit_kb = 8,
     metric = "gzipped",
     group = "runtime"
   ),

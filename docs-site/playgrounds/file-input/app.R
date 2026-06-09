@@ -88,6 +88,19 @@ ui <- block_page(
             block_input("showcase_file_input_doc_dropzone_hint", value = "", placeholder = "optional hint")
           ),
           block_field(
+            block_field_label("dropzone icon", `for` = "showcase_file_input_doc_dropzone_icon"),
+            block_select(
+              "showcase_file_input_doc_dropzone_icon",
+              choices = c(none = "none", upload = "upload", file = "file", image = "image"),
+              selected = "upload",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("custom content", `for` = "showcase_file_input_doc_dropzone_content"),
+            block_checkbox("showcase_file_input_doc_dropzone_content", "Use custom dropzone_content", value = FALSE)
+          ),
+          block_field(
             block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
             block_input("showcase_file_input_doc_placeholder", value = "No file selected")
           ),
@@ -127,6 +140,42 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
+  dropzone_content_example <- function() {
+    htmltools::tagList(
+      htmltools::tags$span(
+        class = "sb-file-dropzone-icon",
+        `aria-hidden` = "true",
+        block_icon("upload", size = "lg")
+      ),
+      htmltools::tags$strong("Upload your files"),
+      htmltools::tags$span(
+        style = "color: var(--muted-foreground); font-size: 0.8125rem;",
+        "Drag and drop files here or click to browse"
+      ),
+      htmltools::tags$button(
+        type = "button",
+        class = "sb-file-dropzone-trigger",
+        `data-dropzone-trigger` = NA,
+        "Select files"
+      )
+    )
+  }
+  dropzone_content_example_code <- paste(
+    "dropzone_content = htmltools::tagList(",
+    "    htmltools::tags$span(",
+    "      class = \"sb-file-dropzone-icon\", `aria-hidden` = \"true\",",
+    "      block_icon(\"upload\", size = \"lg\")",
+    "    ),",
+    "    htmltools::tags$strong(\"Upload your files\"),",
+    "    htmltools::tags$span(\"Drag and drop files here or click to browse\"),",
+    "    htmltools::tags$button(",
+    "      type = \"button\", class = \"sb-file-dropzone-trigger\",",
+    "      `data-dropzone-trigger` = NA, \"Select files\"",
+    "    )",
+    "  )",
+    sep = "\n"
+  )
+
   file_input_args <- reactive({
     accept_value <- input$showcase_file_input_doc_accept %||% ".csv,text/csv"
     accept <- trimws(strsplit(accept_value, ",", fixed = TRUE)[[1]])
@@ -136,12 +185,17 @@ server <- function(input, output, session) {
     dz_hint <- input$showcase_file_input_doc_dropzone_hint %||% ""
     if (!nzchar(dz_hint)) dz_hint <- NULL
 
+    dz_icon <- input$showcase_file_input_doc_dropzone_icon %||% "upload"
+    if (!nzchar(dz_icon) || identical(dz_icon, "none")) dz_icon <- NULL
+
     list(
       variant = input$showcase_file_input_doc_variant %||% "button",
       button_label = input$showcase_file_input_doc_button_label %||% "Browse",
       placeholder = input$showcase_file_input_doc_placeholder %||% "No file selected",
       dropzone_label = input$showcase_file_input_doc_dropzone_label %||% "Drag files here or click to browse",
       dropzone_hint = dz_hint,
+      dropzone_icon = dz_icon,
+      use_content = isTRUE(input$showcase_file_input_doc_dropzone_content),
       accept = accept,
       multiple = isTRUE(input$showcase_file_input_doc_multiple),
       disabled = isTRUE(input$showcase_file_input_doc_disabled),
@@ -160,6 +214,8 @@ server <- function(input, output, session) {
       placeholder = args$placeholder,
       dropzone_label = args$dropzone_label,
       dropzone_hint = args$dropzone_hint,
+      dropzone_icon = args$dropzone_icon,
+      dropzone_content = if (args$use_content) dropzone_content_example() else NULL,
       disabled = args$disabled,
       invalid = args$invalid
     )
@@ -202,6 +258,13 @@ server <- function(input, output, session) {
     }
     if (identical(args$variant, "dropzone") && !is.null(args$dropzone_hint)) {
       code_args <- c(code_args, paste0("dropzone_hint = ", string_literal(args$dropzone_hint)))
+    }
+    if (identical(args$variant, "dropzone") && args$use_content) {
+      code_args <- c(code_args, dropzone_content_example_code)
+    } else if (identical(args$variant, "dropzone") &&
+                 !is.null(args$dropzone_icon) &&
+                 !identical(args$dropzone_icon, "upload")) {
+      code_args <- c(code_args, paste0("dropzone_icon = ", string_literal(args$dropzone_icon)))
     }
     if (args$disabled) code_args <- c(code_args, "disabled = TRUE")
     if (args$invalid) code_args <- c(code_args, "invalid = TRUE")

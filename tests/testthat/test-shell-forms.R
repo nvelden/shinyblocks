@@ -152,10 +152,56 @@ test_that("block_file_input dropzone variant emits dropzone props", {
   expect_identical(payload$props$dropzoneHint, "CSV only")
 })
 
-test_that("block_file_input validates input id, accept, and variant", {
+test_that("block_file_input emits dropzone icon name and sprite href", {
+  payload <- runtime_payload_from(
+    block_file_input("upload", variant = "dropzone", dropzone_icon = "upload")
+  )
+  expect_identical(payload$props$dropzoneIconName, "upload")
+  expect_null(payload$props$dropzoneIconHtml)
+  expect_true(nzchar(payload$props$spriteHref))
+})
+
+test_that("block_file_input serializes a tag dropzone_icon to html", {
+  payload <- runtime_payload_from(
+    block_file_input(
+      "upload",
+      variant = "dropzone",
+      dropzone_icon = htmltools::tags$svg(class = "x")
+    )
+  )
+  expect_null(payload$props$dropzoneIconName)
+  expect_match(payload$props$dropzoneIconHtml, "<svg", fixed = TRUE)
+})
+
+test_that("block_file_input serializes dropzone_content to html", {
+  payload <- runtime_payload_from(
+    block_file_input(
+      "upload",
+      variant = "dropzone",
+      dropzone_content = htmltools::tagList(
+        htmltools::tags$strong("Upload"),
+        htmltools::tags$button(`data-dropzone-trigger` = NA, "Pick")
+      )
+    )
+  )
+  expect_match(payload$props$dropzoneContentHtml, "<strong>Upload</strong>", fixed = TRUE)
+  expect_match(payload$props$dropzoneContentHtml, "data-dropzone-trigger", fixed = TRUE)
+})
+
+test_that("block_file_input has no dropzone icon/content by default", {
+  payload <- runtime_payload_from(block_file_input("upload", variant = "dropzone"))
+  expect_null(payload$props$dropzoneIconName)
+  expect_null(payload$props$dropzoneIconHtml)
+  expect_null(payload$props$dropzoneContentHtml)
+})
+
+test_that("block_file_input validates input id, accept, variant, and icon name", {
   expect_error(block_file_input(""), "`input_id` must be a non-empty string")
   expect_error(block_file_input("upload", accept = 1), "`accept` must be NULL or a character vector")
   expect_error(block_file_input("upload", variant = "tile"), "`variant` must be one of")
+  expect_error(
+    block_file_input("upload", variant = "dropzone", dropzone_icon = "not-a-real-icon-xyz")
+  )
 })
 
 test_that("textarea emits a runtime payload and hidden native textarea", {

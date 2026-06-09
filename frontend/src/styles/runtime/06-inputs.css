@@ -505,6 +505,61 @@
   opacity: var(--sb-disabled-opacity);
 }
 
+/* Custom-content mode is a drop region, not a button: only the explicit
+   [data-dropzone-trigger] element is interactive, so the surface is not a
+   pointer target. */
+[data-shinyblocks-root] .sb-file-dropzone[data-content="custom"] {
+  cursor: default;
+}
+
+[data-shinyblocks-root] .sb-file-dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+[data-shinyblocks-root] .sb-file-dropzone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--radius-full, 9999px);
+  color: var(--muted-foreground);
+  background-color: var(--muted);
+}
+
+[data-shinyblocks-root] .sb-file-dropzone-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Default styling for an author-supplied trigger button inside custom content
+   (opt in with class = "sb-file-dropzone-trigger"). */
+[data-shinyblocks-root] .sb-file-dropzone-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: var(--sb-control-height);
+  padding: 0 0.85rem;
+  font-size: var(--sb-control-font-size);
+  font-weight: 500;
+  color: var(--primary-foreground);
+  background-color: var(--primary);
+  border: none;
+  border-radius: var(--sb-input-radius, var(--radius-md));
+  cursor: pointer;
+  transition: background-color var(--sb-transition-duration);
+}
+
+[data-shinyblocks-root] .sb-file-dropzone-trigger:hover {
+  background-color: color-mix(in oklch, var(--primary) 90%, transparent);
+}
+
 [data-shinyblocks-root] .sb-file-dropzone-label {
   font-size: var(--sb-control-font-size);
   font-weight: 500;
@@ -528,6 +583,10 @@
 
 [data-shinyblocks-root] .sb-file-dropzone-text[data-placeholder="true"] {
   color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-file-dropzone-text:empty {
+  display: none;
 }
 
 [data-shinyblocks-root] .sb-slider {

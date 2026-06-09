@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { labelIdForInput } from "../runtime/dom.js";
 import { nativeFileInput } from "../runtime/native-inputs.js";
-import { classNames } from "./shared.jsx";
+import { classNames, HtmlSlot } from "./shared.jsx";
 
 function selectedFileText(nativeInput) {
   const files = nativeInput?.files ? Array.from(nativeInput.files) : [];
@@ -28,6 +28,35 @@ function fileMatchesAccept(file, acceptAttr) {
   });
 }
 
+// Optional dropzone icon: author markup (iconHtml) or a sprite reference
+// (iconName + spriteHref), rendered inside a muted circle above the label.
+function renderDropzoneIcon(state) {
+  if (state.dropzoneIconHtml) {
+    return (
+      <HtmlSlot
+        html={state.dropzoneIconHtml}
+        className="sb-file-dropzone-icon"
+        data-slot="file-dropzone-icon"
+        aria-hidden="true"
+      />
+    );
+  }
+  if (state.dropzoneIconName) {
+    return (
+      <span
+        className="sb-file-dropzone-icon"
+        data-slot="file-dropzone-icon"
+        aria-hidden="true"
+      >
+        <svg aria-hidden="true" focusable="false">
+          <use href={`${state.spriteHref}#sb-icon-${state.dropzoneIconName}`} />
+        </svg>
+      </span>
+    );
+  }
+  return null;
+}
+
 export function FileInput({ payload, root }) {
   const props = payload.props || {};
   const native = nativeFileInput(root);
@@ -37,6 +66,10 @@ export function FileInput({ payload, root }) {
     placeholder: props.placeholder || "",
     dropzoneLabel: props.dropzoneLabel ?? "Drag files here or click to browse",
     dropzoneHint: props.dropzoneHint ?? "",
+    dropzoneIconName: props.dropzoneIconName ?? null,
+    dropzoneIconHtml: props.dropzoneIconHtml ?? null,
+    dropzoneContentHtml: props.dropzoneContentHtml ?? null,
+    spriteHref: props.spriteHref ?? "",
     disabled: Boolean(props.disabled),
     invalid: Boolean(props.invalid),
     style: props.style || {},
@@ -88,6 +121,10 @@ export function FileInput({ payload, root }) {
         if ("placeholder" in data) next.placeholder = data.placeholder ?? "";
         if ("dropzoneLabel" in data) next.dropzoneLabel = data.dropzoneLabel ?? "";
         if ("dropzoneHint" in data) next.dropzoneHint = data.dropzoneHint ?? "";
+        if ("dropzoneIconName" in data) next.dropzoneIconName = data.dropzoneIconName ?? null;
+        if ("dropzoneIconHtml" in data) next.dropzoneIconHtml = data.dropzoneIconHtml ?? null;
+        if ("dropzoneContentHtml" in data) next.dropzoneContentHtml = data.dropzoneContentHtml ?? null;
+        if ("spriteHref" in data) next.spriteHref = data.spriteHref ?? "";
         if ("disabled" in data) next.disabled = Boolean(data.disabled);
         if ("invalid" in data) next.invalid = Boolean(data.invalid);
         if ("style" in data) next.style = data.style || {};
@@ -117,6 +154,23 @@ export function FileInput({ payload, root }) {
   function openPicker() {
     if (state.disabled || !native) return;
     native.click();
+  }
+
+  // Custom-content mode: the surface is a drop region, not a button, so only a
+  // click landing on an explicit `[data-dropzone-trigger]` element opens the
+  // picker. A real <button>/<a> trigger handles keyboard activation natively;
+  // its click bubbles here. Plain surface clicks are inert (no nested-button
+  // double-trigger).
+  function handleTriggerClick(event) {
+    if (state.disabled) return;
+    const trigger =
+      event.target && event.target.closest
+        ? event.target.closest("[data-dropzone-trigger]")
+        : null;
+    if (trigger && dropRef.current && dropRef.current.contains(trigger)) {
+      event.preventDefault();
+      openPicker();
+    }
   }
 
   function flashReject() {
@@ -172,29 +226,70 @@ export function FileInput({ payload, root }) {
   }
 
   if (state.variant === "dropzone") {
+    const isCustom = Boolean(state.dropzoneContentHtml);
+    const sharedProps = {
+      ref: dropRef,
+      className: classNames("sb-file-dropzone", state.className),
+      "data-slot": "file-dropzone",
+      "data-disabled": state.disabled ? "true" : undefined,
+      "data-dragover": dragover ? "true" : undefined,
+      "aria-invalid": isInvalid || undefined,
+      "aria-controls": inputId || undefined,
+      "aria-disabled": state.disabled || undefined,
+      style: state.style,
+      onDragOver: handleDragOver,
+      onDragLeave: handleDragLeave,
+      onDrop: handleDrop
+    };
+    // Always present so the aria-live filename summary can announce updates.
+    const selectedSummary = (
+      <span
+        className="sb-file-dropzone-text"
+        data-slot="file-input-text"
+        data-placeholder={!hasFiles ? "true" : undefined}
+        aria-live="polite"
+      >
+        {isCustom ? selectedText : displayText}
+      </span>
+    );
+
+    if (isCustom) {
+      // Drop region: author owns the interior; an explicit
+      // `[data-dropzone-trigger]` element opens the picker (see handleTriggerClick).
+      return (
+        <div
+          {...sharedProps}
+          data-content="custom"
+          role="group"
+          aria-labelledby={labelledBy || undefined}
+          aria-describedby={describedBy || undefined}
+          onClick={handleTriggerClick}
+        >
+          <HtmlSlot
+            html={state.dropzoneContentHtml}
+            className="sb-file-dropzone-content"
+            data-slot="file-dropzone-content"
+          />
+          {selectedSummary}
+        </div>
+      );
+    }
+
+    // Easy path: the whole surface is the picker button (click anywhere /
+    // Enter-Space), optionally fronted by an icon above the label/hint.
     return (
       <div
-        ref={dropRef}
-        className={classNames("sb-file-dropzone", state.className)}
-        data-slot="file-dropzone"
+        {...sharedProps}
         role="button"
         tabIndex={state.disabled ? -1 : 0}
-        data-disabled={state.disabled ? "true" : undefined}
-        data-dragover={dragover ? "true" : undefined}
-        aria-invalid={isInvalid || undefined}
-        aria-controls={inputId || undefined}
         aria-labelledby={labelledBy || undefined}
         aria-describedby={[describedBy, state.dropzoneHint ? hintId : null]
           .filter(Boolean)
           .join(" ") || undefined}
-        aria-disabled={state.disabled || undefined}
-        style={state.style}
         onClick={openPicker}
         onKeyDown={handleKeyDown}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
       >
+        {renderDropzoneIcon(state)}
         <span className="sb-file-dropzone-label" data-slot="file-dropzone-label">
           {state.dropzoneLabel || "Drag files here or click to browse"}
         </span>
@@ -207,14 +302,7 @@ export function FileInput({ payload, root }) {
             {state.dropzoneHint}
           </span>
         ) : null}
-        <span
-          className="sb-file-dropzone-text"
-          data-slot="file-input-text"
-          data-placeholder={!hasFiles ? "true" : undefined}
-          aria-live="polite"
-        >
-          {displayText}
-        </span>
+        {selectedSummary}
       </div>
     );
   }

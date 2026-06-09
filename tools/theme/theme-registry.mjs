@@ -86,7 +86,8 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-file-input[data-slot='file-input-control']", property: "backgroundColor", token: "--background" },
       { selector: ".sb-parity-file-input [data-slot='file-input-text']", property: "color", token: "--muted-foreground" },
       { selector: ".sb-parity-file-dropzone[data-slot='file-dropzone']", property: "backgroundColor", token: "--background" },
-      { selector: ".sb-parity-file-dropzone .sb-file-dropzone-hint", property: "color", token: "--muted-foreground" }
+      { selector: ".sb-parity-file-dropzone .sb-file-dropzone-hint", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-file-dropzone .sb-file-dropzone-icon", property: "backgroundColor", token: "--muted" }
     ]
   },
   input: {

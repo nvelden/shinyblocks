@@ -12,7 +12,18 @@
 - **dropzone** — a focusable drag-and-drop surface (dashed border) that
   forwards clicks/Enter/Space to the native picker and accepts dropped files.
   Cosmetic chrome over the **same** native Shiny upload binding; `input$<id>`
-  is identical to the button variant.
+  is identical to the button variant. The interior is customizable:
+  - **default interior** — optional `dropzone_icon` (a muted icon circle) above
+    `dropzone_label` and `dropzone_hint`. The whole surface is the picker
+    (`role="button"`, click anywhere / Enter-Space browses).
+  - **custom interior** — `dropzone_content` (any `htmltools` markup) replaces
+    the icon/label/hint stack. The surface becomes a pure drop **region**
+    (`role="group"`, not a tab stop); browse opens only from an explicit
+    element carrying `data-dropzone-trigger` (use a real `<button>`/`<a>` for
+    keyboard support). This avoids a nested interactive control inside a
+    `role="button"`. Nested `block_*()` runtime components are not hydrated
+    inside the slot — use plain `htmltools` (text, `img`, a styled `<button>`,
+    or a `block_icon()` svg).
 
 ## States
 
@@ -44,6 +55,8 @@
 | `placeholder` | `props$placeholder` | Empty-state filename text. |
 | `dropzone_label` | `props$dropzoneLabel` | Primary dropzone text (dropzone variant). |
 | `dropzone_hint` | `props$dropzoneHint` | Secondary dropzone hint (dropzone variant). |
+| `dropzone_icon` | `props$dropzoneIconName` / `props$dropzoneIconHtml` (+ `spriteHref`) | Icon-name string → sprite `<use>`; `htmltools` tag → serialized HTML. Rendered in a muted circle (dropzone variant). |
+| `dropzone_content` | `props$dropzoneContentHtml` | Serialized custom interior; switches the surface to drop-region + explicit trigger (dropzone variant). |
 | `width` | mount `style` | Wrapper width. |
 | `disabled` | `props$disabled` + native attr | Disables both picker surfaces. |
 | `invalid` | `props$invalid` | Applies invalid state. |
@@ -61,9 +74,12 @@
 - `update_block_file_input()` ships
   (`R/form-controls.R`). It updates cosmetic/stateful props (`variant`,
   `button_label`, `placeholder`, `dropzone_label`, `dropzone_hint`,
-  `accept`, `multiple`, `disabled`, `invalid`, `style`, `class`) and can
+  `dropzone_icon`, `dropzone_content`, `accept`, `multiple`, `disabled`,
+  `invalid`, `style`, `class`) and can
   clear the current selection with `reset = TRUE`. As with Shiny's lack of
   `updateFileInput()`, it cannot set the file value itself from the server.
+  `dropzone_icon = NULL` / `dropzone_content = NULL` clear those slots (the
+  latter restoring the default icon/label/hint interior).
 
 ## Token Contract
 
@@ -89,6 +105,11 @@
   trimmed to one when `multiple = FALSE`), assigns `native.files`, and
   dispatches a bubbling `change` so the unchanged native binding uploads.
   Disabled dropzones ignore drops; an all-rejected drop fires no event.
+- With `dropzone_content`, the surface intentionally stops being a `role="button"`
+  and becomes a drop region; the picker opens via click delegation on a
+  `data-dropzone-trigger` descendant. This keeps a real `<button>`/`<a>` in
+  author content from being a nested interactive control and double-firing the
+  picker. The drop bridge is unchanged in this mode.
 
 ## Reference Screenshot
 

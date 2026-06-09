@@ -13,6 +13,8 @@ block_file_input(
   placeholder = "No file selected",
   dropzone_label = "Drag files here or click to browse",
   dropzone_hint = NULL,
+  dropzone_icon = NULL,
+  dropzone_content = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -42,6 +44,21 @@ used when \code{variant = "dropzone"}).}
 
 \item{dropzone_hint}{Secondary hint text shown beneath \code{dropzone_label}
 (only used when \code{variant = "dropzone"}).}
+
+\item{dropzone_icon}{Optional icon shown above the dropzone label (only used
+when \code{variant = "dropzone"}). Either a shinyblocks icon name (string, e.g.
+\code{"upload"}) or an \code{htmltools} tag (e.g. an \verb{<svg>}). Rendered inside a
+muted circle.}
+
+\item{dropzone_content}{Optional \code{htmltools} tag or \code{tagList} rendered as the
+full dropzone interior, replacing the default icon/label/hint stack (only
+used when \code{variant = "dropzone"}). Use plain \code{htmltools} markup (text,
+\code{img}, a styled \verb{<button>}); nested \verb{block_*()} runtime components are not
+hydrated inside this slot. When supplied, the surface becomes a pure drop
+region: mark the element that should open the file picker with
+\verb{\\}data-dropzone-trigger\\verb{ = NA} (a real \verb{<button>}/\verb{<a>} for keyboard
+support). Give it \code{class = "sb-file-dropzone-trigger"} for the default
+button styling.}
 
 \item{width}{Optional CSS width value (applied to the wrapper).}
 

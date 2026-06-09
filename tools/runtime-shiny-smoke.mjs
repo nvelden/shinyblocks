@@ -308,6 +308,35 @@ try {
     "disabled dropzone drop should be a no-op"
   );
 
+  // Custom-content dropzone: the drop bridge still reaches input$<id> while the
+  // surface is a drop region rather than a button.
+  await assertText(page, "#runtime_file_dropzone_custom_value", "<NULL>");
+  await dropFiles(".runtime-file-dropzone-custom-fixture", [
+    { name: "custom.txt", type: "text/plain", content: "custom drop\n" }
+  ]);
+  await assertText(
+    page,
+    "#runtime_file_dropzone_custom_value",
+    "name=custom.txt cols=name,size,type,datapath rows=1"
+  );
+
+  // Browse opens only from the explicit [data-dropzone-trigger]; a plain surface
+  // click is inert (no nested-button double-trigger). Spy on native.click().
+  const triggerClicks = await page.evaluate(() => {
+    const native = document.querySelector("#runtime_file_dropzone_custom");
+    let count = 0;
+    native.click = () => {
+      count += 1;
+    };
+    const surface = document.querySelector(".runtime-file-dropzone-custom-fixture");
+    surface.querySelector("strong").click(); // non-trigger element -> inert
+    const afterInert = count;
+    document.querySelector("#runtime_file_dropzone_custom_trigger").click(); // trigger -> opens picker
+    return { afterInert, afterTrigger: count };
+  });
+  assert.equal(triggerClicks.afterInert, 0, "non-trigger surface click should not open the picker");
+  assert.equal(triggerClicks.afterTrigger, 1, "clicking [data-dropzone-trigger] should open the picker");
+
   await assertText(
     page,
     "[data-sb-component='table'][data-sb-input-id='runtime_table'] tbody td",

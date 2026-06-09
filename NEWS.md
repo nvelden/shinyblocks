@@ -15,6 +15,8 @@
 
 * `block_file_input()` gained a `variant` argument (issue #56). `variant = "dropzone"` renders a focusable drag-and-drop surface (with `dropzone_label`/`dropzone_hint`) over the same native upload binding, so `input$<id>` is unchanged. Dropped files honor `accept` and `multiple`, disabled dropzones ignore drops, and an all-rejected drop keeps the prior selection. The default `variant = "button"` is unchanged.
 
+* The `"dropzone"` variant is now customizable (issue #56). `dropzone_icon` adds an icon (an icon name or an `htmltools` tag) inside a muted circle above the label, and `dropzone_content` replaces the whole interior with arbitrary `htmltools` markup (icon, title, hint, a styled `<button>`, …). With custom content the surface becomes a drop region and the picker opens from the element you mark with `` `data-dropzone-trigger` = NA `` (use a real `<button>`/`<a>` for keyboard support; give it `class = "sb-file-dropzone-trigger"` for default styling). `update_block_file_input()` can set or clear both `dropzone_icon` and `dropzone_content`.
+
 * Added `update_block_file_input()` to change a file picker's variant, button label, placeholder, dropzone label/hint, `accept`, `multiple`, disabled/invalid states, and styling from the server, or clear the current selection with `reset = TRUE`. As with `shiny::fileInput()`, the uploaded value itself cannot be set from the server.
 
 * `block_table()` gained optional DT-style row selection. Set

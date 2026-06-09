@@ -29,6 +29,19 @@ htmltools::tagList(
           block_input("showcase_file_input_doc_dropzone_hint", value = "CSV up to 10MB", placeholder = "optional hint")
         ),
         block_field(
+          block_field_label("dropzone icon", `for` = "showcase_file_input_doc_dropzone_icon"),
+          block_select(
+            "showcase_file_input_doc_dropzone_icon",
+            choices = c(none = "none", upload = "upload", file = "file", image = "image"),
+            selected = "upload",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("custom content", `for` = "showcase_file_input_doc_dropzone_content"),
+          block_checkbox("showcase_file_input_doc_dropzone_content", "Use custom dropzone_content (icon + title + button)", value = FALSE)
+        ),
+        block_field(
           block_field_label("accept", `for` = "showcase_file_input_doc_accept"),
           block_input("showcase_file_input_doc_accept", value = ".csv,text/csv", placeholder = ".csv,image/png")
         )
@@ -55,6 +68,8 @@ htmltools::tagList(
           showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
           showcase_action_button("showcase_file_input_to_button", "Switch to button"),
           showcase_action_button("showcase_file_input_relabel", "Relabel button"),
+          showcase_action_button("showcase_file_input_set_content", "Set custom content"),
+          showcase_action_button("showcase_file_input_clear_content", "Clear custom content"),
           showcase_action_button("showcase_file_input_disable", "Disable"),
           showcase_action_button("showcase_file_input_enable", "Enable"),
           showcase_action_button("showcase_file_input_mark_invalid", "Mark invalid"),
@@ -115,6 +130,7 @@ htmltools::tagList(
     block_file_input(
       "sb_parity_file_dropzone",
       variant = "dropzone",
+      dropzone_icon = "upload",
       dropzone_label = "Drop files",
       dropzone_hint = "Parity fixture",
       class = "sb-parity-file-dropzone"
