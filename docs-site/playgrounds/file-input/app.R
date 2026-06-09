@@ -49,10 +49,34 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   })
 }
 
+showcase_controls_heading <- function(label) {
+  htmltools::tags$h4(
+    style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+    label
+  )
+}
+
+showcase_action_button <- function(input_id, label) {
+  block_button(
+    label,
+    id = input_id,
+    variant = "outline",
+    size = "sm"
+  )
+}
+
 ui <- block_page(
   title = "shinyblocks · File input playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
+    htmltools::tags$style(htmltools::HTML(
+      "
+      [data-shinyblocks-root] .sb-file-input-control.showcase-file-input-preview-custom,
+      [data-shinyblocks-root] .sb-file-dropzone.showcase-file-input-preview-custom {
+        border: 2px dashed red;
+      }
+      "
+    ))
   ),
   htmltools::tags$div(
     `data-shinyblocks-root` = "",
@@ -60,12 +84,17 @@ ui <- block_page(
     htmltools::div(
       class = "showcase-playground",
       style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+
+      # Left Column: Controls Panel
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
         style = "flex: 1; min-width: 280px; max-width: 320px;",
+
+        # Content Controls Group
         htmltools::div(
           style = "display: flex; flex-direction: column; gap: 0.75rem;",
+          showcase_controls_heading("Content"),
           block_field(
             block_field_label("variant", `for` = "showcase_file_input_doc_variant"),
             block_select(
@@ -78,6 +107,10 @@ ui <- block_page(
           block_field(
             block_field_label("button label", `for` = "showcase_file_input_doc_button_label"),
             block_input("showcase_file_input_doc_button_label", value = "Browse")
+          ),
+          block_field(
+            block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
+            block_input("showcase_file_input_doc_placeholder", value = "No file selected")
           ),
           block_field(
             block_field_label("dropzone label", `for` = "showcase_file_input_doc_dropzone_label"),
@@ -101,28 +134,80 @@ ui <- block_page(
             block_checkbox("showcase_file_input_doc_dropzone_content", "Use custom dropzone_content", value = FALSE)
           ),
           block_field(
-            block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
-            block_input("showcase_file_input_doc_placeholder", value = "No file selected")
-          ),
-          block_field(
             block_field_label("accept", `for` = "showcase_file_input_doc_accept"),
-            block_input("showcase_file_input_doc_accept", value = ".csv,text/csv")
-          ),
+            block_input("showcase_file_input_doc_accept", value = ".csv,text/csv", placeholder = ".csv,image/png")
+          )
+        ),
+
+        # State Controls Group
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          showcase_controls_heading("State"),
           block_field(
             block_field_label("multiple", `for` = "showcase_file_input_doc_multiple"),
-            block_checkbox("showcase_file_input_doc_multiple", "Allow multiple files")
+            block_checkbox("showcase_file_input_doc_multiple", "Allow multiple files", value = FALSE)
           ),
           block_field(
             block_field_label("disabled", `for` = "showcase_file_input_doc_disabled"),
-            block_checkbox("showcase_file_input_doc_disabled", "Disabled")
+            block_checkbox("showcase_file_input_doc_disabled", "Disabled", value = FALSE)
           ),
           block_field(
             block_field_label("invalid", `for` = "showcase_file_input_doc_invalid"),
-            block_checkbox("showcase_file_input_doc_invalid", "Invalid")
+            block_checkbox("showcase_file_input_doc_invalid", "Invalid", value = FALSE)
+          )
+        ),
+
+        # Styling Controls Group
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          showcase_controls_heading("Styling"),
+          block_field(
+            block_field_label("width", `for` = "showcase_file_input_doc_width"),
+            block_input("showcase_file_input_doc_width", value = "100%", placeholder = "20rem or 100%")
+          ),
+          block_field(
+            block_field_label("style", `for` = "showcase_file_input_doc_style"),
+            block_textarea(
+              "showcase_file_input_doc_style",
+              value = "",
+              rows = 1,
+              placeholder = "e.g., max-width: 24rem;",
+              resize = "none"
+            )
+          ),
+          block_field(
+            block_field_label("class", `for` = "showcase_file_input_doc_class"),
+            block_checkbox(
+              "showcase_file_input_doc_class",
+              "Use custom dashed-border class",
+              value = FALSE
+            )
+          )
+        ),
+
+        # Actions (Server Update) Group
+        htmltools::div(
+          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          showcase_controls_heading("Actions (Server Update)"),
+          htmltools::tags$div(
+            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+            showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
+            showcase_action_button("showcase_file_input_to_button", "Switch to button"),
+            showcase_action_button("showcase_file_input_relabel", "Relabel button"),
+            showcase_action_button("showcase_file_input_set_content", "Set custom content"),
+            showcase_action_button("showcase_file_input_clear_content", "Clear custom content"),
+            showcase_action_button("showcase_file_input_disable", "Disable"),
+            showcase_action_button("showcase_file_input_enable", "Enable"),
+            showcase_action_button("showcase_file_input_mark_invalid", "Mark invalid"),
+            showcase_action_button("showcase_file_input_clear_invalid", "Clear invalid"),
+            showcase_action_button("showcase_file_input_reset", "Reset selection")
           )
         )
       ),
+
+      # Right Column: Preview & Code Blocks
       htmltools::div(
+        class = "showcase-playground__main",
         style = "flex: 1.4; min-width: 320px; display: flex; flex-direction: column; gap: 1rem;",
         htmltools::div(
           style = "border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 1.25rem; background: color-mix(in oklch, var(--muted) 18%, transparent);",
@@ -133,7 +218,20 @@ ui <- block_page(
           )
         ),
         uiOutput("showcase_file_input_preview_value"),
-        uiOutput("showcase_file_input_preview_code")
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "UI Definition"
+          ),
+          uiOutput("showcase_file_input_preview_code")
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "Server Action"
+          ),
+          uiOutput("showcase_file_input_reactive_code")
+        )
       )
     )
   )
@@ -182,6 +280,15 @@ server <- function(input, output, session) {
     accept <- accept[nzchar(accept)]
     if (!length(accept)) accept <- NULL
 
+    style_val <- input$showcase_file_input_doc_style %||% ""
+    if (!nzchar(style_val)) style_val <- NULL
+
+    class_val <- if (isTRUE(input$showcase_file_input_doc_class)) {
+      "showcase-file-input-preview-custom"
+    } else {
+      NULL
+    }
+
     dz_hint <- input$showcase_file_input_doc_dropzone_hint %||% ""
     if (!nzchar(dz_hint)) dz_hint <- NULL
 
@@ -198,8 +305,11 @@ server <- function(input, output, session) {
       use_content = isTRUE(input$showcase_file_input_doc_dropzone_content),
       accept = accept,
       multiple = isTRUE(input$showcase_file_input_doc_multiple),
+      width = input$showcase_file_input_doc_width %||% "100%",
       disabled = isTRUE(input$showcase_file_input_doc_disabled),
-      invalid = isTRUE(input$showcase_file_input_doc_invalid)
+      invalid = isTRUE(input$showcase_file_input_doc_invalid),
+      style = style_val,
+      class = class_val
     )
   })
 
@@ -216,8 +326,11 @@ server <- function(input, output, session) {
       dropzone_hint = args$dropzone_hint,
       dropzone_icon = args$dropzone_icon,
       dropzone_content = if (args$use_content) dropzone_content_example() else NULL,
+      width = args$width,
       disabled = args$disabled,
-      invalid = args$invalid
+      invalid = args$invalid,
+      style = args$style,
+      class = args$class
     )
   })
   outputOptions(output, "showcase_file_input_preview_ui", suspendWhenHidden = FALSE)
@@ -266,12 +379,88 @@ server <- function(input, output, session) {
                  !identical(args$dropzone_icon, "upload")) {
       code_args <- c(code_args, paste0("dropzone_icon = ", string_literal(args$dropzone_icon)))
     }
+    if (!is.null(args$width) && nzchar(args$width) && !identical(args$width, "100%")) {
+      code_args <- c(code_args, paste0("width = ", string_literal(args$width)))
+    }
     if (args$disabled) code_args <- c(code_args, "disabled = TRUE")
     if (args$invalid) code_args <- c(code_args, "invalid = TRUE")
+    if (!is.null(args$style)) code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
+    if (!is.null(args$class)) code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
 
     paste0("block_file_input(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
   })
   outputOptions(output, "showcase_file_input_preview_code", suspendWhenHidden = FALSE)
+
+  reactive_code <- reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_file_input() code here."
+  ))
+
+  output$showcase_file_input_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  outputOptions(output, "showcase_file_input_reactive_code", suspendWhenHidden = FALSE)
+
+  observeEvent(input$showcase_file_input_to_dropzone, {
+    update_block_file_input(session, "showcase_file_input_preview", variant = "dropzone")
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  variant = "dropzone"\n)')
+  })
+
+  observeEvent(input$showcase_file_input_to_button, {
+    update_block_file_input(session, "showcase_file_input_preview", variant = "button")
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  variant = "button"\n)')
+  })
+
+  observeEvent(input$showcase_file_input_relabel, {
+    update_block_file_input(session, "showcase_file_input_preview", button_label = "Pick a file")
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  button_label = "Pick a file"\n)')
+  })
+
+  observeEvent(input$showcase_file_input_set_content, {
+    update_block_file_input(
+      session, "showcase_file_input_preview",
+      variant = "dropzone",
+      dropzone_content = dropzone_content_example()
+    )
+    reactive_code(paste0(
+      "update_block_file_input(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_file_input_preview\",\n",
+      "  variant = \"dropzone\",\n",
+      "  ", dropzone_content_example_code, "\n",
+      ")"
+    ))
+  })
+
+  observeEvent(input$showcase_file_input_clear_content, {
+    update_block_file_input(session, "showcase_file_input_preview", dropzone_content = NULL)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  dropzone_content = NULL\n)')
+  })
+
+  observeEvent(input$showcase_file_input_disable, {
+    update_block_file_input(session, "showcase_file_input_preview", disabled = TRUE)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  disabled = TRUE\n)')
+  })
+
+  observeEvent(input$showcase_file_input_enable, {
+    update_block_file_input(session, "showcase_file_input_preview", disabled = FALSE)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  disabled = FALSE\n)')
+  })
+
+  observeEvent(input$showcase_file_input_mark_invalid, {
+    update_block_file_input(session, "showcase_file_input_preview", invalid = TRUE)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  invalid = TRUE\n)')
+  })
+
+  observeEvent(input$showcase_file_input_clear_invalid, {
+    update_block_file_input(session, "showcase_file_input_preview", invalid = FALSE)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  invalid = FALSE\n)')
+  })
+
+  observeEvent(input$showcase_file_input_reset, {
+    update_block_file_input(session, "showcase_file_input_preview", reset = TRUE)
+    reactive_code('update_block_file_input(\n  session = session,\n  input_id = "showcase_file_input_preview",\n  reset = TRUE\n)')
+  })
 }
 
 shinyApp(ui, server)
