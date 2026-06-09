@@ -48,9 +48,10 @@ block_dialog <- function(
   if (missing(title) || is.null(title)) {
     stop("`title` is required.", call. = FALSE)
   }
-  if (!is.null(trigger) && (!is.character(trigger) || length(trigger) != 1)) {
-    stop("`trigger` must be a single string label or NULL.", call. = FALSE)
-  }
+  check_string(
+    trigger, "trigger", null_ok = TRUE,
+    msg = "`trigger` must be a single string label or NULL."
+  )
   size <- match.arg(size)
 
   runtime_component(
@@ -177,9 +178,8 @@ block_popover <- function(
   style = NULL,
   class = NULL
 ) {
-  if (missing(trigger) || is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
-    stop("`trigger` must be a single string label.", call. = FALSE)
-  }
+  if (missing(trigger)) trigger <- NULL
+  check_string(trigger, "trigger", msg = "`trigger` must be a single string label.")
   if (!is.null(id)) {
     validate_input_id(id)
   }
@@ -251,9 +251,7 @@ update_block_popover <- function(
   ))
 
   if (!missing(trigger)) {
-    if (is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
-      stop("`trigger` must be a single string label.", call. = FALSE)
-    }
+    check_string(trigger, "trigger", msg = "`trigger` must be a single string label.")
     payload$triggerLabel <- trigger
   }
   if (!missing(side)) {
@@ -302,14 +300,14 @@ block_tooltip <- function(
   style = NULL,
   class = NULL
 ) {
-  if (missing(trigger) || is.null(trigger) || !is.character(trigger) || length(trigger) != 1) {
-    stop("`trigger` must be a single string label.", call. = FALSE)
-  }
+  if (missing(trigger)) trigger <- NULL
+  check_string(trigger, "trigger", msg = "`trigger` must be a single string label.")
   side <- match.arg(side)
   align <- match.arg(align)
-  if (!is.numeric(delay_duration) || length(delay_duration) != 1 || delay_duration < 0) {
-    stop("`delay_duration` must be a non-negative numeric scalar.", call. = FALSE)
-  }
+  check_number(
+    delay_duration, "delay_duration", min = 0,
+    msg = "`delay_duration` must be a non-negative numeric scalar."
+  )
 
   content_style <- if (!is.null(style)) normalize_runtime_style(style) else NULL
 

@@ -1,24 +1,34 @@
-shinyblocks_dependency <- function() {
-  if (identical(getOption("shinyblocks.asset_mode"), "app")) {
-    htmltools::htmlDependency(
-      name = "shinyblocks",
-      version = shinyblocks_asset_version(),
-      src = c(href = "shinyblocks"),
-      stylesheet = c("shinyblocks.css", "shinyblocks-runtime.css"),
-      script = c("shinyblocks.js", "shinyblocks-runtime.js"),
-      attachment = c(sprite = "icons/sprite.svg")
-    )
-  } else {
-    htmltools::htmlDependency(
-      name = "shinyblocks",
-      version = shinyblocks_asset_version(),
-      src = "www",
-      stylesheet = c("shinyblocks.css", "shinyblocks-runtime.css"),
-      script = c("shinyblocks.js", "shinyblocks-runtime.js"),
-      attachment = c(sprite = "icons/sprite.svg"),
-      package = "shinyblocks"
-    )
+.shinyblocks_assets <- c(
+  "shinyblocks.css",
+  "shinyblocks-runtime.css",
+  "shinyblocks.js",
+  "shinyblocks-runtime.js",
+  "icons/sprite.svg"
+)
+
+shinyblocks_www_dir <- function() {
+  www <- system.file("www", package = "shinyblocks")
+  if (!nzchar(www) && dir.exists("inst/www")) {
+    www <- "inst/www"
   }
+  if (nzchar(www)) www else NULL
+}
+
+shinyblocks_dependency <- function() {
+  args <- list(
+    name = "shinyblocks",
+    version = shinyblocks_asset_version(),
+    stylesheet = c("shinyblocks.css", "shinyblocks-runtime.css"),
+    script = c("shinyblocks.js", "shinyblocks-runtime.js"),
+    attachment = c(sprite = "icons/sprite.svg")
+  )
+  if (identical(getOption("shinyblocks.asset_mode"), "app")) {
+    args$src <- c(href = "shinyblocks")
+  } else {
+    args$src <- "www"
+    args$package <- "shinyblocks"
+  }
+  do.call(htmltools::htmlDependency, args)
 }
 
 attach_shinyblocks_deps <- function(tag) {
@@ -41,24 +51,12 @@ shinyblocks_version <- function() {
 
 shinyblocks_asset_version <- function() {
   version <- shinyblocks_version()
-  www <- system.file("www", package = "shinyblocks")
-  if (!nzchar(www) && dir.exists("inst/www")) {
-    www <- "inst/www"
-  }
-  if (!nzchar(www)) {
+  www <- shinyblocks_www_dir()
+  if (is.null(www)) {
     return(version)
   }
 
-  assets <- file.path(
-    www,
-    c(
-      "shinyblocks.css",
-      "shinyblocks-runtime.css",
-      "shinyblocks.js",
-      "shinyblocks-runtime.js",
-      "icons/sprite.svg"
-    )
-  )
+  assets <- file.path(www, .shinyblocks_assets)
   assets <- assets[file.exists(assets)]
   if (!length(assets)) {
     return(version)
@@ -76,11 +74,9 @@ block_favicon_link <- local({
   cache <- NULL
   function() {
     if (is.null(cache)) {
-      path <- system.file("www", "favicon.svg", package = "shinyblocks")
-      if (!nzchar(path) && file.exists("inst/www/favicon.svg")) {
-        path <- "inst/www/favicon.svg"
-      }
-      if (!nzchar(path) || !file.exists(path)) {
+      dir <- shinyblocks_www_dir()
+      path <- if (!is.null(dir)) file.path(dir, "favicon.svg")
+      if (is.null(path) || !file.exists(path)) {
         return(NULL)
       }
       svg <- paste(readLines(path, warn = FALSE), collapse = "")
