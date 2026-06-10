@@ -107,6 +107,8 @@ ui <- block_page(
   htmltools::div(
     `data-shinyblocks-root` = "",
     style = "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; box-sizing: border-box;",
+    # Mounted once; the Refresh button fires a toast onto this region.
+    block_toaster("gallery_toaster"),
     htmltools::div(
       style = "display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;",
       htmltools::div(
@@ -360,7 +362,16 @@ server <- function(input, output, session) {
   outputOptions(output, "gallery_theme_assets", suspendWhenHidden = FALSE)
 
   observeEvent(input$gallery_refresh, {
-    refreshes(refreshes() + 1L)
+    count <- refreshes() + 1L
+    refreshes(count)
+    show_toast(
+      session,
+      "gallery_toaster",
+      title = "Workspace refreshed",
+      description = paste0("Synced ", count, " time", if (count == 1L) "" else "s", " this session."),
+      variant = "success",
+      icon = "refresh-cw"
+    )
   })
   observeEvent(input$gallery_save, {
     saved(TRUE)

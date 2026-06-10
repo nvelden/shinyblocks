@@ -50,6 +50,7 @@ playground_heights <- list(
   switch = 720L,
   tabs = 720L,
   theme = 720L,
+  toast = 720L,
   style = 720L,
   table = 720L,
   `nav-item` = 720L,
