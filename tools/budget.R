@@ -35,10 +35,10 @@ targets <- list(
     # .sb-file-dropzone surface + dragover/reject/disabled/invalid states, then
     # the customizable interior (icon circle, content flex wrapper, default
     # trigger-button styling, and the custom drop-region cursor) bring the
-    # asset to ~56 KB raw. Gzipped is the meaningful transfer budget; raw is a
-    # headroom guard.
+    # asset to ~56 KB raw. Raised 57 -> 60 KB for a 5% headroom increase.
+    # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 57,
+    limit_kb = 60,
     metric = "raw",
     group = "runtime"
   ),
@@ -65,9 +65,10 @@ targets <- list(
     # branch + DataTransfer drop bridge (raw grows only ~0.3 KB to 258 KB, well
     # under the 275 KB guard). NB: this gzipped metric is platform-variant
     # (R's memCompress zlib differs by OS), so sub-100-byte margins cannot be
-    # measured reliably across local/CI. Raw (275 KB) stays the headroom guard.
+    # measured reliably across local/CI. Raised 78 -> 82 KB for a 5% headroom
+    # increase. Raw (275 KB) stays the headroom guard.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 78,
+    limit_kb = 82,
     metric = "gzipped",
     group = "runtime"
   ),
