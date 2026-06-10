@@ -36,9 +36,12 @@ targets <- list(
     # the customizable interior (icon circle, content flex wrapper, default
     # trigger-button styling, and the custom drop-region cursor) bring the
     # asset to ~56 KB raw. Raised 57 -> 60 KB for a 5% headroom increase.
+    # Raised 60 -> 65 KB for the #59 date-picker runtime CSS (hand-rolled, no
+    # library): trigger surface + portaled calendar (month nav, weekday header,
+    # day grid, selected/today/disabled/focus states) adds ~4 KB raw.
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 60,
+    limit_kb = 65,
     metric = "raw",
     group = "runtime"
   ),
@@ -46,9 +49,10 @@ targets <- list(
     # 7 -> 7.5 KB for DT-style row selection (selectable cursor, themed focus
     # ring, and selection-wins-over-hover/striped backgrounds), then 7.5 -> 8 KB
     # for the #56 customizable dropzone interior (icon circle, content wrapper,
-    # trigger button). Gzipped is the binding transfer budget.
+    # trigger button), then 8 -> 9 KB for the #59 date-picker calendar styling.
+    # Gzipped is the binding transfer budget.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 8,
+    limit_kb = 9,
     metric = "gzipped",
     group = "runtime"
   ),

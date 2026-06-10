@@ -2,9 +2,10 @@
 
 > Shinyblocks function: `block_date_picker()` / `update_block_date_picker()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/date-picker>
-> Status: Slice 1 shipped — R API + runtime payload + `shiny.date` value
-> contract. Runtime component, styling, theme parity, showcase, and the
-> reference screenshot land in slices 2-4 (issue #59).
+> Status: Slices 1-3 shipped — R API + runtime payload + `shiny.date` value
+> contract, the runtime trigger/calendar component and binding, and shadcn
+> token/theme parity (theme-registry + style-registry coverage). The interactive
+> showcase playground and the reference screenshot land in slice 4 (issue #59).
 
 ## Overview
 
@@ -17,10 +18,14 @@ deserializes it as a `Date` with no custom handler.
 
 ## States
 
-Planned for the runtime/styling slices (2-3): default (placeholder-first
-trigger), hover, focus-visible ring, open (popover calendar), day
-hover/selected/today, out-of-bounds disabled days, `disabled`, and `invalid`
-(destructive ring via `aria-invalid="true"`). Not yet rendered in Slice 1.
+Rendered (slice 2): default (placeholder-first trigger), hover, focus-visible
+ring, open (portaled calendar), day hover / selected / today, out-of-bounds
+disabled days, `disabled`, and `invalid` (destructive ring via
+`aria-invalid="true"`). Token parity (slice 3): the trigger uses `--background`
+surface / `--input` border / `--foreground` text (`--muted-foreground` while
+placeholder); the calendar uses `--popover`; the selected day fills `--primary`,
+while today and day hover use `--accent` (selected wins over hover). Focus rings
+use `--ring`.
 
 ## R API
 
@@ -64,7 +69,12 @@ notify.
 
 A hidden native `<input type="text" class="sb-date-picker-native">` carries the
 ISO value as a form-submission bridge; the dedicated `shiny.date`-typed binding
-(slice 2) owns the `input$<id>` value.
+owns the `input$<id>` value. Following the single-writer runtime-input contract
+(ADR 0019), the React mount writes the `__sbDatePickerValue` expando, the
+`data-sb-date-picker-value` dataset attribute, and the native input together on
+mount, on user selection, and in the `__sbDatePickerReceive` server handler,
+dispatching `sb:date-picker-change` only on a notifying change. An empty
+selection reports `null`, so `input$<id>` is `NULL`.
 
 ## Shiny state and update contract
 
@@ -86,4 +96,4 @@ ISO value as a form-submission bridge; the dedicated `shiny.date`-typed binding
 
 ## Reference screenshot
 
-_Pending — captured in the styling/parity slice (slice 3)._
+_Pending — captured alongside the showcase playground (slice 4)._

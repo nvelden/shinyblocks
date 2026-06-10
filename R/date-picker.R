@@ -144,7 +144,8 @@ block_date_picker <- function(
       max = max,
       disabled = isTRUE(disabled),
       invalid = isTRUE(invalid),
-      style = normalize_runtime_style(style)
+      style = normalize_runtime_style(style),
+      spriteHref = sprite_href()
     ),
     input_id = input_id,
     state = list(value = value %||% ""),

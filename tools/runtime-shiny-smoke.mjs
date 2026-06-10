@@ -222,6 +222,34 @@ try {
     )?.disabled === false;
   });
 
+  // Date picker: the binding reports an ISO string typed `shiny.date`, so the
+  // server value is a length-1 Date. Covers initial value, user selection,
+  // server update, clear, and disabled state.
+  const dateRoot = "[data-sb-component='date-picker'][data-sb-input-id='runtime_date']";
+  await assertText(page, "#runtime_date_value", "2026-06-15");
+  await assertText(page, "#runtime_date_class", "Date");
+  await page.click(`${dateRoot} .sb-date-picker-trigger`);
+  await page.waitForSelector("[data-slot='date-picker-content']");
+  await page
+    .locator("[data-slot='date-picker-content'] .sb-date-picker-day", { hasText: "12" })
+    .first()
+    .click();
+  await assertText(page, "#runtime_date_value", "2026-06-12");
+  await page.click("#set_date");
+  await assertText(page, "#runtime_date_value", "2026-06-18");
+  await page.click("#clear_date");
+  await assertText(page, "#runtime_date_value", "<NULL>");
+  await page.click("#set_date");
+  await assertText(page, "#runtime_date_value", "2026-06-18");
+  await page.click("#disable_date");
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} .sb-date-picker-trigger`)?.disabled === true;
+  }, dateRoot);
+  await page.click("#enable_date");
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} .sb-date-picker-trigger`)?.disabled === false;
+  }, dateRoot);
+
   const uploadPath = path.join(os.tmpdir(), "shinyblocks-runtime-upload.txt");
   fs.writeFileSync(uploadPath, "runtime upload fixture\n");
   await assertText(page, "#runtime_file_input_value", "<NULL>");
@@ -656,6 +684,7 @@ try {
   await assertText(page, "#mod-upload_value", "<NULL>");
   await page.setInputFiles("#mod-upload", uploadPath);
   await assertText(page, "#mod-upload_value", "shinyblocks-runtime-upload.txt");
+  await assertText(page, "#mod-date_value", "2026-06-15");
 
   console.log("Runtime Shiny smoke test passed.");
 } catch (error) {

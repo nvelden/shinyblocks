@@ -229,6 +229,11 @@ export const STYLE_REGISTRY = {
     mode: "profile-neutral",
     reason: "An icon-sized spinner has no profile-sensitive geometry; Luma leaves it unchanged."
   },
+  "date-picker": {
+    section: "date-picker",
+    mode: "profile-neutral",
+    reason: "The date-picker trigger inherits the base control radius (calc(var(--radius) * 0.8)); a date-picker-specific geometry token is not ported into the profile system in this token-only slice, so no shipped profile overrides it. Trigger colour conformance is covered by theme-registry.mjs."
+  },
 
   // --- R-side shell families: Luma ported (compiled into inst/www/shinyblocks.css) ---
   nav: {

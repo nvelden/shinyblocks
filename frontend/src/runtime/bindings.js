@@ -18,7 +18,8 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "radio-group",
   "slider",
   "table",
-  "toaster"
+  "toaster",
+  "date-picker"
 ]);
 
 export function isRuntimeInputPayload(payload) {
@@ -105,6 +106,7 @@ const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHand
 const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHandler");
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
 const toasterEvents = rootEventListener("sb:toaster-change", "__sbToasterChangeHandler");
+const datePickerEvents = rootEventListener("sb:date-picker-change", "__sbDatePickerChangeHandler");
 
 const BINDING_CONFIGS = [
   {
@@ -365,6 +367,26 @@ const BINDING_CONFIGS = [
       return el.__sbToasterValue == null ? null : el.__sbToasterValue;
     },
     ...toasterEvents
+  },
+  {
+    // Single-date control. Reports an ISO `yyyy-mm-dd` string typed as
+    // `shiny.date`, so the server deserializes `input$<id>` to a length-1
+    // `Date` (matching `dateInput()`). An empty selection reports `null`.
+    component: "date-picker",
+    type: "shiny.date",
+    receiveProp: "__sbDatePickerReceive",
+    getValue(el) {
+      const value = Object.prototype.hasOwnProperty.call(el, "__sbDatePickerValue")
+        ? el.__sbDatePickerValue
+        : initialValue(el);
+      return value ? String(value) : null;
+    },
+    setValue(el, value) {
+      if (typeof el.__sbDatePickerReceive === "function") {
+        el.__sbDatePickerReceive({ value: value == null ? "" : String(value), notify: false });
+      }
+    },
+    ...datePickerEvents
   }
 ];
 
@@ -381,7 +403,8 @@ const BINDING_NAMES = [
   "shinyblocks.slider",
   "shinyblocks.table",
   "shinyblocks.file-input",
-  "shinyblocks.toaster"
+  "shinyblocks.toaster",
+  "shinyblocks.date-picker"
 ];
 
 let bindingsRegistered = false;

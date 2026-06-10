@@ -40,8 +40,10 @@ module_ui <- function(id) {
       mount_id = ns("runtime-choice")
     ),
     block_file_input(ns("upload"), button_label = "Module upload"),
+    block_date_picker(ns("date"), value = "2026-06-15", class = "runtime-mod-date-fixture"),
     shiny::verbatimTextOutput(ns("value")),
-    shiny::verbatimTextOutput(ns("upload_value"))
+    shiny::verbatimTextOutput(ns("upload_value")),
+    shiny::verbatimTextOutput(ns("date_value"))
   )
 }
 
@@ -155,6 +157,13 @@ ui <- shiny::fluidPage(
     id = "runtime_button",
     class = "runtime-button-fixture"
   ),
+  block_date_picker(
+    "runtime_date",
+    value = "2026-06-15",
+    min = "2026-06-10",
+    max = "2026-06-20",
+    class = "runtime-date-fixture"
+  ),
   block_file_input(
     "runtime_file_input",
     accept = c(".txt", "text/plain"),
@@ -234,6 +243,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_slider_value"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
+  shiny::verbatimTextOutput("runtime_date_value"),
+  shiny::verbatimTextOutput("runtime_date_class"),
   shiny::verbatimTextOutput("runtime_file_input_value"),
   shiny::verbatimTextOutput("runtime_file_dropzone_value"),
   shiny::verbatimTextOutput("runtime_file_dropzone_custom_value"),
@@ -254,6 +265,10 @@ ui <- shiny::fluidPage(
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
   shiny::actionButton("enable_button", "Enable button"),
+  shiny::actionButton("set_date", "Set date"),
+  shiny::actionButton("clear_date", "Clear date"),
+  shiny::actionButton("disable_date", "Disable date"),
+  shiny::actionButton("enable_date", "Enable date"),
   shiny::actionButton("open_popover", "Open popover"),
   shiny::actionButton("close_popover", "Close popover"),
   shiny::actionButton("update_popover_body", "Update popover body"),
@@ -327,6 +342,20 @@ server <- function(input, output, session) {
   output$runtime_button_class <- shiny::renderText({
     value <- input$runtime_button
     if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(class(value), collapse = ",")
+  })
+  output$runtime_date_value <- shiny::renderText({
+    value <- input$runtime_date
+    if (is.null(value) || length(value) == 0) {
+      return("<NULL>")
+    }
+    as.character(value)
+  })
+  output$runtime_date_class <- shiny::renderText({
+    value <- input$runtime_date
+    if (is.null(value) || length(value) == 0) {
       return("<NULL>")
     }
     paste(class(value), collapse = ",")
@@ -549,6 +578,40 @@ server <- function(input, output, session) {
     )
   })
 
+  shiny::observeEvent(input$set_date, {
+    update_block_date_picker(
+      session = session,
+      input_id = "runtime_date",
+      value = "2026-06-18",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$clear_date, {
+    update_block_date_picker(
+      session = session,
+      input_id = "runtime_date",
+      clear = TRUE,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_date, {
+    update_block_date_picker(
+      session = session,
+      input_id = "runtime_date",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_date, {
+    update_block_date_picker(
+      session = session,
+      input_id = "runtime_date",
+      disabled = FALSE
+    )
+  })
+
   shiny::observeEvent(input$open_popover, {
     update_block_popover(
       session = session,
@@ -627,6 +690,13 @@ server <- function(input, output, session) {
         return("<NULL>")
       }
       paste(value$name, collapse = ",")
+    })
+    output$date_value <- shiny::renderText({
+      value <- input$date
+      if (is.null(value) || length(value) == 0) {
+        return("<NULL>")
+      }
+      as.character(value)
     })
   })
 }
