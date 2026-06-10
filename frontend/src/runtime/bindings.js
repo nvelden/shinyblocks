@@ -17,7 +17,8 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "file-input",
   "radio-group",
   "slider",
-  "table"
+  "table",
+  "toaster"
 ]);
 
 export function isRuntimeInputPayload(payload) {
@@ -103,6 +104,7 @@ const radioGroupEvents = rootEventListener("sb:radio-group-change", "__sbRadioGr
 const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHandler", true);
 const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHandler");
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
+const toasterEvents = rootEventListener("sb:toaster-change", "__sbToasterChangeHandler");
 
 const BINDING_CONFIGS = [
   {
@@ -351,6 +353,18 @@ const BINDING_CONFIGS = [
     receiveProp: "__sbFileInputReceive",
     getId(el) { return el.id; },
     getValue() { return null; }
+  },
+  {
+    // Server-driven broadcast region. `show_toast()` / `dismiss_toast()`
+    // (`sendInputMessage`) reach React via `__sbToasterReceive`; the mount
+    // reports the last shown/dismissed toast id as `input$<id>` and dispatches
+    // `sb:toaster-change` when that value changes.
+    component: "toaster",
+    receiveProp: "__sbToasterReceive",
+    getValue(el) {
+      return el.__sbToasterValue == null ? null : el.__sbToasterValue;
+    },
+    ...toasterEvents
   }
 ];
 
@@ -366,7 +380,8 @@ const BINDING_NAMES = [
   "shinyblocks.radio-group",
   "shinyblocks.slider",
   "shinyblocks.table",
-  "shinyblocks.file-input"
+  "shinyblocks.file-input",
+  "shinyblocks.toaster"
 ];
 
 let bindingsRegistered = false;

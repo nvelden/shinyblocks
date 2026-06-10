@@ -221,6 +221,11 @@ ui <- shiny::fluidPage(
       "Inner action"
     )
   ),
+  block_toaster("runtime_toaster", position = "bottom-right"),
+  shiny::verbatimTextOutput("runtime_toaster_value"),
+  shiny::actionButton("fire_toast", "Fire toast"),
+  shiny::actionButton("dismiss_toasts", "Dismiss toasts"),
+  shiny::actionButton("move_toaster", "Move toaster"),
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
   shiny::verbatimTextOutput("runtime_select_value"),
@@ -383,6 +388,36 @@ server <- function(input, output, session) {
       if (is.null(last)) "-" else as.character(last)
     )
   })
+  output$runtime_toaster_value <- shiny::renderText({
+    value <- input$runtime_toaster
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    sprintf(
+      "%s:%s:%s",
+      value$action %||% "",
+      value$id %||% "-",
+      value$seq %||% 0
+    )
+  })
+  shiny::observeEvent(input$fire_toast, {
+    show_toast(
+      session,
+      "runtime_toaster",
+      title = "Saved",
+      description = "All changes stored.",
+      variant = "success",
+      duration = 0,
+      id = paste0("smoke-", input$fire_toast)
+    )
+  })
+  shiny::observeEvent(input$dismiss_toasts, {
+    dismiss_toast(session, "runtime_toaster")
+  })
+  shiny::observeEvent(input$move_toaster, {
+    update_block_toaster(session, "runtime_toaster", position = "top-left")
+  })
+
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")
   output$inserted_value <- shiny::renderText(input$inserted %||% "<NULL>")
 

@@ -101,6 +101,11 @@ export const THEME_REGISTRY = {
     mode: "static-only",
     reason: "Popover content (bg --popover, border --border) only renders when open; CSS is token-driven and covered by the static check."
   },
+  toaster: {
+    section: "toaster",
+    mode: "static-only",
+    reason: "Toasts only render when fired from the server; toast surfaces reuse the alert variant tokens (--card, --success, --warning, --info, --destructive), which the static check covers."
+  },
   "radio-group": {
     section: "radio-group",
     bindings: [

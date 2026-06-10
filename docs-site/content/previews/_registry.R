@@ -210,6 +210,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Toast",
+    slug = "toast",
+    file = "toast.R",
+    description = "Server-fired, auto-dismissing notifications anchored to a screen corner.",
+    featured = TRUE
+  ),
+  list(
     name = "Gallery",
     slug = "gallery",
     file = "gallery.R",

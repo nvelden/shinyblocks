@@ -144,3 +144,160 @@
     0 2px 4px -2px rgb(0 0 0 / 0.1);
   pointer-events: auto;
 }
+
+/* Toaster — fixed, position-anchored stack of transient notifications. The
+ * container ignores pointer events so it never blocks the app; each toast
+ * re-enables them. Toast surfaces reuse the alert variant tokens. */
+[data-shinyblocks-portal-root] .sb-toaster {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: min(420px, calc(100vw - 2rem));
+  max-height: 100vh;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+[data-shinyblocks-portal-root] .sb-toaster-top-left,
+[data-shinyblocks-portal-root] .sb-toaster-top-center,
+[data-shinyblocks-portal-root] .sb-toaster-top-right {
+  top: 0;
+}
+
+[data-shinyblocks-portal-root] .sb-toaster-bottom-left,
+[data-shinyblocks-portal-root] .sb-toaster-bottom-center,
+[data-shinyblocks-portal-root] .sb-toaster-bottom-right {
+  bottom: 0;
+  flex-direction: column-reverse;
+}
+
+[data-shinyblocks-portal-root] .sb-toaster-top-left,
+[data-shinyblocks-portal-root] .sb-toaster-bottom-left {
+  left: 0;
+  align-items: flex-start;
+}
+
+[data-shinyblocks-portal-root] .sb-toaster-top-right,
+[data-shinyblocks-portal-root] .sb-toaster-bottom-right {
+  right: 0;
+  align-items: flex-end;
+}
+
+[data-shinyblocks-portal-root] .sb-toaster-top-center,
+[data-shinyblocks-portal-root] .sb-toaster-bottom-center {
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+[data-shinyblocks-portal-root] .sb-toast {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: 0.125rem;
+  column-gap: 0.75rem;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--sb-toast-radius, var(--radius));
+  padding: 0.75rem 2.25rem 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--sb-toast-shadow, var(--sb-overlay-shadow));
+  pointer-events: auto;
+  animation: sb-toast-in var(--sb-transition-duration, 0.15s) ease-out;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-default {
+  border-color: var(--border);
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-toast-destructive {
+  background-color: var(--card);
+  color: var(--destructive);
+  border-color: var(--destructive-border);
+}
+
+[data-shinyblocks-portal-root] .sb-toast-success {
+  background-color: var(--success);
+  color: var(--success-foreground);
+  border-color: var(--success-border);
+}
+
+[data-shinyblocks-portal-root] .sb-toast-warning {
+  background-color: var(--warning);
+  color: var(--warning-foreground);
+  border-color: var(--warning-border);
+}
+
+[data-shinyblocks-portal-root] .sb-toast-info {
+  background-color: var(--info);
+  color: var(--info-foreground);
+  border-color: var(--info-border);
+}
+
+[data-shinyblocks-portal-root] .sb-toast-icon {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 0.125rem;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-title {
+  font-size: 0.875rem;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-description {
+  font-size: 0.8125rem;
+  color: inherit;
+  opacity: 0.9;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 0;
+  border-radius: calc(var(--radius) * 0.5);
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+[data-shinyblocks-portal-root] .sb-toast-close:hover {
+  opacity: 1;
+}
+
+[data-shinyblocks-portal-root] .sb-toast:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@keyframes sb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}

@@ -39,6 +39,7 @@ import { Slider } from "./components/slider.jsx";
 import { Switch } from "./components/switch.jsx";
 import { Table } from "./components/table.jsx";
 import { Textarea } from "./components/textarea.jsx";
+import { Toaster } from "./components/toaster.jsx";
 import { Tooltip } from "./components/tooltip.jsx";
 
 const mounted = new Map();
@@ -69,7 +70,8 @@ const COMPONENTS = {
   "radio-group": RadioGroup,
   slider: Slider,
   select: Select,
-  table: Table
+  table: Table,
+  toaster: Toaster
 };
 
 function RuntimeMount({ payload, root }) {

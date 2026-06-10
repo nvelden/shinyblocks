@@ -171,6 +171,14 @@
   row-gap: 0.125rem;
 }
 
+/* Toast — mirrors the alert surface (px-4 py-3, radius via token). */
+[data-sb-style="luma"] [data-shinyblocks-portal-root] .sb-toast,
+[data-sb-style="rhea"] [data-shinyblocks-portal-root] .sb-toast {
+  padding: 0.75rem 2.25rem 0.75rem 1rem;
+  column-gap: 0.625rem;
+  row-gap: 0.125rem;
+}
+
 /* Empty — dashed border, p-12 (radius via token). */
 [data-sb-style="luma"] [data-shinyblocks-root] .sb-empty,
 [data-sb-style="rhea"] [data-shinyblocks-root] .sb-empty {

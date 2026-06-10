@@ -495,6 +495,125 @@ try {
   });
   await assertText(page, "#runtime_popover_value", "FALSE");
 
+  // Toaster: server fires a toast, it renders in the portal and reports a
+  // `{action, id, seq}` event (formatted "action:id:seq"); a second fire stacks;
+  // the close button reports a dismiss event; dismiss-all clears the stack and
+  // reports a dismiss with a null id. Toasts use duration:0 so the auto-dismiss
+  // timer does not race the asserts. `seq` increments on every event.
+  await assertText(page, "#runtime_toaster_value", "<NULL>");
+  await page.click("#fire_toast");
+  await page
+    .locator("[data-shinyblocks-portal-root] [data-slot='toast']")
+    .waitFor({ state: "visible" });
+  await assertText(page, "#runtime_toaster_value", "show:smoke-1:1");
+  assert.equal(
+    await page.evaluate(() =>
+      document
+        .querySelector("[data-shinyblocks-portal-root] [data-slot='toast']")
+        ?.hasAttribute("tabindex")
+    ),
+    false,
+    "toast surface should not add a passive tab stop"
+  );
+  // Live reposition via update_block_toaster() — the region re-anchors without
+  // re-mounting and without disturbing the visible toast.
+  assert.equal(
+    await page.getAttribute(
+      "[data-shinyblocks-portal-root] [data-slot='toaster']",
+      "data-position"
+    ),
+    "bottom-right",
+    "toaster should start at its mounted position"
+  );
+  await page.click("#move_toaster");
+  await page.waitForFunction(() => {
+    const region = document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='toaster']"
+    );
+    return region && region.getAttribute("data-position") === "top-left";
+  });
+  await page.click("#fire_toast");
+  await page.waitForFunction(() => {
+    return (
+      document.querySelectorAll(
+        "[data-shinyblocks-portal-root] [data-slot='toast']"
+      ).length === 2
+    );
+  });
+  await assertText(page, "#runtime_toaster_value", "show:smoke-2:2");
+  await page.click(
+    "[data-shinyblocks-portal-root] [data-slot='toast']:last-child [data-slot='toast-close']"
+  );
+  await page.waitForFunction(() => {
+    return (
+      document.querySelectorAll(
+        "[data-shinyblocks-portal-root] [data-slot='toast']"
+      ).length === 1
+    );
+  });
+  await assertText(page, "#runtime_toaster_value", "dismiss:smoke-2:3");
+  await page.click("#dismiss_toasts");
+  await page.waitForFunction(() => {
+    return !document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='toast']"
+    );
+  });
+  await assertText(page, "#runtime_toaster_value", "dismiss:-:4");
+
+  await page.evaluate(() => {
+    const root = document.querySelector(
+      "[data-sb-component='toaster'][data-sb-input-id='runtime_toaster']"
+    );
+    if (typeof root?.__sbToasterReceive !== "function") {
+      throw new Error("toaster receive handler is not installed");
+    }
+    root.__sbToasterReceive({
+      notify: false,
+      toast: {
+        id: "client-a",
+        variant: "default",
+        titleHtml: "<div>Client A</div>",
+        duration: 0,
+        dismissible: true
+      }
+    });
+    root.__sbToasterReceive({
+      notify: false,
+      toast: {
+        id: "client-b",
+        variant: "default",
+        titleHtml: "<div>Client B</div>",
+        duration: 0,
+        dismissible: true
+      }
+    });
+    root.__sbToasterReceive({
+      notify: false,
+      toast: {
+        id: "client-a",
+        variant: "default",
+        titleHtml: "<div>Client A updated</div>",
+        duration: 0,
+        dismissible: true
+      }
+    });
+  });
+  await page.waitForFunction(() => {
+    const texts = Array.from(
+      document.querySelectorAll("[data-shinyblocks-portal-root] [data-slot='toast']")
+    ).map((toast) => toast.textContent);
+    return (
+      texts.length === 2 &&
+      texts[0].includes("Client A updated") &&
+      texts[1].includes("Client B")
+    );
+  });
+  await page.evaluate(() => {
+    document
+      .querySelector("[data-sb-component='toaster'][data-sb-input-id='runtime_toaster']")
+      ?.__sbToasterReceive({ action: "dismiss", notify: false });
+  });
+
   await page.click("#toggle_dynamic");
   await page.waitForFunction(() => {
     return document.querySelector("#runtime-dynamic")?.dataset.sbMounted === "true";

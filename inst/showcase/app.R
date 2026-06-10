@@ -16,6 +16,7 @@ source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
 source(file.path("R", "server_slider.R"), local = TRUE)
 source(file.path("R", "server_tooltip.R"), local = TRUE)
+source(file.path("R", "server_toast.R"), local = TRUE)
 source(file.path("R", "server_code.R"), local = TRUE)
 source(file.path("R", "server_badge.R"), local = TRUE)
 source(file.path("R", "server_alert.R"), local = TRUE)
@@ -357,6 +358,18 @@ sections <- list(
       "package portal root to avoid clipping."
     ),
     file = "tooltip.R"
+  ),
+  list(
+    id = "toast",
+    label = "Toast",
+    icon = "bell",
+    title = "Toasts",
+    lead = paste(
+      "Server-fired, auto-dismissing notifications. Mount one block_toaster()",
+      "per screen position, then push toasts with show_toast(). Variants and",
+      "icons mirror block_alert()."
+    ),
+    file = "toast.R"
   )
 )
 
@@ -469,6 +482,7 @@ server <- function(input, output, session) {
   register_input_group_showcase(input, output, session)
   register_slider_showcase(input, output, session)
   register_tooltip_showcase(input, output, session)
+  register_toast_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
   register_badge_showcase(input, output, session)

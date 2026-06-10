@@ -9,8 +9,8 @@ runtime_mount_state$next_id <- 0L
 RUNTIME_COMPONENT_NAMES <- c(
   "alert", "badge", "button", "card", "checkbox", "code", "dialog",
   "empty", "file-input", "input", "popover", "radio-group", "select", "separator",
-  "skeleton", "slider", "spinner", "switch", "table", "textarea", "tooltip",
-  "value-box"
+  "skeleton", "slider", "spinner", "switch", "table", "textarea", "toaster",
+  "tooltip", "value-box"
 )
 
 # Style ownership (issue #50): a user `style=` argument must land on exactly one
@@ -19,10 +19,10 @@ RUNTIME_COMPONENT_NAMES <- c(
 # by tools/theme/check-style-ownership.mjs). The exception is a component whose
 # visible root is rendered through a portal, outside the mount subtree: there the
 # mount div can never reach it, so the renderer owns the user style on its
-# portaled root and the mount div stays plain. `dialog` is the only such
-# component today (its content reads `payload.style`); keep this list in sync
-# with the gate's allowlist.
-RUNTIME_CONTENT_STYLE_COMPONENTS <- c("dialog")
+# portaled root and the mount div stays plain. `dialog` and `toaster` are the
+# portaled components today (their content reads `payload.style`); keep this list
+# in sync with the gate's allowlist.
+RUNTIME_CONTENT_STYLE_COMPONENTS <- c("dialog", "toaster")
 
 runtime_component <- function(
   component,

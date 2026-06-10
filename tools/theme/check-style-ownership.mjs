@@ -33,6 +33,11 @@ const OWNERSHIP_ALLOWLIST = [
     file: "dialog.jsx",
     reason:
       "Dialog content is portaled to document.body, outside the mount subtree, so the mount div can never style it. runtime_component() leaves dialog's mount div plain and the content owns payload.style."
+  },
+  {
+    file: "toaster.jsx",
+    reason:
+      "The toaster region is portaled to the package portal root, outside the mount subtree, so the mount div can never style it. runtime_component() leaves toaster's mount div plain and the portaled region owns payload.style."
   }
 ];
 

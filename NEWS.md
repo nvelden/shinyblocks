@@ -22,6 +22,7 @@
 * `block_switch()` gained `size = c("default", "sm", "lg")` support in both `block_switch()` and `update_block_switch()`.
 * `block_table()` is new. It renders data frames with column formatting, captions, alignment, width overrides, `NA` handling, max-row truncation notes, reactive server updates via `update_block_table()`, optional row selection, and theme-safe styling intents (issue #49, issue #51, issue #53).
 * `block_textarea()` and `block_input()` now report their initial server value correctly even before React has finished mounting.
+* `block_toaster()`, `show_toast()`, `dismiss_toast()`, and `update_block_toaster()` are new. Mount a `block_toaster()` and fire transient, auto-dismissing toast notifications from the server with `show_toast()`. Toasts stack, pause on hover/focus, support `Escape`-to-dismiss, and reuse the `block_alert()` variants (`default`, `destructive`, `success`, `warning`, `info`) and icon system. `update_block_toaster()` moves the region to a new position without re-mounting it, and `input$<id>` reports the latest toast lifecycle event as a list `{action, id, seq}`.
 * `block_tooltip()` is new. It supports hover/focus activation, configurable side and alignment, delayed opening, Escape-to-close, and portal rendering.
 * `block_value_box()` gained `variant = c("default", "accent", "destructive")` for token-backed metric emphasis.
 

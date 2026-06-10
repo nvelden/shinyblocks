@@ -205,6 +205,12 @@ export const STYLE_REGISTRY = {
     reason:
       "Popover content (radius + foreground-ring tokens) only renders when open; asserted by the overlay presence check (profile sets popover_* tokens and/or a [data-sb-style] popover rule)."
   },
+  toaster: {
+    section: "toaster",
+    mode: "overlay",
+    reason:
+      "Toasts only render when fired from the server; asserted by the overlay presence check (profile sets a [data-sb-style] .sb-toast rule mirroring the alert surface)."
+  },
   tooltip: {
     section: "tooltip",
     mode: "overlay",
