@@ -164,6 +164,15 @@ ui <- shiny::fluidPage(
     max = "2026-06-20",
     class = "runtime-date-fixture"
   ),
+  block_date_range_picker(
+    "runtime_range",
+    start = "2026-06-12",
+    end = "2026-06-18",
+    min = "2026-06-10",
+    max = "2026-06-20",
+    separator = " to ",
+    class = "runtime-range-fixture"
+  ),
   block_file_input(
     "runtime_file_input",
     accept = c(".txt", "text/plain"),
@@ -245,6 +254,9 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_date_value"),
   shiny::verbatimTextOutput("runtime_date_class"),
+  shiny::verbatimTextOutput("runtime_range_value"),
+  shiny::verbatimTextOutput("runtime_range_class"),
+  shiny::verbatimTextOutput("runtime_range_length"),
   shiny::verbatimTextOutput("runtime_file_input_value"),
   shiny::verbatimTextOutput("runtime_file_dropzone_value"),
   shiny::verbatimTextOutput("runtime_file_dropzone_custom_value"),
@@ -269,6 +281,10 @@ ui <- shiny::fluidPage(
   shiny::actionButton("clear_date", "Clear date"),
   shiny::actionButton("disable_date", "Disable date"),
   shiny::actionButton("enable_date", "Enable date"),
+  shiny::actionButton("set_range", "Set range"),
+  shiny::actionButton("clear_range", "Clear range"),
+  shiny::actionButton("disable_range", "Disable range"),
+  shiny::actionButton("enable_range", "Enable range"),
   shiny::actionButton("open_popover", "Open popover"),
   shiny::actionButton("close_popover", "Close popover"),
   shiny::actionButton("update_popover_body", "Update popover body"),
@@ -359,6 +375,24 @@ server <- function(input, output, session) {
       return("<NULL>")
     }
     paste(class(value), collapse = ",")
+  })
+  output$runtime_range_value <- shiny::renderText({
+    value <- input$runtime_range
+    if (is.null(value) || length(value) == 0) {
+      return("<NULL>")
+    }
+    paste(as.character(value), collapse = "/")
+  })
+  output$runtime_range_class <- shiny::renderText({
+    value <- input$runtime_range
+    if (is.null(value) || length(value) == 0) {
+      return("<NULL>")
+    }
+    paste(class(value), collapse = ",")
+  })
+  output$runtime_range_length <- shiny::renderText({
+    value <- input$runtime_range
+    as.character(length(value))
   })
   output$runtime_file_input_value <- shiny::renderText({
     value <- input$runtime_file_input
@@ -608,6 +642,41 @@ server <- function(input, output, session) {
     update_block_date_picker(
       session = session,
       input_id = "runtime_date",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_range, {
+    update_block_date_range_picker(
+      session = session,
+      input_id = "runtime_range",
+      start = "2026-06-13",
+      end = "2026-06-17",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$clear_range, {
+    update_block_date_range_picker(
+      session = session,
+      input_id = "runtime_range",
+      clear = TRUE,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_range, {
+    update_block_date_range_picker(
+      session = session,
+      input_id = "runtime_range",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_range, {
+    update_block_date_range_picker(
+      session = session,
+      input_id = "runtime_range",
       disabled = FALSE
     )
   })

@@ -32,6 +32,7 @@ import { Dialog } from "./components/dialog.jsx";
 import { Popover } from "./components/popover.jsx";
 import { Checkbox } from "./components/checkbox.jsx";
 import { DatePicker } from "./components/date-picker.jsx";
+import { DateRangePicker } from "./components/date-range-picker.jsx";
 import { FileInput } from "./components/file-input.jsx";
 import { Input } from "./components/input.jsx";
 import { RadioGroup } from "./components/radio-group.jsx";
@@ -65,6 +66,7 @@ const COMPONENTS = {
   tooltip: Tooltip,
   checkbox: Checkbox,
   "date-picker": DatePicker,
+  "date-range-picker": DateRangePicker,
   "file-input": FileInput,
   switch: Switch,
   textarea: Textarea,

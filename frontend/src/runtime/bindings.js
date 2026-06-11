@@ -19,7 +19,8 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "slider",
   "table",
   "toaster",
-  "date-picker"
+  "date-picker",
+  "date-range-picker"
 ]);
 
 export function isRuntimeInputPayload(payload) {
@@ -107,6 +108,7 @@ const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHand
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
 const toasterEvents = rootEventListener("sb:toaster-change", "__sbToasterChangeHandler");
 const datePickerEvents = rootEventListener("sb:date-picker-change", "__sbDatePickerChangeHandler");
+const dateRangePickerEvents = rootEventListener("sb:date-range-picker-change", "__sbDateRangePickerChangeHandler");
 
 const BINDING_CONFIGS = [
   {
@@ -387,6 +389,38 @@ const BINDING_CONFIGS = [
       }
     },
     ...datePickerEvents
+  },
+  {
+    // Range-date control. Reports `[startIso, endIso]` typed `shiny.date`, so
+    // the server's `as.Date(unlist(val))` yields a length-2 `Date`
+    // `c(start, end)` (matching `dateRangeInput()`). An empty or incomplete
+    // range reports `null`.
+    component: "date-range-picker",
+    type: "shiny.date",
+    receiveProp: "__sbDateRangePickerReceive",
+    getValue(el) {
+      let range;
+      if (Object.prototype.hasOwnProperty.call(el, "__sbDateRangePickerValue")) {
+        range = el.__sbDateRangePickerValue;
+      } else {
+        const payload = readPayload(el);
+        range = payload && payload.state ? payload.state : {};
+      }
+      const startIso = range && range.start ? String(range.start) : "";
+      const endIso = range && range.end ? String(range.end) : "";
+      return startIso && endIso ? [startIso, endIso] : null;
+    },
+    setValue(el, value) {
+      if (typeof el.__sbDateRangePickerReceive === "function") {
+        const arr = Array.isArray(value) ? value : [];
+        el.__sbDateRangePickerReceive({
+          start: arr[0] == null ? "" : String(arr[0]),
+          end: arr[1] == null ? "" : String(arr[1]),
+          notify: false
+        });
+      }
+    },
+    ...dateRangePickerEvents
   }
 ];
 
@@ -404,7 +438,8 @@ const BINDING_NAMES = [
   "shinyblocks.table",
   "shinyblocks.file-input",
   "shinyblocks.toaster",
-  "shinyblocks.date-picker"
+  "shinyblocks.date-picker",
+  "shinyblocks.date-range-picker"
 ];
 
 let bindingsRegistered = false;

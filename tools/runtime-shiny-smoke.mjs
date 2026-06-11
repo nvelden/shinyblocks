@@ -250,6 +250,39 @@ try {
     return document.querySelector(`${root} .sb-date-picker-trigger`)?.disabled === false;
   }, dateRoot);
 
+  // Date range picker: the binding reports `[startIso, endIso]` typed
+  // `shiny.date`, so the server value is a length-2 Date. Covers initial value,
+  // two-click selection, server update, clear, and disabled state.
+  const rangeRoot = "[data-sb-component='date-range-picker'][data-sb-input-id='runtime_range']";
+  await assertText(page, "#runtime_range_value", "2026-06-12/2026-06-18");
+  await assertText(page, "#runtime_range_class", "Date");
+  await assertText(page, "#runtime_range_length", "2");
+  await page.click(`${rangeRoot} .sb-date-range-picker-trigger`);
+  await page.waitForSelector("[data-slot='date-range-picker-content']");
+  await page
+    .locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "13" })
+    .first()
+    .click();
+  await page
+    .locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "16" })
+    .first()
+    .click();
+  await assertText(page, "#runtime_range_value", "2026-06-13/2026-06-16");
+  await page.click("#set_range");
+  await assertText(page, "#runtime_range_value", "2026-06-13/2026-06-17");
+  await page.click("#clear_range");
+  await assertText(page, "#runtime_range_value", "<NULL>");
+  await page.click("#set_range");
+  await assertText(page, "#runtime_range_value", "2026-06-13/2026-06-17");
+  await page.click("#disable_range");
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} .sb-date-range-picker-trigger`)?.disabled === true;
+  }, rangeRoot);
+  await page.click("#enable_range");
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} .sb-date-range-picker-trigger`)?.disabled === false;
+  }, rangeRoot);
+
   const uploadPath = path.join(os.tmpdir(), "shinyblocks-runtime-upload.txt");
   fs.writeFileSync(uploadPath, "runtime upload fixture\n");
   await assertText(page, "#runtime_file_input_value", "<NULL>");
