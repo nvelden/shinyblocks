@@ -76,9 +76,12 @@ normalize_weekstart <- function(weekstart) {
 #' @param max Latest selectable date, in the same accepted forms as `value`.
 #'   `NULL` for no upper bound.
 #' @param placeholder Text shown on the trigger before a date is selected.
-#' @param format Display format for the trigger label. Supports the token set
-#'   `yyyy`, `mm`, `dd`, `M`, `MM`, `D`, `DD` (Shiny's `dateInput()` tokens).
-#'   The transported value is always ISO regardless of `format`.
+#' @param format Display format for the trigger label. Supports the
+#'   `shiny::dateInput()` token set: `yyyy`/`yy` (4- or 2-digit year),
+#'   `mm`/`m` (month number, zero-padded or not), `MM`/`M` (full or short month
+#'   name), `dd`/`d` (day of month, zero-padded or not), and `DD`/`D` (full or
+#'   short weekday name). The transported value is always ISO regardless of
+#'   `format`.
 #' @param weekstart First day of the week, integer 0-6 using Shiny's convention
 #'   (0 = Sunday, 6 = Saturday).
 #' @param disabled Whether the control is disabled.

@@ -70,6 +70,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Date Picker",
+    slug = "date-picker",
+    file = "date-picker.R",
+    description = "Calendar popover for single-date selection with a shiny.date value binding.",
+    featured = TRUE
+  ),
+  list(
     name = "Checkbox",
     slug = "checkbox",
     file = "checkbox.R",

@@ -33,9 +33,12 @@ block_date_picker(
 
 \item{placeholder}{Text shown on the trigger before a date is selected.}
 
-\item{format}{Display format for the trigger label. Supports the token set
-\code{yyyy}, \code{mm}, \code{dd}, \code{M}, \code{MM}, \code{D}, \code{DD} (Shiny's \code{dateInput()} tokens).
-The transported value is always ISO regardless of \code{format}.}
+\item{format}{Display format for the trigger label. Supports the
+\code{shiny::dateInput()} token set: \code{yyyy}/\code{yy} (4- or 2-digit year),
+\code{mm}/\code{m} (month number, zero-padded or not), \code{MM}/\code{M} (full or short month
+name), \code{dd}/\code{d} (day of month, zero-padded or not), and \code{DD}/\code{D} (full or
+short weekday name). The transported value is always ISO regardless of
+\code{format}.}
 
 \item{weekstart}{First day of the week, integer 0-6 using Shiny's convention
 (0 = Sunday, 6 = Saturday).}

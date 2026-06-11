@@ -46,24 +46,31 @@ function todayIso() {
   return toIso(now.getFullYear(), now.getMonth() + 1, now.getDate());
 }
 
-// Shiny `dateInput()` display tokens. Multi-char, case-sensitive: longest match
-// wins via the alternation order. `mm`/`MM` and `dd`/`DD` differ only by case.
+// Shiny `dateInput()` display tokens. Case-sensitive; the regex lists every
+// token longest-first so multi-char tokens win over their single-char prefixes
+// (`yyyy` over `yy`, `dd` over `d`, `mm` over `m`). `mm`/`MM` and `dd`/`DD`
+// differ only by case. Single-char `d`/`m` are unpadded; `yy` is the 2-digit
+// year.
 function formatLabel(iso, format) {
   const parts = parseIso(iso);
   if (!parts) return "";
   const date = new Date(parts.y, parts.m - 1, parts.d);
   const intl = (opts) => new Intl.DateTimeFormat(undefined, opts).format(date);
+  const yyyy = String(parts.y).padStart(4, "0");
   const tokens = {
-    yyyy: String(parts.y).padStart(4, "0"),
+    yyyy,
+    yy: yyyy.slice(-2),
     MM: intl({ month: "long" }),
     mm: pad2(parts.m),
+    m: String(parts.m),
     DD: intl({ weekday: "long" }),
     dd: pad2(parts.d),
+    d: String(parts.d),
     M: intl({ month: "short" }),
     D: intl({ weekday: "short" })
   };
   return String(format || "yyyy-mm-dd").replace(
-    /yyyy|MM|mm|DD|dd|M|D/g,
+    /yyyy|yy|MM|mm|DD|dd|M|D|m|d/g,
     (token) => tokens[token]
   );
 }

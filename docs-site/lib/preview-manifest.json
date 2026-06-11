@@ -110,6 +110,17 @@
     "playgroundHeight": 720
   },
   {
+    "name": "Date Picker",
+    "slug": "date-picker",
+    "description": "Calendar popover for single-date selection with a shiny.date value binding.",
+    "featured": true,
+    "code": "shinyblocks::block_date_picker(\n  \"preview_date_picker\",\n  value = \"2024-06-15\",\n  format = \"M d, yyyy\",\n  placeholder = \"Pick a date\",\n  width = \"240px\"\n)",
+    "codeHtml": "<div id=\"sb-runtime-code-code-32\" class=\"sb-runtime-mount\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"code\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"code\",\"id\":null,\"props\":{\"code\":\"shinyblocks::block_date_picker(\\n  \\\"preview_date_picker\\\",\\n  value = \\\"2024-06-15\\\",\\n  format = \\\"M d, yyyy\\\",\\n  placeholder = \\\"Pick a date\\\",\\n  width = \\\"240px\\\"\\n)\",\"language\":\"r\",\"copyable\":true,\"line_numbers\":true,\"header\":false,\"variant\":\"default\"},\"slots\":[],\"children\":[],\"state\":[],\"binding\":[],\"className\":null,\"style\":null}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\"><\/div>\n<\/div>",
+    "html": "<div id=\"sb-runtime-date-picker-preview_date_picker\" class=\"sb-runtime-mount sb-date-picker\" style=\"width:240px;\" data-shinyblocks-root=\"\" data-shinyblocks-runtime=\"true\" data-sb-component=\"date-picker\" data-sb-input-id=\"preview_date_picker\">\n  <script type=\"application/json\" data-shinyblocks-payload=\"\">{\"schemaVersion\":1,\"component\":\"date-picker\",\"id\":\"preview_date_picker\",\"props\":{\"placeholder\":\"Pick a date\",\"format\":\"M d, yyyy\",\"weekstart\":0,\"min\":null,\"max\":null,\"disabled\":false,\"invalid\":false,\"style\":null,\"spriteHref\":\"/shinyblocks/runtime/shinyblocks-0.0.0.9002.1781028523/icons/sprite.svg\"},\"slots\":[],\"children\":[],\"state\":{\"value\":\"2024-06-15\"},\"binding\":{\"input\":true,\"type\":\"shinyblocks.date-picker\"},\"className\":null,\"style\":{\"width\":\"240px\"}}<\/script>\n  <div data-shinyblocks-react=\"\"><\/div>\n  <div data-shinyblocks-children=\"\">\n    <input id=\"preview_date_picker\" type=\"text\" class=\"sb-date-picker-native\" tabindex=\"-1\" aria-hidden=\"true\" data-shiny-no-bind-input=\"\" style=\"display:none\" value=\"2024-06-15\"/>\n  <\/div>\n<\/div>",
+    "hasPlayground": true,
+    "playgroundHeight": 720
+  },
+  {
     "name": "Checkbox",
     "slug": "checkbox",
     "description": "Stateful toggle selector for standalone options or boolean flags.",

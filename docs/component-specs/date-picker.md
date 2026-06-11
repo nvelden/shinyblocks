@@ -2,10 +2,12 @@
 
 > Shinyblocks function: `block_date_picker()` / `update_block_date_picker()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/date-picker>
-> Status: Slices 1-3 shipped — R API + runtime payload + `shiny.date` value
-> contract, the runtime trigger/calendar component and binding, and shadcn
-> token/theme parity (theme-registry + style-registry coverage). The interactive
-> showcase playground and the reference screenshot land in slice 4 (issue #59).
+> Status: Slices 1-4 shipped — R API + runtime payload + `shiny.date` value
+> contract, the runtime trigger/calendar component and binding, shadcn
+> token/theme parity (theme-registry + style-registry coverage), and the
+> showcase + docs-site playgrounds (Content/State/Actions/Styling controls,
+> `input$` value display, API table). Follow-up: `block_date_range_picker()`
+> (separate issue).
 
 ## Overview
 
@@ -37,7 +39,7 @@ use `--ring`.
 | `value` | Initial date (`Date`, POSIX time, or `"yyyy-mm-dd"` string). `NULL` (default) starts empty — placeholder-first, unlike `dateInput()`'s "today" default. Intentional shadcn parity. |
 | `min` / `max` | Selectable bounds in the same accepted forms. `min` must not be after `max`; a `value` outside the bounds is rejected. |
 | `placeholder` | Trigger text shown before a date is selected. |
-| `format` | Display format for the trigger label. Tokens: `yyyy`, `mm`, `dd`, `M`, `MM`, `D`, `DD` (Shiny `dateInput()` tokens). Display-only — the transported value stays ISO. |
+| `format` | Display format for the trigger label. Tokens: `yyyy`/`yy`, `mm`/`m`, `MM`/`M`, `dd`/`d`, `DD`/`D` (Shiny `dateInput()` tokens). Display-only — the transported value stays ISO. |
 | `weekstart` | First day of week, integer 0-6 (Shiny convention: 0 = Sunday, 6 = Saturday). |
 | `disabled` | Disables the trigger and hidden input. |
 | `invalid` | Applies `aria-invalid` and destructive styling. |
@@ -96,4 +98,9 @@ selection reports `null`, so `input$<id>` is `NULL`.
 
 ## Reference screenshot
 
-_Pending — captured alongside the showcase playground (slice 4)._
+_Pending manual upstream capture._ Grab the canonical look from
+<https://ui.shadcn.com/docs/components/date-picker>, save it as
+`_screenshots/date-picker.png`, then replace this note with
+`![Date Picker](_screenshots/date-picker.png)` and a "Captured from … on
+<date>" caption (matching the other specs). Refresh whenever shadcn updates the
+canonical design.

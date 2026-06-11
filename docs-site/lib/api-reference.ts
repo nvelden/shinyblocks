@@ -293,6 +293,42 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "date-picker": [
+    {
+      name: "block_date_picker",
+      description: "A shadcn-style date picker: a trigger button plus a portaled calendar popover, backed by a shiny.date value binding (input$id is a length-1 Date).",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Shiny input binding identifier." },
+        { argument: "value", type: "Date | character", defaultVal: "NULL", description: "Initial date (Date, POSIX time, or yyyy-mm-dd string). NULL starts empty (placeholder first)." },
+        { argument: "min", type: "Date | character", defaultVal: "NULL", description: "Earliest selectable date. NULL for no lower bound." },
+        { argument: "max", type: "Date | character", defaultVal: "NULL", description: "Latest selectable date. NULL for no upper bound." },
+        { argument: "placeholder", type: "character", defaultVal: "'Pick a date'", description: "Trigger text shown before a date is selected." },
+        { argument: "format", type: "character", defaultVal: "'yyyy-mm-dd'", description: "Display format for the trigger label (yyyy/yy, mm/m, MM/M, dd/d, DD/D tokens). The transported value is always ISO." },
+        { argument: "weekstart", type: "integer", defaultVal: "0", description: "First day of the week (Shiny convention: 0 = Sunday, 6 = Saturday)." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user interaction." },
+        { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply aria-invalid and destructive border/ring styling." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width applied to the wrapper." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional styling classes." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styling string applied to the trigger." }
+      ]
+    },
+    {
+      name: "update_block_date_picker",
+      description: "Updates the value, bounds, and cosmetic props of a date picker from R. Omitted arguments are left unchanged; pass clear = TRUE to empty the value.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session object." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
+        { argument: "value", type: "Date | character", defaultVal: "missing", description: "Replacement date. Omit to leave unchanged." },
+        { argument: "min", type: "Date | character", defaultVal: "missing", description: "Replacement lower bound. Pass NULL to clear the bound." },
+        { argument: "max", type: "Date | character", defaultVal: "missing", description: "Replacement upper bound. Pass NULL to clear the bound." },
+        { argument: "placeholder", type: "character", defaultVal: "missing", description: "Replacement placeholder text." },
+        { argument: "disabled", type: "logical", defaultVal: "missing", description: "Toggle input disabled state." },
+        { argument: "invalid", type: "logical", defaultVal: "missing", description: "Update invalid border styling." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a value change fires a Shiny input event. Cosmetic-only updates never notify." },
+        { argument: "clear", type: "logical", defaultVal: "FALSE", description: "Clear the selected date (sends an explicit empty value). Takes precedence over value." }
+      ]
+    }
+  ],
   checkbox: [
     {
       name: "block_checkbox",
