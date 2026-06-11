@@ -33,6 +33,7 @@ Collate:
     'field.R'
     'input-group.R'
     'select.R'
+    'date-picker.R'
     'form-controls.R'
     'radio-group.R'
     'tabs.R'

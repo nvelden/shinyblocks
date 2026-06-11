@@ -69,6 +69,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-code-default", property: "backgroundColor", token: "--muted" }
     ]
   },
+  "date-picker": {
+    section: "date-picker",
+    bindings: [
+      { selector: ".sb-parity-date-picker-default .sb-date-picker-trigger", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-date-picker-default .sb-date-picker-trigger", property: "borderColor", token: "--input" }
+    ]
+  },
   dialog: {
     section: "dialog",
     mode: "static-only",

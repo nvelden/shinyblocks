@@ -48,6 +48,7 @@ Update a runtime text input
 \seealso{
 Other forms: 
 \code{\link{block_checkbox}()},
+\code{\link{block_date_picker}()},
 \code{\link{block_field}()},
 \code{\link{block_field_description}()},
 \code{\link{block_field_group}()},
@@ -65,6 +66,7 @@ Other forms:
 \code{\link{block_switch}()},
 \code{\link{block_textarea}()},
 \code{\link{update_block_checkbox}()},
+\code{\link{update_block_date_picker}()},
 \code{\link{update_block_file_input}()},
 \code{\link{update_block_radio_group}()},
 \code{\link{update_block_select}()},

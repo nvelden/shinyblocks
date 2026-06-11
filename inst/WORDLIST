@@ -12,6 +12,7 @@ bslib
 callout
 centre
 centred
+clearable
 colour
 composable
 CRAN
@@ -24,6 +25,7 @@ datatables
 debounced
 deduplicated
 der
+deserializes
 dev
 dialog's
 dogfooded
@@ -56,11 +58,14 @@ ng
 normalisation
 normaliser
 oklch
+PageDown
+PageUp
 passthrough
 pkgdown
 plotly
 PNG
 POC
+portaled
 pre
 Pre
 prefersColorScheme
@@ -77,6 +82,7 @@ roxygen
 roxygen2
 runtime
 scrollbar
+selectable
 Selectize
 selectize
 Selectize's

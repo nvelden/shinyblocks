@@ -77,6 +77,27 @@ const selectPayload = JSON.stringify({
   binding: { input: true },
   className: null
 });
+const datePickerPayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "date-picker",
+  id: "runtime_date",
+  props: {
+    placeholder: "Pick a date",
+    format: "yyyy-mm-dd",
+    weekstart: 0,
+    min: "2026-06-10",
+    max: "2026-06-20",
+    disabled: false,
+    invalid: false,
+    style: {},
+    spriteHref: "shinyblocks-0.0.0.9000/icons/sprite.svg"
+  },
+  slots: {},
+  children: [],
+  state: { value: "2026-06-15" },
+  binding: { input: true, type: "shinyblocks.date-picker" },
+  className: null
+});
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
@@ -122,6 +143,11 @@ try {
           <script type="application/json" data-shinyblocks-payload>${selectPayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children></div>
+        </div>
+        <div id="runtime-date" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="date-picker" data-sb-input-id="runtime_date">
+          <script type="application/json" data-shinyblocks-payload>${datePickerPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children><input type="text" class="sb-date-picker-native" id="runtime_date" value="2026-06-15" /></div>
         </div>
         <script>${runtime}</script>
       </body>
@@ -197,6 +223,41 @@ try {
     "select content should stay visible inside a short embedded viewport"
   );
   await page.keyboard.press("Escape");
+
+  // Date picker: trigger renders the formatted value, calendar opens, out-of-
+  // bounds days are disabled, and selecting a day writes the single-writer
+  // expando + hidden native input. Grow the viewport so the portaled calendar
+  // (fixed-positioned below the trigger) is on-screen and clickable.
+  await page.setViewportSize({ width: 640, height: 800 });
+  assert.equal(
+    await page.locator("#runtime-date .sb-date-picker-value").textContent(),
+    "2026-06-15",
+    "date picker should render the formatted trigger label"
+  );
+  await page.locator("#runtime-date .sb-date-picker-trigger").click();
+  await page.waitForSelector("[data-slot='date-picker-content']");
+  assert.equal(
+    await page.locator("[data-slot='date-picker-content'] .sb-date-picker-day", { hasText: "9" }).first().isDisabled(),
+    true,
+    "days before min should be disabled"
+  );
+  await page.locator("[data-slot='date-picker-content'] .sb-date-picker-day", { hasText: "12" }).first().click();
+  await page.waitForSelector("[data-slot='date-picker-content']", { state: "detached" });
+  assert.equal(
+    await page.locator("#runtime-date").evaluate((node) => node.__sbDatePickerValue),
+    "2026-06-12",
+    "selecting a day should write the date-picker value expando"
+  );
+  assert.equal(
+    await page.locator("#runtime-date input.sb-date-picker-native").inputValue(),
+    "2026-06-12",
+    "selecting a day should update the hidden native input"
+  );
+  assert.equal(
+    await page.locator("#runtime-date .sb-date-picker-value").textContent(),
+    "2026-06-12",
+    "selecting a day should update the trigger label"
+  );
 
   await page.evaluate((payloadText) => {
     const inserted = document.createElement("div");

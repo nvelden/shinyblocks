@@ -66,6 +66,11 @@
   border: 2px dashed var(--ring) !important;
 }
 
+.showcase-date-picker-preview-custom .sb-date-picker-trigger,
+.sb-date-picker.showcase-date-picker-preview-custom .sb-date-picker-trigger {
+  border: 2px dashed var(--ring) !important;
+}
+
 .showcase-dialog-preview-custom .sb-dialog-content,
 .sb-dialog-content.showcase-dialog-preview-custom,
 .showcase-dialog-preview-custom {

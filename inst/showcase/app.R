@@ -5,6 +5,7 @@ source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
 source(file.path("R", "server_button.R"), local = TRUE)
 source(file.path("R", "server_select.R"), local = TRUE)
+source(file.path("R", "server_date_picker.R"), local = TRUE)
 source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
 source(file.path("R", "server_popover.R"), local = TRUE)
@@ -153,6 +154,17 @@ sections <- list(
     title = "Select",
     lead = NULL,
     file = "select.R"
+  ),
+  list(
+    id = "date-picker",
+    label = "Date picker",
+    icon = "calendar",
+    title = "Date picker",
+    lead = paste(
+      "Runtime-rendered shadcn-style date picker: trigger button plus a portaled",
+      "calendar, hidden native input, and a shiny.date value binding."
+    ),
+    file = "date_picker.R"
   ),
   list(
     id = "checkbox",
@@ -473,6 +485,7 @@ server <- function(input, output, session) {
   register_button_showcase(input, output, session)
   register_code_showcase(input, output, session)
   register_select_showcase(input, output, session)
+  register_date_picker_showcase(input, output, session)
   register_checkbox_showcase(input, output, session)
   register_textarea_showcase(input, output, session)
   register_file_input_showcase(input, output, session)

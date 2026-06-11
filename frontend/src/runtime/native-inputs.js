@@ -86,6 +86,21 @@ export function setNativeSliderValue(root, value, notify) {
   }
 }
 
+export function nativeDatePicker(root) {
+  return root ? root.querySelector("input.sb-date-picker-native") : null;
+}
+
+export function setNativeDatePickerValue(root, value, notify) {
+  const native = nativeDatePicker(root);
+  if (!native) return;
+  const next = value == null ? "" : String(value);
+  native.value = next;
+  if (notify) {
+    native.dispatchEvent(new Event("input", { bubbles: true }));
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
 export function nativeSwitch(root) {
   return root ? root.querySelector(".sb-switch-native") : null;
 }

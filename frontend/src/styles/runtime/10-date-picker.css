@@ -1,0 +1,184 @@
+/*
+ * Date picker (block_date_picker). Trigger button + portaled calendar popover.
+ * Visual roles map to shadcn's Date Picker; theme parity fixtures land in the
+ * styling slice. Trigger lives under the mount root; the calendar is portaled.
+ */
+
+[data-shinyblocks-root] .sb-date-picker-shell {
+  display: inline-flex;
+  width: 100%;
+  max-width: 100%;
+}
+
+[data-shinyblocks-root] .sb-date-picker-trigger {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--sb-control-gap);
+  height: var(--sb-control-height);
+  border: 1px solid var(--sb-date-picker-border, var(--input));
+  border-radius: var(--sb-date-picker-radius, calc(var(--radius) * 0.8));
+  background-color: var(--sb-date-picker-surface, var(--background));
+  color: var(--foreground);
+  padding: 0.5rem 0.75rem;
+  font-size: var(--sb-control-font-size);
+  line-height: 1.25rem;
+  text-align: left;
+  outline: none;
+  box-shadow: var(--sb-control-shadow);
+  cursor: pointer;
+  transition:
+    color var(--sb-transition-duration),
+    border-color var(--sb-transition-duration),
+    box-shadow var(--sb-transition-duration);
+}
+
+[data-shinyblocks-root] .sb-date-picker-trigger[data-placeholder="true"] {
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-date-picker-trigger:focus-visible,
+[data-shinyblocks-root] .sb-date-picker-trigger[data-state="open"] {
+  border-color: var(--ring);
+  box-shadow:
+    0 0 0 var(--sb-focus-ring-width) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent),
+    0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+[data-shinyblocks-root] .sb-date-picker-trigger[data-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+[data-shinyblocks-root] .sb-date-picker-trigger:disabled {
+  cursor: not-allowed;
+  opacity: var(--sb-disabled-opacity);
+}
+
+[data-shinyblocks-root] .sb-date-picker-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+
+[data-shinyblocks-root] .sb-date-picker-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Portaled calendar ---------------------------------------------------- */
+
+[data-shinyblocks-portal-root] .sb-date-picker-content {
+  z-index: 50;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: var(--sb-date-picker-content-radius, calc(var(--radius) * 0.8));
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  padding: 0.75rem;
+  box-shadow: var(--sb-overlay-shadow);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-month {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius) * 0.5);
+  background-color: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-nav-btn:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-nav-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-weekdays,
+[data-shinyblocks-portal-root] .sb-date-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, 2rem);
+  gap: 0.125rem;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-weekday {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-pad {
+  display: block;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: calc(var(--radius) * 0.5);
+  background-color: transparent;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  cursor: pointer;
+  outline: none;
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-day:hover:not(:disabled):not([data-selected="true"]) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-day:focus-visible {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 var(--sb-focus-ring-width, 3px) color-mix(in oklch, var(--ring) var(--sb-focus-ring-opacity), transparent);
+}
+
+/* Today mirrors shadcn's calendar: accent surface rather than an outline, so
+ * the selected-day primary fill below still wins when today is selected. */
+[data-shinyblocks-portal-root] .sb-date-picker-day[data-today="true"] {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-day[data-selected="true"] {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-date-picker-day:disabled {
+  color: var(--muted-foreground);
+  opacity: var(--sb-disabled-opacity);
+  cursor: not-allowed;
+}

@@ -35,6 +35,7 @@ playground_heights <- list(
   card = 720L,
   checkbox = 720L,
   code = 720L,
+  `date-picker` = 720L,
   empty = 720L,
   `file-input` = 720L,
   field = 720L,
