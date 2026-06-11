@@ -21,6 +21,7 @@ Create a field wrapper
 Other forms: 
 \code{\link{block_checkbox}()},
 \code{\link{block_date_picker}()},
+\code{\link{block_date_range_picker}()},
 \code{\link{block_field_description}()},
 \code{\link{block_field_group}()},
 \code{\link{block_field_invalid}()},
@@ -38,6 +39,7 @@ Other forms:
 \code{\link{block_textarea}()},
 \code{\link{update_block_checkbox}()},
 \code{\link{update_block_date_picker}()},
+\code{\link{update_block_date_range_picker}()},
 \code{\link{update_block_file_input}()},
 \code{\link{update_block_input}()},
 \code{\link{update_block_radio_group}()},
