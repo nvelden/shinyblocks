@@ -329,6 +329,46 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "date-range-picker": [
+    {
+      name: "block_date_range_picker",
+      description: "A shadcn-style date range picker: a trigger button plus a portaled two-endpoint calendar popover, backed by a shiny.date value binding (input$id is a length-2 Date, c(start, end), or NULL while incomplete).",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Shiny input binding identifier." },
+        { argument: "start", type: "Date | character", defaultVal: "NULL", description: "Range start (Date, POSIX time, or yyyy-mm-dd string). Provide both start and end, or neither (NULL starts empty)." },
+        { argument: "end", type: "Date | character", defaultVal: "NULL", description: "Range end. A reversed start/end pair is silently ordered, matching dateRangeInput()." },
+        { argument: "min", type: "Date | character", defaultVal: "NULL", description: "Earliest selectable date. NULL for no lower bound." },
+        { argument: "max", type: "Date | character", defaultVal: "NULL", description: "Latest selectable date. NULL for no upper bound." },
+        { argument: "separator", type: "character", defaultVal: "' \\u2013 '", description: "Text placed between the two endpoints on the trigger label." },
+        { argument: "placeholder", type: "character", defaultVal: "'Pick a date range'", description: "Trigger text shown before a range is selected." },
+        { argument: "format", type: "character", defaultVal: "'yyyy-mm-dd'", description: "Display format for each endpoint on the trigger label (yyyy/yy, mm/m, MM/M, dd/d, DD/D tokens). The transported value is always ISO." },
+        { argument: "weekstart", type: "integer", defaultVal: "0", description: "First day of the week (Shiny convention: 0 = Sunday, 6 = Saturday)." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user interaction." },
+        { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply aria-invalid and destructive border/ring styling." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width applied to the wrapper." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional styling classes." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styling string applied to the trigger." }
+      ]
+    },
+    {
+      name: "update_block_date_range_picker",
+      description: "Updates the range, bounds, and cosmetic props of a date range picker from R. Omitted arguments are left unchanged; start and end can be updated independently. Pass clear = TRUE to empty the range.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session object." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
+        { argument: "start", type: "Date | character", defaultVal: "missing", description: "Replacement range start. Omit to leave unchanged." },
+        { argument: "end", type: "Date | character", defaultVal: "missing", description: "Replacement range end. Omit to leave unchanged." },
+        { argument: "min", type: "Date | character", defaultVal: "missing", description: "Replacement lower bound. Pass NULL to clear the bound." },
+        { argument: "max", type: "Date | character", defaultVal: "missing", description: "Replacement upper bound. Pass NULL to clear the bound." },
+        { argument: "separator", type: "character", defaultVal: "missing", description: "Replacement separator text." },
+        { argument: "placeholder", type: "character", defaultVal: "missing", description: "Replacement placeholder text." },
+        { argument: "disabled", type: "logical", defaultVal: "missing", description: "Toggle input disabled state." },
+        { argument: "invalid", type: "logical", defaultVal: "missing", description: "Update invalid border styling." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a range change fires a Shiny input event. Cosmetic-only updates never notify." },
+        { argument: "clear", type: "logical", defaultVal: "FALSE", description: "Clear the selected range (sends an explicit empty range). Takes precedence over start/end." }
+      ]
+    }
+  ],
   checkbox: [
     {
       name: "block_checkbox",

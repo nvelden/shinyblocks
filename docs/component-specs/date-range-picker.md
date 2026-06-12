@@ -2,11 +2,12 @@
 
 > Shinyblocks function: `block_date_range_picker()` / `update_block_date_range_picker()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/date-picker> (Calendar `mode="range"`)
-> Status: Slices 1-3 shipped — R API + runtime payload + `shiny.date` value
-> contract (length-2 `Date`), the shared `Calendar` core (extracted from the
-> single-date picker), and the runtime trigger/range-calendar component +
-> binding. Follow-up: theme parity fixtures (slice 4) and the showcase +
-> docs-site playgrounds (slice 5).
+> Status: Shipped — R API + runtime payload + `shiny.date` value contract
+> (length-2 `Date`), the shared `Calendar` core (extracted from the single-date
+> picker), the runtime trigger/range-calendar component + binding, theme parity
+> fixtures + registry entry, and the full showcase + docs-site interactive
+> playgrounds (Content/State/Actions/Styling controls, live `input$` value, API
+> table).
 
 ## Overview
 
