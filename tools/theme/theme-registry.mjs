@@ -76,6 +76,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-date-picker-default .sb-date-picker-trigger", property: "borderColor", token: "--input" }
     ]
   },
+  "date-range-picker": {
+    section: "date-range-picker",
+    bindings: [
+      { selector: ".sb-parity-date-range-picker-default .sb-date-range-picker-trigger", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-date-range-picker-default .sb-date-range-picker-trigger", property: "borderColor", token: "--input" }
+    ]
+  },
   dialog: {
     section: "dialog",
     mode: "static-only",

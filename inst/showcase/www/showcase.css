@@ -71,6 +71,11 @@
   border: 2px dashed var(--ring) !important;
 }
 
+.showcase-date-range-picker-preview-custom .sb-date-range-picker-trigger,
+.sb-date-range-picker.showcase-date-range-picker-preview-custom .sb-date-range-picker-trigger {
+  border: 2px dashed var(--ring) !important;
+}
+
 .showcase-dialog-preview-custom .sb-dialog-content,
 .sb-dialog-content.showcase-dialog-preview-custom,
 .showcase-dialog-preview-custom {

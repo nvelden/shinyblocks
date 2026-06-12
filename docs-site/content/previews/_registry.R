@@ -77,6 +77,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Date Range Picker",
+    slug = "date-range-picker",
+    file = "date-range-picker.R",
+    description = "Calendar popover for two-endpoint range selection with a length-2 shiny.date value binding.",
+    featured = TRUE
+  ),
+  list(
     name = "Checkbox",
     slug = "checkbox",
     file = "checkbox.R",

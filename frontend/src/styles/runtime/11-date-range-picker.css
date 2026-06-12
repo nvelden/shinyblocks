@@ -1,0 +1,44 @@
+/*
+ * Date range picker (block_date_range_picker) — range-only roles. The trigger,
+ * popover, nav, weekday, and day-base rules are shared with the single-date
+ * picker and live in 10-date-picker.css (matched there via `:is(...)` on both
+ * class prefixes). Only the two-endpoint range styling lives here: the in-range
+ * band, the hover preview at reduced emphasis, and the squared endpoint corners.
+ * This file imports after 10, so these rules win on equal specificity.
+ */
+
+/* `position: relative` so the endpoint corner-radius overrides paint above the
+ * in-range band of the adjacent day. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day {
+  position: relative;
+}
+
+/* In-range middle days: accent band; square corners so they read as a
+ * continuous bar between the two primary endpoints. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-in-range="true"] {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: 0;
+}
+
+/* Hover preview while picking the second endpoint: the same accent band but at
+ * reduced emphasis so an uncommitted draft reads as tentative vs a committed
+ * range. Lands after the in-range rule so it wins on equal specificity. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-in-range="true"][data-preview="true"] {
+  background-color: color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
+/* The pending second endpoint during a draft selection is tentative too. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-selected="true"][data-preview="true"] {
+  background-color: color-mix(in oklch, var(--primary) 70%, transparent);
+}
+
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-range-start="true"]:not([data-range-end="true"]) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-range-end="true"]:not([data-range-start="true"]) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

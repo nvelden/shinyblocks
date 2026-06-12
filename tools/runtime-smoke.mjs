@@ -98,6 +98,28 @@ const datePickerPayload = JSON.stringify({
   binding: { input: true, type: "shinyblocks.date-picker" },
   className: null
 });
+const dateRangePayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "date-range-picker",
+  id: "runtime_range",
+  props: {
+    separator: " to ",
+    placeholder: "Pick a date range",
+    format: "yyyy-mm-dd",
+    weekstart: 0,
+    min: "2026-06-10",
+    max: "2026-06-20",
+    disabled: false,
+    invalid: false,
+    style: {},
+    spriteHref: "shinyblocks-0.0.0.9000/icons/sprite.svg"
+  },
+  slots: {},
+  children: [],
+  state: { start: "2026-06-12", end: "2026-06-18" },
+  binding: { input: true, type: "shinyblocks.date-range-picker" },
+  className: null
+});
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
@@ -148,6 +170,11 @@ try {
           <script type="application/json" data-shinyblocks-payload>${datePickerPayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children><input type="text" class="sb-date-picker-native" id="runtime_date" value="2026-06-15" /></div>
+        </div>
+        <div id="runtime-range" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="date-range-picker" data-sb-input-id="runtime_range">
+          <script type="application/json" data-shinyblocks-payload>${dateRangePayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children><input type="text" class="sb-date-range-picker-native" id="runtime_range" value="2026-06-12/2026-06-18" /></div>
         </div>
         <script>${runtime}</script>
       </body>
@@ -257,6 +284,145 @@ try {
     await page.locator("#runtime-date .sb-date-picker-value").textContent(),
     "2026-06-12",
     "selecting a day should update the trigger label"
+  );
+
+  // Date range picker: trigger renders both endpoints, out-of-bounds days are
+  // disabled, the first click anchors without committing (popover stays open and
+  // the reported value is unchanged), and the second click commits the ordered
+  // pair — reversed clicks swap — writing the `[start, end]` expando + the
+  // delimited hidden native input.
+  assert.equal(
+    await page.locator("#runtime-range .sb-date-range-picker-value").textContent(),
+    "2026-06-12 to 2026-06-18",
+    "date range picker should render both endpoints in the trigger label"
+  );
+  await page.locator("#runtime-range .sb-date-range-picker-trigger").click();
+  await page.waitForSelector("[data-slot='date-range-picker-content']");
+  assert.equal(
+    await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "9" }).first().isDisabled(),
+    true,
+    "range days before min should be disabled"
+  );
+  // First click (later day) anchors the selection but does not commit.
+  await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "16" }).first().click();
+  assert.equal(
+    await page.locator("[data-slot='date-range-picker-content']").count(),
+    1,
+    "first range click should keep the popover open"
+  );
+  assert.deepEqual(
+    await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerValue),
+    { start: "2026-06-12", end: "2026-06-18" },
+    "first range click should not change the committed range"
+  );
+  // Hovering an earlier day makes the *moving* endpoint (now the start) the
+  // tentative one — it must carry data-preview, not paint as a committed end.
+  await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "14" }).first().hover();
+  assert.equal(
+    await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "14" }).first().getAttribute("data-preview"),
+    "true",
+    "leftward hover should mark the moving start endpoint as a preview"
+  );
+  // Second click (earlier day) commits the swapped, ordered range and closes.
+  await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day", { hasText: "14" }).first().click();
+  await page.waitForSelector("[data-slot='date-range-picker-content']", { state: "detached" });
+  assert.deepEqual(
+    await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerValue),
+    { start: "2026-06-14", end: "2026-06-16" },
+    "committing a reversed range should swap into ascending order"
+  );
+  assert.equal(
+    await page.locator("#runtime-range input.sb-date-range-picker-native").inputValue(),
+    "2026-06-14/2026-06-16",
+    "committing a range should update the delimited hidden native input"
+  );
+  assert.equal(
+    await page.locator("#runtime-range .sb-date-range-picker-value").textContent(),
+    "2026-06-14 to 2026-06-16",
+    "committing a range should update the trigger label"
+  );
+
+  // Keyboard navigation: open, arrow around, Home, commit via Enter, and cancel
+  // a draft via Escape — asserting `document.activeElement` throughout. The
+  // arrow-nav assertions are the regression guard for the focus-cleanup bug:
+  // changing the focused day must NOT tear down the popover/return-focus effect.
+  const activeText = () =>
+    page.evaluate(() => document.activeElement && document.activeElement.textContent);
+  const waitForTriggerFocus = () =>
+    page.waitForFunction(() =>
+      Boolean(document.activeElement && document.activeElement.classList.contains("sb-date-range-picker-trigger"))
+    );
+  const activeIsTrigger = () =>
+    page.evaluate(() =>
+      Boolean(document.activeElement && document.activeElement.classList.contains("sb-date-range-picker-trigger"))
+    );
+
+  // Clear the bounds so keyboard nav can roam the whole month (days past the
+  // 06-20 max would otherwise be disabled and unable to take focus).
+  await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerReceive({ min: null, max: null }));
+
+  // ARIA grid is well-formed: weeks are `role="row"` and days `role="gridcell"`.
+  await page.locator("#runtime-range .sb-date-range-picker-trigger").click();
+  await page.waitForSelector("[data-slot='date-range-picker-content']");
+  assert.ok(
+    (await page.locator("[data-slot='date-range-picker-content'] [role='row']").count()) >= 5,
+    "range calendar should wrap each week in a role=row"
+  );
+  assert.ok(
+    (await page.locator("[data-slot='date-range-picker-content'] .sb-date-range-picker-day[role='gridcell']").count()) > 0,
+    "range day cells should keep role=gridcell"
+  );
+
+  // On open, focus lands on the committed start (14).
+  assert.equal(await activeText(), "14", "open should focus the committed start day");
+  // ArrowRight + ArrowDown move focus; the popover stays open (regression guard).
+  await page.keyboard.press("ArrowRight");
+  assert.equal(await activeText(), "15", "ArrowRight should move focus a day forward");
+  await page.keyboard.press("ArrowDown");
+  assert.equal(await activeText(), "22", "ArrowDown should move focus a week forward");
+  assert.equal(
+    await page.locator("[data-slot='date-range-picker-content']").count(),
+    1,
+    "arrow navigation must not close the popover"
+  );
+  assert.equal(await activeIsTrigger(), false, "arrow navigation must not return focus to the trigger");
+  // Home jumps to the first day of the focused week. 2026-06-22 is a Monday;
+  // weekstart 0 (Sunday) → the row starts on 2026-06-21.
+  await page.keyboard.press("Home");
+  assert.equal(await activeText(), "21", "Home should focus the first day of the week (weekstart Sunday)");
+  // Enter anchors the first endpoint (popover stays open), ArrowRight previews,
+  // Enter commits the second endpoint and returns focus to the trigger.
+  await page.keyboard.press("Enter");
+  assert.equal(
+    await page.locator("[data-slot='date-range-picker-content']").count(),
+    1,
+    "first Enter should anchor without closing"
+  );
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("[data-slot='date-range-picker-content']", { state: "detached" });
+  await waitForTriggerFocus();
+  assert.equal(await activeIsTrigger(), true, "committing via Enter should return focus to the trigger");
+  assert.deepEqual(
+    await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerValue),
+    { start: "2026-06-21", end: "2026-06-23" },
+    "keyboard Enter/Enter should commit the ordered range"
+  );
+
+  // Escape during a draft cancels the in-progress selection and returns focus.
+  await page.locator("#runtime-range .sb-date-range-picker-trigger").click();
+  await page.waitForSelector("[data-slot='date-range-picker-content']");
+  await page.keyboard.press("Enter"); // anchor a draft
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("[data-slot='date-range-picker-content']", { state: "detached" });
+  await waitForTriggerFocus();
+  assert.equal(await activeIsTrigger(), true, "Escape should return focus to the trigger");
+  assert.deepEqual(
+    await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerValue),
+    { start: "2026-06-21", end: "2026-06-23" },
+    "Escape during a draft must leave the committed range unchanged"
   );
 
   await page.evaluate((payloadText) => {

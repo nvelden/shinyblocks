@@ -38,10 +38,13 @@ targets <- list(
     # asset to ~56 KB raw. Raised 57 -> 60 KB for a 5% headroom increase.
     # Raised 60 -> 65 KB for the #59 date-picker runtime CSS (hand-rolled, no
     # library): trigger surface + portaled calendar (month nav, weekday header,
-    # day grid, selected/today/disabled/focus states) adds ~4 KB raw.
+    # day grid, selected/today/disabled/focus states) adds ~4 KB raw. Raised
+    # 65 -> 70 KB for the #61 date-range-picker runtime CSS (trigger + portaled
+    # range calendar: in-range band, range-start/end endpoints, hover-preview
+    # reduced-emphasis states) adds ~3.5 KB raw.
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 65,
+    limit_kb = 70,
     metric = "raw",
     group = "runtime"
   ),
@@ -57,8 +60,12 @@ targets <- list(
     group = "runtime"
   ),
   list(
+    # Raised 275 -> 285 KB for the #61 date-range-picker runtime: the range
+    # state machine (two-click commit, hover/keyboard preview, half-open
+    # guard) + its binding adds ~3 KB raw on top of the shared calendar core
+    # (extracted, not duplicated). Still no react-day-picker dependency.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 275,
+    limit_kb = 285,
     metric = "raw",
     group = "runtime"
   ),
@@ -70,9 +77,10 @@ targets <- list(
     # under the 275 KB guard). NB: this gzipped metric is platform-variant
     # (R's memCompress zlib differs by OS), so sub-100-byte margins cannot be
     # measured reliably across local/CI. Raised 78 -> 82 KB for a 5% headroom
-    # increase. Raw (275 KB) stays the headroom guard.
+    # increase, then 82 -> 85 KB for the #61 date-range-picker runtime. Raw
+    # (285 KB) stays the headroom guard.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 82,
+    limit_kb = 85,
     metric = "gzipped",
     group = "runtime"
   ),
