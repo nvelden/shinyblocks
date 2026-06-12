@@ -2,8 +2,7 @@
  * Date range picker (block_date_range_picker). Trigger button + portaled
  * calendar with a two-endpoint range selection. Structure mirrors the
  * single-date picker; range-specific day roles (start / end / in-range middle /
- * hover preview) map to shadcn's `Calendar mode="range"`. Theme parity fixtures
- * land in the styling slice.
+ * hover preview) map to shadcn's `Calendar mode="range"`.
  */
 
 [data-shinyblocks-root] .sb-date-range-picker-shell {
@@ -181,10 +180,22 @@
   border-radius: 0;
 }
 
+/* Hover preview while picking the second endpoint: the same accent band but at
+ * reduced emphasis so an uncommitted draft reads as tentative vs a committed
+ * range. Lands after the in-range rule so it wins on equal specificity. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-in-range="true"][data-preview="true"] {
+  background-color: color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
 /* Range endpoints win over in-range / today with the primary fill. */
 [data-shinyblocks-portal-root] .sb-date-range-picker-day[data-selected="true"] {
   background-color: var(--primary);
   color: var(--primary-foreground);
+}
+
+/* The pending second endpoint during a draft selection is tentative too. */
+[data-shinyblocks-portal-root] .sb-date-range-picker-day[data-selected="true"][data-preview="true"] {
+  background-color: color-mix(in oklch, var(--primary) 70%, transparent);
 }
 
 [data-shinyblocks-portal-root] .sb-date-range-picker-day[data-range-start="true"]:not([data-range-end="true"]) {

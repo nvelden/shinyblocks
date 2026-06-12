@@ -61,7 +61,9 @@ block_date_range_picker <- function(
   end = NULL,
   min = NULL,
   max = NULL,
-  separator = " – ",
+  # `\u2013` (en dash) as a locale-independent escape: a literal en-dash in the
+  # source is mangled to "<U+2013>" when the package is parsed under a C locale.
+  separator = " \u2013 ",
   placeholder = "Pick a date range",
   format = "yyyy-mm-dd",
   weekstart = 0,

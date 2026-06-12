@@ -272,10 +272,14 @@ export function DateRangePicker({ payload, root }) {
     const inRange = lo != null && hi != null && iso > lo && iso < hi;
     const selected = isStart || isEnd;
     const isToday = iso === todayIso();
+    // While selecting the second endpoint the band is a hover *preview*; mark
+    // it so the styling can render it at reduced emphasis vs a committed range.
+    const isPreview = selecting && (inRange || (isEnd && iso !== draftAnchor));
     return {
       "data-range-start": isStart ? "true" : undefined,
       "data-range-end": isEnd ? "true" : undefined,
       "data-in-range": inRange ? "true" : undefined,
+      "data-preview": isPreview ? "true" : undefined,
       "data-selected": selected ? "true" : undefined,
       "data-today": isToday ? "true" : undefined,
       "aria-selected": selected ? "true" : "false",

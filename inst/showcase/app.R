@@ -167,6 +167,18 @@ sections <- list(
     file = "date_picker.R"
   ),
   list(
+    id = "date-range-picker",
+    label = "Date range picker",
+    icon = "calendar",
+    title = "Date range picker",
+    lead = paste(
+      "Runtime-rendered shadcn-style date range picker: trigger button plus a",
+      "portaled two-endpoint calendar, hidden native input, and a length-2",
+      "shiny.date value binding. Full playground lands in slice 5."
+    ),
+    file = "date_range_picker.R"
+  ),
+  list(
     id = "checkbox",
     label = "Checkbox",
     icon = "check",
