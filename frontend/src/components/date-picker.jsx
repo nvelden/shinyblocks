@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import { setNativeDatePickerValue } from "../runtime/native-inputs.js";
@@ -7,6 +7,7 @@ import {
   useFloatingPosition
 } from "../runtime/overlays.js";
 import { Calendar, formatLabel, parseIso, todayIso } from "./calendar.jsx";
+import { useDatePickerPopover } from "./date-picker-popover.js";
 import { classNames } from "./shared.jsx";
 
 export function DatePicker({ payload, root }) {
@@ -19,7 +20,7 @@ export function DatePicker({ payload, root }) {
     typeof state.value === "string" ? state.value : ""
   );
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
-  const [format, setFormat] = useState(props.format || "yyyy-mm-dd");
+  const format = props.format || "yyyy-mm-dd";
   const [min, setMin] = useState(props.min || null);
   const [max, setMax] = useState(props.max || null);
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
@@ -28,15 +29,22 @@ export function DatePicker({ payload, root }) {
   const [className, setClassName] = useState(payload.className || "");
   const weekstart = Number.isFinite(Number(props.weekstart)) ? Number(props.weekstart) : 0;
 
-  const [open, setOpenState] = useState(false);
   const initialView = parseIso(value) || parseIso(todayIso());
   const [view, setView] = useState({ y: initialView.y, m: initialView.m - 1 });
   const [focused, setFocused] = useState(value || todayIso());
 
-  const triggerRef = useRef(null);
-  const contentRef = useRef(null);
-  const returnFocusRef = useRef(null);
-  const dayRefs = useRef({});
+  const { open, setOpen, setOpenState, triggerRef, contentRef, dayRefs } =
+    useDatePickerPopover({
+      root,
+      disabled,
+      nativeSelector: "input.sb-date-picker-native",
+      focused,
+      onOpen: () => {
+        const anchor = parseIso(value) || parseIso(todayIso());
+        setView({ y: anchor.y, m: anchor.m - 1 });
+        setFocused(value || todayIso());
+      }
+    });
   const contentId = `${inputId || "date-picker"}-content`;
   const labelledBy = inputId ? labelIdForInput(inputId) : null;
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
@@ -69,17 +77,6 @@ export function DatePicker({ payload, root }) {
     if (notify) root.dispatchEvent(new CustomEvent("sb:date-picker-change"));
   }
 
-  function setOpen(next) {
-    const nextOpen = Boolean(next);
-    if (nextOpen && !open) {
-      returnFocusRef.current = document.activeElement;
-      const anchor = parseIso(value) || parseIso(todayIso());
-      setView({ y: anchor.y, m: anchor.m - 1 });
-      setFocused(value || todayIso());
-    }
-    setOpenState(nextOpen);
-  }
-
   function selectDay(iso) {
     if (disabled || isDisabledDay(iso)) return;
     setValue(iso, true);
@@ -100,13 +97,6 @@ export function DatePicker({ payload, root }) {
     writeValue(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, root]);
-
-  useEffect(() => {
-    if (!root) return undefined;
-    root.toggleAttribute("data-disabled", disabled);
-    const native = root.querySelector("input.sb-date-picker-native");
-    if (native) native.disabled = disabled;
-  }, [disabled, root]);
 
   useEffect(() => {
     if (!root) return undefined;
@@ -146,48 +136,6 @@ export function DatePicker({ payload, root }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [root]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const focusFrame = requestAnimationFrame(() => {
-      const node = dayRefs.current[focused];
-      if (node && typeof node.focus === "function") {
-        node.focus({ preventScroll: true });
-      } else if (contentRef.current) {
-        contentRef.current.focus({ preventScroll: true });
-      }
-    });
-
-    function onPointerDown(event) {
-      const target = event.target;
-      if (triggerRef.current?.contains(target)) return;
-      if (contentRef.current?.contains(target)) return;
-      setOpen(false);
-    }
-
-    document.addEventListener("pointerdown", onPointerDown);
-
-    return () => {
-      cancelAnimationFrame(focusFrame);
-      document.removeEventListener("pointerdown", onPointerDown);
-      const target = returnFocusRef.current;
-      returnFocusRef.current = null;
-      if (target && typeof target.focus === "function") {
-        requestAnimationFrame(() => target.focus({ preventScroll: true }));
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, focused]);
-
-  // Move keyboard focus to the active day as the user arrows around.
-  useEffect(() => {
-    if (!open) return;
-    const node = dayRefs.current[focused];
-    if (node && typeof node.focus === "function") {
-      node.focus({ preventScroll: true });
-    }
-  }, [focused, open]);
 
   const triggerLabel = value ? formatLabel(value, format) : (placeholder || "Pick a date");
   const portal = ensurePortalRoot();

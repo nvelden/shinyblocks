@@ -8,7 +8,13 @@ function minifyCss(source) {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\s+/g, " ")
-    .replace(/\s*([{}:;,>])\s*/g, "$1")
+    .replace(/\s*([{};,>])\s*/g, "$1")
+    // Colon is handled separately from the set above: only the *trailing* space
+    // is dropped. A leading space before `:` is a descendant combinator into a
+    // pseudo-class (e.g. `[root] :is(.a, .b)`); stripping it would silently turn
+    // the rule into the compound `[root]:is(...)`, which matches nothing.
+    // Declarations never have a space before their colon, so this is lossless.
+    .replace(/:\s+/g, ":")
     .replace(/;}/g, "}")
     .trim();
 }

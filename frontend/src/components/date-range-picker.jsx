@@ -7,6 +7,7 @@ import {
   useFloatingPosition
 } from "../runtime/overlays.js";
 import { Calendar, formatLabel, parseIso, todayIso } from "./calendar.jsx";
+import { useDatePickerPopover } from "./date-picker-popover.js";
 import { classNames } from "./shared.jsx";
 
 // Range date picker. Reports `[startIso, endIso]` typed `shiny.date`, so the
@@ -31,7 +32,7 @@ export function DateRangePicker({ payload, root }) {
     typeof props.separator === "string" ? props.separator : " – "
   );
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
-  const [format, setFormat] = useState(props.format || "yyyy-mm-dd");
+  const format = props.format || "yyyy-mm-dd";
   const [min, setMin] = useState(props.min || null);
   const [max, setMax] = useState(props.max || null);
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
@@ -40,7 +41,6 @@ export function DateRangePicker({ payload, root }) {
   const [className, setClassName] = useState(payload.className || "");
   const weekstart = Number.isFinite(Number(props.weekstart)) ? Number(props.weekstart) : 0;
 
-  const [open, setOpenState] = useState(false);
   // In-progress selection: `draftAnchor` is the first click, `hover` previews
   // the second endpoint (mouse hover or keyboard focus). Null when not selecting.
   const [draftAnchor, setDraftAnchor] = useState(null);
@@ -51,10 +51,20 @@ export function DateRangePicker({ payload, root }) {
   const [view, setView] = useState({ y: initialView.y, m: initialView.m - 1 });
   const [focused, setFocused] = useState(start || todayIso());
 
-  const triggerRef = useRef(null);
-  const contentRef = useRef(null);
-  const returnFocusRef = useRef(null);
-  const dayRefs = useRef({});
+  const { open, setOpen, setOpenState, triggerRef, contentRef, dayRefs } =
+    useDatePickerPopover({
+      root,
+      disabled,
+      nativeSelector: "input.sb-date-range-picker-native",
+      focused,
+      onOpen: () => {
+        const anchor = parseIso(start) || parseIso(todayIso());
+        setView({ y: anchor.y, m: anchor.m - 1 });
+        setFocused(start || todayIso());
+        setDraftAnchor(null);
+        setHover(null);
+      }
+    });
   // Latest committed range, readable from the once-installed receive handler
   // without a stale closure (server updates may change one endpoint at a time).
   const committedRef = useRef({ start, end });
@@ -83,19 +93,6 @@ export function DateRangePicker({ payload, root }) {
     root.dataset.sbDateRangePickerEnd = nextEnd;
     setNativeDateRangePickerValue(root, nextStart, nextEnd, notify);
     if (notify) root.dispatchEvent(new CustomEvent("sb:date-range-picker-change"));
-  }
-
-  function setOpen(next) {
-    const nextOpen = Boolean(next);
-    if (nextOpen && !open) {
-      returnFocusRef.current = document.activeElement;
-      const anchor = parseIso(start) || parseIso(todayIso());
-      setView({ y: anchor.y, m: anchor.m - 1 });
-      setFocused(start || todayIso());
-      setDraftAnchor(null);
-      setHover(null);
-    }
-    setOpenState(nextOpen);
   }
 
   // Two-click range state machine. First click anchors the range (committed
@@ -152,13 +149,6 @@ export function DateRangePicker({ payload, root }) {
 
   useEffect(() => {
     if (!root) return undefined;
-    root.toggleAttribute("data-disabled", disabled);
-    const native = root.querySelector("input.sb-date-range-picker-native");
-    if (native) native.disabled = disabled;
-  }, [disabled, root]);
-
-  useEffect(() => {
-    if (!root) return undefined;
 
     root.__sbDateRangePickerReceive = (data) => {
       const nextData = data || {};
@@ -188,6 +178,10 @@ export function DateRangePicker({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
         setStyle(nextData.style || {});
       }
+      // Server updates are trusted as-is: a range pushed from R is committed
+      // without re-checking the runtime's own min/max (R already validates
+      // bounds for the fields present in the call). This intentionally matches
+      // `updateDateRangeInput()` laxity — the server is the source of truth.
       const hasStart = Object.prototype.hasOwnProperty.call(nextData, "start");
       const hasEnd = Object.prototype.hasOwnProperty.call(nextData, "end");
       if (hasStart || hasEnd) {
@@ -211,48 +205,6 @@ export function DateRangePicker({ payload, root }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [root]);
 
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const focusFrame = requestAnimationFrame(() => {
-      const node = dayRefs.current[focused];
-      if (node && typeof node.focus === "function") {
-        node.focus({ preventScroll: true });
-      } else if (contentRef.current) {
-        contentRef.current.focus({ preventScroll: true });
-      }
-    });
-
-    function onPointerDown(event) {
-      const target = event.target;
-      if (triggerRef.current?.contains(target)) return;
-      if (contentRef.current?.contains(target)) return;
-      setOpen(false);
-    }
-
-    document.addEventListener("pointerdown", onPointerDown);
-
-    return () => {
-      cancelAnimationFrame(focusFrame);
-      document.removeEventListener("pointerdown", onPointerDown);
-      const target = returnFocusRef.current;
-      returnFocusRef.current = null;
-      if (target && typeof target.focus === "function") {
-        requestAnimationFrame(() => target.focus({ preventScroll: true }));
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, focused]);
-
-  // Move keyboard focus to the active day as the user arrows around.
-  useEffect(() => {
-    if (!open) return;
-    const node = dayRefs.current[focused];
-    if (node && typeof node.focus === "function") {
-      node.focus({ preventScroll: true });
-    }
-  }, [focused, open]);
-
   // The visible range band: the in-progress draft while selecting, else the
   // committed range. `lo`/`hi` are the ordered endpoints.
   let lo = null;
@@ -274,7 +226,7 @@ export function DateRangePicker({ payload, root }) {
     const isToday = iso === todayIso();
     // While selecting the second endpoint the band is a hover *preview*; mark
     // it so the styling can render it at reduced emphasis vs a committed range.
-    const isPreview = selecting && (inRange || (isEnd && iso !== draftAnchor));
+    const isPreview = selecting && (inRange || (selected && iso !== draftAnchor));
     return {
       "data-range-start": isStart ? "true" : undefined,
       "data-range-end": isEnd ? "true" : undefined,

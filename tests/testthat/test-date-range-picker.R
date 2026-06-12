@@ -218,3 +218,65 @@ test_that("update_block_date_range_picker rejects invalid replacement dates", {
     "valid `yyyy-mm-dd`"
   )
 })
+
+test_that("update_block_date_range_picker enforces min <= max in the same call", {
+  cap <- local_input_message_session()
+  expect_error(
+    update_block_date_range_picker(
+      cap$session, "stay", min = "2026-12-31", max = "2026-01-01"
+    ),
+    "`min` must not be after `max`."
+  )
+})
+
+test_that("update_block_date_range_picker rejects an endpoint outside supplied bounds", {
+  cap <- local_input_message_session()
+  expect_error(
+    update_block_date_range_picker(
+      cap$session, "stay", start = "2027-01-01", max = "2026-12-31"
+    ),
+    "`start` must not be after `max`."
+  )
+  expect_error(
+    update_block_date_range_picker(
+      cap$session, "stay", end = "2025-01-01", min = "2026-01-01"
+    ),
+    "`end` must not be before `min`."
+  )
+})
+
+test_that("update_block_date_range_picker swaps a reversed start/end", {
+  cap <- local_input_message_session()
+  update_block_date_range_picker(
+    cap$session, "stay", start = "2026-06-07", end = "2026-06-01"
+  )
+
+  payload <- cap$last_payload()
+  expect_identical(payload$start, "2026-06-01")
+  expect_identical(payload$end, "2026-06-07")
+})
+
+test_that("update_block_date_range_picker rejects vector separator/placeholder", {
+  cap <- local_input_message_session()
+  expect_error(
+    update_block_date_range_picker(cap$session, "stay", separator = c(" - ", " to ")),
+    "`separator` must be a single string."
+  )
+  expect_error(
+    update_block_date_range_picker(cap$session, "stay", placeholder = c("a", "b")),
+    "`placeholder` must be a single string."
+  )
+})
+
+# Constructor scalar validation -----------------------------------------------
+
+test_that("block_date_range_picker rejects vector separator/placeholder", {
+  expect_error(
+    block_date_range_picker("rng", separator = c(" - ", " to ")),
+    "`separator` must be a single string."
+  )
+  expect_error(
+    block_date_range_picker("rng", placeholder = c("a", "b")),
+    "`placeholder` must be a single string."
+  )
+})

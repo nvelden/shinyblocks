@@ -126,8 +126,10 @@ byte-identical (same `sb-date-picker-*` hooks).
 
 ## Reference screenshot
 
-_Pending manual upstream capture._ Grab the canonical look from
-<https://ui.shadcn.com/docs/components/date-picker> (the range example), save it
-as `_screenshots/date-range-picker.png`, then replace this note with
-`![Date Range Picker](_screenshots/date-range-picker.png)` and a "Captured from
-… on <date>" caption. Refresh whenever shadcn updates the canonical design.
+_Intentionally deferred._ A reference capture is not a ship gate for this
+component — the runtime parity is enforced by the theme/style-parity fixtures and
+browser tests, not by a static image. When capturing one is worthwhile, grab the
+canonical look from <https://ui.shadcn.com/docs/components/date-picker> (the
+range example), save it as `_screenshots/date-range-picker.png`, then replace
+this note with `![Date Range Picker](_screenshots/date-range-picker.png)` and a
+"Captured from … on <date>" caption.

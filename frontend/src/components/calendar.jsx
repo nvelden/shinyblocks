@@ -125,19 +125,29 @@ export function Calendar({
   }
 
   function onGridKeyDown(event) {
+    // `focused` is normally a validated ISO date, but runtime bindings and
+    // server messages are external inputs, so a malformed value must not crash
+    // keyboard handling. Arrow keys lean on `addDays` (which no-ops on invalid
+    // input); the month/week branches need the parsed parts, so bail if absent.
+    const cur = parseIso(focused);
     let next = null;
     if (event.key === "ArrowLeft") next = addDays(focused, -1);
     else if (event.key === "ArrowRight") next = addDays(focused, 1);
     else if (event.key === "ArrowUp") next = addDays(focused, -7);
     else if (event.key === "ArrowDown") next = addDays(focused, 7);
-    else if (event.key === "Home") next = addDays(focused, -(((parseIso(focused).d) % 7)));
-    else if (event.key === "PageUp") {
-      const d = parseIso(focused);
-      const date = new Date(d.y, d.m - 2, d.d);
+    else if (event.key === "Home") {
+      if (!cur) return;
+      // Jump to the first day of the focused row: subtract the offset of the
+      // focused weekday from the configured week start (not day-of-month % 7).
+      const weekday = new Date(cur.y, cur.m - 1, cur.d).getDay();
+      next = addDays(focused, -(((weekday - weekstart) % 7 + 7) % 7));
+    } else if (event.key === "PageUp") {
+      if (!cur) return;
+      const date = new Date(cur.y, cur.m - 2, cur.d);
       next = toIso(date.getFullYear(), date.getMonth() + 1, date.getDate());
     } else if (event.key === "PageDown") {
-      const d = parseIso(focused);
-      const date = new Date(d.y, d.m, d.d);
+      if (!cur) return;
+      const date = new Date(cur.y, cur.m, cur.d);
       next = toIso(date.getFullYear(), date.getMonth() + 1, date.getDate());
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -170,6 +180,10 @@ export function Calendar({
   const cells = [];
   for (let i = 0; i < offset; i += 1) cells.push(null);
   for (let day = 1; day <= total; day += 1) cells.push(day);
+  // Pad the trailing partial week so every `role="row"` holds exactly 7 cells.
+  while (cells.length % 7 !== 0) cells.push(null);
+  const weeks = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
 
   return (
     <div className={`${classPrefix}-calendar`} data-slot={`${slotPrefix}-calendar`}>
@@ -205,35 +219,48 @@ export function Calendar({
           ))}
         </div>
         <div className={`${classPrefix}-days`}>
-          {cells.map((day, index) => {
-            if (day == null) {
-              return <span key={`pad-${index}`} className={`${classPrefix}-pad`} />;
-            }
-            const iso = toIso(view.y, view.m + 1, day);
-            const dayDisabled = isDisabledDay(iso);
-            const isFocusable = iso === focused;
-            const extra = getDayProps ? getDayProps(iso) : {};
-            return (
-              <button
-                key={iso}
-                ref={(node) => {
-                  if (node) dayRefs.current[iso] = node;
-                  else delete dayRefs.current[iso];
-                }}
-                type="button"
-                className={`${classPrefix}-day`}
-                data-slot={`${slotPrefix}-day`}
-                role="gridcell"
-                tabIndex={isFocusable ? 0 : -1}
-                disabled={dayDisabled}
-                {...extra}
-                onClick={() => onSelect(iso)}
-                onFocus={() => setFocused(iso)}
-              >
-                {day}
-              </button>
-            );
-          })}
+          {/* Each week is a `role="row"` for a well-formed ARIA grid. The
+              wrapper uses `display: contents` (see the picker CSS) so the day
+              buttons still participate in the parent grid's column layout. */}
+          {weeks.map((week, weekIndex) => (
+            <div key={`week-${weekIndex}`} className={`${classPrefix}-week`} role="row">
+              {week.map((day, index) => {
+                if (day == null) {
+                  return (
+                    <span
+                      key={`pad-${weekIndex}-${index}`}
+                      className={`${classPrefix}-pad`}
+                      role="gridcell"
+                    />
+                  );
+                }
+                const iso = toIso(view.y, view.m + 1, day);
+                const dayDisabled = isDisabledDay(iso);
+                const isFocusable = iso === focused;
+                const extra = getDayProps ? getDayProps(iso) : {};
+                return (
+                  <button
+                    key={iso}
+                    ref={(node) => {
+                      if (node) dayRefs.current[iso] = node;
+                      else delete dayRefs.current[iso];
+                    }}
+                    type="button"
+                    className={`${classPrefix}-day`}
+                    data-slot={`${slotPrefix}-day`}
+                    role="gridcell"
+                    tabIndex={isFocusable ? 0 : -1}
+                    disabled={dayDisabled}
+                    {...extra}
+                    onClick={() => onSelect(iso)}
+                    onFocus={() => setFocused(iso)}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

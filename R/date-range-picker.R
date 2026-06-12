@@ -13,6 +13,33 @@ date_range_native_value <- function(start, end) {
   paste0(start, DATE_RANGE_NATIVE_SEP, end)
 }
 
+# Order and bounds-check a (possibly partial) ISO range. Reversed `start`/`end`
+# are silently swapped to match `dateRangeInput()`; an inverted `min`/`max` or an
+# endpoint outside its bounds is an error. Any argument may be `NULL` (absent),
+# so this serves both the constructor and the partial-update path. Returns the
+# possibly-swapped `list(start, end)`.
+validate_range_bounds <- function(start, end, min, max) {
+  if (!is.null(start) && !is.null(end) && start > end) {
+    swapped <- start
+    start <- end
+    end <- swapped
+  }
+  if (!is.null(min) && !is.null(max) && min > max) {
+    stop("`min` must not be after `max`.", call. = FALSE)
+  }
+  for (endpoint in list(list("start", start), list("end", end))) {
+    val <- endpoint[[2]]
+    if (is.null(val)) next
+    if (!is.null(min) && val < min) {
+      stop(sprintf("`%s` must not be before `min`.", endpoint[[1]]), call. = FALSE)
+    }
+    if (!is.null(max) && val > max) {
+      stop(sprintf("`%s` must not be after `max`.", endpoint[[1]]), call. = FALSE)
+    }
+  }
+  list(start = start, end = end)
+}
+
 #' Create a shadcn-style date range picker
 #'
 #' A package-owned runtime input that renders a trigger button plus a popover
@@ -75,6 +102,8 @@ block_date_range_picker <- function(
 ) {
   validate_input_id(input_id)
   check_string(format, "format")
+  check_string(separator, "separator", null_ok = TRUE)
+  check_string(placeholder, "placeholder", null_ok = TRUE)
 
   if (is.null(start) != is.null(end)) {
     stop(
@@ -90,27 +119,11 @@ block_date_range_picker <- function(
   max <- normalize_iso_date(max, "max")
   weekstart <- normalize_weekstart(weekstart)
 
-  if (!is.null(min) && !is.null(max) && min > max) {
-    stop("`min` must not be after `max`.", call. = FALSE)
-  }
-
-  # Match `dateRangeInput()`, which silently orders a reversed selection.
-  if (!is.null(start) && !is.null(end) && start > end) {
-    swapped <- start
-    start <- end
-    end <- swapped
-  }
-
-  for (endpoint in list(list("start", start), list("end", end))) {
-    val <- endpoint[[2]]
-    if (is.null(val)) next
-    if (!is.null(min) && val < min) {
-      stop(sprintf("`%s` must not be before `min`.", endpoint[[1]]), call. = FALSE)
-    }
-    if (!is.null(max) && val > max) {
-      stop(sprintf("`%s` must not be after `max`.", endpoint[[1]]), call. = FALSE)
-    }
-  }
+  # Match `dateRangeInput()`, which silently orders a reversed selection, then
+  # reject inverted bounds / out-of-range endpoints.
+  bounds <- validate_range_bounds(start, end, min, max)
+  start <- bounds$start
+  end <- bounds$end
 
   hidden_native <- hidden_native_input(
     input_id,
@@ -124,8 +137,8 @@ block_date_range_picker <- function(
   runtime_component(
     component = "date-range-picker",
     props = list(
-      separator = as.character(separator %||% ""),
-      placeholder = as.character(placeholder %||% ""),
+      separator = separator %||% "",
+      placeholder = placeholder %||% "",
       format = format,
       weekstart = weekstart,
       min = min,
@@ -150,9 +163,12 @@ block_date_range_picker <- function(
 #' Updates the range, bounds, and cosmetic props of a
 #' [block_date_range_picker()]. Following [shiny::updateDateRangeInput()],
 #' omitted arguments are left unchanged, and `start`/`end` can be updated
-#' independently. To clear the selected range from the server, pass
-#' `clear = TRUE` (a bare `start = NULL`/`end = NULL` is ignored, matching
-#' Shiny's "missing args are ignored" rule).
+#' independently. Note that the control only reports a *complete* range: setting
+#' a single endpoint when the other is empty leaves the value `NULL` (the
+#' trigger keeps its placeholder) until both endpoints are present, so the input
+#' event fires but `input$<id>` stays empty. To clear the selected range from
+#' the server, pass `clear = TRUE` (a bare `start = NULL`/`end = NULL` is
+#' ignored, matching Shiny's "missing args are ignored" rule).
 #'
 #' @param session Shiny session. Defaults to the current reactive domain.
 #' @param input_id Input id passed to `block_date_range_picker()`.
@@ -193,21 +209,34 @@ update_block_date_range_picker <- function(
 ) {
   payload <- list()
 
+  if (!missing(separator)) check_string(separator, "separator", null_ok = TRUE)
+  if (!missing(placeholder)) check_string(placeholder, "placeholder", null_ok = TRUE)
+
+  norm_start <- if (!missing(start) && !isTRUE(clear)) normalize_iso_date(start, "start") else NULL
+  norm_end <- if (!missing(end) && !isTRUE(clear)) normalize_iso_date(end, "end") else NULL
+  norm_min <- if (!missing(min)) normalize_iso_date(min, "min") else NULL
+  norm_max <- if (!missing(max)) normalize_iso_date(max, "max") else NULL
+
+  # Validate the combination of values supplied in *this* update, mirroring the
+  # constructor's consistency checks. The server cannot see the client's current
+  # state, so this only reasons about fields present in the same call -- but that
+  # is enough to reject the impossible combinations the runtime would otherwise
+  # accept silently (e.g. `min` after `max`, or an endpoint outside its bounds).
+  bounds <- validate_range_bounds(norm_start, norm_end, norm_min, norm_max)
+  norm_start <- bounds$start
+  norm_end <- bounds$end
+
   if (!missing(start) && !isTRUE(clear)) {
-    payload$start <- normalize_iso_date(start, "start") %||% ""
+    payload$start <- norm_start %||% ""
   }
   if (!missing(end) && !isTRUE(clear)) {
-    payload$end <- normalize_iso_date(end, "end") %||% ""
+    payload$end <- norm_end %||% ""
   }
   if (!missing(min)) {
-    payload <- payload_set_clearable(
-      payload, "min", normalize_iso_date(min, "min")
-    )
+    payload <- payload_set_clearable(payload, "min", norm_min)
   }
   if (!missing(max)) {
-    payload <- payload_set_clearable(
-      payload, "max", normalize_iso_date(max, "max")
-    )
+    payload <- payload_set_clearable(payload, "max", norm_max)
   }
   if (isTRUE(clear)) {
     payload$start <- ""

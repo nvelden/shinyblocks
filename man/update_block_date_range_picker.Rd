@@ -60,9 +60,12 @@ Invisibly returns \code{NULL}.
 Updates the range, bounds, and cosmetic props of a
 \code{\link[=block_date_range_picker]{block_date_range_picker()}}. Following \code{\link[shiny:updateDateRangeInput]{shiny::updateDateRangeInput()}},
 omitted arguments are left unchanged, and \code{start}/\code{end} can be updated
-independently. To clear the selected range from the server, pass
-\code{clear = TRUE} (a bare \code{start = NULL}/\code{end = NULL} is ignored, matching
-Shiny's "missing args are ignored" rule).
+independently. Note that the control only reports a \emph{complete} range: setting
+a single endpoint when the other is empty leaves the value \code{NULL} (the
+trigger keeps its placeholder) until both endpoints are present, so the input
+event fires but \verb{input$<id>} stays empty. To clear the selected range from
+the server, pass \code{clear = TRUE} (a bare \code{start = NULL}/\code{end = NULL} is
+ignored, matching Shiny's "missing args are ignored" rule).
 }
 \seealso{
 Other forms: 

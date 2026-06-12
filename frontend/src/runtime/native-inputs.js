@@ -108,6 +108,12 @@ export function nativeDateRangePicker(root) {
 // The hidden native input ferries a committed range as `"<startIso>/<endIso>"`
 // (delimiter matches `DATE_RANGE_NATIVE_SEP` on the R side). An incomplete range
 // writes an empty string so a half-open selection never round-trips.
+//
+// Intentional forward-compat / SSR scaffolding: the binding's `getValue` reads
+// the `__sbDateRangePickerValue` expando, not this input (which carries
+// `data-shiny-no-bind-input`), so nothing consumes the slash-encoded value
+// today. It is kept as the server-rendered fallback and for parity with the
+// other native-backed controls; the `id` also anchors `<label for>`.
 export function setNativeDateRangePickerValue(root, start, end, notify) {
   const native = nativeDateRangePicker(root);
   if (!native) return;
