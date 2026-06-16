@@ -229,6 +229,11 @@ export const STYLE_REGISTRY = {
     mode: "profile-neutral",
     reason: "An icon-sized spinner has no profile-sensitive geometry; Luma leaves it unchanged."
   },
+  progress: {
+    section: "progress",
+    mode: "profile-neutral",
+    reason: "The progress track is a fixed 0.5rem fully-rounded (9999px) bar to match shadcn; its geometry is intentionally constant and not parameterized by a profile geometry token, so no shipped profile overrides it. Indicator colour conformance is covered by theme-registry.mjs."
+  },
   "date-picker": {
     section: "date-picker",
     mode: "profile-neutral",

@@ -157,6 +157,125 @@
   }
 }
 
+[data-shinyblocks-root] .sb-progress {
+  display: block;
+  width: 100%;
+}
+
+[data-shinyblocks-root] .sb-progress-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  /* One rule drives every variant fill; the variant attribute remaps the
+     custom property (D5). The success/warning/info fills intentionally use the
+     saturated `-foreground` tokens, not the pale `--success`/`--warning`/`--info`
+     badge-background tints — see the plan's token note. */
+  --sb-progress-indicator: var(--primary);
+}
+
+[data-shinyblocks-root] .sb-progress-body[data-variant="success"] {
+  --sb-progress-indicator: var(--success-foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-body[data-variant="warning"] {
+  --sb-progress-indicator: var(--warning-foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-body[data-variant="info"] {
+  --sb-progress-indicator: var(--info-foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-body[data-variant="destructive"] {
+  --sb-progress-indicator: var(--destructive);
+}
+
+[data-shinyblocks-root] .sb-progress-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+[data-shinyblocks-root] .sb-progress-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+[data-shinyblocks-root] .sb-progress-label {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-message {
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-value {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-root] .sb-progress-track {
+  position: relative;
+  width: 100%;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: var(--muted);
+}
+
+[data-shinyblocks-root] .sb-progress-indicator {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--sb-progress-indicator, var(--primary));
+  /* shadcn composited fill: the indicator is full-width and the determinate
+     percent is applied as translateX in the component, so only the transform
+     animates (no layout reflow). */
+  transition: transform 200ms ease;
+}
+
+[data-shinyblocks-root] .sb-progress-track[data-indeterminate="true"] .sb-progress-indicator {
+  width: 40%;
+  transform: translateX(-100%);
+  animation: shinyblocks-progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+[data-shinyblocks-root] .sb-progress-detail {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  color: var(--muted-foreground);
+}
+
+/* Single-stop keyframe: the resting transform (translateX(-100%), set on the
+   indeterminate indicator rule above) is the implicit `from`, so the sweep runs
+   off-left -> off-right and the per-iteration snap-back happens entirely
+   off-screen. */
+@keyframes shinyblocks-progress-indeterminate {
+  to {
+    transform: translateX(350%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-shinyblocks-root] .sb-progress-indicator {
+    transition: none;
+  }
+
+  /* Reduced-motion fallback: drop the sweep and rest as a static ~40% bar (D10). */
+  [data-shinyblocks-root] .sb-progress-track[data-indeterminate="true"] .sb-progress-indicator {
+    animation: none;
+    transform: none;
+    width: 40%;
+  }
+}
+
 [data-shinyblocks-root] .sb-skeleton {
   border-radius: var(--sb-skeleton-radius, calc(var(--radius) * 0.8));
   background-color: var(--muted);

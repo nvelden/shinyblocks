@@ -339,6 +339,17 @@ sections <- list(
     file = "spinner.R"
   ),
   list(
+    id = "progress",
+    label = "Progress",
+    icon = "loader-2",
+    title = "Progress",
+    lead = paste(
+      "Embedded, server-driven progress bar that renders inline instead of as",
+      "a Shiny notification panel. Set or increment it from the server."
+    ),
+    file = "progress.R"
+  ),
+  list(
     id = "empty",
     label = "Empty",
     icon = "folder",

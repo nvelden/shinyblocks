@@ -120,6 +120,14 @@ export const THEME_REGISTRY = {
     mode: "static-only",
     reason: "Toasts only render when fired from the server; toast surfaces reuse the alert variant tokens (--card, --success, --warning, --info, --destructive), which the static check covers."
   },
+  progress: {
+    section: "progress",
+    bindings: [
+      { selector: ".sb-parity-progress-default .sb-progress-indicator", property: "backgroundColor", token: "--primary" },
+      { selector: ".sb-parity-progress-success .sb-progress-indicator", property: "backgroundColor", token: "--success-foreground" },
+      { selector: ".sb-parity-progress-destructive .sb-progress-indicator", property: "backgroundColor", token: "--destructive" }
+    ]
+  },
   "radio-group": {
     section: "radio-group",
     bindings: [
