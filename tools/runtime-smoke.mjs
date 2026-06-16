@@ -535,6 +535,35 @@ try {
     "inverting the client bounds should swap endpoints and re-clamp the value"
   );
 
+  // Equal endpoints from a single-endpoint update are an irreparable zero-width
+  // range: kept as an explicit degenerate state (0% fill, validly ordered ARIA).
+  await sendProgress({ min: 2 });
+  assert.deepEqual(
+    {
+      min: await page.locator(`${progressTrack}`).getAttribute("aria-valuemin"),
+      max: await page.locator(`${progressTrack}`).getAttribute("aria-valuemax"),
+      now: await page.locator(`${progressTrack}`).getAttribute("aria-valuenow")
+    },
+    { min: "2", max: "2", now: "2" },
+    "equal endpoints should hold a degenerate range with ordered ARIA"
+  );
+  assert.equal(
+    await progressIndicatorTransform(),
+    "translateX(-100%)",
+    "a zero-width range should render empty (0%)"
+  );
+
+  // A server-driven `class` update must reach the runtime body (R sends the
+  // `class` key, not `className`).
+  await sendProgress({ class: "runtime-progress-updated" });
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress']").evaluate(
+      (node) => node.classList.contains("runtime-progress-updated")
+    ),
+    true,
+    "update_block_progress(class=) should apply the class to the body"
+  );
+
   // Clearing a text field with the null sentinel collapses its node.
   await sendProgress({ message: null });
   assert.equal(

@@ -14,8 +14,9 @@ function clamp(value, min, max) {
   return value;
 }
 
-// Compute the displayed/clamped percent for a determinate bar. The track is
-// degenerate when `max === min`; treat that as empty (0%).
+// Compute the displayed/clamped percent for a determinate bar. A zero-width
+// track (`max === min`, see `reconcile`) has no meaningful scale, so it renders
+// empty (0%).
 function percentOf(value, min, max) {
   if (max <= min) return 0;
   return clamp(((value - min) / (max - min)) * 100, 0, 100);
@@ -23,10 +24,16 @@ function percentOf(value, min, max) {
 
 // The runtime owns merged-state validity: the server sends partial updates and
 // cannot see current client `min`/`max`/`value`. After merging the supplied
-// fields we (1) repair an inverted range by swapping endpoints so `min < max`
+// fields we (1) repair an inverted range by swapping endpoints so `min <= max`
 // holds, then (2) clamp `value` into the repaired `[min, max]`. A single-endpoint
 // update that crosses the other bound therefore resolves to a valid state
 // instead of a NaN/negative-width bar.
+//
+// Equal endpoints (`min === max`) are an irreparable zero-width range: a partial
+// update can't tell which endpoint is stale, and fabricating a width would lie
+// about the scale. We keep it as an explicit degenerate state — `percentOf`
+// renders 0% and the progressbar ARIA stays validly ordered (valuemin === value
+// === valuemax satisfies the `valuemin <= valuenow <= valuemax` contract).
 function reconcile(state) {
   let { min, max, value } = state;
   if (min > max) {
@@ -79,7 +86,7 @@ function applyUpdate(prev, data) {
   if ("message" in data) next.message = data.message == null ? null : String(data.message);
   if ("detail" in data) next.detail = data.detail == null ? null : String(data.detail);
   if ("label" in data) next.label = data.label == null ? null : String(data.label);
-  if ("className" in data) next.className = data.className || "";
+  if ("class" in data) next.className = data.class || "";
   if ("style" in data) next.style = data.style || {};
 
   return reconcile(next);
