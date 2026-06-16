@@ -155,6 +155,13 @@
   padding: 0.25rem !important;
 }
 
+.showcase-progress-preview-custom,
+.sb-progress.showcase-progress-preview-custom {
+  border: 2px dashed var(--ring) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem !important;
+}
+
 /* Custom header styling via table_column(header_class = ). Deliberately does
    things the intent enum can't (uppercase + letter-spacing) so the escape hatch
    is visibly distinct from the built-in header_intent demo. Still token-driven so

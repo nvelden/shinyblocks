@@ -777,6 +777,50 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  progress: [
+    {
+      name: "block_progress",
+      description: "Embedded, display-only progress bar that renders inline where placed (not as a Shiny notification panel) and is driven from the server.",
+      arguments: [
+        { argument: "id", type: "character", defaultVal: "required", description: "Component id used to address the bar from the server. Not a form control: no input$<id> value." },
+        { argument: "value", type: "numeric", defaultVal: "0", description: "Current progress value, clamped into [min, max]." },
+        { argument: "min", type: "numeric", defaultVal: "0", description: "Lower bound. Must be finite and less than max." },
+        { argument: "max", type: "numeric", defaultVal: "1", description: "Upper bound. Must be finite and greater than min." },
+        { argument: "message", type: "character", defaultVal: "NULL", description: "Dynamic status line; header-left, or a muted second line when label is also set." },
+        { argument: "detail", type: "character", defaultVal: "NULL", description: "Secondary muted text below the track." },
+        { argument: "label", type: "character", defaultVal: "NULL", description: "Static description of what is progressing; takes header-left when set." },
+        { argument: "show_value", type: "logical", defaultVal: "FALSE", description: "Render the clamped percent at header-right. Suppressed when indeterminate." },
+        { argument: "indeterminate", type: "logical", defaultVal: "FALSE", description: "Show an unknown-progress sweep instead of a determinate fill." },
+        { argument: "variant", type: "'default' | 'success' | 'warning' | 'info' | 'destructive'", defaultVal: "'default'", description: "Indicator color." },
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width for the component (NULL fills the container)." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the runtime mount." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles applied to the runtime mount." }
+      ]
+    },
+    {
+      name: "update_block_progress",
+      description: "Set fields on a block_progress() from the server. Omitted args preserve the client value; NULL clears text fields; NULL on numeric fields errors.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "getDefaultReactiveDomain()", description: "The Shiny session." },
+        { argument: "id", type: "character", defaultVal: "required", description: "Component id passed to block_progress()." },
+        { argument: "value / min / max", type: "numeric", defaultVal: "—", description: "Replacement scale; clamped/reconciled client-side." },
+        { argument: "message / detail / label", type: "character", defaultVal: "—", description: "Replacement text; NULL clears." },
+        { argument: "show_value / indeterminate", type: "logical", defaultVal: "—", description: "Replacement state flags." },
+        { argument: "variant", type: "character", defaultVal: "—", description: "Replacement indicator color." },
+        { argument: "class / style", type: "character | list", defaultVal: "—", description: "Replacement classes/styles; NULL clears." }
+      ]
+    },
+    {
+      name: "inc_block_progress",
+      description: "Increment a block_progress() by a signed amount, saturating at the bounds. Reaching max is a stable no-op state.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "getDefaultReactiveDomain()", description: "The Shiny session." },
+        { argument: "id", type: "character", defaultVal: "required", description: "Component id passed to block_progress()." },
+        { argument: "amount", type: "numeric", defaultVal: "0.1", description: "Signed amount added to the current value (may be negative)." },
+        { argument: "message / detail", type: "character", defaultVal: "—", description: "Optional text updates applied alongside the increment." }
+      ]
+    }
+  ],
   empty: [
     {
       name: "block_empty",
