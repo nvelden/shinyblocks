@@ -41,9 +41,11 @@ module_ui <- function(id) {
     ),
     block_file_input(ns("upload"), button_label = "Module upload"),
     block_date_picker(ns("date"), value = "2026-06-15", class = "runtime-mod-date-fixture"),
+    block_progress(ns("progress"), value = 0.1, show_value = TRUE, class = "runtime-mod-progress-fixture"),
     shiny::verbatimTextOutput(ns("value")),
     shiny::verbatimTextOutput(ns("upload_value")),
-    shiny::verbatimTextOutput(ns("date_value"))
+    shiny::verbatimTextOutput(ns("date_value")),
+    shiny::verbatimTextOutput(ns("progress_value"))
   )
 }
 
@@ -173,6 +175,13 @@ ui <- shiny::fluidPage(
     separator = " to ",
     class = "runtime-range-fixture"
   ),
+  block_progress(
+    "runtime_progress",
+    value = 0.25,
+    message = "Importing",
+    show_value = TRUE,
+    class = "runtime-progress-fixture"
+  ),
   block_file_input(
     "runtime_file_input",
     accept = c(".txt", "text/plain"),
@@ -261,6 +270,11 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_file_dropzone_value"),
   shiny::verbatimTextOutput("runtime_file_dropzone_custom_value"),
   shiny::verbatimTextOutput("runtime_popover_value"),
+  shiny::verbatimTextOutput("runtime_progress_value"),
+  shiny::actionButton("set_progress_75", "Set progress 75"),
+  shiny::actionButton("inc_progress", "Inc progress"),
+  shiny::actionButton("reset_progress", "Reset progress"),
+  shiny::actionButton("indeterminate_progress", "Indeterminate progress"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
   shiny::actionButton("shrink_select_table", "Shrink select table"),
@@ -749,6 +763,22 @@ server <- function(input, output, session) {
     shiny::removeUI(selector = "#inserted_host", immediate = TRUE)
   })
 
+  # Progress is receive-only: `input$runtime_progress` should stay NULL even as
+  # the server drives the bar.
+  output$runtime_progress_value <- shiny::renderText(input$runtime_progress %||% "<NULL>")
+  shiny::observeEvent(input$set_progress_75, {
+    update_block_progress(session, "runtime_progress", value = 0.75, message = "Three quarters")
+  })
+  shiny::observeEvent(input$inc_progress, {
+    inc_block_progress(session, "runtime_progress", amount = 0.1)
+  })
+  shiny::observeEvent(input$reset_progress, {
+    update_block_progress(session, "runtime_progress", value = 0, message = NULL)
+  })
+  shiny::observeEvent(input$indeterminate_progress, {
+    update_block_progress(session, "runtime_progress", indeterminate = TRUE)
+  })
+
   output$inserted_child <- shiny::renderText("inserted-child-ready")
 
   shiny::moduleServer("mod", function(input, output, session) {
@@ -767,6 +797,7 @@ server <- function(input, output, session) {
       }
       as.character(value)
     })
+    output$progress_value <- shiny::renderText(input$progress %||% "<NULL>")
   })
 }
 

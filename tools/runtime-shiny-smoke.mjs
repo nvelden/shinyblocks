@@ -713,11 +713,55 @@ try {
     "page should include one portal root"
   );
 
+  // Progress: receive-only display block driven entirely by the server. The
+  // bare input stays NULL while update/increment helpers move the bar; clearing
+  // the message collapses its node; indeterminate drops the percent.
+  const progressRoot = "[data-sb-component='progress'][data-sb-input-id='runtime_progress']";
+  const progressValueAttr = (attr) => page.getAttribute(`${progressRoot} [data-slot='progress-track']`, attr);
+  await assertText(page, "#runtime_progress_value", "<NULL>");
+  await assertText(page, `${progressRoot} [data-slot='progress-value']`, "25%");
+  await page.click("#set_progress_75");
+  await assertText(page, `${progressRoot} [data-slot='progress-value']`, "75%");
+  await assertText(page, `${progressRoot} [data-slot='progress-message']`, "Three quarters");
+  assert.equal(await progressValueAttr("aria-valuenow"), "0.75", "server set should drive aria-valuenow");
+  await assertText(page, "#runtime_progress_value", "<NULL>");
+  await page.click("#inc_progress");
+  await page.waitForFunction(
+    (root) => document.querySelector(`${root} [data-slot='progress-value']`)?.textContent === "85%",
+    progressRoot
+  );
+  await page.click("#reset_progress");
+  await assertText(page, `${progressRoot} [data-slot='progress-value']`, "0%");
+  assert.equal(
+    await page.locator(`${progressRoot} [data-slot='progress-message']`).count(),
+    0,
+    "resetting with message = NULL should clear the message node"
+  );
+  await page.click("#indeterminate_progress");
+  await page.waitForFunction(
+    (root) => document.querySelector(`${root} [data-slot='progress-track']`)?.getAttribute("data-indeterminate") === "true",
+    progressRoot
+  );
+  assert.equal(await progressValueAttr("aria-valuenow"), null, "indeterminate progress should drop aria-valuenow");
+  assert.equal(
+    await page.locator(`${progressRoot} [data-slot='progress-value']`).count(),
+    0,
+    "indeterminate progress should suppress the percent"
+  );
+
   await assertText(page, "#mod-value", "m0");
   await assertText(page, "#mod-upload_value", "<NULL>");
   await page.setInputFiles("#mod-upload", uploadPath);
   await assertText(page, "#mod-upload_value", "shinyblocks-runtime-upload.txt");
   await assertText(page, "#mod-date_value", "2026-06-15");
+
+  // Under a moduleServer the namespaced progress mount still registers its
+  // receive-only binding and reports no Shiny input value. (Server-driven
+  // update routing under a module is blocked by a pre-existing double-namespace
+  // bug in runtime_input_update(); see HANDOFF.md — not asserted here.)
+  const modProgress = "[data-sb-component='progress'][data-sb-input-id='mod-progress']";
+  await assertText(page, `${modProgress} [data-slot='progress-value']`, "10%");
+  await assertText(page, "#mod-progress_value", "<NULL>");
 
   console.log("Runtime Shiny smoke test passed.");
 } catch (error) {

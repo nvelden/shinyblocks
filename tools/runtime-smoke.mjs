@@ -120,6 +120,24 @@ const dateRangePayload = JSON.stringify({
   binding: { input: true, type: "shinyblocks.date-range-picker" },
   className: null
 });
+const progressPayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "progress",
+  id: "runtime_progress",
+  props: {
+    message: "Importing rows",
+    detail: "batch 1/4",
+    label: "Upload",
+    showValue: true,
+    variant: "default",
+    style: {}
+  },
+  slots: {},
+  children: [],
+  state: { value: 0.25, min: 0, max: 1, indeterminate: false },
+  binding: { input: true, type: "shinyblocks.progress" },
+  className: null
+});
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
@@ -175,6 +193,11 @@ try {
           <script type="application/json" data-shinyblocks-payload>${dateRangePayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children><input type="text" class="sb-date-range-picker-native" id="runtime_range" value="2026-06-12/2026-06-18" /></div>
+        </div>
+        <div id="runtime-progress" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="progress" data-sb-input-id="runtime_progress">
+          <script type="application/json" data-shinyblocks-payload>${progressPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
         </div>
         <script>${runtime}</script>
       </body>
@@ -423,6 +446,124 @@ try {
     await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerValue),
     { start: "2026-06-21", end: "2026-06-23" },
     "Escape during a draft must leave the committed range unchanged"
+  );
+
+  // Progress: receive-only display block. The mount renders the determinate
+  // track/indicator, header (label + message), detail, and the rounded percent;
+  // `__sbProgressReceive` drives set/increment/clamp/range-repair and ARIA.
+  const progressTrack = "#runtime-progress [data-slot='progress-track']";
+  const progressIndicatorTransform = () =>
+    page.locator("#runtime-progress [data-slot='progress-indicator']").evaluate((node) => node.style.transform);
+  const sendProgress = (data) =>
+    page.locator("#runtime-progress").evaluate((node, payload) => node.__sbProgressReceive(payload), data);
+
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuenow"),
+    "0.25",
+    "progress should expose the raw clamped value as aria-valuenow"
+  );
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuetext"),
+    "25%",
+    "progress aria-valuetext should be the rounded percent"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-value']").textContent(),
+    "25%",
+    "progress should render the rounded percent when show_value is set"
+  );
+  assert.equal(
+    await progressIndicatorTransform(),
+    "translateX(-75%)",
+    "progress indicator should offset by (100 - percent)%"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-label']").textContent(),
+    "Upload",
+    "progress should render the label as the header primary line"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-message']").textContent(),
+    "Importing rows",
+    "progress should render the message beneath the label"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-detail']").textContent(),
+    "batch 1/4",
+    "progress should render the detail line below the track"
+  );
+
+  // Set updates the value/percent/ARIA together.
+  await sendProgress({ value: 0.6 });
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuenow"),
+    "0.6",
+    "progress set should update aria-valuenow"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-value']").textContent(),
+    "60%",
+    "progress set should update the rendered percent"
+  );
+
+  // Increment saturates at max; a large negative increment saturates at min.
+  await sendProgress({ action: "increment", amount: 0.9 });
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuenow"),
+    "1",
+    "progress increment should saturate at max (no overflow)"
+  );
+  assert.equal(await progressIndicatorTransform(), "translateX(0%)", "saturated progress should fill the track");
+  await sendProgress({ action: "increment", amount: -5 });
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuenow"),
+    "0",
+    "negative progress increment should saturate at min"
+  );
+
+  // Range-repair: a single-endpoint update that inverts the current bounds is
+  // reconciled (endpoints swap so min < max holds) and the value is re-clamped.
+  await sendProgress({ value: 0.5 });
+  await sendProgress({ min: 2 });
+  assert.deepEqual(
+    {
+      min: await page.locator(`${progressTrack}`).getAttribute("aria-valuemin"),
+      max: await page.locator(`${progressTrack}`).getAttribute("aria-valuemax"),
+      now: await page.locator(`${progressTrack}`).getAttribute("aria-valuenow")
+    },
+    { min: "1", max: "2", now: "1" },
+    "inverting the client bounds should swap endpoints and re-clamp the value"
+  );
+
+  // Clearing a text field with the null sentinel collapses its node.
+  await sendProgress({ message: null });
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-message']").count(),
+    0,
+    "clearing the message should remove its node"
+  );
+
+  // Indeterminate mode drops the determinate ARIA + percent and flags the track.
+  await sendProgress({ indeterminate: true });
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-valuenow"),
+    null,
+    "indeterminate progress should omit aria-valuenow"
+  );
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("aria-busy"),
+    "true",
+    "indeterminate progress should mark the bar busy"
+  );
+  assert.equal(
+    await page.locator("#runtime-progress [data-slot='progress-value']").count(),
+    0,
+    "indeterminate progress should suppress the percent"
+  );
+  assert.equal(
+    await page.locator(`${progressTrack}`).getAttribute("data-indeterminate"),
+    "true",
+    "indeterminate progress should flag the track"
   );
 
   await page.evaluate((payloadText) => {

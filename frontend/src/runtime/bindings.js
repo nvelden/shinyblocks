@@ -20,7 +20,8 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "table",
   "toaster",
   "date-picker",
-  "date-range-picker"
+  "date-range-picker",
+  "progress"
 ]);
 
 export function isRuntimeInputPayload(payload) {
@@ -421,6 +422,15 @@ const BINDING_CONFIGS = [
       }
     },
     ...dateRangePickerEvents
+  },
+  {
+    // Display-only, receive-only binding. Progress carries no meaningful
+    // `input$<id>` value (`getValue` → null); the binding exists purely so
+    // `update_block_progress()` / `inc_block_progress()` (`sendInputMessage`,
+    // routed by the mount's element id) reach React via `__sbProgressReceive`.
+    component: "progress",
+    receiveProp: "__sbProgressReceive",
+    getValue() { return null; }
   }
 ];
 
@@ -439,7 +449,8 @@ const BINDING_NAMES = [
   "shinyblocks.file-input",
   "shinyblocks.toaster",
   "shinyblocks.date-picker",
-  "shinyblocks.date-range-picker"
+  "shinyblocks.date-range-picker",
+  "shinyblocks.progress"
 ];
 
 let bindingsRegistered = false;
