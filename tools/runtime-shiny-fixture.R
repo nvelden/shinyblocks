@@ -42,6 +42,7 @@ module_ui <- function(id) {
     block_file_input(ns("upload"), button_label = "Module upload"),
     block_date_picker(ns("date"), value = "2026-06-15", class = "runtime-mod-date-fixture"),
     block_progress(ns("progress"), value = 0.1, show_value = TRUE, class = "runtime-mod-progress-fixture"),
+    shiny::actionButton(ns("set_progress_60"), "Set module progress 60"),
     shiny::verbatimTextOutput(ns("value")),
     shiny::verbatimTextOutput(ns("upload_value")),
     shiny::verbatimTextOutput(ns("date_value")),
@@ -798,6 +799,12 @@ server <- function(input, output, session) {
       as.character(value)
     })
     output$progress_value <- shiny::renderText(input$progress %||% "<NULL>")
+
+    # Server-driven update from inside the module: routes via the root session
+    # so the ns-baked mount target is not double-namespaced (issue #63).
+    shiny::observeEvent(input$set_progress_60, {
+      update_block_progress(session, "progress", value = 0.6)
+    })
   })
 }
 

@@ -755,13 +755,17 @@ try {
   await assertText(page, "#mod-upload_value", "shinyblocks-runtime-upload.txt");
   await assertText(page, "#mod-date_value", "2026-06-15");
 
-  // Under a moduleServer the namespaced progress mount still registers its
-  // receive-only binding and reports no Shiny input value. (Server-driven
-  // update routing under a module is blocked by a pre-existing double-namespace
-  // bug in runtime_input_update(); see HANDOFF.md — not asserted here.)
+  // Under a moduleServer the namespaced progress mount registers its
+  // receive-only binding and reports no Shiny input value.
   const modProgress = "[data-sb-component='progress'][data-sb-input-id='mod-progress']";
   await assertText(page, `${modProgress} [data-slot='progress-value']`, "10%");
   await assertText(page, "#mod-progress_value", "<NULL>");
+
+  // Server-driven update from inside the module must route to the ns-baked mount
+  // (issue #63): a regressed updater double-namespaces the target and the value
+  // never changes off 10%.
+  await page.click("#mod-set_progress_60");
+  await assertText(page, `${modProgress} [data-slot='progress-value']`, "60%");
 
   console.log("Runtime Shiny smoke test passed.");
 } catch (error) {

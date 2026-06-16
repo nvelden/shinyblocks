@@ -46,6 +46,7 @@
 * Runtime input updates now use a shared `sendInputMessage()` path, stricter component-name validation, synchronous DOM value writes, and less duplicated Shiny binding boilerplate (issue #23, issue #24, issue #26, issue #27, issue #28, issue #30, issue #41).
 * The theme and style-profile test harnesses now check token usage, light/dark theme response, palette coverage, style-profile parity, and style-profile leanness so future components are less likely to drift (issue #32, issue #33, issue #34).
 * Runtime CSS/JS, showcase smoke tests, parity tests, spell checks, and package checks were tightened so generated assets and browser behavior are easier to verify before release.
+* `update_block_*()` helpers now deliver server-driven updates correctly inside a `moduleServer()`. Previously the runtime mount id (which already carries the module namespace) was re-namespaced by the module session, double-prefixing the target so updates were silently dropped; updates now route through the root session. A new module-routing regression test and a runtime-shiny smoke assertion guard it (issue #63).
 
 ## 0.0.0.9000
 
