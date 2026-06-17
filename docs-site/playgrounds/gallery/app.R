@@ -141,8 +141,8 @@ ui <- block_page(
     ),
     htmltools::div(
       style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: stretch;",
-      uiOutput("gallery_metric", style = "display: flex; flex-direction: column;"),
-      uiOutput("gallery_budget_metric", style = "display: flex; flex-direction: column;"),
+      uiOutput("gallery_metric", style = "display: flex; flex-direction: column; height: 100%;"),
+      uiOutput("gallery_budget_metric", style = "display: flex; flex-direction: column; height: 100%;"),
       metric_box(
         title = "Members",
         value = "24",
@@ -308,6 +308,7 @@ ui <- block_page(
           style = "height: 100%;",
           stack(
             block_badge("Loading surface", variant = "secondary"),
+            uiOutput("gallery_pipeline_progress"),
             loading_lines(),
             block_separator(),
             block_file_input(
@@ -403,6 +404,22 @@ server <- function(input, output, session) {
       description = "Monthly cap",
       icon = "pie-chart",
       block_badge(if (value > 8000) "High" else "On track", variant = if (value > 8000) "destructive" else "secondary")
+    )
+  })
+
+  output$gallery_pipeline_progress <- renderUI({
+    total <- 5L
+    done <- min(refreshes(), total)
+    frac <- done / total
+    ready <- done >= total
+    block_progress(
+      "gallery_pipeline_readiness",
+      value = frac,
+      label = "Deploy readiness",
+      message = if (ready) "Ready to publish" else "Awaiting refresh checks",
+      detail = sprintf("%d of %d checks complete", done, total),
+      show_value = TRUE,
+      variant = if (ready) "success" else "default"
     )
   })
 
