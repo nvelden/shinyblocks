@@ -792,9 +792,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "show_value", type: "logical", defaultVal: "FALSE", description: "Render the clamped percent at header-right. Suppressed when indeterminate." },
         { argument: "indeterminate", type: "logical", defaultVal: "FALSE", description: "Show an unknown-progress sweep instead of a determinate fill." },
         { argument: "variant", type: "'default' | 'success' | 'warning' | 'info' | 'destructive'", defaultVal: "'default'", description: "Indicator color." },
-        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width for the component (NULL fills the container)." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the runtime mount." },
-        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles applied to the runtime mount." }
+        { argument: "width", type: "character", defaultVal: "NULL", description: "CSS width for the component (NULL fills the container); sizes the mount wrapper only." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes applied to the inner progress body (.sb-progress-body), not the mount wrapper." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles applied to the inner progress body (.sb-progress-body); use width for wrapper sizing." }
       ]
     },
     {

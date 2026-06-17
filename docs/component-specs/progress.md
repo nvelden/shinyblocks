@@ -34,8 +34,8 @@ the UI rather than as a floating session notification.
 | `show_value` | Render the clamped percent at header-right. Suppressed when indeterminate. |
 | `indeterminate` | Show the unknown-progress sweep instead of a determinate fill. |
 | `variant` | `default`, `success`, `warning`, `info`, or `destructive`. |
-| `width` | CSS width of the component (`NULL` fills the container). |
-| `class` / `style` | Merged onto / applied to the runtime mount. |
+| `width` | CSS width of the component (`NULL` fills the container). Sizes the mount wrapper only. |
+| `class` / `style` | Applied to the inner `.sb-progress-body` (the bar element), not the mount wrapper. |
 
 Server helpers: `update_block_progress()` sets any field (omitted args preserve,
 `NULL` text clears, `NULL` numeric errors); `inc_block_progress(amount=)` is
@@ -49,13 +49,13 @@ the merged `[min, max]` and repairs an inverted range.
 | `value` / `min` / `max` / `indeterminate` | `state` |
 | `message` / `detail` / `label` / `show_value` / `variant` / `style` | `props` |
 | `width` | mount `<div>` inline style (wrapper sizing only) |
-| `class` | `className` on the mount |
+| `class` | `className` in the payload, applied by the runtime to `.sb-progress-body` |
 
-`style` and `width` target different nodes by design: `width` sizes the mount
-wrapper, while `style` is applied to the inner `.sb-progress-body`. Both
-`block_progress(style=)` and `update_block_progress(style=)` style that same node
-with the same normalized-React-object grammar (matching the textarea/select
-convention).
+`width` targets the mount wrapper; `class` and `style` both target the inner
+`.sb-progress-body` (the bar element). Both `block_progress(style=)` and
+`update_block_progress(style=)` style that same node with the same
+normalized-React-object grammar (matching the textarea/select convention), and
+likewise for `class`.
 
 ## Token contract
 

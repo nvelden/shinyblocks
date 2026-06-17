@@ -184,7 +184,8 @@ clamp <- function(x, lo, hi) max(lo, min(hi, x))
 #'   `"warning"`, `"info"`, `"destructive"`.
 #' @param width Optional CSS width for the component (`NULL` fills the
 #'   container). Sizes the mount wrapper only.
-#' @param class Additional classes.
+#' @param class Additional classes applied to the bar element
+#'   (`.sb-progress-body`), not the mount wrapper.
 #' @param style Optional inline styles (CSS string or named list) applied to the
 #'   bar element. Targets the same node as `update_block_progress(style = )`; use
 #'   `width` to size the component.

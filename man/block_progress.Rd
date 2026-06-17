@@ -50,7 +50,8 @@ of a determinate fill.}
 \item{width}{Optional CSS width for the component (\code{NULL} fills the
 container). Sizes the mount wrapper only.}
 
-\item{class}{Additional classes.}
+\item{class}{Additional classes applied to the bar element
+(\code{.sb-progress-body}), not the mount wrapper.}
 
 \item{style}{Optional inline styles (CSS string or named list) applied to the
 bar element. Targets the same node as \code{update_block_progress(style = )}; use
