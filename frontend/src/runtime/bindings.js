@@ -68,7 +68,40 @@ function makeRuntimeBinding(config) {
         return;
       }
       const handler = el[receiveProp];
-      if (typeof handler === "function") handler(data || {});
+      if (typeof handler === "function") {
+        handler(data || {});
+        return;
+      }
+      // The component installs `el[receiveProp]` from a React mount effect, which
+      // runs a frame or two after the element is inserted and bound. If Shiny
+      // delivers a `sendInputMessage` in that window (e.g. an update fired in the
+      // same flush that inserted dynamic UI), the handler is not ready yet. Queue
+      // the message and drain it in order once the handler appears, instead of
+      // silently dropping it. Bounded so a never-mounting element cannot leak a
+      // timer or an unbounded queue.
+      const queue = el.__sbReceiveQueue || (el.__sbReceiveQueue = []);
+      queue.push(data || {});
+      if (el.__sbReceiveDraining) return;
+      el.__sbReceiveDraining = true;
+      let tries = 0;
+      const drain = () => {
+        const ready = el[receiveProp];
+        if (typeof ready === "function") {
+          el.__sbReceiveDraining = false;
+          const pending = el.__sbReceiveQueue || [];
+          el.__sbReceiveQueue = [];
+          for (const message of pending) ready(message);
+          return;
+        }
+        if (++tries > 120) {
+          // ~2s at 16ms: the element never mounted a handler; drop the queue.
+          el.__sbReceiveDraining = false;
+          el.__sbReceiveQueue = [];
+          return;
+        }
+        setTimeout(drain, 16);
+      };
+      setTimeout(drain, 16);
     }
     getRatePolicy() { return ratePolicy; }
   };
@@ -429,6 +462,7 @@ const BINDING_CONFIGS = [
     // `update_block_progress()` / `inc_block_progress()` (`sendInputMessage`,
     // routed by the mount's element id) reach React via `__sbProgressReceive`.
     component: "progress",
+    type: "shinyblocks.progress",
     receiveProp: "__sbProgressReceive",
     getValue() { return null; }
   }

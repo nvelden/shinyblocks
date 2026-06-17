@@ -40,6 +40,10 @@ test_that("block_progress carries text fields, variant, and class/style", {
   expect_true(payload$props$showValue)
   expect_identical(payload$props$variant, "success")
   expect_equal(payload$state$value, 0.6)
+  # `style` lives in props (applied by the runtime to `.sb-progress-body`),
+  # normalized to a React object like `update_block_progress(style=)`, so the
+  # constructor and updater style the same node with the same grammar.
+  expect_identical(payload$props$style, list(marginTop = "4px"))
   expect_match(render_html(bar), "sb-progress")
   expect_match(render_html(bar), "extra")
 })
@@ -58,15 +62,24 @@ test_that("block_progress applies width to the mount style", {
   expect_match(html, "width:240px", fixed = TRUE)
 })
 
-test_that("block_progress merges width and a user style string on the mount div", {
-  html <- render_html(block_progress("job", width = 240, style = "margin-top:4px"))
-  expect_match(html, 'style="width:240px;margin-top:4px;"', fixed = TRUE)
+test_that("block_progress keeps width on the mount and user style in props", {
+  # width sizes the mount wrapper; user `style` targets the inner body (props),
+  # so the two never collide on a single attribute and the updater can reach the
+  # same node.
+  bar <- block_progress("job", width = 240, style = "margin-top:4px")
+  html <- render_html(bar)
+  expect_match(html, "width:240px", fixed = TRUE)
+  expect_no_match(html, 'style="width:240px;margin-top:4px;"', fixed = TRUE)
+  expect_identical(runtime_payload_from(bar)$props$style, list(marginTop = "4px"))
 })
 
-test_that("block_progress accepts a named list style using CSS property names", {
-  # List keys are CSS property names (kebab-case), not React camelCase.
-  html <- render_html(block_progress("job", style = list("margin-top" = "4px")))
-  expect_match(html, "margin-top:4px;", fixed = TRUE)
+test_that("block_progress accepts a named list style passed through to props", {
+  # A named list is passed through verbatim (CSS property names), matching
+  # update_block_progress(style=).
+  payload <- runtime_payload_from(
+    block_progress("job", style = list("margin-top" = "4px"))
+  )
+  expect_identical(payload$props$style, list("margin-top" = "4px"))
 })
 
 test_that("block_progress rejects an empty id", {

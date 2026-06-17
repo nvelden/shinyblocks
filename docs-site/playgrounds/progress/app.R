@@ -74,7 +74,10 @@ action_button <- function(input_id, label) {
 ui <- block_page(
   title = "shinyblocks - Progress playground",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
+    htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
+    htmltools::tags$style(htmltools::HTML(
+      ".docs-progress-preview-custom { border: 2px dashed var(--ring); border-radius: 0.5rem; padding: 0.5rem; }"
+    ))
   ),
   htmltools::tags$div(
     `data-shinyblocks-root` = "",
@@ -106,6 +109,10 @@ ui <- block_page(
           block_field(
             block_field_label("message", `for` = "message"),
             block_textarea("message", value = "Importing rows...", rows = 1, resize = "none")
+          ),
+          block_field(
+            block_field_label("detail", `for` = "detail"),
+            block_textarea("detail", value = "", rows = 1, placeholder = "e.g., 1,200 of 3,400", resize = "none")
           )
         ),
         controls_group(
@@ -140,6 +147,18 @@ ui <- block_page(
               selected = "default",
               size = "sm"
             )
+          ),
+          block_field(
+            block_field_label("width", `for` = "width"),
+            block_textarea("width", value = "", rows = 1, placeholder = "e.g., 320px (blank = 100%)", resize = "none")
+          ),
+          block_field(
+            block_field_label("style", `for` = "style"),
+            block_textarea("style", value = "", rows = 1, placeholder = "e.g., opacity: 0.8;", resize = "none")
+          ),
+          block_field(
+            block_field_label("class", `for` = "use_class"),
+            block_checkbox("use_class", "Use custom dashed-border class", value = FALSE)
           )
         )
       ),
@@ -195,9 +214,13 @@ server <- function(input, output, session) {
       max = max,
       label = blank_to_null(input$label),
       message = blank_to_null(input$message),
+      detail = blank_to_null(input$detail),
       show_value = isTRUE(input$show_value),
       indeterminate = isTRUE(input$indeterminate),
-      variant = input$variant %||% "default"
+      variant = input$variant %||% "default",
+      width = blank_to_null(input$width),
+      style = blank_to_null(input$style),
+      use_class = isTRUE(input$use_class)
     )
   })
 
@@ -209,10 +232,14 @@ server <- function(input, output, session) {
       min = s$min,
       max = s$max,
       message = s$message,
+      detail = s$detail,
       label = s$label,
       show_value = s$show_value,
       indeterminate = s$indeterminate,
-      variant = s$variant
+      variant = s$variant,
+      width = s$width,
+      style = s$style,
+      class = if (s$use_class) "docs-progress-preview-custom" else NULL
     )
   })
   outputOptions(output, "preview_ui", suspendWhenHidden = FALSE)
@@ -225,9 +252,13 @@ server <- function(input, output, session) {
     if (s$max != 1) args <- c(args, paste0("max = ", s$max))
     if (!is.null(s$label)) args <- c(args, paste0('label = "', s$label, '"'))
     if (!is.null(s$message)) args <- c(args, paste0('message = "', s$message, '"'))
+    if (!is.null(s$detail)) args <- c(args, paste0('detail = "', s$detail, '"'))
     if (isTRUE(s$show_value)) args <- c(args, "show_value = TRUE")
     if (isTRUE(s$indeterminate)) args <- c(args, "indeterminate = TRUE")
     if (!identical(s$variant, "default")) args <- c(args, paste0('variant = "', s$variant, '"'))
+    if (!is.null(s$width)) args <- c(args, paste0('width = "', s$width, '"'))
+    if (!is.null(s$style)) args <- c(args, paste0('style = "', s$style, '"'))
+    if (isTRUE(s$use_class)) args <- c(args, 'class = "docs-progress-preview-custom"')
     paste0("block_progress(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   outputOptions(output, "preview_code", suspendWhenHidden = FALSE)

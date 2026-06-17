@@ -47,9 +47,15 @@ the merged `[min, max]` and repairs an inverted range.
 | R input | Runtime payload |
 | --- | --- |
 | `value` / `min` / `max` / `indeterminate` | `state` |
-| `message` / `detail` / `label` / `show_value` / `variant` | `props` |
-| `width` + `style` | mount `<div>` inline style |
+| `message` / `detail` / `label` / `show_value` / `variant` / `style` | `props` |
+| `width` | mount `<div>` inline style (wrapper sizing only) |
 | `class` | `className` on the mount |
+
+`style` and `width` target different nodes by design: `width` sizes the mount
+wrapper, while `style` is applied to the inner `.sb-progress-body`. Both
+`block_progress(style=)` and `update_block_progress(style=)` style that same node
+with the same normalized-React-object grammar (matching the textarea/select
+convention).
 
 ## Token contract
 

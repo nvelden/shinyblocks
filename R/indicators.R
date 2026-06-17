@@ -158,54 +158,6 @@ check_flag <- function(x, name) {
 
 clamp <- function(x, lo, hi) max(lo, min(hi, x))
 
-# Build the mount-div style for progress as a CSS string: an optional `width`
-# declaration prepended to the (possibly NULL) user style. `runtime_component()`
-# carries the raw style through to the mount `<div>`, so it must be a string,
-# not a list. Returns NULL when both are empty.
-progress_mount_style <- function(style, width) {
-  width_decl <- if (is.null(width)) {
-    NULL
-  } else {
-    paste0("width:", htmltools::validateCssUnit(width), ";")
-  }
-  user_decl <- style_to_css_string(style)
-  combined <- paste0(width_decl %||% "", user_decl %||% "")
-  if (nzchar(combined)) combined else NULL
-}
-
-# Coerce a user `style` to a CSS declaration string for the mount `<div>`.
-# Accepts a CSS string (passed through) or a fully named list whose keys are
-# CSS property names (e.g. `list("margin-top" = "4px")`, NOT React camelCase).
-# Keys are joined verbatim, matching the CSS-property-name contract used by
-# style strings elsewhere in the package.
-style_to_css_string <- function(style) {
-  if (is.null(style)) {
-    return(NULL)
-  }
-  if (is.character(style) && length(style) == 1 && !is.na(style)) {
-    s <- trimws(style)
-    if (!nzchar(s)) {
-      return(NULL)
-    }
-    return(if (endsWith(s, ";")) s else paste0(s, ";"))
-  }
-  if (!is.list(style)) {
-    stop("`style` must be a CSS string or a named list.", call. = FALSE)
-  }
-  names <- names(style)
-  if (length(style) > 0 && (is.null(names) || any(is.na(names) | !nzchar(names)))) {
-    stop("`style` lists must be fully named.", call. = FALSE)
-  }
-  paste0(
-    vapply(
-      names,
-      function(n) paste0(n, ":", style[[n]], ";"),
-      character(1)
-    ),
-    collapse = ""
-  )
-}
-
 #' Create a progress bar
 #'
 #' An embedded, shadcn-style progress indicator. Unlike Shiny's native
@@ -231,9 +183,11 @@ style_to_css_string <- function(style) {
 #' @param variant Indicator color: one of `"default"`, `"success"`,
 #'   `"warning"`, `"info"`, `"destructive"`.
 #' @param width Optional CSS width for the component (`NULL` fills the
-#'   container).
+#'   container). Sizes the mount wrapper only.
 #' @param class Additional classes.
-#' @param style Optional inline custom styles.
+#' @param style Optional inline styles (CSS string or named list) applied to the
+#'   bar element. Targets the same node as `update_block_progress(style = )`; use
+#'   `width` to size the component.
 #'
 #' @return An `htmltools` tag.
 #' @family content
@@ -276,7 +230,13 @@ block_progress <- function(
       detail = detail,
       label = label,
       showValue = isTRUE(show_value),
-      variant = variant
+      variant = variant,
+      # User `style` targets the inner `.sb-progress-body` (matching the textarea
+      # / select convention: width sizes the mount wrapper, `style` styles the
+      # component element). `update_block_progress(style=)` reaches the same node
+      # via the runtime payload, so constructor and update style the same DOM
+      # node with the same (normalized React object) grammar.
+      style = normalize_runtime_style(style)
     ),
     input_id = id,
     state = list(
@@ -287,7 +247,8 @@ block_progress <- function(
     ),
     binding = list(input = TRUE, type = "shinyblocks.progress"),
     class = class,
-    style = progress_mount_style(style, width),
+    # The mount wrapper only carries `width`; user `style` lives in `props`.
+    style = normalize_width_style(width),
     root_class = "sb-progress"
   )
 }

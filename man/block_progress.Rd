@@ -48,11 +48,13 @@ of a determinate fill.}
 \code{"warning"}, \code{"info"}, \code{"destructive"}.}
 
 \item{width}{Optional CSS width for the component (\code{NULL} fills the
-container).}
+container). Sizes the mount wrapper only.}
 
 \item{class}{Additional classes.}
 
-\item{style}{Optional inline custom styles.}
+\item{style}{Optional inline styles (CSS string or named list) applied to the
+bar element. Targets the same node as \code{update_block_progress(style = )}; use
+\code{width} to size the component.}
 }
 \value{
 An \code{htmltools} tag.

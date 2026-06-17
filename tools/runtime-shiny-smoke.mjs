@@ -749,6 +749,17 @@ try {
     "indeterminate progress should suppress the percent"
   );
 
+  // Race regression: a fresh progress bar inserted and updated in the same flush
+  // must show the update (60%), proving the binding queues messages that arrive
+  // before the React mount effect installs the receive handler (not dropped).
+  const lateProgress = "[data-sb-component='progress'][data-sb-input-id='late_progress']";
+  await page.click("#insert_late_progress");
+  await page.waitForFunction(
+    (root) => document.querySelector(`${root} [data-slot='progress-value']`)?.textContent === "60%",
+    lateProgress
+  );
+  await assertText(page, `${lateProgress} [data-slot='progress-message']`, "Late update");
+
   await assertText(page, "#mod-value", "m0");
   await assertText(page, "#mod-upload_value", "<NULL>");
   await page.setInputFiles("#mod-upload", uploadPath);

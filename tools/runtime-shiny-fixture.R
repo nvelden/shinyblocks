@@ -276,6 +276,8 @@ ui <- shiny::fluidPage(
   shiny::actionButton("inc_progress", "Inc progress"),
   shiny::actionButton("reset_progress", "Reset progress"),
   shiny::actionButton("indeterminate_progress", "Indeterminate progress"),
+  shiny::actionButton("insert_late_progress", "Insert + immediately update progress"),
+  shiny::div(id = "late_progress_target"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
   shiny::actionButton("shrink_select_table", "Shrink select table"),
@@ -778,6 +780,28 @@ server <- function(input, output, session) {
   })
   shiny::observeEvent(input$indeterminate_progress, {
     update_block_progress(session, "runtime_progress", indeterminate = TRUE)
+  })
+
+  # Race regression: insert a fresh progress bar and, in the SAME flush, send an
+  # update before the React mount effect can install `__sbProgressReceive`. The
+  # binding's queued fallback must drain the message so the bar lands at 60%
+  # instead of silently dropping it.
+  shiny::observeEvent(input$insert_late_progress, {
+    shiny::insertUI(
+      selector = "#late_progress_target",
+      where = "beforeEnd",
+      ui = shiny::div(
+        id = "late_progress_host",
+        block_progress(
+          "late_progress",
+          value = 0,
+          show_value = TRUE,
+          class = "runtime-late-progress-fixture"
+        )
+      ),
+      immediate = TRUE
+    )
+    update_block_progress(session, "late_progress", value = 0.6, message = "Late update")
   })
 
   output$inserted_child <- shiny::renderText("inserted-child-ready")
