@@ -10,6 +10,9 @@
 
 - **default** — custom runtime trigger and portal popup backed by a
   hidden native `<select>` that carries the Shiny value.
+- **multiple** — `multiple = TRUE` emits a hidden native
+  `<select multiple>` mirror and initializes to a character vector,
+  defaulting to no selection.
 - **changed** — user selection updates `input$<id>` through the
   component-specific Shiny input binding.
 - **server-updated** — `update_block_select()` can update value,
@@ -23,13 +26,13 @@
 
 ## R API
 
-### `block_select(input_id, choices, selected, placeholder, disabled, width, class, size, invalid)`
+### `block_select(input_id, choices, selected, placeholder, disabled, width, class, size, invalid, multiple, max_items)`
 
 | Argument | Purpose |
 | --- | --- |
 | `input_id` | Shiny input id used for `input$<id>` and update messages. |
 | `choices` | Character vector or named vector of labels/values. Values must be unique and non-empty; `""` is reserved as the placeholder sentinel. |
-| `selected` | Initial selected value. |
+| `selected` | Initial selected value. In multiple mode, a character vector. |
 | `placeholder` | Empty-value prompt shown before selection. |
 | `disabled` | Disables browser interaction while keeping server updates possible. |
 | `width` | CSS width for the runtime select wrapper. |
@@ -37,13 +40,15 @@
 | `class` | Additional class merged onto the runtime wrapper. |
 | `size` | One of `default`, `sm`, or `lg`. |
 | `invalid` | Applies `aria-invalid` and destructive border/ring styling. |
+| `multiple` | Enables multiple-selection value semantics. |
+| `max_items` | Optional selected-item cap for multiple mode. |
 
 ### `update_block_select(session, input_id, ...)`
 
 Accepts `selected`, `choices`, `placeholder`, `disabled`, `style`, and
 `class`, with optional `notify` semantics. Passing `selected = NULL`
-clears to the empty placeholder value (`""`) because browser selects
-do not have a stable JavaScript `null`.
+clears single selects to the empty placeholder value (`""`);
+`selected = character(0)` clears multiple selects.
 
 ## Runtime mapping
 
@@ -56,6 +61,8 @@ do not have a stable JavaScript `null`.
 | `disabled` | `props$disabled` | Disables the visible control. |
 | `invalid` | `props$invalid` | Toggles destructive-tinted state. |
 | `size` | `props$size` | One of `sm`/`default`/`lg`. |
+| `multiple` | `props$multiple` | Branches the runtime into multiple mode. |
+| `max_items` | `props$maxItems` | Optional multiple-mode cap. |
 | `width` | mount `style.width` | Applied to the wrapper. |
 | `class` | `className` | Extra wrapper class. |
 
@@ -64,10 +71,14 @@ do not have a stable JavaScript `null`.
 - The visible UI is a package runtime overlay with shadcn-aligned
   trigger, content, viewport, item, and selected-indicator parts.
 - A hidden `<select id="{input_id}" class="sb-select-native">` lives
-  inside the runtime mount as the canonical Shiny value source.
+  inside the runtime mount as the canonical Shiny value source. In
+  multiple mode the native mirror carries the `multiple` attribute and
+  selected options.
 - `ShinyblocksSelectBinding` is registered as `shinyblocks.select`. It
   reads and updates the hidden native control while routing server
   messages through `receiveMessage()`.
+- Single mode reports a length-1 string. Multiple mode reports a
+  character vector and defaults to `character(0)`.
 - The popup is rendered into the package portal root
   (`[data-shinyblocks-portal-root]`) to avoid `overflow`/`transform`
   clipping from ancestor containers.

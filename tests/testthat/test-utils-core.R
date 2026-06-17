@@ -106,6 +106,45 @@ test_that("block_select validates choices and selected value", {
     block_select("plan", choices = c("Free", "Pro"), selected = "Team")
   })
 
+  expect_error(
+    block_select(
+      "plan",
+      choices = c("Free", "Pro"),
+      selected = c("Free", "Pro")
+    ),
+    "`selected` must be a single value"
+  )
+
+  expect_error(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = c("free", "team"),
+      multiple = TRUE
+    ),
+    "`selected` must match one of `choices`"
+  )
+
+  expect_error(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = NA_character_,
+      multiple = TRUE
+    ),
+    "`selected` must not contain missing values"
+  )
+
+  expect_error(
+    block_select(
+      "plan",
+      choices = c("Free", "Pro"),
+      multiple = TRUE,
+      max_items = 0
+    ),
+    "`max_items` must be a positive whole number"
+  )
+
   expect_snapshot(error = TRUE, {
     block_select("plan", choices = c("Free", "Pro"), size = "xl")
   })
