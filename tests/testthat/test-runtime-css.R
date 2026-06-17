@@ -16,10 +16,37 @@ package_source_css <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+# Split a comma-separated selector list on top-level commas only, leaving
+# commas inside functional pseudo-classes (`:is(a,b)`, `:where(a,b)`,
+# `:not(a,b)`) intact. A naive split on every comma would tear an `:is()`
+# group apart and misread its tail as an unscoped selector even though the
+# whole compound is confined by its ancestor (e.g. `[data-shinyblocks-root]`).
+split_top_level_commas <- function(selector) {
+  chars <- strsplit(selector, "", fixed = TRUE)[[1]]
+  depth <- 0L
+  parts <- character()
+  current <- ""
+  for (ch in chars) {
+    if (ch == "(") {
+      depth <- depth + 1L
+    } else if (ch == ")") {
+      depth <- depth - 1L
+    }
+    if (ch == "," && depth == 0L) {
+      parts <- c(parts, current)
+      current <- ""
+    } else {
+      current <- paste0(current, ch)
+    }
+  }
+  c(parts, current)
+}
+
 css_selectors <- function(css) {
   rules <- unlist(strsplit(css, "}"), use.names = FALSE)
   selectors <- sub("\\{.*$", "", rules)
-  selectors <- trimws(unlist(strsplit(selectors, ","), use.names = FALSE))
+  selectors <- unlist(lapply(selectors, split_top_level_commas), use.names = FALSE)
+  selectors <- trimws(selectors)
   selectors[nzchar(selectors)]
 }
 
