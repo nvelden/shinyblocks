@@ -92,27 +92,27 @@ ui <- block_page(
           "Content", first = TRUE,
           block_field(
             block_field_label("value", `for` = "value"),
-            block_textarea("value", value = "0.6", rows = 1, resize = "none")
+            block_input("value", value = "0.6", type = "number")
           ),
           block_field(
             block_field_label("min", `for` = "min"),
-            block_textarea("min", value = "0", rows = 1, resize = "none")
+            block_input("min", value = "0", type = "number")
           ),
           block_field(
             block_field_label("max", `for` = "max"),
-            block_textarea("max", value = "1", rows = 1, resize = "none")
+            block_input("max", value = "1", type = "number")
           ),
           block_field(
             block_field_label("label", `for` = "label"),
-            block_textarea("label", value = "Upload", rows = 1, resize = "none")
+            block_input("label", value = "Upload")
           ),
           block_field(
             block_field_label("message", `for` = "message"),
-            block_textarea("message", value = "Importing rows...", rows = 1, resize = "none")
+            block_input("message", value = "Importing rows...")
           ),
           block_field(
             block_field_label("detail", `for` = "detail"),
-            block_textarea("detail", value = "", rows = 1, placeholder = "e.g., 1,200 of 3,400", resize = "none")
+            block_input("detail", value = "", placeholder = "e.g., 1,200 of 3,400")
           )
         ),
         controls_group(
@@ -135,6 +135,19 @@ ui <- block_page(
             action_button("inc", "Increment"),
             action_button("reset", "Reset"),
             action_button("toggle_indeterminate", "Indeterminate")
+          ),
+          htmltools::tags$p(
+            style = "color: var(--muted-foreground); margin: 0.5rem 0 0.35rem 0; font-size: 0.8125rem;",
+            paste(
+              "Long-running task: advance a batch job without blocking the",
+              "session. Run simulates a 20-batch import; the recipe appears",
+              "under Server Action."
+            )
+          ),
+          htmltools::div(
+            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+            action_button("batch_run", "Run import"),
+            action_button("batch_cancel", "Cancel")
           )
         ),
         controls_group(
@@ -150,11 +163,11 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("width", `for` = "width"),
-            block_textarea("width", value = "", rows = 1, placeholder = "e.g., 320px (blank = 100%)", resize = "none")
+            block_input("width", value = "", placeholder = "e.g., 320px (blank = 100%)")
           ),
           block_field(
             block_field_label("style", `for` = "style"),
-            block_textarea("style", value = "", rows = 1, placeholder = "e.g., opacity: 0.8;", resize = "none")
+            block_input("style", value = "", placeholder = "e.g., opacity: 0.8;")
           ),
           block_field(
             block_field_label("class", `for` = "use_class"),
@@ -291,6 +304,77 @@ server <- function(input, output, session) {
   observeEvent(input$toggle_indeterminate, {
     update_block_progress(session, "preview_progress", indeterminate = TRUE)
     reactive_code('update_block_progress(session, "preview_progress", indeterminate = TRUE)')
+  })
+
+  # Long-running task recipe, wired into the live preview bar. A stepped,
+  # non-blocking reactive — each tick advances one batch and pushes an update,
+  # so Shiny flushes progress to the browser between steps instead of freezing
+  # on a blocking loop.
+  batch <- reactiveValues(running = FALSE, step = 0, total = 20)
+
+  batch_recipe_code <- paste0(
+    "batch <- reactiveValues(running = FALSE, step = 0, total = 20)\n\n",
+    "observeEvent(input$run, {\n",
+    "  batch$running <- TRUE\n",
+    "  batch$step <- 0\n",
+    "})\n\n",
+    "# Stepped + non-blocking: re-invalidates until the job is done, so each\n",
+    "# update_block_progress() call is flushed to the browser between steps.\n",
+    "# A blocking for-loop would freeze the session and the bar would only\n",
+    "# jump once, at the end.\n",
+    "observe({\n",
+    "  if (!batch$running) return()\n",
+    "  invalidateLater(180, session)\n",
+    "  isolate({\n",
+    "    batch$step <- batch$step + 1\n",
+    "    done <- batch$step >= batch$total\n",
+    "    update_block_progress(\n",
+    '      session, "preview_progress",\n',
+    "      value   = batch$step / batch$total,\n",
+    '      message = if (done) "Import complete" else sprintf("Importing batch %d of %d", batch$step, batch$total),\n',
+    '      detail  = sprintf("%s rows written", format(batch$step * 500L, big.mark = ","))\n',
+    "    )\n",
+    "    if (done) batch$running <- FALSE\n",
+    "  })\n",
+    "})"
+  )
+
+  observeEvent(input$batch_run, {
+    batch$running <- TRUE
+    batch$step <- 0
+    update_block_progress(
+      session, "preview_progress",
+      value = 0, message = "Starting import...", detail = NULL, indeterminate = FALSE
+    )
+    reactive_code(batch_recipe_code)
+  })
+
+  observeEvent(input$batch_cancel, {
+    if (!batch$running) return()
+    batch$running <- FALSE
+    update_block_progress(
+      session, "preview_progress",
+      message = "Cancelled",
+      detail = sprintf("Stopped at batch %d of %d", batch$step, batch$total)
+    )
+  })
+
+  observe({
+    if (!batch$running) return()
+    invalidateLater(180, session)
+    isolate({
+      batch$step <- batch$step + 1
+      done <- batch$step >= batch$total
+      update_block_progress(
+        session, "preview_progress",
+        value = batch$step / batch$total,
+        message = if (done) "Import complete" else {
+          sprintf("Importing batch %d of %d", batch$step, batch$total)
+        },
+        detail = sprintf("%s rows written", format(batch$step * 500L, big.mark = ","))
+      )
+      if (done) batch$running <- FALSE
+    })
   })
 }
 

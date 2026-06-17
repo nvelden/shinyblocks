@@ -52,9 +52,9 @@ htmltools::tagList(
         htmltools::tags$p(
           style = "color: var(--muted-foreground); margin: 0.5rem 0 0.35rem 0; font-size: 0.8125rem;",
           paste(
-            "Long-running task: step a batch job through the bar without",
-            "blocking the session. Run drives a simulated 20-batch import;",
-            "the Server Action code shows the non-blocking recipe."
+            "Long-running task: advance a batch job without blocking the",
+            "session. Run simulates a 20-batch import; the recipe appears",
+            "under Server Action."
           )
         ),
         htmltools::div(
