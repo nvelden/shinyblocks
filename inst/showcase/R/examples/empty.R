@@ -5,7 +5,7 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("title", `for` = "showcase_empty_doc_title"),
-          block_textarea("showcase_empty_doc_title", value = "No projects found", rows = 1, resize = "none")
+          block_input("showcase_empty_doc_title", value = "No projects found")
         ),
         block_field(
           block_field_label("description", `for` = "showcase_empty_doc_description"),

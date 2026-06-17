@@ -27,6 +27,7 @@ source(file.path("R", "server_icon.R"), local = TRUE)
 source(file.path("R", "server_separator.R"), local = TRUE)
 source(file.path("R", "server_skeleton.R"), local = TRUE)
 source(file.path("R", "server_spinner.R"), local = TRUE)
+source(file.path("R", "server_progress.R"), local = TRUE)
 source(file.path("R", "server_empty.R"), local = TRUE)
 source(file.path("R", "server_card.R"), local = TRUE)
 source(file.path("R", "server_value_box.R"), local = TRUE)
@@ -339,6 +340,17 @@ sections <- list(
     file = "spinner.R"
   ),
   list(
+    id = "progress",
+    label = "Progress",
+    icon = "loader-2",
+    title = "Progress",
+    lead = paste(
+      "Embedded, server-driven progress bar that renders inline instead of as",
+      "a Shiny notification panel. Set or increment it from the server."
+    ),
+    file = "progress.R"
+  ),
+  list(
     id = "empty",
     label = "Empty",
     icon = "folder",
@@ -401,7 +413,7 @@ sections <- list(
 ui <- block_page(
   title = "shinyblocks — component gallery",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260606_02")
+    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260616_01")
   ),
   sidebar = block_sidebar(
     title = "shinyblocks",
@@ -519,6 +531,7 @@ server <- function(input, output, session) {
   register_separator_showcase(input, output, session)
   register_skeleton_showcase(input, output, session)
   register_spinner_showcase(input, output, session)
+  register_progress_showcase(input, output, session)
   register_empty_showcase(input, output, session)
   register_card_showcase(input, output, session)
   register_value_box_showcase(input, output, session)

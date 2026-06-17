@@ -50,7 +50,7 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("style", `for` = "showcase_input_doc_style"),
-          block_textarea("showcase_input_doc_style", value = "", rows = 1, placeholder = "e.g., font-family: var(--font-mono);", resize = "none")
+          block_input("showcase_input_doc_style", value = "", placeholder = "e.g., font-family: var(--font-mono);")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_input_doc_class"),

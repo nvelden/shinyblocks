@@ -196,6 +196,13 @@ registry <- list(
     featured = FALSE
   ),
   list(
+    name = "Progress",
+    slug = "progress",
+    file = "progress.R",
+    description = "Embedded, server-driven progress bar that renders inline instead of as a notification panel.",
+    featured = FALSE
+  ),
+  list(
     name = "Empty",
     slug = "empty",
     file = "empty.R",

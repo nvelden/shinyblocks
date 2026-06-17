@@ -13,7 +13,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
-          block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1, resize = "none")
+          block_input("showcase_select_doc_placeholder", value = "Choose a plan")
         )
       ),
       showcase_controls_group(
@@ -46,11 +46,11 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("width", `for` = "showcase_select_doc_width"),
-          block_textarea("showcase_select_doc_width", value = "100%", rows = 1, resize = "none")
+          block_input("showcase_select_doc_width", value = "100%")
         ),
         block_field(
           block_field_label("style", `for` = "showcase_select_doc_style"),
-          block_textarea("showcase_select_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
+          block_input("showcase_select_doc_style", value = "", placeholder = "e.g., border: 2px dashed red;")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_select_doc_class"),

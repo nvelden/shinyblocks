@@ -64,6 +64,7 @@ Other content:
 \code{\link{block_dialog}()},
 \code{\link{block_empty}()},
 \code{\link{block_popover}()},
+\code{\link{block_progress}()},
 \code{\link{block_separator}()},
 \code{\link{block_skeleton}()},
 \code{\link{block_spinner}()},
@@ -72,10 +73,12 @@ Other content:
 \code{\link{block_tooltip}()},
 \code{\link{block_value_box}()},
 \code{\link{dismiss_toast}()},
+\code{\link{inc_block_progress}()},
 \code{\link{show_toast}()},
 \code{\link{table_column}()},
 \code{\link{update_block_dialog}()},
 \code{\link{update_block_popover}()},
+\code{\link{update_block_progress}()},
 \code{\link{update_block_table}()},
 \code{\link{update_block_toaster}()}
 }

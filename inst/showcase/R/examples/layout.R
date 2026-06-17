@@ -5,11 +5,11 @@ htmltools::tagList(
         "Header & Sidebar", first = TRUE,
         block_field(
           block_field_label("header title", `for` = "showcase_layout_doc_title"),
-          block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
+          block_input("showcase_layout_doc_title", value = "Admin Dashboard")
         ),
         block_field(
           block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
-          block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
+          block_input("showcase_layout_doc_sidebar_title", value = "Acme Corp")
         ),
         block_field(
           block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
@@ -17,7 +17,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
-          block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
+          block_input("showcase_layout_doc_profile_label", value = "NV")
         )
       ),
       showcase_controls_group(

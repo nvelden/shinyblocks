@@ -5,7 +5,7 @@ htmltools::tagList(
           "Accessibility", first = TRUE,
           block_field(
             block_field_label("aria-label", `for` = "showcase_spinner_doc_label"),
-            block_textarea("showcase_spinner_doc_label", value = "Loading", rows = 1, resize = "none")
+            block_input("showcase_spinner_doc_label", value = "Loading")
           ),
           block_field_description(
             "Screen-reader label only; it does not render visible text."

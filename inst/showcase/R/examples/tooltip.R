@@ -5,7 +5,7 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("trigger label", `for` = "showcase_tooltip_doc_trigger"),
-          block_textarea("showcase_tooltip_doc_trigger", value = "Hover me", rows = 1, resize = "none")
+          block_input("showcase_tooltip_doc_trigger", value = "Hover me")
         ),
         block_field(
           block_field_label("content", `for` = "showcase_tooltip_doc_content"),
@@ -33,7 +33,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("style", `for` = "showcase_tooltip_doc_style"),
-          block_textarea("showcase_tooltip_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
+          block_input("showcase_tooltip_doc_style", value = "", placeholder = "e.g., border: 2px dashed red;")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_tooltip_doc_class"),

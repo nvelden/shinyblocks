@@ -54,7 +54,7 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_code_doc_style"),
-            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;", resize = "none")
+            block_input("showcase_code_doc_style", value = "", placeholder = "e.g., max-width: 400px;")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_code_doc_class"),

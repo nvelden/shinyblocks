@@ -7,7 +7,7 @@ htmltools::tagList(
           "Content", first = TRUE,
           block_field(
             block_field_label("title", `for` = "showcase_toast_doc_title"),
-            block_textarea("showcase_toast_doc_title", value = "Changes saved", rows = 1, resize = "none")
+            block_input("showcase_toast_doc_title", value = "Changes saved")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_toast_doc_description"),

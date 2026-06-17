@@ -49,6 +49,7 @@ playground_heights <- list(
   skeleton = 720L,
   slider = 720L,
   spinner = 720L,
+  progress = 720L,
   switch = 720L,
   tabs = 720L,
   theme = 720L,

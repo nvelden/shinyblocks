@@ -5,7 +5,7 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("label", `for` = "showcase_button_doc_label"),
-          block_textarea("showcase_button_doc_label", value = "Continue", rows = 1, resize = "none")
+          block_input("showcase_button_doc_label", value = "Continue")
         ),
         block_field(
           block_field_label("variant", `for` = "showcase_button_doc_variant"),
@@ -51,7 +51,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("style", `for` = "showcase_button_doc_style"),
-          block_textarea("showcase_button_doc_style", value = "", rows = 1, placeholder = "e.g., min-width: 10rem;", resize = "none")
+          block_input("showcase_button_doc_style", value = "", placeholder = "e.g., min-width: 10rem;")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_button_doc_class"),

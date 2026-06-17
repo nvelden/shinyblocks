@@ -10,7 +10,8 @@ RUNTIME_COMPONENT_NAMES <- c(
   "alert", "badge", "button", "card", "checkbox", "code", "date-picker",
   "date-range-picker",
   "dialog",
-  "empty", "file-input", "input", "popover", "radio-group", "select", "separator",
+  "empty", "file-input", "input", "popover", "progress", "radio-group", "select",
+  "separator",
   "skeleton", "slider", "spinner", "switch", "table", "textarea", "toaster",
   "tooltip", "value-box"
 )

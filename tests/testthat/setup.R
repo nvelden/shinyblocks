@@ -75,6 +75,44 @@ local_input_message_session <- function(ns = identity) {
   )
 }
 
+# Mimics a `moduleServer` session proxy: `ns()` namespaces ids, the proxy's own
+# `sendInputMessage()` re-namespaces its target (as Shiny's `makeScope` does),
+# and `rootScope()` returns the root whose `sendInputMessage()` does not. A
+# correct updater routes through `rootScope()` so the target is namespaced once.
+local_module_message_session <- function(namespace) {
+  messages <- list()
+  ns <- function(id) paste0(namespace, "-", id)
+
+  root <- list(
+    ns = identity,
+    sendInputMessage = function(input_id, payload) {
+      messages[[length(messages) + 1L]] <<- list(
+        input_id = input_id,
+        payload = payload
+      )
+    }
+  )
+  root$rootScope <- function() root
+
+  proxy <- list(
+    ns = ns,
+    rootScope = function() root,
+    sendInputMessage = function(input_id, payload) {
+      root$sendInputMessage(ns(input_id), payload)
+    }
+  )
+
+  list(
+    session = proxy,
+    last_target = function() {
+      if (!length(messages)) {
+        stop("No input messages were captured.", call. = FALSE)
+      }
+      messages[[length(messages)]]$input_id
+    }
+  )
+}
+
 local_custom_message_session <- function() {
   messages <- list()
   session <- list(

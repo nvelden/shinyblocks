@@ -5,11 +5,11 @@ htmltools::tagList(
         "Navigation Settings", first = TRUE,
         block_field(
           block_field_label("label", `for` = "showcase_nav_item_doc_label"),
-          block_textarea("showcase_nav_item_doc_label", value = "Home", rows = 1, resize = "none")
+          block_input("showcase_nav_item_doc_label", value = "Home")
         ),
         block_field(
           block_field_label("href", `for` = "showcase_nav_item_doc_href"),
-          block_textarea("showcase_nav_item_doc_href", value = "#", rows = 1, resize = "none")
+          block_input("showcase_nav_item_doc_href", value = "#")
         ),
         block_field(
           block_field_label("icon", `for` = "showcase_nav_item_doc_icon"),

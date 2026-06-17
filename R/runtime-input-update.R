@@ -22,9 +22,29 @@ runtime_input_update <- function(
     payload$notify <- isTRUE(notify) && notify_key %in% names(payload)
   }
 
+  # `session$ns()` resolves the fully namespaced input id; baking it into the
+  # mount-id slug yields the runtime element's DOM id (the routing target).
   message_target <- runtime_mount_id(component, session$ns(input_id))
-  session$sendInputMessage(message_target, payload)
+
+  # Deliver via the root session. A `moduleServer` session proxy re-namespaces
+  # the first arg of its own `sendInputMessage()`, which would double-prefix an
+  # already-namespaced target and silently drop the update (issue #63). The root
+  # `ShinySession$ns` is identity, so the ns-baked target routes unchanged.
+  runtime_root_session(session)$sendInputMessage(message_target, payload)
   invisible(NULL)
+}
+
+# Walk up to the root `ShinySession`. Shiny exposes `rootScope()` on real
+# sessions (returning the root for both top-level and module-proxy sessions);
+# mock/test sessions without it fall back to the session as given.
+runtime_root_session <- function(session) {
+  if (is.function(session$rootScope)) {
+    root <- session$rootScope()
+    if (!is.null(root) && is.function(root$sendInputMessage)) {
+      return(root)
+    }
+  }
+  session
 }
 
 payload_set_if_present <- function(payload, name, value, transform = NULL) {

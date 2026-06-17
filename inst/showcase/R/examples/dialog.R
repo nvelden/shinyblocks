@@ -7,7 +7,7 @@ htmltools::tagList(
           "Content", first = TRUE,
           block_field(
             block_field_label("title", `for` = "showcase_dialog_doc_title"),
-            block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")
+            block_input("showcase_dialog_doc_title", value = "Confirm action")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_dialog_doc_description"),
@@ -15,7 +15,7 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("trigger label", `for` = "showcase_dialog_doc_trigger"),
-            block_textarea("showcase_dialog_doc_trigger", value = "Open dialog", rows = 1, resize = "none")
+            block_input("showcase_dialog_doc_trigger", value = "Open dialog")
           ),
           block_field(
             block_field_label("footer", `for` = "showcase_dialog_doc_footer"),
@@ -48,7 +48,7 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_dialog_doc_style"),
-            block_textarea("showcase_dialog_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
+            block_input("showcase_dialog_doc_style", value = "", placeholder = "e.g., border: 2px dashed red;")
           ),
           block_field(
             block_field_label("class", `for` = "showcase_dialog_doc_class"),

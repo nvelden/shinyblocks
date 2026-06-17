@@ -62,6 +62,16 @@ test_that("update_block_button clears icon and style via NULL", {
   expect_null(message$style)
 })
 
+test_that("update_block_*() routes via root session under a module (issue #63)", {
+  capture <- local_module_message_session("mod")
+
+  update_block_progress(capture$session, "load", value = 40)
+
+  # The mount-id slug already bakes in the module namespace; routing through the
+  # root session must not re-namespace it (no `mod-sb-runtime-...` double prefix).
+  expect_identical(capture$last_target(), "sb-runtime-progress-mod-load")
+})
+
 test_that("update_block_select sends input binding messages", {
   capture <- local_input_message_session()
 
