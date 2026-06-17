@@ -5,15 +5,15 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("start", `for` = "showcase_date_range_picker_doc_start"),
-          block_textarea("showcase_date_range_picker_doc_start", value = "2024-01-08", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+          block_input("showcase_date_range_picker_doc_start", value = "2024-01-08", placeholder = "yyyy-mm-dd")
         ),
         block_field(
           block_field_label("end", `for` = "showcase_date_range_picker_doc_end"),
-          block_textarea("showcase_date_range_picker_doc_end", value = "2024-01-19", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+          block_input("showcase_date_range_picker_doc_end", value = "2024-01-19", placeholder = "yyyy-mm-dd")
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_date_range_picker_doc_placeholder"),
-          block_textarea("showcase_date_range_picker_doc_placeholder", value = "Pick a date range", rows = 1, resize = "none")
+          block_input("showcase_date_range_picker_doc_placeholder", value = "Pick a date range")
         ),
         block_field(
           block_field_label("format", `for` = "showcase_date_range_picker_doc_format"),
@@ -21,18 +21,18 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("separator", `for` = "showcase_date_range_picker_doc_separator"),
-          block_textarea("showcase_date_range_picker_doc_separator", value = " – ", rows = 1, resize = "none")
+          block_input("showcase_date_range_picker_doc_separator", value = " – ")
         )
       ),
       showcase_controls_group(
         "State",
         block_field(
           block_field_label("min", `for` = "showcase_date_range_picker_doc_min"),
-          block_textarea("showcase_date_range_picker_doc_min", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+          block_input("showcase_date_range_picker_doc_min", value = "", placeholder = "yyyy-mm-dd")
         ),
         block_field(
           block_field_label("max", `for` = "showcase_date_range_picker_doc_max"),
-          block_textarea("showcase_date_range_picker_doc_max", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+          block_input("showcase_date_range_picker_doc_max", value = "", placeholder = "yyyy-mm-dd")
         ),
         block_field(
           block_field_label("disabled", `for` = "showcase_date_range_picker_doc_disabled"),
@@ -63,11 +63,11 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("width", `for` = "showcase_date_range_picker_doc_width"),
-          block_textarea("showcase_date_range_picker_doc_width", value = "300px", rows = 1, resize = "none")
+          block_input("showcase_date_range_picker_doc_width", value = "300px")
         ),
         block_field(
           block_field_label("style", `for` = "showcase_date_range_picker_doc_style"),
-          block_textarea("showcase_date_range_picker_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
+          block_input("showcase_date_range_picker_doc_style", value = "", placeholder = "e.g., border: 2px dashed red;")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_date_range_picker_doc_class"),

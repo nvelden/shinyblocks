@@ -5,11 +5,11 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("label", `for` = "showcase_textarea_doc_label"),
-          block_textarea("showcase_textarea_doc_label", value = "Notes", rows = 1, resize = "none")
+          block_input("showcase_textarea_doc_label", value = "Notes")
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_textarea_doc_placeholder"),
-          block_textarea("showcase_textarea_doc_placeholder", value = "Add release notes here…", rows = 1, resize = "none")
+          block_input("showcase_textarea_doc_placeholder", value = "Add release notes here…")
         ),
         block_field(
           block_field_label("initial value", `for` = "showcase_textarea_doc_value"),
@@ -20,7 +20,7 @@ htmltools::tagList(
         "State",
         block_field(
           block_field_label("rows", `for` = "showcase_textarea_doc_rows"),
-          block_textarea("showcase_textarea_doc_rows", value = "3", rows = 1, resize = "none")
+          block_input("showcase_textarea_doc_rows", value = "3")
         ),
         block_field(
           block_field_label("disabled", `for` = "showcase_textarea_doc_disabled"),
@@ -55,7 +55,7 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("style", `for` = "showcase_textarea_doc_style"),
-          block_textarea("showcase_textarea_doc_style", value = "", rows = 1, placeholder = "e.g., font-family: var(--font-mono);", resize = "none")
+          block_input("showcase_textarea_doc_style", value = "", placeholder = "e.g., font-family: var(--font-mono);")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_textarea_doc_class"),

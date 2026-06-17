@@ -74,12 +74,10 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("style", `for` = "showcase_slider_doc_style"),
-          block_textarea(
+          block_input(
             "showcase_slider_doc_style",
             value = "",
-            rows = 1,
-            placeholder = "e.g., max-width: 20rem;",
-            resize = "none"
+            placeholder = "e.g., max-width: 20rem;"
           )
         ),
         block_field(

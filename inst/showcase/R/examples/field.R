@@ -5,11 +5,11 @@ htmltools::tagList(
         "Form Layout", first = TRUE,
         block_field(
           block_field_label("legend text", `for` = "showcase_field_legend"),
-          block_textarea("showcase_field_legend", value = "Account Details", rows = 1, resize = "none")
+          block_input("showcase_field_legend", value = "Account Details")
         ),
         block_field(
           block_field_label("first name label", `for` = "showcase_field_fname_label"),
-          block_textarea("showcase_field_fname_label", value = "First name", rows = 1, resize = "none")
+          block_input("showcase_field_fname_label", value = "First name")
         ),
         block_field(
           block_field_label("first name description", `for` = "showcase_field_fname_desc"),
@@ -20,7 +20,7 @@ htmltools::tagList(
         "State",
         block_field(
           block_field_label("email label", `for` = "showcase_field_email_label"),
-          block_textarea("showcase_field_email_label", value = "Email address", rows = 1, resize = "none")
+          block_input("showcase_field_email_label", value = "Email address")
         ),
         block_field(
           block_field_label("email description", `for` = "showcase_field_email_desc"),

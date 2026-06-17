@@ -56,12 +56,10 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("style", `for` = "showcase_radio_group_doc_style"),
-          block_textarea(
+          block_input(
             "showcase_radio_group_doc_style",
             value = "",
-            rows = 1,
-            placeholder = "e.g., padding: 0.5rem;",
-            resize = "none"
+            placeholder = "e.g., padding: 0.5rem;"
           )
         ),
         block_field(

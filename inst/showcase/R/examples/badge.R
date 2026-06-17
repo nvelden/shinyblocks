@@ -5,7 +5,7 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("label", `for` = "showcase_badge_doc_label"),
-          block_textarea("showcase_badge_doc_label", value = "Deploying", rows = 1, resize = "none")
+          block_input("showcase_badge_doc_label", value = "Deploying")
         ),
         block_field(
           block_field_label("variant", `for` = "showcase_badge_doc_variant"),
@@ -20,11 +20,11 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("class", `for` = "showcase_badge_doc_class"),
-          block_textarea("showcase_badge_doc_class", value = "", rows = 1, placeholder = "e.g., shadow-sm", resize = "none")
+          block_input("showcase_badge_doc_class", value = "", placeholder = "e.g., shadow-sm")
         ),
         block_field(
           block_field_label("style", `for` = "showcase_badge_doc_style"),
-          block_textarea("showcase_badge_doc_style", value = "", rows = 1, placeholder = "e.g., letter-spacing: 0.04em;", resize = "none")
+          block_input("showcase_badge_doc_style", value = "", placeholder = "e.g., letter-spacing: 0.04em;")
         )
       )
     ),

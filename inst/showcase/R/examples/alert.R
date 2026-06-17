@@ -5,7 +5,7 @@ htmltools::tagList(
           "Content", first = TRUE,
           block_field(
             block_field_label("title", `for` = "showcase_alert_doc_title"),
-            block_textarea("showcase_alert_doc_title", value = "Heads up", rows = 1, resize = "none")
+            block_input("showcase_alert_doc_title", value = "Heads up")
           ),
           block_field(
             block_field_label("description", `for` = "showcase_alert_doc_description"),
@@ -62,12 +62,10 @@ htmltools::tagList(
           ),
           block_field(
             block_field_label("style", `for` = "showcase_alert_doc_style"),
-            block_textarea(
+            block_input(
               "showcase_alert_doc_style",
               value = "",
-              rows = 1,
-              placeholder = "e.g., border-style: dashed;",
-              resize = "none"
+              placeholder = "e.g., border-style: dashed;"
             )
           )
         )

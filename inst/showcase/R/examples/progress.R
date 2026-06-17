@@ -5,27 +5,27 @@ htmltools::tagList(
         "Content", first = TRUE,
         block_field(
           block_field_label("value", `for` = "showcase_progress_doc_value"),
-          block_textarea("showcase_progress_doc_value", value = "0.6", rows = 1, resize = "none")
+          block_input("showcase_progress_doc_value", value = "0.6", type = "number")
         ),
         block_field(
           block_field_label("min", `for` = "showcase_progress_doc_min"),
-          block_textarea("showcase_progress_doc_min", value = "0", rows = 1, resize = "none")
+          block_input("showcase_progress_doc_min", value = "0", type = "number")
         ),
         block_field(
           block_field_label("max", `for` = "showcase_progress_doc_max"),
-          block_textarea("showcase_progress_doc_max", value = "1", rows = 1, resize = "none")
+          block_input("showcase_progress_doc_max", value = "1", type = "number")
         ),
         block_field(
           block_field_label("label", `for` = "showcase_progress_doc_label"),
-          block_textarea("showcase_progress_doc_label", value = "Upload", rows = 1, resize = "none")
+          block_input("showcase_progress_doc_label", value = "Upload")
         ),
         block_field(
           block_field_label("message", `for` = "showcase_progress_doc_message"),
-          block_textarea("showcase_progress_doc_message", value = "Importing rows...", rows = 1, resize = "none")
+          block_input("showcase_progress_doc_message", value = "Importing rows...")
         ),
         block_field(
           block_field_label("detail", `for` = "showcase_progress_doc_detail"),
-          block_textarea("showcase_progress_doc_detail", value = "", rows = 1, placeholder = "e.g., 1,200 of 3,400", resize = "none")
+          block_input("showcase_progress_doc_detail", value = "", placeholder = "e.g., 1,200 of 3,400")
         )
       ),
       showcase_controls_group(
@@ -63,11 +63,11 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("width", `for` = "showcase_progress_doc_width"),
-          block_textarea("showcase_progress_doc_width", value = "", rows = 1, placeholder = "e.g., 320px (blank = 100%)", resize = "none")
+          block_input("showcase_progress_doc_width", value = "", placeholder = "e.g., 320px (blank = 100%)")
         ),
         block_field(
           block_field_label("style", `for` = "showcase_progress_doc_style"),
-          block_textarea("showcase_progress_doc_style", value = "", rows = 1, placeholder = "e.g., opacity: 0.8;", resize = "none")
+          block_input("showcase_progress_doc_style", value = "", placeholder = "e.g., opacity: 0.8;")
         ),
         block_field(
           block_field_label("class", `for` = "showcase_progress_doc_class"),
