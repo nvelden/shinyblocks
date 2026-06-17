@@ -96,7 +96,7 @@ try {
   );
 
   await page.fill(
-    "[data-sb-component='textarea'][data-sb-input-id='showcase_button_doc_style'] [data-slot='textarea-control']",
+    "[data-sb-component='input'][data-sb-input-id='showcase_button_doc_style'] [data-slot='input-control']",
     "color: red;"
   );
   await page.waitForFunction(() => {
