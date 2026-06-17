@@ -188,4 +188,75 @@ register_progress_showcase <- function(input, output, session) {
       ")"
     ))
   })
+
+  # Long-running task recipe, wired into the live preview bar. A stepped,
+  # non-blocking reactive — each tick advances one batch and pushes an update,
+  # so Shiny flushes progress to the browser between steps instead of freezing
+  # on a blocking loop.
+  batch <- shiny::reactiveValues(running = FALSE, step = 0, total = 20)
+
+  batch_recipe_code <- paste0(
+    "batch <- reactiveValues(running = FALSE, step = 0, total = 20)\n\n",
+    "observeEvent(input$run, {\n",
+    "  batch$running <- TRUE\n",
+    "  batch$step <- 0\n",
+    "})\n\n",
+    "# Stepped + non-blocking: re-invalidates until the job is done, so each\n",
+    "# update_block_progress() call is flushed to the browser between steps.\n",
+    "# A blocking for-loop would freeze the session and the bar would only\n",
+    "# jump once, at the end.\n",
+    "observe({\n",
+    "  if (!batch$running) return()\n",
+    "  invalidateLater(180, session)\n",
+    "  isolate({\n",
+    "    batch$step <- batch$step + 1\n",
+    "    done <- batch$step >= batch$total\n",
+    "    update_block_progress(\n",
+    '      session, "showcase_progress_preview",\n',
+    "      value   = batch$step / batch$total,\n",
+    '      message = if (done) "Import complete" else sprintf("Importing batch %d of %d", batch$step, batch$total),\n',
+    '      detail  = sprintf("%s rows written", format(batch$step * 500L, big.mark = ","))\n',
+    "    )\n",
+    "    if (done) batch$running <- FALSE\n",
+    "  })\n",
+    "})"
+  )
+
+  shiny::observeEvent(input$showcase_progress_batch_run, {
+    batch$running <- TRUE
+    batch$step <- 0
+    update_block_progress(
+      session, "showcase_progress_preview",
+      value = 0, message = "Starting import...", detail = NULL, indeterminate = FALSE
+    )
+    reactive_code(batch_recipe_code)
+  })
+
+  shiny::observeEvent(input$showcase_progress_batch_cancel, {
+    if (!batch$running) return()
+    batch$running <- FALSE
+    update_block_progress(
+      session, "showcase_progress_preview",
+      message = "Cancelled",
+      detail = sprintf("Stopped at batch %d of %d", batch$step, batch$total)
+    )
+  })
+
+  shiny::observe({
+    if (!batch$running) return()
+    shiny::invalidateLater(180, session)
+    shiny::isolate({
+      batch$step <- batch$step + 1
+      done <- batch$step >= batch$total
+      update_block_progress(
+        session, "showcase_progress_preview",
+        value = batch$step / batch$total,
+        message = if (done) "Import complete" else {
+          sprintf("Importing batch %d of %d", batch$step, batch$total)
+        },
+        detail = sprintf("%s rows written", format(batch$step * 500L, big.mark = ","))
+      )
+      if (done) batch$running <- FALSE
+    })
+  })
 }

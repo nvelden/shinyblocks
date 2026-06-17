@@ -48,6 +48,19 @@ htmltools::tagList(
           showcase_action_button("showcase_progress_inc", "Increment"),
           showcase_action_button("showcase_progress_reset", "Reset"),
           showcase_action_button("showcase_progress_toggle_indeterminate", "Indeterminate")
+        ),
+        htmltools::tags$p(
+          style = "color: var(--muted-foreground); margin: 0.5rem 0 0.35rem 0; font-size: 0.8125rem;",
+          paste(
+            "Long-running task: step a batch job through the bar without",
+            "blocking the session. Run drives a simulated 20-batch import;",
+            "the Server Action code shows the non-blocking recipe."
+          )
+        ),
+        htmltools::div(
+          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          showcase_action_button("showcase_progress_batch_run", "Run import"),
+          showcase_action_button("showcase_progress_batch_cancel", "Cancel")
         )
       ),
       showcase_controls_group(
