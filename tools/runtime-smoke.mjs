@@ -379,6 +379,21 @@ try {
     page.evaluate(() =>
       Boolean(document.activeElement && document.activeElement.classList.contains("sb-date-range-picker-trigger"))
     );
+  // Keyboard focus moves via a React state update + effect, so activeElement
+  // lags the keypress by a tick. Poll for the expected day rather than reading
+  // it in the same turn (the immediate read races in headless CI). Falls back
+  // to a plain assert on timeout so the failure still names the expected day.
+  const waitForActiveText = async (expected, message) => {
+    try {
+      await page.waitForFunction(
+        (exp) => document.activeElement && document.activeElement.textContent === exp,
+        expected,
+        { timeout: 4000 }
+      );
+    } catch {
+      assert.equal(await activeText(), expected, message);
+    }
+  };
 
   // Clear the bounds so keyboard nav can roam the whole month (days past the
   // 06-20 max would otherwise be disabled and unable to take focus).
@@ -397,12 +412,12 @@ try {
   );
 
   // On open, focus lands on the committed start (14).
-  assert.equal(await activeText(), "14", "open should focus the committed start day");
+  await waitForActiveText("14", "open should focus the committed start day");
   // ArrowRight + ArrowDown move focus; the popover stays open (regression guard).
   await page.keyboard.press("ArrowRight");
-  assert.equal(await activeText(), "15", "ArrowRight should move focus a day forward");
+  await waitForActiveText("15", "ArrowRight should move focus a day forward");
   await page.keyboard.press("ArrowDown");
-  assert.equal(await activeText(), "22", "ArrowDown should move focus a week forward");
+  await waitForActiveText("22", "ArrowDown should move focus a week forward");
   assert.equal(
     await page.locator("[data-slot='date-range-picker-content']").count(),
     1,
@@ -412,7 +427,7 @@ try {
   // Home jumps to the first day of the focused week. 2026-06-22 is a Monday;
   // weekstart 0 (Sunday) → the row starts on 2026-06-21.
   await page.keyboard.press("Home");
-  assert.equal(await activeText(), "21", "Home should focus the first day of the week (weekstart Sunday)");
+  await waitForActiveText("21", "Home should focus the first day of the week (weekstart Sunday)");
   // Enter anchors the first endpoint (popover stays open), ArrowRight previews,
   // Enter commits the second endpoint and returns focus to the trigger.
   await page.keyboard.press("Enter");
