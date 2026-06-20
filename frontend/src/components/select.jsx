@@ -1,10 +1,23 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import { installNativeFocusForwarding, nativeSelect, setNativeChoices, setNativeValue } from "../runtime/native-inputs.js";
+import { moveHighlightIndex, useSelectPopover } from "../runtime/select-popover.js";
+import { MultiSelectView } from "./multi-select-view.jsx";
 import { classNames } from "./shared.jsx";
 
+// One runtime identity (`component = "select"`), two implementations. Multiple
+// mode delegates to `MultiSelectView`; the binding and `update_block_select()`
+// routing stay shared. Hooks must run unconditionally, so the branch lives in
+// this wrapper and each view owns its own hook calls.
 export function Select({ payload, root }) {
+  if ((payload.props || {}).multiple) {
+    return <MultiSelectView payload={payload} root={root} />;
+  }
+  return <SingleSelectView payload={payload} root={root} />;
+}
+
+function SingleSelectView({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
   const inputId = payload.id;
@@ -17,12 +30,18 @@ export function Select({ payload, root }) {
   const [width, setWidth] = useState(props.width || "100%");
   const [style, setStyle] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
-  const [open, setOpen] = useState(false);
-  const [highlighted, setHighlighted] = useState(-1);
   const [labelledBy, setLabelledBy] = useState(null);
-  const [position, setPosition] = useState(null);
-  const triggerRef = useRef(null);
-  const contentRef = useRef(null);
+  const {
+    open,
+    setOpen,
+    highlighted,
+    setHighlighted,
+    position,
+    triggerRef,
+    contentRef,
+    updatePosition,
+    closePopover
+  } = useSelectPopover({ choicesCount: choices.length, layoutDeps: [choices, size] });
   const valueRef = useRef(value);
   const choicesRef = useRef(choices);
   const placeholderRef = useRef(placeholder);
@@ -39,68 +58,6 @@ export function Select({ payload, root }) {
     placeholderRef.current = placeholder;
   }, [placeholder]);
 
-  // Natural (unclipped) height of the open popover, used to choose a side and
-  // cap the box. Falls back to a per-item estimate before the first paint;
-  // once the content is mounted we measure it so taller items (e.g. the `luma`
-  // style profile's roomier spacing) don't get clipped by `overflow: hidden`.
-  function measuredContentHeight() {
-    const content = contentRef.current;
-    if (!content) return null;
-    const viewport = content.querySelector('[data-slot="select-viewport"]');
-    if (!viewport) return null;
-    const cs = window.getComputedStyle(content);
-    const padY = parseFloat(cs.paddingTop || "0") + parseFloat(cs.paddingBottom || "0");
-    const borderY =
-      parseFloat(cs.borderTopWidth || "0") + parseFloat(cs.borderBottomWidth || "0");
-    return viewport.scrollHeight + padY + borderY;
-  }
-
-  function updatePosition(contentHeight) {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-
-    const rect = trigger.getBoundingClientRect();
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-    const gap = 4;
-    const viewportPadding = 8;
-    const maxContentHeight = 384;
-    const estimatedItemHeight = 32;
-    const naturalHeight = contentHeight != null
-      ? contentHeight
-      : Math.max(choicesRef.current.length * estimatedItemHeight + 16, estimatedItemHeight + 16);
-    // `desiredHeight` is the natural content height, clamped only by the hard
-    // 384px cap. It drives the side (top/bottom) decision but must NOT be the
-    // box's maxHeight: pinning the border-box to the exact measured height
-    // leaves the scrolling viewport a fraction short (scrollHeight is integer
-    // rounded), so `overflow-y: auto` paints a scrollbar that isn't needed.
-    const desiredHeight = Math.min(naturalHeight, maxContentHeight);
-    const availableBelow = Math.max(0, viewportHeight - rect.bottom - gap - viewportPadding);
-    const availableAbove = Math.max(0, rect.top - gap - viewportPadding);
-    const side = availableBelow < desiredHeight && availableAbove > availableBelow
-      ? "top"
-      : "bottom";
-    const availableHeight = side === "top" ? availableAbove : availableBelow;
-    const minWidth = rect.width;
-    const left = viewportWidth > 0
-      ? Math.min(
-        Math.max(viewportPadding, rect.left),
-        Math.max(viewportPadding, viewportWidth - minWidth - viewportPadding)
-      )
-      : rect.left;
-
-    setPosition({
-      side,
-      top: side === "top" ? rect.top - gap : rect.bottom + gap,
-      left,
-      minWidth,
-      // Cap to the space actually available (never below the 384px ceiling).
-      // The flex column shrinks to its content when shorter than this cap, so
-      // a scrollbar only appears when the content truly overflows the viewport.
-      maxHeight: Math.max(1, Math.min(maxContentHeight, availableHeight))
-    });
-  }
-
   function selectedIndex() {
     return choicesRef.current.findIndex((choice) => choice.value === valueRef.current);
   }
@@ -115,12 +72,7 @@ export function Select({ payload, root }) {
   }
 
   function closeSelect({ focus = false } = {}) {
-    setOpen(false);
-    setHighlighted(-1);
-    setPosition(null);
-    if (focus) {
-      requestAnimationFrame(() => triggerRef.current?.focus());
-    }
+    closePopover({ focus });
   }
 
   function commit(nextValue) {
@@ -216,70 +168,11 @@ export function Select({ payload, root }) {
     if (native) native.disabled = disabled;
   }, [choices, disabled, placeholder, root, value]);
 
-  useEffect(() => {
-    if (!open) return undefined;
-
-    updatePosition();
-
-    const onPointerDown = (event) => {
-      const target = event.target;
-      if (
-        triggerRef.current?.contains(target) ||
-        contentRef.current?.contains(target)
-      ) {
-        return;
-      }
-      closeSelect();
-    };
-    const onWindowChange = () => updatePosition();
-
-    document.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("resize", onWindowChange);
-    window.addEventListener("scroll", onWindowChange, true);
-
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("resize", onWindowChange);
-      window.removeEventListener("scroll", onWindowChange, true);
-    };
-  }, [open]);
-
-  // Once the popover is painted, reposition using its real height so the side
-  // choice and clamp track the active style profile's item spacing instead of
-  // a fixed estimate. Re-runs when the choices or size change the content box.
-  useLayoutEffect(() => {
-    if (!open) return;
-    const height = measuredContentHeight();
-    if (height != null) updatePosition(height);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, choices, size]);
-
-  useEffect(() => {
-    if (!open || highlighted < 0) return;
-    const viewport = contentRef.current?.querySelector(
-      '[data-slot="select-viewport"]'
-    );
-    const item = contentRef.current?.querySelector(
-      `[data-sb-index="${highlighted}"]`
-    );
-    if (viewport && item) {
-      const containerRect = viewport.getBoundingClientRect();
-      const itemRect = item.getBoundingClientRect();
-      if (itemRect.top < containerRect.top) {
-        viewport.scrollTop -= (containerRect.top - itemRect.top);
-      } else if (itemRect.bottom > containerRect.bottom) {
-        viewport.scrollTop += (itemRect.bottom - containerRect.bottom);
-      }
-    }
-  }, [highlighted, open]);
-
   function moveHighlight(delta) {
     if (choices.length === 0) return;
-    setHighlighted((current) => {
-      const base = current < 0 ? selectedIndex() : current;
-      const next = (base + delta + choices.length) % choices.length;
-      return next;
-    });
+    setHighlighted((current) =>
+      moveHighlightIndex(current, delta, choices.length, selectedIndex())
+    );
   }
 
   function onTriggerKeyDown(event) {

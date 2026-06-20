@@ -919,3 +919,85 @@
 [data-shinyblocks-portal-root] .sb-select-item:not([aria-selected="true"]) .sb-select-item-indicator {
   visibility: hidden;
 }
+
+[data-shinyblocks-portal-root] .sb-select-item[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: var(--sb-disabled-opacity);
+}
+
+/* Multiple mode: the trigger is a `div role="combobox"` whose selected values
+   render as wrapping removable chips, so it grows vertically instead of
+   clipping. Reuses the single-select trigger surface/border tokens; chip
+   tokens map to the secondary/badge palette. Token + theme-parity bindings
+   land in the styling slice. */
+[data-shinyblocks-root] .sb-select-trigger-multi {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: var(--sb-control-height);
+  align-items: center;
+  padding-block: 0.25rem;
+}
+
+[data-shinyblocks-root] .sb-select-trigger-multi.sb-select-size-sm {
+  height: auto;
+  min-height: var(--sb-control-height-sm);
+}
+
+[data-shinyblocks-root] .sb-select-trigger-multi.sb-select-size-lg {
+  height: auto;
+  min-height: var(--sb-control-height-lg);
+}
+
+[data-shinyblocks-root] .sb-select-chips {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+[data-shinyblocks-root] .sb-select-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.0625rem 0.25rem 0.0625rem 0.5rem;
+  border: 1px solid var(--sb-select-chip-border, var(--border));
+  border-radius: var(--sb-select-chip-radius, calc(var(--radius) * 0.6));
+  background-color: var(--sb-select-chip-surface, var(--secondary));
+  color: var(--sb-select-chip-foreground, var(--secondary-foreground));
+  font-size: 0.75rem;
+  line-height: 1rem;
+  white-space: nowrap;
+}
+
+[data-shinyblocks-root] .sb-select-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--sb-select-chip-radius, calc(var(--radius) * 0.5));
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--sb-transition-duration), background-color var(--sb-transition-duration);
+}
+
+[data-shinyblocks-root] .sb-select-chip-remove:hover {
+  opacity: 1;
+  background-color: color-mix(in oklch, currentColor 15%, transparent);
+}
+
+[data-shinyblocks-root] .sb-select-chip-remove:disabled {
+  cursor: not-allowed;
+  opacity: var(--sb-disabled-opacity);
+}
+
+[data-shinyblocks-root] .sb-select-chip-remove svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}

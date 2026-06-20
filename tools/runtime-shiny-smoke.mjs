@@ -115,6 +115,92 @@ try {
       document.querySelector("#runtime_select-trigger")?.disabled === false;
   });
 
+  // Multiple-mode select: chips, a multiselectable listbox that stays open on
+  // toggle, chip removal (pointer + keyboard), the `max_items` cap, server
+  // update/clear, stale-choice reconciliation, and disabled state.
+  const multiTrigger = "#runtime_multi_select-trigger";
+  const multiItem = (label) =>
+    page
+      .locator("[data-shinyblocks-portal-root] [data-slot='select-item']")
+      .filter({ hasText: label });
+  const nativeMultiValues = () =>
+    page.evaluate(() =>
+      Array.from(document.querySelector("#runtime_multi_select").selectedOptions).map(
+        (option) => option.value
+      )
+    );
+
+  await assertText(page, "#runtime_multi_select_value", "one");
+  await assertText(page, "#runtime_multi_select_length", "1");
+  await page.click(multiTrigger);
+  // Toggle "Two" on; the popup must stay open so a second pick needs no reopen.
+  await multiItem("Two").click();
+  assert.equal(
+    await page
+      .locator("[data-shinyblocks-portal-root] [data-slot='select-content']")
+      .count(),
+    1,
+    "multi-select popup should stay open after toggling an item"
+  );
+  await assertText(page, "#runtime_multi_select_value", "one,two");
+  await assertText(page, "#runtime_multi_select_length", "2");
+  // max_items = 2: the unselected "Three" row is disabled and ignores toggle.
+  assert.equal(
+    await multiItem("Three").getAttribute("aria-disabled"),
+    "true",
+    "unselected rows should be disabled at the max_items cap"
+  );
+  // force: Playwright treats aria-disabled as un-clickable; bypass actionability
+  // to prove the component itself ignores the toggle at the cap.
+  await multiItem("Three").click({ force: true });
+  await assertText(page, "#runtime_multi_select_value", "one,two");
+  assert.deepEqual(
+    await nativeMultiValues(),
+    ["one", "two"],
+    "hidden native <select multiple> should mirror the selection"
+  );
+  // Toggle "One" off inside the still-open popup, then close it.
+  await multiItem("One").click();
+  await assertText(page, "#runtime_multi_select_value", "two");
+  await page.keyboard.press("Escape");
+  // Remove the remaining chip via its x button.
+  await page.locator(`${multiTrigger} .sb-select-chip-remove`).first().click();
+  // An empty multiple select reports NULL (Shiny's `selectInput(multiple=TRUE)`
+  // semantics for an empty selection), so the bare value goes <NULL>, length 0.
+  await assertText(page, "#runtime_multi_select_value", "<NULL>");
+  await assertText(page, "#runtime_multi_select_length", "0");
+  // Server update sets two values; Backspace on the focused combobox pops the
+  // last chip.
+  await page.click("#set_multi_select");
+  await assertText(page, "#runtime_multi_select_value", "two,three");
+  await page.focus(multiTrigger);
+  await page.keyboard.press("Backspace");
+  await assertText(page, "#runtime_multi_select_value", "two");
+  // Server clear (selected = character(0)) empties the selection → NULL.
+  await page.click("#clear_multi_select");
+  await assertText(page, "#runtime_multi_select_value", "<NULL>");
+  // Stale-choice reconciliation: re-select two+three, then push choices that
+  // drop "three" — the surviving "two" stays, the removed value is dropped.
+  await page.click("#set_multi_select");
+  await assertText(page, "#runtime_multi_select_value", "two,three");
+  await page.click("#update_multi_choices");
+  await assertText(page, "#runtime_multi_select_value", "two");
+  // Disabled: native disabled + combobox aria-disabled and removed tab stop.
+  await page.click("#disable_multi_select");
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector("#runtime_multi_select-trigger");
+    return document.querySelector("#runtime_multi_select")?.disabled === true &&
+      trigger?.getAttribute("aria-disabled") === "true" &&
+      trigger?.getAttribute("tabindex") === "-1";
+  });
+  await page.click("#enable_multi_select");
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector("#runtime_multi_select-trigger");
+    return document.querySelector("#runtime_multi_select")?.disabled === false &&
+      trigger?.getAttribute("aria-disabled") === null &&
+      trigger?.getAttribute("tabindex") === "0";
+  });
+
   await assertText(page, "#runtime_checkbox_value", "FALSE");
   await page.locator("[data-sb-component='checkbox'] [data-slot='checkbox-control']").evaluate((node) => {
     node.click();

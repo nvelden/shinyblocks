@@ -135,6 +135,15 @@ ui <- shiny::fluidPage(
     size = "lg",
     class = "runtime-select-fixture"
   ),
+  block_select(
+    "runtime_multi_select",
+    choices = c(One = "one", Two = "two", Three = "three"),
+    selected = c("one"),
+    placeholder = "Choose options",
+    multiple = TRUE,
+    max_items = 2,
+    class = "runtime-multi-select-fixture"
+  ),
   block_checkbox(
     "runtime_checkbox",
     "Runtime checkbox",
@@ -257,6 +266,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
   shiny::verbatimTextOutput("runtime_select_value"),
+  shiny::verbatimTextOutput("runtime_multi_select_value"),
+  shiny::verbatimTextOutput("runtime_multi_select_length"),
   shiny::verbatimTextOutput("runtime_checkbox_value"),
   shiny::verbatimTextOutput("runtime_switch_value"),
   shiny::verbatimTextOutput("runtime_slider_value"),
@@ -285,6 +296,11 @@ ui <- shiny::fluidPage(
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
   shiny::actionButton("enable_select", "Enable select"),
+  shiny::actionButton("set_multi_select", "Set multi select"),
+  shiny::actionButton("clear_multi_select", "Clear multi select"),
+  shiny::actionButton("disable_multi_select", "Disable multi select"),
+  shiny::actionButton("enable_multi_select", "Enable multi select"),
+  shiny::actionButton("update_multi_choices", "Update multi choices"),
   shiny::actionButton("set_switch_on", "Set switch on"),
   shiny::actionButton("set_switch_off", "Set switch off"),
   shiny::actionButton("disable_switch", "Disable switch"),
@@ -337,6 +353,19 @@ server <- function(input, output, session) {
       return("<EMPTY>")
     }
     value
+  })
+  output$runtime_multi_select_value <- shiny::renderText({
+    value <- input$runtime_multi_select
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (length(value) == 0) {
+      return("<EMPTY>")
+    }
+    paste(value, collapse = ",")
+  })
+  output$runtime_multi_select_length <- shiny::renderText({
+    as.character(length(input$runtime_multi_select))
   })
   output$runtime_checkbox_value <- shiny::renderText({
     value <- input$runtime_checkbox
@@ -551,6 +580,51 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_select",
       disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_multi_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      selected = c("two", "three"),
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$clear_multi_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      selected = character(0),
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_multi_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_multi_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      disabled = FALSE
+    )
+  })
+
+  # Push new choices that drop a previously selected value ("three"), exercising
+  # the multi-select stale-selection reconciliation: the surviving "two" stays,
+  # the removed value is dropped from both chips and the reported vector.
+  shiny::observeEvent(input$update_multi_choices, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      choices = c(Two = "two", Four = "four", Five = "five")
     )
   })
 
