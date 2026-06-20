@@ -53,9 +53,14 @@ targets <- list(
     # ring, and selection-wins-over-hover/striped backgrounds), then 7.5 -> 8 KB
     # for the #56 customizable dropzone interior (icon circle, content wrapper,
     # trigger button), then 8 -> 9 KB for the #59 date-picker calendar styling.
+    # Raised 9 -> 10 KB for the #64 multi-select chip CSS (multi-trigger layout,
+    # wrapping removable chips with --sb-select-chip-* hooks, multi-listbox check
+    # column): this sits right at the 9 KB boundary, and because the gzipped
+    # metric is platform-variant (R's memCompress zlib differs by OS) it reads
+    # ok locally but tips just over on CI. 10 KB restores margin.
     # Gzipped is the binding transfer budget.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 9,
+    limit_kb = 10,
     metric = "gzipped",
     group = "runtime"
   ),
