@@ -114,12 +114,7 @@ ui <- block_page(
             ),
             block_field(
               block_field_label("selected", `for` = "showcase_select_doc_selected"),
-              block_select(
-                "showcase_select_doc_selected",
-                choices = c(Free = "free", Pro = "pro", Team = "team"),
-                selected = "free",
-                size = "sm"
-              )
+              uiOutput("showcase_select_doc_selected_ui")
             ),
             block_field(
               block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
@@ -133,6 +128,19 @@ ui <- block_page(
             htmltools::tags$h4(
               style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
               "State"
+            ),
+            block_field(
+              block_field_label("multiple", `for` = "showcase_select_doc_multiple"),
+              block_checkbox("showcase_select_doc_multiple", "Allow multiple values", value = FALSE)
+            ),
+            block_field(
+              block_field_label("max_items", `for` = "showcase_select_doc_max_items"),
+              block_select(
+                "showcase_select_doc_max_items",
+                choices = c("No cap" = "none", "1" = "1", "2" = "2", "3" = "3"),
+                selected = "none",
+                size = "sm"
+              )
             ),
             block_field(
               block_field_label("disabled", `for` = "showcase_select_doc_disabled"),
@@ -194,6 +202,7 @@ ui <- block_page(
             htmltools::tags$div(
               style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
               showcase_action_button("showcase_select_set_pro", "Set Pro"),
+              showcase_action_button("showcase_select_set_two", "Select two"),
               showcase_action_button("showcase_select_clear", "Clear"),
               showcase_action_button("showcase_select_disable", "Disable"),
               showcase_action_button("showcase_select_enable", "Enable"),
@@ -262,28 +271,55 @@ server <- function(input, output, session) {
     )
   }
 
+  select_doc_max_items <- function(key) {
+    key <- key %||% "none"
+    if (identical(key, "none")) NULL else as.integer(key)
+  }
+
+  # `multiple` is mount-time identity, so single and multiple modes render the
+  # `selected` control under distinct input ids (forcing a real remount when the
+  # checkbox flips). This reader returns whichever id is currently active.
+  select_doc_selected <- function() {
+    if (isTRUE(input$showcase_select_doc_multiple)) {
+      input$showcase_select_doc_selected_multi
+    } else {
+      input$showcase_select_doc_selected_single
+    }
+  }
+
   output$showcase_select_preview_value <- showcase_render_value({
     value <- input$showcase_select_preview
     val_str <- if (is.null(value)) {
       "<NULL>"
-    } else if (identical(value, "")) {
+    } else if (length(value) == 0) {
+      "character(0)"
+    } else if (length(value) == 1 && identical(value, "")) {
       "<EMPTY>"
-    } else {
+    } else if (length(value) == 1) {
       paste0('"', value, '"')
+    } else {
+      paste0("c(", paste0('"', value, '"', collapse = ", "), ")")
     }
     paste0("input$showcase_select_preview = ", val_str)
   })
   outputOptions(output, "showcase_select_preview_value", suspendWhenHidden = FALSE)
 
-  observeEvent(input$showcase_select_doc_choices, {
+  # The `selected` control mirrors the `multiple` checkbox: single mode renders a
+  # single-value select, multiple mode renders a chip multi-select. Re-render on
+  # checkbox or choices change; default to the first choice so it is never empty.
+  output$showcase_select_doc_selected_ui <- renderUI({
     choices <- select_doc_choices(input$showcase_select_doc_choices)
-    update_block_select(
-      session,
-      "showcase_select_doc_selected",
+    multiple <- isTRUE(input$showcase_select_doc_multiple)
+    block_select(
+      if (multiple) "showcase_select_doc_selected_multi" else "showcase_select_doc_selected_single",
       choices = choices,
-      selected = unname(choices[[1]])
+      selected = unname(choices[[1]]),
+      multiple = multiple,
+      placeholder = if (multiple) "Select default value(s)" else NULL,
+      size = "sm"
     )
-  }, ignoreInit = TRUE)
+  })
+  outputOptions(output, "showcase_select_doc_selected_ui", suspendWhenHidden = FALSE)
 
   observeEvent(input$showcase_select_doc_class, {
     update_block_select(
@@ -295,11 +331,21 @@ server <- function(input, output, session) {
 
   output$showcase_select_preview_ui <- renderUI({
     choices <- select_doc_choices(input$showcase_select_doc_choices)
-    selected <- input$showcase_select_doc_selected
-    if (identical(selected, "")) {
-      selected <- NULL
-    } else if (is.null(selected) || !selected %in% unname(choices)) {
-      selected <- unname(choices[[1]])
+    multiple <- isTRUE(input$showcase_select_doc_multiple)
+    max_items <- select_doc_max_items(input$showcase_select_doc_max_items)
+
+    # The `selected` control reports a (possibly empty) vector; keep only valid
+    # values. Multiple mode passes the whole vector; single mode takes the first,
+    # falling back to the first choice so the preview is never empty.
+    chosen <- select_doc_selected()
+    chosen <- chosen[chosen %in% unname(choices)]
+    if (multiple) {
+      selected <- chosen
+      if (!is.null(max_items) && length(selected) > max_items) {
+        selected <- selected[seq_len(max_items)]
+      }
+    } else {
+      selected <- if (length(chosen)) chosen[[1]] else unname(choices[[1]])
     }
 
     placeholder <- input$showcase_select_doc_placeholder %||% ""
@@ -321,7 +367,9 @@ server <- function(input, output, session) {
       style = style,
       class = if (isTRUE(input$showcase_select_doc_class)) "showcase-select-preview-custom" else NULL,
       size = input$showcase_select_doc_size %||% "default",
-      invalid = isTRUE(input$showcase_select_doc_invalid)
+      invalid = isTRUE(input$showcase_select_doc_invalid),
+      multiple = multiple,
+      max_items = if (multiple) max_items else NULL
     )
   })
   outputOptions(output, "showcase_select_preview_ui", suspendWhenHidden = FALSE)
@@ -335,7 +383,11 @@ server <- function(input, output, session) {
       'c(Free = "free", Pro = "pro", Team = "team")'
     )
 
-    selected_val <- input$showcase_select_doc_selected
+    choices <- select_doc_choices(choices_val)
+    multiple_val <- isTRUE(input$showcase_select_doc_multiple)
+    max_items_val <- select_doc_max_items(input$showcase_select_doc_max_items)
+    selected_val <- select_doc_selected()
+    selected_val <- selected_val[selected_val %in% unname(choices)]
     placeholder_val <- input$showcase_select_doc_placeholder
     width_val <- input$showcase_select_doc_width
     style_val <- input$showcase_select_doc_style
@@ -348,11 +400,25 @@ server <- function(input, output, session) {
       'input_id = "showcase_select_preview"',
       paste0("choices = ", choices_str)
     )
-    if (!is.null(selected_val) && selected_val != "") {
-      args <- c(args, paste0('selected = "', selected_val, '"'))
+    if (multiple_val) {
+      sel <- selected_val
+      if (!is.null(max_items_val) && length(sel) > max_items_val) {
+        sel <- sel[seq_len(max_items_val)]
+      }
+      if (length(sel)) {
+        args <- c(args, paste0("selected = c(", paste0('"', sel, '"', collapse = ", "), ")"))
+      }
+    } else if (length(selected_val)) {
+      args <- c(args, paste0('selected = "', selected_val[[1]], '"'))
     }
     if (!is.null(placeholder_val) && nzchar(placeholder_val)) {
       args <- c(args, paste0('placeholder = "', placeholder_val, '"'))
+    }
+    if (multiple_val) {
+      args <- c(args, "multiple = TRUE")
+      if (!is.null(max_items_val)) {
+        args <- c(args, paste0("max_items = ", max_items_val))
+      }
     }
     if (isTRUE(disabled_val)) args <- c(args, "disabled = TRUE")
     if (!is.null(width_val) && nzchar(width_val) && width_val != "100%") {
@@ -381,6 +447,10 @@ server <- function(input, output, session) {
   observeEvent(input$showcase_select_set_pro, {
     update_block_select(session, "showcase_select_preview", selected = "pro")
     reactive_code('update_block_select(\n  session = session,\n  input_id = "showcase_select_preview",\n  selected = "pro"\n)')
+  })
+  observeEvent(input$showcase_select_set_two, {
+    update_block_select(session, "showcase_select_preview", selected = c("free", "pro"))
+    reactive_code('update_block_select(\n  session = session,\n  input_id = "showcase_select_preview",\n  selected = c("free", "pro")\n)')
   })
   observeEvent(input$showcase_select_clear, {
     update_block_select(session, "showcase_select_preview", selected = NULL)

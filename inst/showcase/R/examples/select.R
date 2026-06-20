@@ -9,7 +9,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("selected", `for` = "showcase_select_doc_selected"),
-          block_select("showcase_select_doc_selected", choices = c(Free = "free", Pro = "pro", Team = "team"), selected = "free")
+          shiny::uiOutput("showcase_select_doc_selected_ui")
         ),
         block_field(
           block_field_label("placeholder", `for` = "showcase_select_doc_placeholder"),
@@ -18,6 +18,18 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "State",
+        block_field(
+          block_field_label("multiple", `for` = "showcase_select_doc_multiple"),
+          block_checkbox("showcase_select_doc_multiple", "Allow multiple values", value = FALSE)
+        ),
+        block_field(
+          block_field_label("max_items", `for` = "showcase_select_doc_max_items"),
+          block_select(
+            "showcase_select_doc_max_items",
+            choices = c("No cap" = "none", "1" = "1", "2" = "2", "3" = "3"),
+            selected = "none"
+          )
+        ),
         block_field(
           block_field_label("disabled", `for` = "showcase_select_doc_disabled"),
           block_checkbox("showcase_select_doc_disabled", "Disabled", value = FALSE)
@@ -32,6 +44,7 @@ htmltools::tagList(
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
           showcase_action_button("showcase_select_set_pro", "Set Pro"),
+          showcase_action_button("showcase_select_set_two", "Select two"),
           showcase_action_button("showcase_select_clear", "Clear"),
           showcase_action_button("showcase_select_disable", "Disable"),
           showcase_action_button("showcase_select_enable", "Enable"),
@@ -82,12 +95,20 @@ htmltools::tagList(
     "Stable instance captured by tools/parity/. Do not remove."
   ),
   htmltools::div(
-    style = "padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+    style = "padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem; display: flex; flex-wrap: wrap; gap: 1rem;",
     block_select(
       "showcase_parity_select",
       choices = c("Apple", "Banana", "Cherry"),
       width = "180px",
       class = "sb-parity-select-default"
+    ),
+    block_select(
+      "showcase_parity_multi_select",
+      choices = c("Apple", "Banana", "Cherry"),
+      selected = c("Apple", "Banana"),
+      multiple = TRUE,
+      width = "220px",
+      class = "sb-parity-multi-select"
     )
   )
 )

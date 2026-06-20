@@ -95,6 +95,8 @@ clears single selects to the empty placeholder value (`""`);
 - `.sb-select-viewport`
 - `.sb-select-item`
 - `.sb-select-item-indicator`
+- `.sb-select-trigger-multi` (multiple-mode `div role="combobox"` trigger)
+- `.sb-select-chips`, `.sb-select-chip`, `.sb-select-chip-remove`
 
 The runtime also mirrors shadcn `data-slot` attributes for parity
 tooling, but those are not the primary public styling hooks.
@@ -111,6 +113,15 @@ tooling, but those are not the primary public styling hooks.
 | Invalid ring | `--destructive`, `--border` |
 | Popup surface | `--popover` |
 | Popup text | `--popover-foreground` |
+| Chip surface | `--sb-select-chip-surface` → `--secondary` |
+| Chip text | `--sb-select-chip-foreground` → `--secondary-foreground` |
+| Chip border | `--sb-select-chip-border` → `--border` |
+
+Multiple-mode chips and the `div role="combobox"` trigger are
+token-driven; the `.sb-parity-multi-select` showcase fixture and
+`tools/theme/theme-registry.mjs` `select` bindings prove chip
+surface/text/border and trigger text re-color under dark mode and
+`block_theme()` overrides.
 
 ## Deliberate divergences from shadcn
 
