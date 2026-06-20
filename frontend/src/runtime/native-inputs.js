@@ -182,6 +182,43 @@ export function setNativeValue(root, value, notify) {
   }
 }
 
+// Multiple-mode mirror writers. The custom binding owns the Shiny value; these
+// keep the hidden `<select multiple>` in sync so `getValue` (which reads the
+// native selected options) and the pre-mount fallback agree with React state.
+export function getNativeMultiValue(root) {
+  const native = nativeSelect(root);
+  if (!native) return [];
+  return Array.from(native.selectedOptions).map((option) => option.value);
+}
+
+export function setNativeMultiValue(root, values, notify) {
+  const native = nativeSelect(root);
+  if (!native) return;
+
+  const wanted = new Set((values || []).map((value) => String(value)));
+  Array.from(native.options).forEach((option) => {
+    option.selected = wanted.has(option.value);
+  });
+  if (notify) {
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
+export function setNativeMultiChoices(root, choices, selectedValues) {
+  const native = nativeSelect(root);
+  if (!native) return;
+
+  native.textContent = "";
+  const wanted = new Set((selectedValues || []).map((value) => String(value)));
+  (choices || []).forEach((choice) => {
+    const option = document.createElement("option");
+    option.value = String(choice.value);
+    option.textContent = String(choice.label);
+    option.selected = wanted.has(option.value);
+    native.appendChild(option);
+  });
+}
+
 function focusSelectTrigger(root) {
   const trigger = root && root.querySelector(".sb-select-trigger");
   if (trigger && !trigger.disabled) {

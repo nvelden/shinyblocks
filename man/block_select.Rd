@@ -14,7 +14,9 @@ block_select(
   class = NULL,
   size = c("default", "sm", "lg"),
   style = NULL,
-  invalid = FALSE
+  invalid = FALSE,
+  multiple = FALSE,
+  max_items = NULL
 )
 }
 \arguments{
@@ -22,7 +24,8 @@ block_select(
 
 \item{choices}{Choice labels and values.}
 
-\item{selected}{Optional selected value.}
+\item{selected}{Optional selected value. When \code{multiple = TRUE}, use a
+character vector.}
 
 \item{placeholder}{Optional placeholder shown when no value is selected.}
 
@@ -37,6 +40,11 @@ block_select(
 \item{style}{Inline CSS styles.}
 
 \item{invalid}{Whether to show the invalid/error state.}
+
+\item{multiple}{Whether multiple values can be selected.}
+
+\item{max_items}{Optional maximum number of selected values when
+\code{multiple = TRUE}.}
 }
 \value{
 An \code{htmltools} tag.

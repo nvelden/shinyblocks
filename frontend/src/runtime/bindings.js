@@ -1,9 +1,21 @@
 import { currentValue, readPayload } from "./dom.js";
 import {
+  getNativeMultiValue,
   nativeSelect,
   setNativeChoices,
+  setNativeMultiChoices,
+  setNativeMultiValue,
   setNativeValue
 } from "./native-inputs.js";
+
+// Coerce a `setValue`/`receiveMessage` `selected` into a string array for
+// multiple mode. Mirrors `toMultiSelected` in `multi-select-view.jsx`: empty
+// strings are dropped because multiple mode has no placeholder row.
+function toMultiSelectedArray(value) {
+  if (value == null) return [];
+  const arr = Array.isArray(value) ? value : [value];
+  return arr.map((item) => String(item)).filter((item) => item.length > 0);
+}
 
 const RUNTIME_INPUT_COMPONENTS = new Set([
   "button",
@@ -182,9 +194,23 @@ const BINDING_CONFIGS = [
     receiveProp: "__sbSelectReceive",
     getValue(el) {
       const native = nativeSelect(el);
-      return native ? native.value : null;
+      if (!native) return null;
+      // Multiple mode reports a JS array (Shiny → character vector); single
+      // mode keeps the scalar `native.value`. The custom view is the single
+      // writer that keeps the native options synchronized, so reading native
+      // here matches the established select pattern in both modes.
+      return native.multiple ? getNativeMultiValue(el) : native.value;
     },
     setValue(el, value) {
+      const native = nativeSelect(el);
+      if (native && native.multiple) {
+        const selected = toMultiSelectedArray(value);
+        setNativeMultiValue(el, selected, false);
+        if (typeof el.__sbSelectReceive === "function") {
+          el.__sbSelectReceive({ selected, notify: false });
+        }
+        return;
+      }
       setNativeValue(el, value, false);
       if (typeof el.__sbSelectReceive === "function") {
         el.__sbSelectReceive({ selected: value == null ? "" : String(value), notify: false });
@@ -210,11 +236,27 @@ const BINDING_CONFIGS = [
       }
       // Pre-mount fallback: React hasn't installed its receiver yet, but
       // Shiny is flushing pending input messages — write directly to native.
+      const native = nativeSelect(el);
+      const multiple = Boolean(native && native.multiple);
       if (Object.prototype.hasOwnProperty.call(data, "choices")) {
-        setNativeChoices(el, data.choices, data.placeholder, data.selected);
+        if (multiple) {
+          setNativeMultiChoices(
+            el,
+            data.choices,
+            Object.prototype.hasOwnProperty.call(data, "selected")
+              ? toMultiSelectedArray(data.selected)
+              : getNativeMultiValue(el)
+          );
+        } else {
+          setNativeChoices(el, data.choices, data.placeholder, data.selected);
+        }
       }
       if (Object.prototype.hasOwnProperty.call(data, "selected")) {
-        setNativeValue(el, data.selected, Boolean(data.notify));
+        if (multiple) {
+          setNativeMultiValue(el, toMultiSelectedArray(data.selected), Boolean(data.notify));
+        } else {
+          setNativeValue(el, data.selected, Boolean(data.notify));
+        }
       }
     }
   },

@@ -25,7 +25,9 @@ update_block_select(
 
 \item{choices}{Optional replacement choices.}
 
-\item{selected}{Optional selected value. \code{NULL} clears the value.}
+\item{selected}{Optional selected value. Use a character vector for
+multiple selects. \code{NULL} clears single selects to \code{""}; \code{character(0)}
+clears multiple selects.}
 
 \item{placeholder}{Optional replacement placeholder.}
 

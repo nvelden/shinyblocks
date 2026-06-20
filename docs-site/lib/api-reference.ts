@@ -270,13 +270,15 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "input_id", type: "character", defaultVal: "required", description: "Shiny input binding identifier." },
         { argument: "choices", type: "list | character", defaultVal: "required", description: "List of selectable values/keys." },
-        { argument: "selected", type: "character", defaultVal: "NULL", description: "Initial default selected value." },
+        { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Initial selected value; use a vector for multiple mode." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Prompt text displayed when selection is empty." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user inputs." },
         { argument: "width", type: "character", defaultVal: "'100%'", description: "Dimensions layout width." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styling string." },
         { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Sizing dimensions." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply invalid visual highlights." },
+        { argument: "multiple", type: "logical", defaultVal: "FALSE", description: "Allow selecting multiple values." },
+        { argument: "max_items", type: "integer", defaultVal: "NULL", description: "Optional maximum selected values in multiple mode." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional styling classes." }
       ]
     },
@@ -287,7 +289,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session object." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
         { argument: "choices", type: "list | character", defaultVal: "NULL", description: "New selection choices list." },
-        { argument: "selected", type: "character", defaultVal: "NULL", description: "Value selector key to choose." },
+        { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Value selector key or vector to choose." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle input disabled state." },
         { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." }
       ]

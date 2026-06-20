@@ -137,7 +137,15 @@ export const THEME_REGISTRY = {
   select: {
     section: "select",
     bindings: [
-      { selector: ".sb-parity-select-default [data-slot='select-trigger']", property: "color", token: "--foreground" }
+      { selector: ".sb-parity-select-default [data-slot='select-trigger']", property: "color", token: "--foreground" },
+      // Multiple mode: the `div role="combobox"` trigger reuses the single-select
+      // foreground/border tokens, and the wrapping removable chips map to the
+      // secondary palette (chips render statically from the pre-selected fixture,
+      // no popup needed). Confirms multi mode is token-driven, not hardcoded.
+      { selector: ".sb-parity-multi-select [data-slot='select-trigger']", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-multi-select .sb-select-chip", property: "backgroundColor", token: "--secondary" },
+      { selector: ".sb-parity-multi-select .sb-select-chip", property: "color", token: "--secondary-foreground" },
+      { selector: ".sb-parity-multi-select .sb-select-chip", property: "borderColor", token: "--border" }
     ]
   },
   separator: {

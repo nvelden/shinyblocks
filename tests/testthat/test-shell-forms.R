@@ -522,3 +522,61 @@ test_that("block_select defaults to first choice unless a placeholder is present
   expect_identical(select$state$value, "Free")
   expect_identical(placeholder$state$value, "")
 })
+
+test_that("block_select emits a multiple runtime select payload", {
+  select <- block_select(
+    "plan",
+    choices = c(Free = "free", Pro = "pro", Team = "team"),
+    selected = c("free", "team"),
+    placeholder = "Choose plans",
+    multiple = TRUE,
+    max_items = 2
+  )
+  html <- render_html(select)
+  payload <- runtime_payload_from(select)
+
+  expect_match(html, '<select id="plan" class="sb-select-native"', fixed = TRUE)
+  expect_match(html, " multiple", fixed = TRUE)
+  expect_match(html, '<option value="free" selected', fixed = TRUE)
+  expect_match(html, '<option value="team" selected', fixed = TRUE)
+  expect_no_match(html, '<option value="">Choose plans</option>', fixed = TRUE)
+  expect_identical(payload$component, "select")
+  expect_identical(payload$state$value, list("free", "team"))
+  expect_identical(payload$props$multiple, TRUE)
+  expect_identical(payload$props$maxItems, 2L)
+  expect_identical(payload$binding$type, "shinyblocks.select")
+})
+
+test_that("block_select multiple defaults to no selection", {
+  select <- runtime_payload_from(
+    block_select("plan", choices = c("Free", "Pro"), multiple = TRUE)
+  )
+
+  expect_identical(select$state$value, list())
+})
+
+test_that("block_select multiple keeps a single selection as an array", {
+  select <- runtime_payload_from(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = "free",
+      multiple = TRUE
+    )
+  )
+
+  expect_identical(select$state$value, list("free"))
+})
+
+test_that("block_select multiple keeps single selection as an array", {
+  select <- runtime_payload_from(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = "free",
+      multiple = TRUE
+    )
+  )
+
+  expect_identical(select$state$value, list("free"))
+})
