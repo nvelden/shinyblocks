@@ -169,14 +169,23 @@ export function setNativeChoices(root, choices, placeholder, selected) {
     native.appendChild(option);
   });
 
-  native.value = selected == null ? "" : String(selected);
+  native.value = toSingleSelected(selected);
+}
+
+// Coerce a `selected` into the single scalar a single-mode `<select>` expects.
+// `update_block_select()` legitimately sends character vectors in multiple
+// mode; if such a payload reaches a single select we take the first element
+// (rather than letting `String([...])` stringify to `"a,b"`).
+export function toSingleSelected(value) {
+  const scalar = Array.isArray(value) ? value[0] : value;
+  return scalar == null ? "" : String(scalar);
 }
 
 export function setNativeValue(root, value, notify) {
   const native = nativeSelect(root);
   if (!native) return;
 
-  native.value = value == null ? "" : String(value);
+  native.value = toSingleSelected(value);
   if (notify) {
     native.dispatchEvent(new Event("change", { bubbles: true }));
   }

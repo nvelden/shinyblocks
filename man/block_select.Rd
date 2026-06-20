@@ -44,7 +44,9 @@ character vector.}
 \item{multiple}{Whether multiple values can be selected.}
 
 \item{max_items}{Optional maximum number of selected values when
-\code{multiple = TRUE}.}
+\code{multiple = TRUE}. An initial \code{selected} longer than \code{max_items} is an
+error; the runtime blocks adds beyond the cap and clamps any later
+server-sent \code{selected} to it.}
 }
 \value{
 An \code{htmltools} tag.

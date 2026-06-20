@@ -36,9 +36,13 @@ export function MultiSelectView({ payload, root }) {
   // repeats.
   const [value, setValue] = useState(() => {
     const wanted = new Set(toMultiSelected(state.value));
-    return (props.choices || [])
+    const ordered = (props.choices || [])
       .map((choice) => choice.value)
       .filter((choiceValue) => wanted.has(choiceValue));
+    // R rejects an over-cap initial `selected`, but clamp defensively so the
+    // mounted view can never start above the cap.
+    const cap = props.maxItems == null ? null : Number(props.maxItems);
+    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
   });
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
@@ -86,6 +90,14 @@ export function MultiSelectView({ payload, root }) {
     return choicesRef.current
       .map((choice) => choice.value)
       .filter((choiceValue) => set.has(choiceValue));
+  }
+
+  // Truncate to the active cap, keeping the leading (choice-order) values.
+  // Toggling already blocks adds beyond the cap; this guards values that
+  // arrive whole (initial mount, choices reconcile, server `selected`).
+  function clampToCap(ordered) {
+    const cap = maxItemsRef.current;
+    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
   }
 
   function applyValue(next, notify) {
@@ -171,9 +183,11 @@ export function MultiSelectView({ payload, root }) {
           ? toMultiSelected(nextData.selected)
           : prior;
         const allowed = new Set(nextChoices.map((choice) => String(choice.value)));
-        const next = nextChoices
-          .map((choice) => choice.value)
-          .filter((choiceValue) => carried.includes(choiceValue) && allowed.has(choiceValue));
+        const next = clampToCap(
+          nextChoices
+            .map((choice) => choice.value)
+            .filter((choiceValue) => carried.includes(choiceValue) && allowed.has(choiceValue))
+        );
         valueRef.current = next;
         setValue(next);
         setNativeMultiChoices(root, nextChoices, next);
@@ -194,7 +208,10 @@ export function MultiSelectView({ payload, root }) {
         }
       } else if (Object.prototype.hasOwnProperty.call(nextData, "selected")) {
         const requested = new Set(toMultiSelected(nextData.selected));
-        const next = orderByChoices(requested);
+        // Clamp a server `selected` to the cap so it can never exceed what a
+        // user could reach by toggling (R also rejects an over-cap initial
+        // `selected`; this guards a `max_items`-aware update path).
+        const next = clampToCap(orderByChoices(requested));
         applyValue(next, Boolean(nextData.notify));
       }
 
@@ -335,6 +352,10 @@ export function MultiSelectView({ payload, root }) {
         aria-haspopup="listbox"
         aria-expanded={open ? "true" : "false"}
         aria-controls={contentId}
+        // Focus stays on this combobox while the listbox is portaled, so
+        // `aria-activedescendant` belongs here (not on the listbox) for AT to
+        // announce the highlighted option.
+        aria-activedescendant={open ? highlightedId : undefined}
         aria-disabled={disabled ? "true" : undefined}
         aria-invalid={invalid || undefined}
         aria-labelledby={labelledBy || undefined}
@@ -390,7 +411,6 @@ export function MultiSelectView({ payload, root }) {
           id={contentId}
           role="listbox"
           aria-multiselectable="true"
-          aria-activedescendant={highlightedId}
           style={position ? {
             position: "fixed",
             top: `${position.top}px`,

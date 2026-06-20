@@ -568,15 +568,29 @@ test_that("block_select multiple keeps a single selection as an array", {
   expect_identical(select$state$value, list("free"))
 })
 
-test_that("block_select multiple keeps single selection as an array", {
+test_that("block_select multiple rejects an initial selection over max_items", {
+  expect_error(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro", Team = "team"),
+      selected = c("free", "pro", "team"),
+      multiple = TRUE,
+      max_items = 2
+    ),
+    "max_items"
+  )
+})
+
+test_that("block_select multiple accepts a selection at the max_items cap", {
   select <- runtime_payload_from(
     block_select(
       "plan",
-      choices = c(Free = "free", Pro = "pro"),
-      selected = "free",
-      multiple = TRUE
+      choices = c(Free = "free", Pro = "pro", Team = "team"),
+      selected = c("free", "pro"),
+      multiple = TRUE,
+      max_items = 2
     )
   )
 
-  expect_identical(select$state$value, list("free"))
+  expect_identical(select$state$value, list("free", "pro"))
 })

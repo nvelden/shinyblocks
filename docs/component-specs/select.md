@@ -45,17 +45,19 @@
 
 ### `update_block_select(session, input_id, ...)`
 
-Accepts `selected`, `choices`, `placeholder`, `disabled`, `style`, and
-`class`, with optional `notify` semantics. Passing `selected = NULL`
-clears single selects to the empty placeholder value (`""`);
-`selected = character(0)` clears multiple selects.
+Accepts `selected`, `choices`, `placeholder`, `disabled`, `width`, `class`,
+`size`, and `invalid`, with optional `notify` semantics. (There is no `style`
+argument — the inline `style` is set once at construction.) Passing
+`selected = NULL` clears single selects to the empty placeholder value (`""`);
+`selected = character(0)` clears multiple selects. A vector `selected` is for
+multiple mode; reaching a single select it collapses to its first element.
 
 ## Runtime mapping
 
 | R input | Runtime payload | Notes |
 | --- | --- | --- |
 | `input_id` | mount id | Drives `input$<id>` and message routing. |
-| `choices` | `props$options` | Array of `{ value, label }`. |
+| `choices` | `props$choices` | Array of `{ value, label }`. |
 | `selected` | `state$value` | Initial value (or `""` for placeholder). |
 | `placeholder` | `props$placeholder` | Prompt for the empty value. |
 | `disabled` | `props$disabled` | Disables the visible control. |

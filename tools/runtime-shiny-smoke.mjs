@@ -104,6 +104,29 @@ try {
   await assertText(page, "#runtime_select_value", "<EMPTY>");
   await page.click("#set_select_pro");
   await assertText(page, "#runtime_select_value", "pro");
+  // aria-activedescendant must live on the focused combobox trigger (the
+  // listbox is portaled and never holds focus). Open, assert, then close.
+  await page.click("#runtime_select-trigger");
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector("#runtime_select-trigger");
+    const listbox = document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='select-content']"
+    );
+    return (
+      /^runtime_select-item-\d+$/.test(trigger?.getAttribute("aria-activedescendant") || "") &&
+      listbox?.getAttribute("aria-activedescendant") === null
+    );
+  });
+  await page.keyboard.press("Escape");
+  // A vector `selected` reaching the single select collapses to its first
+  // element ("free") rather than stringifying to "free,pro".
+  await page.click("#set_select_vector");
+  await assertText(page, "#runtime_select_value", "free");
+  assert.equal(
+    await page.locator("#runtime_select").inputValue(),
+    "free",
+    "vector update to a single select should collapse to the first element"
+  );
   await page.click("#disable_select");
   await page.waitForFunction(() => {
     return document.querySelector("#runtime_select")?.disabled === true &&
@@ -133,6 +156,19 @@ try {
   await assertText(page, "#runtime_multi_select_value", "one");
   await assertText(page, "#runtime_multi_select_length", "1");
   await page.click(multiTrigger);
+  // aria-activedescendant lives on the focused combobox trigger, not the
+  // portaled listbox.
+  await page.waitForFunction(() => {
+    const trigger = document.querySelector("#runtime_multi_select-trigger");
+    const listbox = document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='select-content']"
+    );
+    return (
+      /^runtime_multi_select-item-\d+$/.test(
+        trigger?.getAttribute("aria-activedescendant") || ""
+      ) && listbox?.getAttribute("aria-activedescendant") === null
+    );
+  });
   // Toggle "Two" on; the popup must stay open so a second pick needs no reopen.
   await multiItem("Two").click();
   assert.equal(
@@ -200,6 +236,16 @@ try {
       trigger?.getAttribute("aria-disabled") === null &&
       trigger?.getAttribute("tabindex") === "0";
   });
+  // Server overflow: a `selected` of three values (cap = 2) clamps to the
+  // leading two in choice order rather than exceeding the visible cap.
+  await page.click("#overflow_multi_select");
+  await assertText(page, "#runtime_multi_select_value", "two,four");
+  await assertText(page, "#runtime_multi_select_length", "2");
+  assert.deepEqual(
+    await nativeMultiValues(),
+    ["two", "four"],
+    "over-cap server selection should clamp the hidden native mirror too"
+  );
 
   await assertText(page, "#runtime_checkbox_value", "FALSE");
   await page.locator("[data-sb-component='checkbox'] [data-slot='checkbox-control']").evaluate((node) => {

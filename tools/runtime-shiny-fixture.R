@@ -293,6 +293,7 @@ ui <- shiny::fluidPage(
   shiny::actionButton("update_table", "Update table"),
   shiny::actionButton("shrink_select_table", "Shrink select table"),
   shiny::actionButton("set_select_pro", "Set select Pro"),
+  shiny::actionButton("set_select_vector", "Set select vector"),
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
   shiny::actionButton("enable_select", "Enable select"),
@@ -301,6 +302,7 @@ ui <- shiny::fluidPage(
   shiny::actionButton("disable_multi_select", "Disable multi select"),
   shiny::actionButton("enable_multi_select", "Enable multi select"),
   shiny::actionButton("update_multi_choices", "Update multi choices"),
+  shiny::actionButton("overflow_multi_select", "Overflow multi select"),
   shiny::actionButton("set_switch_on", "Set switch on"),
   shiny::actionButton("set_switch_off", "Set switch off"),
   shiny::actionButton("disable_switch", "Disable switch"),
@@ -625,6 +627,30 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_multi_select",
       choices = c(Two = "two", Four = "four", Five = "five")
+    )
+  })
+
+  # Defensive coercion: a vector `selected` reaching the single select collapses
+  # to its first element instead of stringifying to "free,pro".
+  shiny::observeEvent(input$set_select_vector, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_select",
+      selected = c("free", "pro"),
+      notify = TRUE
+    )
+  })
+
+  # Server overflow: send more values than `max_items` (2) — the runtime clamps
+  # to the leading two (choice order) rather than exceeding the visible cap.
+  # Uses the post-`update_multi_choices` set (two/four/five) so the smoke can run
+  # it after that step without reintroducing dropped choices.
+  shiny::observeEvent(input$overflow_multi_select, {
+    update_block_select(
+      session = session,
+      input_id = "runtime_multi_select",
+      selected = c("two", "four", "five"),
+      notify = TRUE
     )
   })
 
