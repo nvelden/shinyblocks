@@ -88,9 +88,12 @@ targets <- list(
     # (R's memCompress zlib differs by OS), so sub-100-byte margins cannot be
     # measured reliably across local/CI. Raised 78 -> 82 KB for a 5% headroom
     # increase, then 82 -> 85 KB for the #61 date-range-picker runtime. Raw
-    # (285 KB) stays the headroom guard.
+    # (292 KB) stays the headroom guard. Raised 85 -> 86 KB for the #64
+    # multi-select review follow-up (defensive single-mode coercion + cap
+    # clamp): it lands at exactly 85.0 KB locally, which the platform-variant
+    # zlib tips over on CI, so 86 KB restores margin.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 85,
+    limit_kb = 86,
     metric = "gzipped",
     group = "runtime"
   ),

@@ -17,7 +17,9 @@
 #' @param invalid Whether to show the invalid/error state.
 #' @param multiple Whether multiple values can be selected.
 #' @param max_items Optional maximum number of selected values when
-#'   `multiple = TRUE`.
+#'   `multiple = TRUE`. An initial `selected` longer than `max_items` is an
+#'   error; the runtime blocks adds beyond the cap and clamps any later
+#'   server-sent `selected` to it.
 #'
 #' @return An `htmltools` tag.
 #' @family forms
@@ -48,7 +50,8 @@ block_select <- function(
     selected,
     choice_values,
     multiple = multiple,
-    placeholder = placeholder
+    placeholder = placeholder,
+    max_items = max_items
   )
   width_value <- if (is.null(width)) {
     "100%"
@@ -198,7 +201,8 @@ normalize_select_selected <- function(
   selected,
   choice_values,
   multiple = FALSE,
-  placeholder = NULL
+  placeholder = NULL,
+  max_items = NULL
 ) {
   if (is.null(selected)) {
     if (multiple) {
@@ -208,11 +212,21 @@ normalize_select_selected <- function(
   }
 
   selected <- as.character(selected)
-  validate_select_selected_values(selected, choice_values, multiple = multiple)
+  validate_select_selected_values(
+    selected,
+    choice_values,
+    multiple = multiple,
+    max_items = max_items
+  )
   selected
 }
 
-validate_select_selected_values <- function(selected, choice_values, multiple) {
+validate_select_selected_values <- function(
+  selected,
+  choice_values,
+  multiple,
+  max_items = NULL
+) {
   if (anyNA(selected)) {
     stop("`selected` must not contain missing values.", call. = FALSE)
   }
@@ -226,6 +240,17 @@ validate_select_selected_values <- function(selected, choice_values, multiple) {
 
   if (any(!selected %in% choice_values)) {
     stop("`selected` must match one of `choices`.", call. = FALSE)
+  }
+
+  if (multiple && !is.null(max_items) && length(selected) > max_items) {
+    stop(
+      sprintf(
+        "`selected` has %d values but `max_items` is %d.",
+        length(selected),
+        max_items
+      ),
+      call. = FALSE
+    )
   }
 
   invisible(selected)

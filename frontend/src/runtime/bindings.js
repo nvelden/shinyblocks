@@ -5,7 +5,8 @@ import {
   setNativeChoices,
   setNativeMultiChoices,
   setNativeMultiValue,
-  setNativeValue
+  setNativeValue,
+  toSingleSelected
 } from "./native-inputs.js";
 
 // Coerce a `setValue`/`receiveMessage` `selected` into a string array for
@@ -211,9 +212,10 @@ const BINDING_CONFIGS = [
         }
         return;
       }
-      setNativeValue(el, value, false);
+      const single = toSingleSelected(value);
+      setNativeValue(el, single, false);
       if (typeof el.__sbSelectReceive === "function") {
-        el.__sbSelectReceive({ selected: value == null ? "" : String(value), notify: false });
+        el.__sbSelectReceive({ selected: single, notify: false });
       }
     },
     subscribe(el, callback) {

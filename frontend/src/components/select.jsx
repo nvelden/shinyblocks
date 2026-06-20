@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
-import { installNativeFocusForwarding, nativeSelect, setNativeChoices, setNativeValue } from "../runtime/native-inputs.js";
+import { installNativeFocusForwarding, nativeSelect, setNativeChoices, setNativeValue, toSingleSelected } from "../runtime/native-inputs.js";
 import { moveHighlightIndex, useSelectPopover } from "../runtime/select-popover.js";
 import { MultiSelectView } from "./multi-select-view.jsx";
 import { classNames } from "./shared.jsx";
@@ -125,7 +125,9 @@ function SingleSelectView({ payload, root }) {
       }
 
       if (Object.prototype.hasOwnProperty.call(nextData, "selected")) {
-        const next = nextData.selected == null ? "" : String(nextData.selected);
+        // A vector `selected` (legal in multiple mode) reaching a single select
+        // collapses to its first element rather than stringifying to "a,b".
+        const next = toSingleSelected(nextData.selected);
         valueRef.current = next;
         setValue(next);
         setNativeValue(root, next, Boolean(nextData.notify));
@@ -249,6 +251,10 @@ function SingleSelectView({ payload, root }) {
         aria-haspopup="listbox"
         aria-expanded={open ? "true" : "false"}
         aria-controls={contentId}
+        // Focus stays on the trigger while the listbox is portaled, so
+        // `aria-activedescendant` must live here (the focused combobox) for AT
+        // to announce the highlighted option.
+        aria-activedescendant={open ? highlightedId : undefined}
         aria-invalid={invalid || undefined}
         aria-labelledby={labelledBy || undefined}
         style={style}
@@ -272,7 +278,6 @@ function SingleSelectView({ payload, root }) {
           data-state="open"
           id={contentId}
           role="listbox"
-          aria-activedescendant={highlightedId}
           style={position ? {
             position: "fixed",
             top: `${position.top}px`,
