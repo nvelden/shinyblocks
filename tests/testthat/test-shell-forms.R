@@ -555,6 +555,19 @@ test_that("block_select multiple defaults to no selection", {
   expect_identical(select$state$value, list())
 })
 
+test_that("block_select multiple keeps a single selection as an array", {
+  select <- runtime_payload_from(
+    block_select(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = "free",
+      multiple = TRUE
+    )
+  )
+
+  expect_identical(select$state$value, list("free"))
+})
+
 test_that("block_select multiple keeps single selection as an array", {
   select <- runtime_payload_from(
     block_select(
