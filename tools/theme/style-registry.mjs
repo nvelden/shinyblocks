@@ -311,6 +311,11 @@ export const STYLE_REGISTRY = {
     bindings: [
       { selector: ".sb-parity-input-group-leading", property: "borderRadius" }
     ]
+  },
+  "image-output": {
+    section: "image-output",
+    mode: "profile-neutral",
+    reason: "The output-frame media box draws its rounded corners straight from the base --radius token; no shipped profile overrides the base radius (profiles only set per-component *_radius tokens), so the frame geometry is intentionally constant. Border/caption colour conformance is covered by theme-registry.mjs."
   }
 };
 

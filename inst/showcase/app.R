@@ -258,6 +258,17 @@ sections <- list(
     file = "input_group.R"
   ),
   list(
+    id = "image-output",
+    label = "Image output",
+    icon = "image",
+    title = "Image / plot output",
+    lead = paste(
+      "shadcn-styled frames around Shiny's reactive raster outputs —",
+      "block_image_output() wraps imageOutput(), block_plot_output() wraps plotOutput()."
+    ),
+    file = "image-output.R"
+  ),
+  list(
     id = "slider",
     label = "Slider",
     icon = "sliders-horizontal",
