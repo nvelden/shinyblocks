@@ -116,13 +116,6 @@ ui <- block_page(
         ),
         controls_group(
           "Actions (Server Render)",
-          htmltools::tags$p(
-            style = "color: var(--muted-foreground); margin: 0 0 0.35rem 0; font-size: 0.8125rem;",
-            paste(
-              "Server code stays vanilla Shiny. Regenerate pushes new random",
-              "data; switch the demo to render the plot vs the image path live."
-            )
-          ),
           htmltools::div(
             style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
             action_button("regen", "Regenerate")
