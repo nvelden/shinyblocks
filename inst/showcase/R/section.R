@@ -132,3 +132,88 @@ showcase_interaction_values <- function(input, prefix) {
     collapse = "\n\n"
   )
 }
+
+# Build the demo-data reactive (+ its regenerate observer) shared by the
+# image/plot output showcases. Pressing the `<prefix>_regen` button reseeds the
+# sample, so each press is reproducible. No other showcase demo uses the RNG, so
+# a plain set.seed() is fine here.
+showcase_output_demo_values <- function(input, prefix) {
+  regen <- shiny::reactiveVal(0)
+  shiny::observeEvent(input[[paste0(prefix, "_regen")]], {
+    regen(regen() + 1)
+  })
+  shiny::reactive({
+    set.seed(100 + regen())
+    stats::setNames(
+      round(runif(4, 40, 100)),
+      c("North", "South", "East", "West")
+    )
+  })
+}
+
+# Resolve the live frame controls into the arg list both output showcases share.
+# `include_fit = TRUE` adds the image-only object-fit control.
+showcase_output_frame_state <- function(input, prefix, include_fit = FALSE) {
+  ctrl <- function(suffix) input[[paste0(prefix, suffix)]]
+  aspect_raw <- ctrl("_aspect") %||% "16/9"
+  state <- list(
+    caption = showcase_blank_to_null(ctrl("_caption")),
+    width = showcase_blank_to_null(ctrl("_width")),
+    height = showcase_blank_to_null(ctrl("_height")),
+    aspect = if (identical(aspect_raw, "none")) NULL else aspect_raw,
+    border = isTRUE(ctrl("_border")),
+    rounded = isTRUE(ctrl("_rounded")),
+    class = if (isTRUE(ctrl("_class"))) "border-dashed" else NULL,
+    style = showcase_blank_to_null(ctrl("_style"))
+  )
+  if (include_fit) {
+    state$fit <- ctrl("_fit") %||% "cover"
+  }
+  state
+}
+
+# Frame state -> named arg list for the live block_*_output() preview call.
+showcase_output_preview_args <- function(s) {
+  args <- list(
+    width = s$width %||% "100%",
+    height = s$height,
+    aspect = s$aspect,
+    border = s$border,
+    rounded = s$rounded,
+    caption = s$caption,
+    class = s$class,
+    style = s$style
+  )
+  if (!is.null(s$fit)) {
+    args$fit <- s$fit
+  }
+  args
+}
+
+# Frame state -> the block_*_output() source shown in the "UI Definition" panel.
+# Only non-default args are emitted, mirroring how an author would write it.
+showcase_output_preview_code <- function(s, constructor, output_id, prefix) {
+  args <- paste0("id = ", showcase_string_literal(output_id))
+  if (!is.null(s$width)) args <- c(args, paste0("width = ", showcase_string_literal(s$width)))
+  if (!is.null(s$height)) args <- c(args, paste0("height = ", showcase_string_literal(s$height)))
+  if (!is.null(s$aspect)) args <- c(args, paste0("aspect = ", showcase_string_literal(s$aspect)))
+  if (!is.null(s$fit) && !identical(s$fit, "cover")) {
+    args <- c(args, paste0("fit = ", showcase_string_literal(s$fit)))
+  }
+  if (isTRUE(s$border)) args <- c(args, "border = TRUE")
+  if (!isTRUE(s$rounded)) args <- c(args, "rounded = FALSE")
+  if (!is.null(s$caption)) args <- c(args, paste0("caption = ", showcase_string_literal(s$caption)))
+  args <- c(args, showcase_interaction_code_args(prefix))
+  if (!is.null(s$class)) args <- c(args, paste0("class = ", showcase_string_literal(s$class)))
+  if (!is.null(s$style)) args <- c(args, paste0("style = ", showcase_string_literal(s$style)))
+  paste0(constructor, "(\n  ", paste(args, collapse = ",\n  "), "\n)")
+}
+
+# Shared "values <- c(...)" line for the Server Render code panel.
+showcase_output_data_line <- function(v) {
+  paste0(
+    "values <- c(",
+    paste(sprintf("%s = %d", names(v), as.integer(v)), collapse = ", "),
+    ")  # Regenerate draws a new sample"
+  )
+}

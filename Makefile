@@ -129,7 +129,9 @@ docs:
 	# Force a UTF-8 LC_CTYPE so roxygen writes non-ASCII defaults (e.g. the
 	# date-range `separator` en-dash) as real characters instead of <U+NNNN>
 	# escapes, which would otherwise trip R CMD check's codoc comparison.
-	LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 $(R) -e 'devtools::document()'
+	# C.UTF-8 is portable (always present); en_US.UTF-8 is the macOS fallback.
+	LC_ALL=$${SB_DOCS_LOCALE:-$$(locale -a 2>/dev/null | grep -iE '^(C\.UTF-?8|en_US\.UTF-?8)$$' | head -n1)}; \
+	LANG=$${LC_ALL:-C.UTF-8} LC_CTYPE=$${LC_ALL:-C.UTF-8} $(R) -e 'devtools::document()'
 
 check:
 	$(R) -e 'devtools::check(remote = TRUE, manual = FALSE)'

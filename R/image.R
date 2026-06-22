@@ -44,6 +44,10 @@ resolve_aspect <- function(aspect) {
 # would otherwise stay full-width while the Shiny output shrank to `width`.
 output_frame <- function(output_tag, kind, width, aspect, fit, border, rounded,
                          caption, class, style) {
+  check_flag(border, "border")
+  check_flag(rounded, "rounded")
+  check_string(caption, "caption", null_ok = TRUE)
+
   frame_class <- switch(
     kind,
     image = "sb-output-frame sb-image-output",
@@ -81,18 +85,16 @@ output_frame <- function(output_tag, kind, width, aspect, fit, border, rounded,
 }
 
 # Shared arg validation + Shiny-output construction for both public functions.
-build_output <- function(output_fn, id, width, height, aspect, border,
-                         rounded, caption, click, dblclick, hover, brush,
-                         inline, fill) {
+# Frame-only args (border/rounded/caption) are validated in `output_frame()`,
+# which is where they are actually consumed.
+build_output <- function(output_fn, id, width, height, aspect,
+                         click, dblclick, hover, brush, inline, fill) {
   check_string(id, "id")
   if (!nzchar(id)) {
     stop("`id` must be a non-empty string.", call. = FALSE)
   }
-  check_flag(border, "border")
-  check_flag(rounded, "rounded")
   check_flag(inline, "inline")
   check_flag(fill, "fill")
-  check_string(caption, "caption", null_ok = TRUE)
 
   # height = NULL resolves to "100%" when aspect is set so the Shiny output
   # fills the aspect box; without aspect, omit it so Shiny applies its own
@@ -169,9 +171,8 @@ block_image_output <- function(id,
 
   output_tag <- build_output(
     output_fn = shiny::imageOutput, id = id, width = width, height = height,
-    aspect = aspect, border = border, rounded = rounded, caption = caption,
-    click = click, dblclick = dblclick, hover = hover, brush = brush,
-    inline = inline, fill = fill
+    aspect = aspect, click = click, dblclick = dblclick, hover = hover,
+    brush = brush, inline = inline, fill = fill
   )
 
   output_frame(
@@ -219,9 +220,8 @@ block_plot_output <- function(id,
                               style = NULL) {
   output_tag <- build_output(
     output_fn = shiny::plotOutput, id = id, width = width, height = height,
-    aspect = aspect, border = border, rounded = rounded, caption = caption,
-    click = click, dblclick = dblclick, hover = hover, brush = brush,
-    inline = inline, fill = fill
+    aspect = aspect, click = click, dblclick = dblclick, hover = hover,
+    brush = brush, inline = inline, fill = fill
   )
 
   output_frame(

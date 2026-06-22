@@ -1,53 +1,19 @@
 register_image_output_showcase <- function(input, output, session) {
-  # Shared output-playground helpers (showcase_blank_to_null,
-  # showcase_string_literal, showcase_interaction_*) live in section.R.
+  # Shared output-playground helpers (showcase_output_*, showcase_interaction_*)
+  # live in section.R.
 
-  # A regenerate counter feeds the RNG so the image demo pulls fresh random
-  # data on demand.
-  regen <- shiny::reactiveVal(0)
-  shiny::observeEvent(input$showcase_image_output_regen, {
-    regen(regen() + 1)
-  })
-
-  demo_values <- shiny::reactive({
-    seed <- regen()
-    set.seed(100 + seed)
-    stats::setNames(
-      round(runif(4, 40, 100)),
-      c("North", "South", "East", "West")
-    )
-  })
+  demo_values <- showcase_output_demo_values(input, "showcase_image_output")
 
   # Resolved frame args shared by the preview and the UI-definition code block.
   frame_state <- shiny::reactive({
-    aspect_raw <- input$showcase_image_output_aspect %||% "16/9"
-    list(
-      caption = showcase_blank_to_null(input$showcase_image_output_caption),
-      width = showcase_blank_to_null(input$showcase_image_output_width),
-      height = showcase_blank_to_null(input$showcase_image_output_height),
-      aspect = if (identical(aspect_raw, "none")) NULL else aspect_raw,
-      fit = input$showcase_image_output_fit %||% "cover",
-      border = isTRUE(input$showcase_image_output_border),
-      rounded = isTRUE(input$showcase_image_output_rounded),
-      class = if (isTRUE(input$showcase_image_output_class)) "border-dashed" else NULL,
-      style = showcase_blank_to_null(input$showcase_image_output_style)
-    )
+    showcase_output_frame_state(input, "showcase_image_output", include_fit = TRUE)
   })
 
   output$showcase_image_output_preview_ui <- shiny::renderUI({
-    s <- frame_state()
-    common <- list(
-      width = s$width %||% "100%",
-      height = s$height,
-      aspect = s$aspect,
-      fit = s$fit,
-      border = s$border,
-      rounded = s$rounded,
-      caption = s$caption,
-      class = s$class,
-      style = s$style
+    common <- c(
+      showcase_output_preview_args(frame_state()),
+      showcase_interaction_args("showcase_image_output")
     )
-    common <- c(common, showcase_interaction_args("showcase_image_output"))
     do.call(block_image_output, c(list(id = "showcase_image_output_image"), common))
   })
   shiny::outputOptions(output, "showcase_image_output_preview_ui", suspendWhenHidden = FALSE)
@@ -115,19 +81,10 @@ register_image_output_showcase <- function(input, output, session) {
 
   # UI Definition — the block_*_output() call that builds the framed preview.
   output$showcase_image_output_preview_code <- showcase_render_code({
-    s <- frame_state()
-    args <- paste0('id = "showcase_image_output_image"')
-    if (!is.null(s$width)) args <- c(args, paste0("width = ", showcase_string_literal(s$width)))
-    if (!is.null(s$height)) args <- c(args, paste0("height = ", showcase_string_literal(s$height)))
-    if (!is.null(s$aspect)) args <- c(args, paste0("aspect = ", showcase_string_literal(s$aspect)))
-    if (!identical(s$fit, "cover")) args <- c(args, paste0("fit = ", showcase_string_literal(s$fit)))
-    if (isTRUE(s$border)) args <- c(args, "border = TRUE")
-    if (!isTRUE(s$rounded)) args <- c(args, "rounded = FALSE")
-    if (!is.null(s$caption)) args <- c(args, paste0("caption = ", showcase_string_literal(s$caption)))
-    args <- c(args, showcase_interaction_code_args("showcase_image_output"))
-    if (!is.null(s$class)) args <- c(args, paste0("class = ", showcase_string_literal(s$class)))
-    if (!is.null(s$style)) args <- c(args, paste0("style = ", showcase_string_literal(s$style)))
-    paste0("block_image_output(\n  ", paste(args, collapse = ",\n  "), "\n)")
+    showcase_output_preview_code(
+      frame_state(), "block_image_output", "showcase_image_output_image",
+      "showcase_image_output"
+    )
   })
   shiny::outputOptions(output, "showcase_image_output_preview_code", suspendWhenHidden = FALSE)
 
@@ -141,13 +98,8 @@ register_image_output_showcase <- function(input, output, session) {
     # Depend on demo_values() so pressing Regenerate visibly redraws this
     # panel with the freshly sampled data the render block just used.
     v <- demo_values()
-    data_line <- paste0(
-      "values <- c(",
-      paste(sprintf("%s = %d", names(v), as.integer(v)), collapse = ", "),
-      ")  # Regenerate draws a new sample"
-    )
     paste0(
-      data_line, "\n\n",
+      showcase_output_data_line(v), "\n\n",
       "output$showcase_image_output_image <- renderImage({\n",
       "  # render `values` to an SVG/PNG file\n",
       '  list(src = file, contentType = "image/svg+xml",\n',

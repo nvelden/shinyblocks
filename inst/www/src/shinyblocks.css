@@ -542,9 +542,10 @@
   }
 
   /* object-fit only applies to image frames; renderPlot() already fits the box,
-   * so plot frames have no `--sb-output-fit` and fall back to the default. */
+   * so plot frames never set `--sb-output-fit` and this rule never targets them.
+   * The `cover` fallback keeps the declaration valid if the property is unset. */
   .sb-app .sb-image-output .sb-output-media img {
-    object-fit: var(--sb-output-fit);
+    object-fit: var(--sb-output-fit, cover);
   }
 
   .sb-app .sb-output-caption {
