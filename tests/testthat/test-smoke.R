@@ -39,6 +39,9 @@ test_that("block_page accepts a style profile", {
 
 test_that("showcase app sources without launching", {
   app_file <- system.file("showcase", "app.R", package = "shinyblocks")
+  # showcase is a dev-only asset (^inst/showcase in .Rbuildignore), so it is
+  # absent from the built/installed package under R CMD check.
+  skip_if(!nzchar(app_file), "showcase excluded from the built package")
   env <- new.env(parent = globalenv())
 
   source(app_file, local = env, chdir = TRUE)

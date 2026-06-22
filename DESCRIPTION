@@ -26,6 +26,7 @@ Collate:
     'badge.R'
     'code.R'
     'table.R'
+    'image.R'
     'alert.R'
     'overlays.R'
     'indicators.R'
