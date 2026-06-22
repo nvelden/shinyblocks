@@ -80,3 +80,55 @@ showcase_api_table <- function(data) {
     class = "showcase-api-table"
   )
 }
+
+# --- Shared output-playground helpers --------------------------------------
+# Used by the image/plot output showcases to build live block_*_output() calls
+# and to mirror the resolved arguments back into the "UI Definition" code panel.
+
+# Treat a blank/whitespace-only control value as an unset (NULL) argument.
+showcase_blank_to_null <- function(x) {
+  if (is.null(x) || !nzchar(trimws(x))) NULL else x
+}
+
+# Quote a value as an R string literal, escaping embedded quotes/backslashes.
+showcase_string_literal <- function(value) {
+  paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+}
+
+# Live click/dblclick/hover/brush *Opts() for a block_*_output() preview call.
+showcase_interaction_args <- function(prefix) {
+  list(
+    click = shiny::clickOpts(id = paste0(prefix, "_click")),
+    dblclick = shiny::dblclickOpts(id = paste0(prefix, "_dblclick")),
+    hover = shiny::hoverOpts(id = paste0(prefix, "_hover")),
+    brush = shiny::brushOpts(id = paste0(prefix, "_brush"))
+  )
+}
+
+# The same interaction options rendered as source lines for the code panel.
+showcase_interaction_code_args <- function(prefix) {
+  c(
+    paste0("click = shiny::clickOpts(id = ", showcase_string_literal(paste0(prefix, "_click")), ")"),
+    paste0("dblclick = shiny::dblclickOpts(id = ", showcase_string_literal(paste0(prefix, "_dblclick")), ")"),
+    paste0("hover = shiny::hoverOpts(id = ", showcase_string_literal(paste0(prefix, "_hover")), ")"),
+    paste0("brush = shiny::brushOpts(id = ", showcase_string_literal(paste0(prefix, "_brush")), ")")
+  )
+}
+
+showcase_format_interaction_value <- function(value) {
+  if (is.null(value)) {
+    return("<NULL>")
+  }
+  paste(utils::capture.output(utils::str(value, max.level = 1, give.attr = FALSE)), collapse = "\n")
+}
+
+# Dump the current click/dblclick/hover/brush input values for the live demo.
+showcase_interaction_values <- function(input, prefix) {
+  ids <- paste0(prefix, c("_click", "_dblclick", "_hover", "_brush"))
+  paste(
+    vapply(ids, function(id) {
+      paste0("input$", id, "\n", showcase_format_interaction_value(input[[id]]))
+    }, character(1)),
+    collapse = "\n\n"
+  )
+}

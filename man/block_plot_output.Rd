@@ -9,7 +9,6 @@ block_plot_output(
   width = "100\%",
   height = NULL,
   aspect = NULL,
-  fit = c("cover", "contain", "fill", "none", "scale-down"),
   border = FALSE,
   rounded = TRUE,
   caption = NULL,
@@ -31,9 +30,6 @@ block_plot_output(
 \item{aspect}{Aspect ratio for the media box: \code{NULL}, a positive number, or a
 \code{"w/h"} string (e.g. \code{"16/9"}).}
 
-\item{fit}{\code{object-fit} for the rendered plot. One of \code{"cover"}, \code{"contain"},
-\code{"fill"}, \code{"none"}, \code{"scale-down"}.}
-
 \item{border}{Draw a border around the media box.}
 
 \item{rounded}{Round the media box corners (and clip overflow).}
@@ -53,11 +49,16 @@ block_plot_output(
 An \code{htmltools} \verb{<figure>} tag.
 }
 \description{
-Wraps \code{\link[shiny:plotOutput]{shiny::plotOutput()}} in a shadcn-styled frame (aspect box, object-fit,
-border, radius, optional caption). App-author server code stays vanilla
-Shiny: \code{output$id <- shiny::renderPlot(...)} is unchanged. Covers base
-graphics, ggplot2, and lattice. The plot's accessible name (\code{alt}) is
-server-controlled via \code{\link[shiny:renderPlot]{shiny::renderPlot()}}'s \code{alt}; the frame cannot set it.
+Wraps \code{\link[shiny:plotOutput]{shiny::plotOutput()}} in a shadcn-styled frame (aspect box, border,
+radius, optional caption). App-author server code stays vanilla Shiny:
+\code{output$id <- shiny::renderPlot(...)} is unchanged. Covers base graphics,
+ggplot2, and lattice. The plot's accessible name (\code{alt}) is server-controlled
+via \code{\link[shiny:renderPlot]{shiny::renderPlot()}}'s \code{alt}; the frame cannot set it.
+}
+\details{
+Unlike \code{\link[=block_image_output]{block_image_output()}} there is no \code{fit} argument: \code{\link[shiny:renderPlot]{shiny::renderPlot()}}
+already renders to the media box size, so \code{object-fit} would have no visible
+effect.
 }
 \seealso{
 Other outputs: 

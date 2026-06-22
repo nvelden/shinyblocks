@@ -53,7 +53,9 @@ output_frame <- function(output_tag, kind, width, aspect, fit, border, rounded,
   aspect_value <- resolve_aspect(aspect)
   media_style <- paste0(
     if (!is.null(width)) paste0("width:", width, ";"),
-    "--sb-output-fit:", fit, ";",
+    # Plots render to the box size, so `object-fit` is meaningless for them and
+    # `fit` is NULL — only image frames carry `--sb-output-fit`.
+    if (!is.null(fit)) paste0("--sb-output-fit:", fit, ";"),
     if (!is.null(aspect_value)) paste0("--sb-output-aspect:", aspect_value, ";")
   )
 
@@ -181,16 +183,18 @@ block_image_output <- function(id,
 
 #' Frame a reactive plot output
 #'
-#' Wraps [shiny::plotOutput()] in a shadcn-styled frame (aspect box, object-fit,
-#' border, radius, optional caption). App-author server code stays vanilla
-#' Shiny: `output$id <- shiny::renderPlot(...)` is unchanged. Covers base
-#' graphics, ggplot2, and lattice. The plot's accessible name (`alt`) is
-#' server-controlled via [shiny::renderPlot()]'s `alt`; the frame cannot set it.
+#' Wraps [shiny::plotOutput()] in a shadcn-styled frame (aspect box, border,
+#' radius, optional caption). App-author server code stays vanilla Shiny:
+#' `output$id <- shiny::renderPlot(...)` is unchanged. Covers base graphics,
+#' ggplot2, and lattice. The plot's accessible name (`alt`) is server-controlled
+#' via [shiny::renderPlot()]'s `alt`; the frame cannot set it.
+#'
+#' Unlike [block_image_output()] there is no `fit` argument: [shiny::renderPlot()]
+#' already renders to the media box size, so `object-fit` would have no visible
+#' effect.
 #'
 #' @inheritParams block_image_output
 #' @param id Shiny output id, passed verbatim to [shiny::plotOutput()].
-#' @param fit `object-fit` for the rendered plot. One of `"cover"`, `"contain"`,
-#'   `"fill"`, `"none"`, `"scale-down"`.
 #' @param caption Optional `<figcaption>` text shown below the plot.
 #' @param inline,fill Forwarded to the Shiny output. `fill` defaults to
 #'   `!inline` to match [shiny::plotOutput()].
@@ -202,7 +206,6 @@ block_plot_output <- function(id,
                               width = "100%",
                               height = NULL,
                               aspect = NULL,
-                              fit = c("cover", "contain", "fill", "none", "scale-down"),
                               border = FALSE,
                               rounded = TRUE,
                               caption = NULL,
@@ -214,8 +217,6 @@ block_plot_output <- function(id,
                               fill = !inline,
                               class = NULL,
                               style = NULL) {
-  fit <- match_arg(fit, c("cover", "contain", "fill", "none", "scale-down"))
-
   output_tag <- build_output(
     output_fn = shiny::plotOutput, id = id, width = width, height = height,
     aspect = aspect, border = border, rounded = rounded, caption = caption,
@@ -224,7 +225,7 @@ block_plot_output <- function(id,
   )
 
   output_frame(
-    output_tag, kind = "plot", width = width, aspect = aspect, fit = fit,
+    output_tag, kind = "plot", width = width, aspect = aspect, fit = NULL,
     border = border, rounded = rounded, caption = caption, class = class,
     style = style
   )

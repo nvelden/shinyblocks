@@ -655,7 +655,6 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "width", type: "character", defaultVal: "\"100%\"", description: "CSS width forwarded to the Shiny output and mirrored on the media box." },
         { argument: "height", type: "character", defaultVal: "NULL", description: "CSS height. NULL resolves to \"100%\" when aspect is set, else Shiny's default." },
         { argument: "aspect", type: "character | numeric", defaultVal: "NULL", description: "Media-box aspect ratio: NULL, a positive number, or a \"w/h\" string." },
-        { argument: "fit", type: "character", defaultVal: "\"cover\"", description: "object-fit for the rendered plot: cover, contain, fill, none, scale-down." },
         { argument: "border", type: "logical", defaultVal: "FALSE", description: "Draw a border around the media box." },
         { argument: "rounded", type: "logical", defaultVal: "TRUE", description: "Round the media box corners (and clip overflow)." },
         { argument: "caption", type: "character", defaultVal: "NULL", description: "Optional <figcaption> text below the media box." },

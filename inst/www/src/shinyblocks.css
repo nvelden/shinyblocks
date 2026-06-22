@@ -534,11 +534,16 @@
     height: 100%;
   }
 
-  /* object-fit the eventual <img>, gated by the image/plot frame variant. */
+  /* The eventual <img> fills the media box for both frame variants. */
   .sb-app .sb-image-output .sb-output-media img,
   .sb-app .sb-plot-output .sb-output-media img {
     width: 100%;
     height: 100%;
+  }
+
+  /* object-fit only applies to image frames; renderPlot() already fits the box,
+   * so plot frames have no `--sb-output-fit` and fall back to the default. */
+  .sb-app .sb-image-output .sb-output-media img {
     object-fit: var(--sb-output-fit);
   }
 

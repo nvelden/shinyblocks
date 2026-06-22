@@ -30,8 +30,6 @@ coverage matrix, token contract, and accessibility notes — they are identical.
 - **default** — bordered (optional) media box with rounded corners.
 - **with aspect** — media box drives height via `aspect-ratio`; the Shiny output
   fills it (`height: 100%`).
-- **fit** — accepted for API parity with image output, but usually not visually
-  apparent because `renderPlot()` renders the image to the output box size.
 - **captioned** — muted `<figcaption>` below the media box.
 
 ## Token contract

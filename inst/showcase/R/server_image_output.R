@@ -1,46 +1,6 @@
 register_image_output_showcase <- function(input, output, session) {
-  blank_to_null <- function(x) {
-    if (is.null(x) || !nzchar(trimws(x))) NULL else x
-  }
-
-  string_literal <- function(value) {
-    paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
-  }
-
-  interaction_args <- function(prefix) {
-    list(
-      click = shiny::clickOpts(id = paste0(prefix, "_click")),
-      dblclick = shiny::dblclickOpts(id = paste0(prefix, "_dblclick")),
-      hover = shiny::hoverOpts(id = paste0(prefix, "_hover")),
-      brush = shiny::brushOpts(id = paste0(prefix, "_brush"))
-    )
-  }
-
-  interaction_code_args <- function(prefix) {
-    c(
-      paste0("click = shiny::clickOpts(id = ", string_literal(paste0(prefix, "_click")), ")"),
-      paste0("dblclick = shiny::dblclickOpts(id = ", string_literal(paste0(prefix, "_dblclick")), ")"),
-      paste0("hover = shiny::hoverOpts(id = ", string_literal(paste0(prefix, "_hover")), ")"),
-      paste0("brush = shiny::brushOpts(id = ", string_literal(paste0(prefix, "_brush")), ")")
-    )
-  }
-
-  format_interaction_value <- function(value) {
-    if (is.null(value)) {
-      return("<NULL>")
-    }
-    paste(utils::capture.output(str(value, max.level = 1, give.attr = FALSE)), collapse = "\n")
-  }
-
-  interaction_values <- function(input, prefix) {
-    ids <- paste0(prefix, c("_click", "_dblclick", "_hover", "_brush"))
-    paste(
-      vapply(ids, function(id) {
-        paste0("input$", id, "\n", format_interaction_value(input[[id]]))
-      }, character(1)),
-      collapse = "\n\n"
-    )
-  }
+  # Shared output-playground helpers (showcase_blank_to_null,
+  # showcase_string_literal, showcase_interaction_*) live in section.R.
 
   # A regenerate counter feeds the RNG so the image demo pulls fresh random
   # data on demand.
@@ -62,15 +22,15 @@ register_image_output_showcase <- function(input, output, session) {
   frame_state <- shiny::reactive({
     aspect_raw <- input$showcase_image_output_aspect %||% "16/9"
     list(
-      caption = blank_to_null(input$showcase_image_output_caption),
-      width = blank_to_null(input$showcase_image_output_width),
-      height = blank_to_null(input$showcase_image_output_height),
+      caption = showcase_blank_to_null(input$showcase_image_output_caption),
+      width = showcase_blank_to_null(input$showcase_image_output_width),
+      height = showcase_blank_to_null(input$showcase_image_output_height),
       aspect = if (identical(aspect_raw, "none")) NULL else aspect_raw,
       fit = input$showcase_image_output_fit %||% "cover",
       border = isTRUE(input$showcase_image_output_border),
       rounded = isTRUE(input$showcase_image_output_rounded),
       class = if (isTRUE(input$showcase_image_output_class)) "border-dashed" else NULL,
-      style = blank_to_null(input$showcase_image_output_style)
+      style = showcase_blank_to_null(input$showcase_image_output_style)
     )
   })
 
@@ -87,7 +47,7 @@ register_image_output_showcase <- function(input, output, session) {
       class = s$class,
       style = s$style
     )
-    common <- c(common, interaction_args("showcase_image_output"))
+    common <- c(common, showcase_interaction_args("showcase_image_output"))
     do.call(block_image_output, c(list(id = "showcase_image_output_image"), common))
   })
   shiny::outputOptions(output, "showcase_image_output_preview_ui", suspendWhenHidden = FALSE)
@@ -157,22 +117,22 @@ register_image_output_showcase <- function(input, output, session) {
   output$showcase_image_output_preview_code <- showcase_render_code({
     s <- frame_state()
     args <- paste0('id = "showcase_image_output_image"')
-    if (!is.null(s$width)) args <- c(args, paste0("width = ", string_literal(s$width)))
-    if (!is.null(s$height)) args <- c(args, paste0("height = ", string_literal(s$height)))
-    if (!is.null(s$aspect)) args <- c(args, paste0("aspect = ", string_literal(s$aspect)))
-    if (!identical(s$fit, "cover")) args <- c(args, paste0("fit = ", string_literal(s$fit)))
+    if (!is.null(s$width)) args <- c(args, paste0("width = ", showcase_string_literal(s$width)))
+    if (!is.null(s$height)) args <- c(args, paste0("height = ", showcase_string_literal(s$height)))
+    if (!is.null(s$aspect)) args <- c(args, paste0("aspect = ", showcase_string_literal(s$aspect)))
+    if (!identical(s$fit, "cover")) args <- c(args, paste0("fit = ", showcase_string_literal(s$fit)))
     if (isTRUE(s$border)) args <- c(args, "border = TRUE")
     if (!isTRUE(s$rounded)) args <- c(args, "rounded = FALSE")
-    if (!is.null(s$caption)) args <- c(args, paste0("caption = ", string_literal(s$caption)))
-    args <- c(args, interaction_code_args("showcase_image_output"))
-    if (!is.null(s$class)) args <- c(args, paste0("class = ", string_literal(s$class)))
-    if (!is.null(s$style)) args <- c(args, paste0("style = ", string_literal(s$style)))
+    if (!is.null(s$caption)) args <- c(args, paste0("caption = ", showcase_string_literal(s$caption)))
+    args <- c(args, showcase_interaction_code_args("showcase_image_output"))
+    if (!is.null(s$class)) args <- c(args, paste0("class = ", showcase_string_literal(s$class)))
+    if (!is.null(s$style)) args <- c(args, paste0("style = ", showcase_string_literal(s$style)))
     paste0("block_image_output(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   shiny::outputOptions(output, "showcase_image_output_preview_code", suspendWhenHidden = FALSE)
 
   output$showcase_image_output_interaction_value <- showcase_render_code({
-    interaction_values(input, "showcase_image_output")
+    showcase_interaction_values(input, "showcase_image_output")
   })
   shiny::outputOptions(output, "showcase_image_output_interaction_value", suspendWhenHidden = FALSE)
 
