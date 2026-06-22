@@ -53,6 +53,41 @@ string_literal <- function(value) {
   paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
 }
 
+interaction_args <- function(output_id) {
+  list(
+    click = clickOpts(id = paste0(output_id, "_click")),
+    dblclick = dblclickOpts(id = paste0(output_id, "_dblclick")),
+    hover = hoverOpts(id = paste0(output_id, "_hover")),
+    brush = brushOpts(id = paste0(output_id, "_brush"))
+  )
+}
+
+interaction_code_args <- function(output_id) {
+  c(
+    paste0("click = shiny::clickOpts(id = ", string_literal(paste0(output_id, "_click")), ")"),
+    paste0("dblclick = shiny::dblclickOpts(id = ", string_literal(paste0(output_id, "_dblclick")), ")"),
+    paste0("hover = shiny::hoverOpts(id = ", string_literal(paste0(output_id, "_hover")), ")"),
+    paste0("brush = shiny::brushOpts(id = ", string_literal(paste0(output_id, "_brush")), ")")
+  )
+}
+
+format_interaction_value <- function(value) {
+  if (is.null(value)) {
+    return("<NULL>")
+  }
+  paste(utils::capture.output(str(value, max.level = 1, give.attr = FALSE)), collapse = "\n")
+}
+
+interaction_values <- function(input, output_id) {
+  ids <- paste0(output_id, c("_click", "_dblclick", "_hover", "_brush"))
+  paste(
+    vapply(ids, function(id) {
+      paste0("input$", id, "\n", format_interaction_value(input[[id]]))
+    }, character(1)),
+    collapse = "\n\n"
+  )
+}
+
 controls_group <- function(title, ..., first = FALSE) {
   border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
   htmltools::div(
@@ -144,7 +179,7 @@ ui <- block_page(
             block_field_label("style", `for` = "frame_style"),
             block_input(
               "frame_style",
-              value = "max-width: 34rem; margin-inline: auto;",
+              value = "",
               placeholder = "e.g., max-width: 34rem; margin-inline: auto;"
             )
           )
@@ -168,6 +203,13 @@ ui <- block_page(
             ),
             uiOutput("preview_ui")
           )
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "Interaction values"
+          ),
+          uiOutput("interaction_value")
         ),
         htmltools::tags$div(
           htmltools::tags$div(
@@ -225,6 +267,7 @@ server <- function(input, output, session) {
       class = s$class,
       style = s$style
     )
+    common <- c(common, interaction_args("preview_image"))
     do.call(block_image_output, c(list(id = "preview_image"), common))
   })
   outputOptions(output, "preview_ui", suspendWhenHidden = FALSE)
@@ -284,11 +327,17 @@ server <- function(input, output, session) {
     if (isTRUE(s$border)) args <- c(args, "border = TRUE")
     if (!isTRUE(s$rounded)) args <- c(args, "rounded = FALSE")
     if (!is.null(s$caption)) args <- c(args, paste0("caption = ", string_literal(s$caption)))
+    args <- c(args, interaction_code_args("preview_image"))
     if (!is.null(s$class)) args <- c(args, paste0("class = ", string_literal(s$class)))
     if (!is.null(s$style)) args <- c(args, paste0("style = ", string_literal(s$style)))
     paste0("block_image_output(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   outputOptions(output, "preview_code", suspendWhenHidden = FALSE)
+
+  output$interaction_value <- showcase_render_code({
+    interaction_values(input, "preview_image")
+  })
+  outputOptions(output, "interaction_value", suspendWhenHidden = FALSE)
 
   output$reactive_code <- showcase_render_code({
     # Depend on demo_values() so pressing Regenerate visibly redraws this

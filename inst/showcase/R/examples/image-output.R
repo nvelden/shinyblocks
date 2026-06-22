@@ -62,7 +62,7 @@ htmltools::tagList(
           block_field_label("style", `for` = "showcase_image_output_style"),
           block_input(
             "showcase_image_output_style",
-            value = "max-width: 34rem; margin-inline: auto;",
+            value = "",
             placeholder = "e.g., max-width: 34rem; margin-inline: auto;"
           )
         )
@@ -78,6 +78,13 @@ htmltools::tagList(
       "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
     ),
     extra_outputs = htmltools::tagList(
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Interaction values"
+        ),
+        shiny::uiOutput("showcase_image_output_interaction_value")
+      ),
       htmltools::tags$div(
         htmltools::tags$div(
           style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
