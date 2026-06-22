@@ -268,16 +268,26 @@ server <- function(input, output, session) {
 
   output$reactive_code <- showcase_render_code({
     s <- frame_state()
+    # Depend on demo_values() so pressing Regenerate visibly redraws this
+    # panel with the freshly sampled data the render block just used.
+    v <- demo_values()
+    data_line <- paste0(
+      "values <- c(",
+      paste(sprintf("%s = %d", names(v), as.integer(v)), collapse = ", "),
+      ")  # Regenerate draws a new sample"
+    )
     if (identical(s$demo, "image")) {
       paste0(
+        data_line, "\n\n",
         "output$preview_image <- renderImage({\n",
-        "  # ... write/locate an image file ...\n",
+        "  # render `values` to an SVG/PNG file\n",
         '  list(src = file, contentType = "image/svg+xml",\n',
         '       alt = "Quarterly revenue by region")\n',
         "}, deleteFile = TRUE)"
       )
     } else {
       paste0(
+        data_line, "\n\n",
         "output$preview_plot <- renderPlot({\n",
         "  barplot(values, col = palette, border = NA)\n",
         '}, alt = "Quarterly revenue by region")'
