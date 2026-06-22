@@ -126,7 +126,10 @@ test:
 	$(R) -e 'devtools::test()'
 
 docs:
-	$(R) -e 'devtools::document()'
+	# Force a UTF-8 LC_CTYPE so roxygen writes non-ASCII defaults (e.g. the
+	# date-range `separator` en-dash) as real characters instead of <U+NNNN>
+	# escapes, which would otherwise trip R CMD check's codoc comparison.
+	LANG=en_US.UTF-8 LC_CTYPE=en_US.UTF-8 $(R) -e 'devtools::document()'
 
 check:
 	$(R) -e 'devtools::check(remote = TRUE, manual = FALSE)'
