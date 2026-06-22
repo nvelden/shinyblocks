@@ -644,7 +644,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the <figure> wrapper." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Inline style for the <figure> wrapper." }
       ]
-    },
+    }
+  ],
+  "plot-output": [
     {
       name: "block_plot_output",
       description: "Frames a reactive shiny::plotOutput() (renderPlot()) in the same shadcn-styled box. Covers base graphics, ggplot2, and lattice; alt is server-controlled via renderPlot(alt=).",

@@ -243,6 +243,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-image-output .sb-output-media", property: "borderColor", token: "--border" },
       { selector: ".sb-parity-image-output .sb-output-caption", property: "color", token: "--muted-foreground" }
     ]
+  },
+  "plot-output": {
+    section: "plot-output",
+    bindings: [
+      { selector: ".sb-parity-plot-output .sb-output-media", property: "borderColor", token: "--border" },
+      { selector: ".sb-parity-plot-output .sb-output-caption", property: "color", token: "--muted-foreground" }
+    ]
   }
 };
 
@@ -254,5 +261,6 @@ export const RSIDE_PRIMITIVES = [
   "tabs",
   "field",
   "input-group",
-  "image-output"
+  "image-output",
+  "plot-output"
 ];

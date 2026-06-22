@@ -1,6 +1,6 @@
 # Image Output
 
-> Shinyblocks function: `block_image_output()` (see also `block_plot_output()`)
+> Shinyblocks function: `block_image_output()`
 > Shadcn reference: image / aspect-ratio composition (`AspectRatio`,
 > `object-cover`, rounded + border treatment)
 > Status: Phase — R-side composition primitive framing a Shiny raster output
@@ -19,12 +19,12 @@ input binding, no payload, no `update_block_*()`.
 
 | Library / source | Shiny mechanism | Wrapper |
 | --- | --- | --- |
-| base graphics, ggplot2, lattice | `renderPlot()` / `plotOutput()` (PNG) | `block_plot_output()` |
 | magick, server-generated image files (PNG/JPEG/SVG/GIF) | `renderImage()` / `imageOutput()` | `block_image_output()` |
 
 Scope is Shiny's raster image outputs only. **Out of scope:** interactive
 htmlwidgets (plotly, leaflet, DT, …) are a different mechanism (interactive
 `<div>`, not an `<img>`); *static* images use `htmltools::img()` directly.
+For `renderPlot()` / `plotOutput()`, use [`plot-output.md`](plot-output.md).
 
 ## Structure
 
@@ -76,4 +76,4 @@ for `alt`.
 ![Image output](_screenshots/image-output.png)
 
 Captured from the local shinyblocks showcase `image-output` playground (live
-`renderPlot()` framed by `block_plot_output()`).
+portrait `renderImage()` framed by `block_image_output()` in a landscape box).

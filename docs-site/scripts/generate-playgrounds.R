@@ -41,6 +41,7 @@ playground_heights <- list(
   `file-input` = 720L,
   field = 720L,
   `image-output` = 720L,
+  `plot-output` = 720L,
   icon = 720L,
   input = 720L,
   `input-group` = 720L,

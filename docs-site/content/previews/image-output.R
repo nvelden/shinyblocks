@@ -1,6 +1,6 @@
-shinyblocks::block_plot_output(
-  "preview_plot",
+shinyblocks::block_image_output(
+  "preview_image",
   aspect = "16/9",
   border = TRUE,
-  caption = "Quarterly revenue by region"
+  caption = "Server-rendered campaign artwork"
 )

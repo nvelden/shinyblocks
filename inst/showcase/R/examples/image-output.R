@@ -46,21 +46,24 @@ htmltools::tagList(
       showcase_controls_group(
         "Styling",
         block_field(
-          block_field_label("demo", `for` = "showcase_image_output_demo"),
-          block_select(
-            "showcase_image_output_demo",
-            choices = c("plot", "image"),
-            selected = "plot",
-            size = "sm"
-          )
-        ),
-        block_field(
           block_field_label("fit", `for` = "showcase_image_output_fit"),
           block_select(
             "showcase_image_output_fit",
             choices = c("cover", "contain", "fill", "none", "scale-down"),
             selected = "cover",
             size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("class", `for` = "showcase_image_output_class"),
+          block_checkbox("showcase_image_output_class", "Use border-dashed class", value = FALSE)
+        ),
+        block_field(
+          block_field_label("style", `for` = "showcase_image_output_style"),
+          block_input(
+            "showcase_image_output_style",
+            value = "max-width: 34rem; margin-inline: auto;",
+            placeholder = "e.g., max-width: 34rem; margin-inline: auto;"
           )
         )
       )

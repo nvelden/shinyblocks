@@ -3,8 +3,12 @@ register_image_output_showcase <- function(input, output, session) {
     if (is.null(x) || !nzchar(trimws(x))) NULL else x
   }
 
-  # A regenerate counter feeds the RNG so both the plot and image demos pull
-  # fresh random data on demand.
+  string_literal <- function(value) {
+    paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
+  }
+
+  # A regenerate counter feeds the RNG so the image demo pulls fresh random
+  # data on demand.
   regen <- shiny::reactiveVal(0)
   shiny::observeEvent(input$showcase_image_output_regen, {
     regen(regen() + 1)
@@ -23,14 +27,15 @@ register_image_output_showcase <- function(input, output, session) {
   frame_state <- shiny::reactive({
     aspect_raw <- input$showcase_image_output_aspect %||% "16/9"
     list(
-      demo = input$showcase_image_output_demo %||% "plot",
       caption = blank_to_null(input$showcase_image_output_caption),
       width = blank_to_null(input$showcase_image_output_width),
       height = blank_to_null(input$showcase_image_output_height),
       aspect = if (identical(aspect_raw, "none")) NULL else aspect_raw,
       fit = input$showcase_image_output_fit %||% "cover",
       border = isTRUE(input$showcase_image_output_border),
-      rounded = isTRUE(input$showcase_image_output_rounded)
+      rounded = isTRUE(input$showcase_image_output_rounded),
+      class = if (isTRUE(input$showcase_image_output_class)) "border-dashed" else NULL,
+      style = blank_to_null(input$showcase_image_output_style)
     )
   })
 
@@ -43,53 +48,60 @@ register_image_output_showcase <- function(input, output, session) {
       fit = s$fit,
       border = s$border,
       rounded = s$rounded,
-      caption = s$caption
+      caption = s$caption,
+      class = s$class,
+      style = s$style
     )
-    if (identical(s$demo, "image")) {
-      do.call(block_image_output, c(list(id = "showcase_image_output_image"), common))
-    } else {
-      do.call(block_plot_output, c(list(id = "showcase_image_output_plot"), common))
-    }
+    do.call(block_image_output, c(list(id = "showcase_image_output_image"), common))
   })
   shiny::outputOptions(output, "showcase_image_output_preview_ui", suspendWhenHidden = FALSE)
 
-  # Plot demo — vanilla shiny::renderPlot(), base graphics.
-  output$showcase_image_output_plot <- shiny::renderPlot({
-    v <- demo_values()
-    op <- graphics::par(mar = c(3, 3, 1, 1))
-    on.exit(graphics::par(op), add = TRUE)
-    graphics::barplot(
-      v,
-      col = c("#2563eb", "#16a34a", "#f59e0b", "#dc2626"),
-      border = NA,
-      ylim = c(0, 110)
-    )
-  }, alt = "Bar chart of quarterly revenue by region.")
-  shiny::outputOptions(output, "showcase_image_output_plot", suspendWhenHidden = FALSE)
-
-  # Image demo — vanilla shiny::renderImage(). A hand-built SVG written to a
-  # temp file keeps the demo dependency-free and portable (no graphics device
-  # needed), exercising the same image-output frame as renderImage() of a file.
+  # Image demo — vanilla shiny::renderImage(). The generated SVG is
+  # intentionally portrait-shaped while the default frame is landscape, so the
+  # fit control visibly demonstrates cover/contain/fill/none/scale-down.
   output$showcase_image_output_image <- shiny::renderImage(
     {
       v <- demo_values()
       cols <- c("#2563eb", "#16a34a", "#f59e0b", "#dc2626")
-      w <- 400
-      h <- 225
-      bw <- 70
-      gap <- (w - length(v) * bw) / (length(v) + 1)
-      bars <- vapply(seq_along(v), function(i) {
-        bh <- (v[[i]] / 110) * (h - 30)
-        x <- gap * i + bw * (i - 1)
-        y <- h - bh - 10
+      w <- 260
+      h <- 420
+      plot_top <- 118
+      plot_bottom <- 320
+      plot_height <- plot_bottom - plot_top
+      bw <- 30
+      gap <- 18
+      start_x <- 46
+      grid <- vapply(seq(0, 100, by = 25), function(mark) {
+        y <- plot_bottom - (mark / 110) * plot_height
         sprintf(
-          "<rect x='%.1f' y='%.1f' width='%d' height='%.1f' fill='%s' rx='3'/>",
-          x, y, bw, bh, cols[[i]]
+          "<line x1='34' y1='%.1f' x2='232' y2='%.1f' stroke='hsl(214 32%% 91%%)' stroke-width='1'/>",
+          y, y
+        )
+      }, character(1))
+      bars <- vapply(seq_along(v), function(i) {
+        bh <- (v[[i]] / 110) * plot_height
+        x <- start_x + (i - 1) * (bw + gap)
+        y <- plot_bottom - bh
+        label <- names(v)[[i]]
+        sprintf(
+          paste0(
+            "<rect x='%.1f' y='%.1f' width='%d' height='%.1f' fill='%s' rx='4'/>",
+            "<text x='%.1f' y='%.1f' text-anchor='middle' font-family='system-ui, sans-serif' font-size='12' font-weight='700' fill='hsl(222 47%% 11%%)'>%d</text>",
+            "<text x='%.1f' y='342' text-anchor='middle' font-family='system-ui, sans-serif' font-size='10' fill='hsl(215 16%% 47%%)'>%s</text>"
+          ),
+          x, y, bw, bh, cols[[i]],
+          x + bw / 2, max(98, y - 8), as.integer(v[[i]]),
+          x + bw / 2, label
         )
       }, character(1))
       svg <- paste0(
         "<svg xmlns='http://www.w3.org/2000/svg' width='", w, "' height='", h, "'>",
-        "<rect width='", w, "' height='", h, "' fill='hsl(220 14% 96%)'/>",
+        "<rect width='", w, "' height='", h, "' fill='hsl(0 0% 100%)'/>",
+        "<rect x='18' y='24' width='224' height='356' rx='16' fill='hsl(220 14% 96%)' stroke='hsl(214 32% 91%)'/>",
+        "<text x='34' y='62' font-family='system-ui, sans-serif' font-size='19' font-weight='800' fill='hsl(222 47% 11%)'>Revenue by region</text>",
+        "<text x='34' y='84' font-family='system-ui, sans-serif' font-size='12' fill='hsl(215 16% 47%)'>Quarterly snapshot</text>",
+        paste(grid, collapse = ""),
+        "<line x1='34' y1='320' x2='232' y2='320' stroke='hsl(215 16% 47%)' stroke-width='1.25'/>",
         paste(bars, collapse = ""),
         "</svg>"
       )
@@ -108,23 +120,22 @@ register_image_output_showcase <- function(input, output, session) {
   # UI Definition — the block_*_output() call that builds the framed preview.
   output$showcase_image_output_preview_code <- showcase_render_code({
     s <- frame_state()
-    fn <- if (identical(s$demo, "image")) "block_image_output" else "block_plot_output"
-    id <- if (identical(s$demo, "image")) "showcase_image_output_image" else "showcase_image_output_plot"
-    args <- paste0('id = "', id, '"')
-    if (!is.null(s$width)) args <- c(args, paste0('width = "', s$width, '"'))
-    if (!is.null(s$height)) args <- c(args, paste0('height = "', s$height, '"'))
-    if (!is.null(s$aspect)) args <- c(args, paste0('aspect = "', s$aspect, '"'))
-    if (!identical(s$fit, "cover")) args <- c(args, paste0('fit = "', s$fit, '"'))
+    args <- paste0('id = "showcase_image_output_image"')
+    if (!is.null(s$width)) args <- c(args, paste0("width = ", string_literal(s$width)))
+    if (!is.null(s$height)) args <- c(args, paste0("height = ", string_literal(s$height)))
+    if (!is.null(s$aspect)) args <- c(args, paste0("aspect = ", string_literal(s$aspect)))
+    if (!identical(s$fit, "cover")) args <- c(args, paste0("fit = ", string_literal(s$fit)))
     if (isTRUE(s$border)) args <- c(args, "border = TRUE")
     if (!isTRUE(s$rounded)) args <- c(args, "rounded = FALSE")
-    if (!is.null(s$caption)) args <- c(args, paste0('caption = "', s$caption, '"'))
-    paste0(fn, "(\n  ", paste(args, collapse = ",\n  "), "\n)")
+    if (!is.null(s$caption)) args <- c(args, paste0("caption = ", string_literal(s$caption)))
+    if (!is.null(s$class)) args <- c(args, paste0("class = ", string_literal(s$class)))
+    if (!is.null(s$style)) args <- c(args, paste0("style = ", string_literal(s$style)))
+    paste0("block_image_output(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   shiny::outputOptions(output, "showcase_image_output_preview_code", suspendWhenHidden = FALSE)
 
-  # Server Render — the vanilla Shiny render recipe for the active demo.
+  # Server Render — the vanilla Shiny render recipe.
   output$showcase_image_output_reactive_code <- showcase_render_code({
-    s <- frame_state()
     # Depend on demo_values() so pressing Regenerate visibly redraws this
     # panel with the freshly sampled data the render block just used.
     v <- demo_values()
@@ -133,23 +144,14 @@ register_image_output_showcase <- function(input, output, session) {
       paste(sprintf("%s = %d", names(v), as.integer(v)), collapse = ", "),
       ")  # Regenerate draws a new sample"
     )
-    if (identical(s$demo, "image")) {
-      paste0(
-        data_line, "\n\n",
-        "output$showcase_image_output_image <- renderImage({\n",
-        "  # render `values` to an SVG/PNG file\n",
-        '  list(src = file, contentType = "image/svg+xml",\n',
-        '       alt = "Quarterly revenue by region")\n',
-        "}, deleteFile = TRUE)"
-      )
-    } else {
-      paste0(
-        data_line, "\n\n",
-        "output$showcase_image_output_plot <- renderPlot({\n",
-        "  barplot(values, col = palette, border = NA)\n",
-        '}, alt = "Quarterly revenue by region")'
-      )
-    }
+    paste0(
+      data_line, "\n\n",
+      "output$showcase_image_output_image <- renderImage({\n",
+      "  # render `values` to an SVG/PNG file\n",
+      '  list(src = file, contentType = "image/svg+xml",\n',
+      '       alt = "Quarterly revenue by region")\n',
+      "}, deleteFile = TRUE)"
+    )
   })
   shiny::outputOptions(output, "showcase_image_output_reactive_code", suspendWhenHidden = FALSE)
 
@@ -171,7 +173,7 @@ register_image_output_showcase <- function(input, output, session) {
         "FALSE (image) / !inline (plot)", "NULL", "NULL"
       ),
       Description = c(
-        "Shiny output id, passed verbatim to imageOutput() / plotOutput().",
+        "Shiny output id, passed verbatim to imageOutput().",
         "CSS width forwarded to the Shiny output and mirrored on the media box.",
         "CSS height. NULL resolves to \"100%\" when aspect is set, else Shiny's default.",
         "Media-box aspect ratio: NULL, a positive number, or a \"w/h\" string.",
@@ -179,9 +181,9 @@ register_image_output_showcase <- function(input, output, session) {
         "Draw a border around the media box.",
         "Round the media box corners (and clip overflow).",
         "Optional <figcaption> text below the media box.",
-        "Forwarded to the Shiny output unchanged (plot click/hover/brush inputs).",
         "Forwarded to the Shiny output unchanged.",
-        "Forwarded to the Shiny output; default matches the underlying function.",
+        "Forwarded to the Shiny output unchanged.",
+        "Forwarded to the Shiny output; default matches imageOutput().",
         "Additional classes for the <figure> wrapper.",
         "Inline style for the <figure> wrapper."
       )
