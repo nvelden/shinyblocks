@@ -1,5 +1,9 @@
 # shinyblocks (development version)
 
+### Components
+
+* `block_image_output()` and `block_plot_output()` are new. They add shadcn-styled frames (aspect box, `object-fit`, border, radius, optional caption) around Shiny's two reactive raster outputs — `block_image_output()` wraps `shiny::imageOutput()` (`renderImage()`); `block_plot_output()` wraps `shiny::plotOutput()` (`renderPlot()`, covering base graphics, ggplot2, and lattice). They are R-side composition primitives: app-author server code stays vanilla Shiny (`output$id <- renderImage(...)` / `renderPlot(...)` unchanged) and Shiny keeps owning content serving, resize/recalc, and click/hover/brush coordinates. `fill` defaults match each underlying Shiny output (`FALSE` for image, `!inline` for plot). The image's accessible name (`alt`) remains server-controlled via `renderImage(alt=)` / `renderPlot(alt=)` (issue #67).
+
 ## 0.0.0.9002
 
 ### Highlights

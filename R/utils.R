@@ -32,6 +32,16 @@ check_number <- function(x, name, min = NULL, positive = FALSE,
   invisible(x)
 }
 
+check_flag <- function(x, name, msg = NULL) {
+  if (!is.logical(x) || length(x) != 1 || is.na(x)) {
+    stop(
+      msg %||% sprintf("`%s` must be a single `TRUE` or `FALSE`.", name),
+      call. = FALSE
+    )
+  }
+  invisible(x)
+}
+
 check_string <- function(x, name, null_ok = FALSE, msg = NULL) {
   if (null_ok && is.null(x)) {
     return(invisible(x))
