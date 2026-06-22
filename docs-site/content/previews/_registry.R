@@ -140,6 +140,13 @@ registry <- list(
     featured = FALSE
   ),
   list(
+    name = "Image / Plot Output",
+    slug = "image-output",
+    file = "image-output.R",
+    description = "shadcn-styled frames around Shiny's reactive raster outputs (imageOutput/plotOutput).",
+    featured = FALSE
+  ),
+  list(
     name = "Slider",
     slug = "slider",
     file = "slider.R",

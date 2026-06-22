@@ -75,4 +75,5 @@ for `alt`.
 
 ![Image output](_screenshots/image-output.png)
 
-Captured from the local shinyblocks showcase. _(Pending Slice 3.)_
+Captured from the local shinyblocks showcase `image-output` playground (live
+`renderPlot()` framed by `block_plot_output()`).

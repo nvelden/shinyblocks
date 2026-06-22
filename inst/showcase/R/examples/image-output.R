@@ -1,69 +1,117 @@
-local({
-  # A tiny inline SVG (data URI) so the static frame ships a real <img> element
-  # that exercises the container-sizing + object-fit CSS without a live server.
-  placeholder_src <- paste0(
-    "data:image/svg+xml,",
-    utils::URLencode(paste0(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='180'>",
-      "<rect width='320' height='180' fill='hsl(220 14% 90%)'/>",
-      "<text x='50%' y='50%' fill='hsl(220 9% 46%)' font-family='sans-serif' ",
-      "font-size='16' text-anchor='middle' dominant-baseline='middle'>",
-      "placeholder image</text></svg>"
-    ), reserved = TRUE)
-  )
-
-  htmltools::tagList(
-    htmltools::tags$p(
-      style = "color: var(--muted-foreground); margin: 0;",
-      paste(
-        "block_image_output() / block_plot_output() wrap shiny::imageOutput() /",
-        "shiny::plotOutput() in a shadcn-styled frame (aspect box, object-fit,",
-        "border, radius, caption). The full live playground lands in Slice 3."
-      )
-    ),
-    htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "Static frame"),
-    htmltools::tags$p(
-      style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
-      paste(
-        "A hand-built frame with a real <img> (no live server) so the media-box",
-        "aspect/border/radius and object-fit CSS are exercised before Slice 3",
-        "wires live renderImage()/renderPlot() demos."
-      )
-    ),
-    htmltools::div(
-      style = "max-width: 28rem;",
-      htmltools::tags$figure(
-        class = "sb-output-frame sb-image-output",
-        htmltools::tags$div(
-          class = "sb-output-media",
-          `data-aspect` = NA,
-          `data-border` = NA,
-          `data-rounded` = NA,
-          style = "--sb-output-fit:cover; --sb-output-aspect:16/9;",
-          htmltools::img(src = placeholder_src, alt = "Placeholder image inside a styled frame.")
+htmltools::tagList(
+  showcase_playground_layout(
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Content", first = TRUE,
+        block_field(
+          block_field_label("caption", `for` = "showcase_image_output_caption"),
+          block_input("showcase_image_output_caption", value = "Quarterly revenue by region")
         ),
-        htmltools::tags$figcaption(
-          class = "sb-output-caption",
-          "16/9 frame, cover fit, bordered + rounded media box."
+        block_field(
+          block_field_label("width", `for` = "showcase_image_output_width"),
+          block_input("showcase_image_output_width", value = "", placeholder = "e.g., 360px (blank = 100%)")
+        ),
+        block_field(
+          block_field_label("height", `for` = "showcase_image_output_height"),
+          block_input("showcase_image_output_height", value = "", placeholder = "blank = aspect/Shiny default")
+        )
+      ),
+      showcase_controls_group(
+        "State",
+        block_field(
+          block_field_label("aspect", `for` = "showcase_image_output_aspect"),
+          block_select(
+            "showcase_image_output_aspect",
+            choices = c("none", "16/9", "4/3", "1/1", "21/9"),
+            selected = "16/9",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("border", `for` = "showcase_image_output_border"),
+          block_checkbox("showcase_image_output_border", "Draw border", value = TRUE)
+        ),
+        block_field(
+          block_field_label("rounded", `for` = "showcase_image_output_rounded"),
+          block_checkbox("showcase_image_output_rounded", "Rounded corners", value = TRUE)
+        )
+      ),
+      showcase_controls_group(
+        "Actions (Server Render)",
+        htmltools::tags$p(
+          style = "color: var(--muted-foreground); margin: 0 0 0.35rem 0; font-size: 0.8125rem;",
+          paste(
+            "Server code stays vanilla Shiny — output$id <- renderPlot(...) /",
+            "renderImage(...). Regenerate pushes new random data; switch the demo",
+            "to render the plot vs the image path live."
+          )
+        ),
+        htmltools::div(
+          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          showcase_action_button("showcase_image_output_regen", "Regenerate")
+        )
+      ),
+      showcase_controls_group(
+        "Styling",
+        block_field(
+          block_field_label("demo", `for` = "showcase_image_output_demo"),
+          block_select(
+            "showcase_image_output_demo",
+            choices = c("plot", "image"),
+            selected = "plot",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("fit", `for` = "showcase_image_output_fit"),
+          block_select(
+            "showcase_image_output_fit",
+            choices = c("cover", "contain", "fill", "none", "scale-down"),
+            selected = "cover",
+            size = "sm"
+          )
         )
       )
     ),
-    htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "Parity fixtures"),
-    htmltools::tags$p(
-      style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
-      "Stable instances captured by tools/parity/. Do not remove."
+    preview_output_id = "showcase_image_output_preview_ui",
+    code_output_id = "showcase_image_output_preview_code",
+    preview_canvas_style = paste(
+      "position: relative; display: block;",
+      "padding: 1.5rem; background: var(--card);",
+      "border: 1px solid var(--border); border-radius: 0.75rem;",
+      "box-sizing: border-box;",
+      "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
     ),
-    htmltools::div(
-      style = "display: flex; flex-direction: column; gap: 1rem; max-width: 28rem;",
-      # A real block_image_output(): an empty Shiny output container (no render
-      # wired here) — enough for the border/caption theme bindings.
-      block_image_output(
-        "parity_image_output",
-        aspect = "16/9",
-        border = TRUE,
-        caption = "Bordered, captioned block_image_output() frame.",
-        class = "sb-parity-image-output"
+    extra_outputs = htmltools::tagList(
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Render"
+        ),
+        shiny::uiOutput("showcase_image_output_reactive_code")
       )
     )
+  ),
+  htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
+  shiny::uiOutput("showcase_image_output_api_table"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "Parity fixtures"
+  ),
+  htmltools::tags$p(
+    style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
+    "Stable instances used by tools/parity/. Do not remove."
+  ),
+  htmltools::div(
+    style = "display: flex; flex-direction: column; gap: 1rem; max-width: 28rem;",
+    # A real block_image_output(): an empty Shiny output container (no render
+    # wired here) — enough for the border/caption theme bindings.
+    block_image_output(
+      "showcase_parity_image_output",
+      aspect = "16/9",
+      border = TRUE,
+      caption = "Bordered, captioned block_image_output() frame.",
+      class = "sb-parity-image-output"
+    )
   )
-})
+)

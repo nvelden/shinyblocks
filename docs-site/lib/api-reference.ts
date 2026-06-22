@@ -625,6 +625,46 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "image-output": [
+    {
+      name: "block_image_output",
+      description: "Frames a reactive shiny::imageOutput() (renderImage()) in a shadcn-styled aspect/border/radius/caption box. App-author server code stays vanilla Shiny.",
+      arguments: [
+        { argument: "id", type: "character", defaultVal: "required", description: "Shiny output id, passed verbatim to imageOutput()." },
+        { argument: "width", type: "character", defaultVal: "\"100%\"", description: "CSS width forwarded to the Shiny output and mirrored on the media box." },
+        { argument: "height", type: "character", defaultVal: "NULL", description: "CSS height. NULL resolves to \"100%\" when aspect is set, else Shiny's default." },
+        { argument: "aspect", type: "character | numeric", defaultVal: "NULL", description: "Media-box aspect ratio: NULL, a positive number, or a \"w/h\" string." },
+        { argument: "fit", type: "character", defaultVal: "\"cover\"", description: "object-fit for the rendered image: cover, contain, fill, none, scale-down." },
+        { argument: "border", type: "logical", defaultVal: "FALSE", description: "Draw a border around the media box." },
+        { argument: "rounded", type: "logical", defaultVal: "TRUE", description: "Round the media box corners (and clip overflow)." },
+        { argument: "caption", type: "character", defaultVal: "NULL", description: "Optional <figcaption> text below the media box." },
+        { argument: "click / dblclick / hover / brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged." },
+        { argument: "inline", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output unchanged." },
+        { argument: "fill", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output; matches shiny::imageOutput()." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the <figure> wrapper." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline style for the <figure> wrapper." }
+      ]
+    },
+    {
+      name: "block_plot_output",
+      description: "Frames a reactive shiny::plotOutput() (renderPlot()) in the same shadcn-styled box. Covers base graphics, ggplot2, and lattice; alt is server-controlled via renderPlot(alt=).",
+      arguments: [
+        { argument: "id", type: "character", defaultVal: "required", description: "Shiny output id, passed verbatim to plotOutput()." },
+        { argument: "width", type: "character", defaultVal: "\"100%\"", description: "CSS width forwarded to the Shiny output and mirrored on the media box." },
+        { argument: "height", type: "character", defaultVal: "NULL", description: "CSS height. NULL resolves to \"100%\" when aspect is set, else Shiny's default." },
+        { argument: "aspect", type: "character | numeric", defaultVal: "NULL", description: "Media-box aspect ratio: NULL, a positive number, or a \"w/h\" string." },
+        { argument: "fit", type: "character", defaultVal: "\"cover\"", description: "object-fit for the rendered plot: cover, contain, fill, none, scale-down." },
+        { argument: "border", type: "logical", defaultVal: "FALSE", description: "Draw a border around the media box." },
+        { argument: "rounded", type: "logical", defaultVal: "TRUE", description: "Round the media box corners (and clip overflow)." },
+        { argument: "caption", type: "character", defaultVal: "NULL", description: "Optional <figcaption> text below the media box." },
+        { argument: "click / dblclick / hover / brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged (plot click/hover/brush inputs)." },
+        { argument: "inline", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output unchanged." },
+        { argument: "fill", type: "logical", defaultVal: "!inline", description: "Forwarded to the Shiny output; matches shiny::plotOutput()." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the <figure> wrapper." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline style for the <figure> wrapper." }
+      ]
+    }
+  ],
   slider: [
     {
       name: "block_slider",
