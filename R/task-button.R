@@ -106,9 +106,11 @@ block_task_button <- function(
   }
   disabled <- isTRUE(attrs$disabled) || identical(attrs$disabled, NA)
   attrs$disabled <- NULL
-  if (!is.null(attrs$style)) {
-    attrs$style <- normalize_runtime_style(attrs$style)
-  }
+  # Style flows through the dedicated `style` prop (the same channel the updater
+  # uses), not through `attrs`, so a later `update_block_task_button(style =)`
+  # is not clobbered by a stale spread of the initial attrs.
+  style <- if (is.null(attrs$style)) NULL else normalize_runtime_style(attrs$style)
+  attrs$style <- NULL
 
   ready_icon <- task_button_icon(icon, icon_position)
   busy_icon <- task_button_icon(icon_busy, icon_position)
@@ -127,6 +129,7 @@ block_task_button <- function(
       iconPosition = icon_position,
       spriteHref = sprite_href(),
       attrs = attrs,
+      style = style,
       disabled = disabled,
       autoReset = auto_reset
     ),
@@ -181,16 +184,10 @@ update_block_task_button <- function(
 ) {
   payload <- list()
 
-  if (!missing(state)) {
+  state_supplied <- !missing(state)
+  if (state_supplied) {
     state <- match_arg(state, TASK_BUTTON_STATES)
     payload$state <- state
-    # A non-ready state is manual control: record it so an automatic reset
-    # scheduled by the triggering click leaves the button busy. Ready releases.
-    if (identical(state, "ready")) {
-      task_button_clear_manual(session, session$ns(input_id))
-    } else {
-      task_button_mark_manual(session, session$ns(input_id))
-    }
   }
   if (!missing(label)) {
     payload$labelHtml <- html_fragment(label)
@@ -250,6 +247,21 @@ update_block_task_button <- function(
     payload,
     notify_key = NULL
   )
+
+  # Record manual control only after the update has been validated and
+  # dispatched. Doing it earlier would let a validation error below (e.g. an
+  # invalid `variant`) abort the send while leaving the input permanently marked
+  # manual, so its next click could never auto-reset.
+  if (state_supplied) {
+    key <- session$ns(input_id)
+    if (identical(state, "ready")) {
+      task_button_clear_manual(session, key)
+    } else {
+      task_button_mark_manual(session, key)
+    }
+  }
+
+  invisible(NULL)
 }
 
 # --- Session-local manual-reset map --------------------------------------

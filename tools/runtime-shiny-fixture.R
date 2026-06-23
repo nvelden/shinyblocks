@@ -172,7 +172,9 @@ ui <- shiny::fluidPage(
   block_task_button(
     "runtime_task_button",
     "Run task",
-    label_busy = "Working…",
+    # ASCII label keeps the assertion locale-independent (the smoke spawns
+    # Rscript without forcing a UTF-8 locale).
+    label_busy = "Working",
     class = "runtime-task-button-fixture"
   ),
   block_date_picker(
@@ -325,6 +327,10 @@ ui <- shiny::fluidPage(
   shiny::actionButton("tb_ready", "Release task"),
   shiny::actionButton("tb_disable", "Disable task"),
   shiny::actionButton("tb_enable", "Enable task"),
+  shiny::actionButton("tb_combined", "Busy + enable (combined)"),
+  shiny::actionButton("tb_busy_icon", "Set busy icon"),
+  shiny::actionButton("tb_icon_end", "Busy icon inline-end"),
+  shiny::actionButton("tb_icon_start", "Busy icon inline-start"),
   shiny::actionButton("set_date", "Set date"),
   shiny::actionButton("clear_date", "Clear date"),
   shiny::actionButton("disable_date", "Disable date"),
@@ -795,6 +801,42 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_task_button",
       disabled = FALSE
+    )
+  })
+
+  # Combined update: busy must win even though disabled = FALSE is also sent, and
+  # the merged next state must be computed before the DOM is touched (no stale
+  # field-by-field re-enable).
+  shiny::observeEvent(input$tb_combined, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      state = "busy",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$tb_busy_icon, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_busy = "check"
+    )
+  })
+
+  shiny::observeEvent(input$tb_icon_end, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_position = "inline-end"
+    )
+  })
+
+  shiny::observeEvent(input$tb_icon_start, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_position = "inline-start"
     )
   })
 

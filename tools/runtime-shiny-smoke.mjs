@@ -375,12 +375,35 @@ try {
   await page.locator(taskBtn).evaluate((node) => node.click());
   await assertText(page, "#runtime_task_button_value", "1");
 
-  // Release returns it to ready (re-enabled).
+  // While busy the button advertises aria-busy and takes the busy label as its
+  // accessible name.
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("aria-busy"), taskBtn),
+    "true",
+    "busy task button should set aria-busy"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("aria-label"), taskBtn),
+    "Working",
+    "busy task button accessible name should be label_busy"
+  );
+
+  // Release returns it to ready (re-enabled) and drops the busy ARIA state.
   await page.click("#tb_ready");
   await page.waitForFunction((sel) => {
     const b = document.querySelector(sel);
     return b?.disabled === false && b.getAttribute("data-state") === "ready";
   }, taskBtn);
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.hasAttribute("aria-busy"), taskBtn),
+    false,
+    "ready task button should not set aria-busy"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.hasAttribute("aria-label"), taskBtn),
+    false,
+    "ready task button without an author label should not keep aria-label"
+  );
 
   // Automatic reset: without the hold, the click flushes and the button returns
   // to ready on its own.
@@ -401,6 +424,54 @@ try {
   await page.click("#tb_ready");
   await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === true, taskBtn);
   await page.click("#tb_enable");
+  await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === false, taskBtn);
+
+  // Combined update {state:"busy", disabled:FALSE}: busy must win. A naive
+  // field-by-field apply would re-enable using the stale ready state; the merged
+  // next state keeps it disabled + busy.
+  await page.click("#tb_combined");
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b?.disabled === true && b.getAttribute("data-state") === "busy";
+  }, taskBtn);
+  await page.click("#tb_ready");
+  await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === false, taskBtn);
+
+  // Busy icon honors icon_position: inline-start renders the icon before the
+  // busy label, inline-end after it. `iconChildOffset` returns the icon index
+  // minus the busy-label index among the button's children.
+  const iconChildOffset = (sel) => {
+    const b = document.querySelector(sel);
+    const kids = Array.from(b.children);
+    const iconIdx = kids.findIndex((n) => n.matches && n.matches("svg"));
+    const labelIdx = kids.findIndex(
+      (n) => n.tagName === "SPAN" && n.getAttribute("aria-hidden") === "true"
+    );
+    return iconIdx - labelIdx;
+  };
+  await page.click("#tb_busy_icon");
+  await page.click("#tb_hold_on");
+  await page.click(taskBtn); // go busy (held)
+  await page.waitForFunction((sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy", taskBtn);
+  assert.ok(
+    (await page.evaluate(iconChildOffset, taskBtn)) < 0,
+    "inline-start busy icon should render before the busy label"
+  );
+  await page.click("#tb_icon_end");
+  await page.waitForFunction(
+    (sel) => (() => {
+      const b = document.querySelector(sel);
+      const kids = Array.from(b.children);
+      const iconIdx = kids.findIndex((n) => n.matches && n.matches("svg"));
+      const labelIdx = kids.findIndex((n) => n.tagName === "SPAN" && n.getAttribute("aria-hidden") === "true");
+      return iconIdx > labelIdx;
+    })(),
+    taskBtn
+  );
+  // Reset fixture state for any later assertions.
+  await page.click("#tb_icon_start");
+  await page.click("#tb_hold_off");
+  await page.click("#tb_ready");
   await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === false, taskBtn);
 
   // Date picker: the binding reports an ISO string typed `shiny.date`, so the

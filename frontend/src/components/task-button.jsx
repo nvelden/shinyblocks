@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { classNames, HtmlSlot, Icon } from "./shared.jsx";
+import { classNames, HtmlSlot, Icon, passthroughAttrs } from "./shared.jsx";
 
 // Decorative busy spinner. `aria-hidden` and no status role — the persistent
 // status region (below) carries the announcement, so the spinner must stay
@@ -27,6 +27,20 @@ export function TaskButton({ payload, root }) {
   const initialProps = payload.props || {};
   const initialState = payload.state || {};
 
+  // Author-provided passthrough attributes (title, data-*, etc.) are fixed at
+  // construction — the updater cannot change them. Pull `aria-label` /
+  // `aria-labelledby` out of the spread so the busy state can override the
+  // accessible name and restore the author's labeling when ready; `style` flows
+  // through its own state channel (so the updater's style messages win).
+  const attrs = passthroughAttrs(initialProps.attrs);
+  const authorAriaLabel =
+    typeof attrs["aria-label"] === "string" ? attrs["aria-label"] : null;
+  const authorAriaLabelledBy =
+    typeof attrs["aria-labelledby"] === "string" ? attrs["aria-labelledby"] : null;
+  delete attrs["aria-label"];
+  delete attrs["aria-labelledby"];
+  delete attrs.style;
+
   const [labelHtml, setLabelHtml] = useState(initialProps.labelHtml || "");
   const [labelBusy, setLabelBusy] = useState(initialProps.labelBusy || "");
   const [variant, setVariant] = useState(initialProps.variant || "default");
@@ -43,11 +57,19 @@ export function TaskButton({ payload, root }) {
   const [taskState, setTaskState] = useState(
     initialState.state === "busy" ? "busy" : "ready"
   );
-  const buttonRef = useRef(null);
 
-  // Synchronously reflect a task-state change onto the real button before React
-  // reconciles. The click binding calls this so the lock is visible in the same
-  // tick as the click; the server-reset path calls it via the receive handler.
+  const buttonRef = useRef(null);
+  // Mirrors of the values the click binding and receive handler need
+  // synchronously. A combined server update computes one consistent next state
+  // from these refs instead of layering stale closure reads field by field.
+  const taskStateRef = useRef(taskState);
+  const authorDisabledRef = useRef(authorDisabled);
+  const labelBusyRef = useRef(labelBusy);
+
+  // Reflect the complete next state onto the real button in one pass, before
+  // React reconciles. The click binding calls this (via the setter) for the
+  // synchronous lock; the receive handler calls it after computing the merged
+  // next state.
   function syncButtonDom(nextState, nextAuthorDisabled, nextLabelBusy) {
     const button = buttonRef.current;
     if (!button) return;
@@ -56,12 +78,16 @@ export function TaskButton({ payload, root }) {
     button.setAttribute("data-state", busy ? "busy" : "ready");
     if (busy) {
       button.setAttribute("aria-busy", "true");
-      // While busy the accessible name is the busy label; restore author
-      // labeling (the label content) when ready.
+      // While busy the accessible name is the busy label.
       button.setAttribute("aria-label", nextLabelBusy || "");
     } else {
       button.removeAttribute("aria-busy");
-      button.removeAttribute("aria-label");
+      // Restore the author's accessible name (or clear ours when none).
+      if (authorAriaLabel != null) {
+        button.setAttribute("aria-label", authorAriaLabel);
+      } else {
+        button.removeAttribute("aria-label");
+      }
     }
   }
 
@@ -73,70 +99,54 @@ export function TaskButton({ payload, root }) {
     }
     root.__sbTaskButtonAutoReset = Boolean(initialProps.autoReset);
 
-    // The click binding installs the synchronous lock by calling this setter,
-    // then schedules React reconciliation through it.
+    // The click binding installs the synchronous lock by calling this setter.
     root.__sbTaskButtonSetState = (nextState) => {
       const next = nextState === "busy" ? "busy" : "ready";
-      syncButtonDom(next, authorDisabled, labelBusy);
+      taskStateRef.current = next;
+      syncButtonDom(next, authorDisabledRef.current, labelBusyRef.current);
       setTaskState(next);
     };
 
     root.__sbTaskButtonReceive = (data) => {
-      const nextData = data || {};
+      const d = data || {};
+      const has = (key) => Object.prototype.hasOwnProperty.call(d, key);
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "state")) {
-        const next = nextData.state === "busy" ? "busy" : "ready";
-        syncButtonDom(next, authorDisabled, labelBusy);
-        setTaskState(next);
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "labelHtml")) {
-        setLabelHtml(nextData.labelHtml == null ? "" : String(nextData.labelHtml));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "labelBusy")) {
-        setLabelBusy(nextData.labelBusy == null ? "" : String(nextData.labelBusy));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "variant")) {
-        setVariant(nextData.variant || "default");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
-        setSize(nextData.size || "default");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "iconPosition")) {
-        setIconPosition(nextData.iconPosition || "inline-start");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "iconName")) {
-        setIconName(nextData.iconName == null ? null : String(nextData.iconName));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "iconHtml")) {
-        setIconHtml(nextData.iconHtml == null ? null : String(nextData.iconHtml));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "iconBusyName")) {
-        setIconBusyName(nextData.iconBusyName == null ? null : String(nextData.iconBusyName));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "iconBusyHtml")) {
-        setIconBusyHtml(nextData.iconBusyHtml == null ? null : String(nextData.iconBusyHtml));
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "spriteHref")) {
-        setSpriteHref(nextData.spriteHref || "");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
-        const nextDisabled = Boolean(nextData.disabled);
-        setAuthorDisabled(nextDisabled);
-        syncButtonDom(taskState, nextDisabled, labelBusy);
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
-        setStyle(nextData.style == null ? {} : nextData.style);
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
-        setClassName(nextData.class == null ? "" : String(nextData.class));
-      }
+      // Compute the complete next synchronous state first, then sync the DOM
+      // once — never field-by-field with stale values (a combined
+      // {state, disabled} update must not flip disabled mid-apply).
+      let nextState = taskStateRef.current;
+      let nextDisabled = authorDisabledRef.current;
+      let nextLabelBusy = labelBusyRef.current;
+      if (has("state")) nextState = d.state === "busy" ? "busy" : "ready";
+      if (has("disabled")) nextDisabled = Boolean(d.disabled);
+      if (has("labelBusy")) nextLabelBusy = d.labelBusy == null ? "" : String(d.labelBusy);
+
+      if (has("state")) setTaskState(nextState);
+      if (has("disabled")) setAuthorDisabled(nextDisabled);
+      if (has("labelBusy")) setLabelBusy(nextLabelBusy);
+      if (has("labelHtml")) setLabelHtml(d.labelHtml == null ? "" : String(d.labelHtml));
+      if (has("variant")) setVariant(d.variant || "default");
+      if (has("size")) setSize(d.size || "default");
+      if (has("iconPosition")) setIconPosition(d.iconPosition || "inline-start");
+      if (has("iconName")) setIconName(d.iconName == null ? null : String(d.iconName));
+      if (has("iconHtml")) setIconHtml(d.iconHtml == null ? null : String(d.iconHtml));
+      if (has("iconBusyName")) setIconBusyName(d.iconBusyName == null ? null : String(d.iconBusyName));
+      if (has("iconBusyHtml")) setIconBusyHtml(d.iconBusyHtml == null ? null : String(d.iconBusyHtml));
+      if (has("spriteHref")) setSpriteHref(d.spriteHref || "");
+      if (has("style")) setStyle(d.style == null ? {} : d.style);
+      if (has("class")) setClassName(d.class == null ? "" : String(d.class));
+
+      taskStateRef.current = nextState;
+      authorDisabledRef.current = nextDisabled;
+      labelBusyRef.current = nextLabelBusy;
+      syncButtonDom(nextState, nextDisabled, nextLabelBusy);
     };
 
     return () => {
       delete root.__sbTaskButtonSetState;
       delete root.__sbTaskButtonReceive;
     };
-  }, [root, authorDisabled, labelBusy, taskState]);
+  }, [root]);
 
   const busy = taskState === "busy";
   const disabled = authorDisabled || busy;
@@ -153,6 +163,7 @@ export function TaskButton({ payload, root }) {
     }
   };
   const hasBusyIcon = Boolean(iconBusyName || iconBusyHtml);
+  const busyIndicator = hasBusyIcon ? <Icon payload={busyIconPayload} /> : <BusySpinner />;
 
   return (
     <>
@@ -164,7 +175,8 @@ export function TaskButton({ payload, root }) {
         data-size={size}
         data-state={busy ? "busy" : "ready"}
         aria-busy={busy ? "true" : undefined}
-        aria-label={busy ? labelBusy : undefined}
+        aria-label={busy ? labelBusy : (authorAriaLabel ?? undefined)}
+        aria-labelledby={busy ? undefined : (authorAriaLabelledBy ?? undefined)}
         className={classNames(
           "sb-button",
           "sb-task-button",
@@ -174,13 +186,15 @@ export function TaskButton({ payload, root }) {
         )}
         disabled={disabled}
         style={style}
+        {...attrs}
       >
         {busy ? (
           <>
-            {hasBusyIcon ? <Icon payload={busyIconPayload} /> : <BusySpinner />}
+            {iconPosition === "inline-start" && busyIndicator}
             {/* Visible busy label, hidden from AT to avoid a duplicate
                 announcement alongside the status region. */}
             <span aria-hidden="true">{labelBusy}</span>
+            {iconPosition === "inline-end" && busyIndicator}
           </>
         ) : (
           <>

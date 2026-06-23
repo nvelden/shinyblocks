@@ -49,6 +49,23 @@ test_that("block_task_button() payload carries label, busy label, and auto_reset
   expect_identical(payload$state$state, "ready")
 })
 
+test_that("block_task_button() forwards ... attributes and routes style to props", {
+  payload <- runtime_payload_from(block_task_button(
+    "run", "Go",
+    title = "Run it",
+    `aria-label` = "Run the analysis",
+    `data-test` = "tb",
+    style = "min-width: 10rem;"
+  ))
+  # Passthrough attrs reach the button via props$attrs ...
+  expect_identical(payload$props$attrs$title, "Run it")
+  expect_identical(payload$props$attrs$`aria-label`, "Run the analysis")
+  expect_identical(payload$props$attrs$`data-test`, "tb")
+  # ... while style is normalized onto the dedicated style channel, not attrs.
+  expect_null(payload$props$attrs$style)
+  expect_identical(payload$props$style$minWidth, "10rem")
+})
+
 test_that("block_task_button() validates its arguments", {
   expect_error(block_task_button("", "x"), "non-empty string")
   expect_error(block_task_button("id", "x", label_busy = c("a", "b")), "length-one string")
@@ -104,6 +121,24 @@ test_that("update_block_task_button(state=) toggles the manual-reset map", {
 
   update_block_task_button(session, "run", state = "ready")
   expect_false(task_button_is_manual(session, "run"))
+})
+
+test_that("a failed update does not poison the manual-reset map", {
+  ctx <- fake_task_session()
+  session <- ctx$session
+
+  # A later invalid argument must abort the whole update — including the manual
+  # mark — so the input is not left permanently suppressed from auto-reset.
+  expect_error(
+    update_block_task_button(session, "run", state = "busy", variant = "invalid"),
+    "must be one of"
+  )
+  expect_false(task_button_is_manual(session, "run"))
+  expect_length(ctx$messages(), 0)
+
+  # A valid update still records manual control.
+  update_block_task_button(session, "run", state = "busy", variant = "secondary")
+  expect_true(task_button_is_manual(session, "run"))
 })
 
 test_that("manual-reset map is isolated per session and keyed by namespaced id", {
