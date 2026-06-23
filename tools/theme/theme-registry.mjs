@@ -51,6 +51,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-button-default[data-slot='button']", property: "color", token: "--primary-foreground" }
     ]
   },
+  "task-button": {
+    section: "task-button",
+    bindings: [
+      { selector: ".sb-parity-task-button-default[data-slot='task-button']", property: "backgroundColor", token: "--primary" },
+      { selector: ".sb-parity-task-button-default[data-slot='task-button']", property: "color", token: "--primary-foreground" }
+    ]
+  },
   card: {
     section: "card",
     bindings: [

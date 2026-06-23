@@ -32,6 +32,7 @@ playground_heights <- list(
   alert = 720L,
   badge = 720L,
   button = 720L,
+  `task-button` = 720L,
   card = 720L,
   checkbox = 720L,
   code = 720L,

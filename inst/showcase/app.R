@@ -4,6 +4,7 @@ suppressPackageStartupMessages(library(shinyblocks))
 source(file.path("R", "render_example.R"), local = TRUE)
 source(file.path("R", "section.R"), local = TRUE)
 source(file.path("R", "server_button.R"), local = TRUE)
+source(file.path("R", "server_task_button.R"), local = TRUE)
 source(file.path("R", "server_select.R"), local = TRUE)
 source(file.path("R", "server_date_picker.R"), local = TRUE)
 source(file.path("R", "server_date_range_picker.R"), local = TRUE)
@@ -139,6 +140,17 @@ sections <- list(
       "destructive, link), four sizes, and optional inline icons."
     ),
     file = "button.R"
+  ),
+  list(
+    id = "task-button",
+    label = "Task Button",
+    icon = "play",
+    title = "Task Buttons",
+    lead = paste(
+      "An action button that locks on click, shows a busy label and spinner,",
+      "and auto-resets after the click flush (or under manual server control)."
+    ),
+    file = "task-button.R"
   ),
   list(
     id = "field",
@@ -532,6 +544,7 @@ ui <- block_page(
 
 server <- function(input, output, session) {
   register_button_showcase(input, output, session)
+  register_task_button_showcase(input, output, session)
   register_code_showcase(input, output, session)
   register_select_showcase(input, output, session)
   register_date_picker_showcase(input, output, session)

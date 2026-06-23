@@ -169,6 +169,12 @@ ui <- shiny::fluidPage(
     id = "runtime_button",
     class = "runtime-button-fixture"
   ),
+  block_task_button(
+    "runtime_task_button",
+    "Run task",
+    label_busy = "Working…",
+    class = "runtime-task-button-fixture"
+  ),
   block_date_picker(
     "runtime_date",
     value = "2026-06-15",
@@ -273,6 +279,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_slider_value"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
+  shiny::verbatimTextOutput("runtime_task_button_value"),
+  shiny::verbatimTextOutput("runtime_task_button_class"),
   shiny::verbatimTextOutput("runtime_date_value"),
   shiny::verbatimTextOutput("runtime_date_class"),
   shiny::verbatimTextOutput("runtime_range_value"),
@@ -312,6 +320,11 @@ ui <- shiny::fluidPage(
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
   shiny::actionButton("enable_button", "Enable button"),
+  shiny::actionButton("tb_hold_on", "Hold task busy on click"),
+  shiny::actionButton("tb_hold_off", "Stop holding task busy"),
+  shiny::actionButton("tb_ready", "Release task"),
+  shiny::actionButton("tb_disable", "Disable task"),
+  shiny::actionButton("tb_enable", "Enable task"),
   shiny::actionButton("set_date", "Set date"),
   shiny::actionButton("clear_date", "Clear date"),
   shiny::actionButton("disable_date", "Disable date"),
@@ -405,6 +418,20 @@ server <- function(input, output, session) {
   })
   output$runtime_button_class <- shiny::renderText({
     value <- input$runtime_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(class(value), collapse = ",")
+  })
+  output$runtime_task_button_value <- shiny::renderText({
+    value <- input$runtime_task_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    as.character(value)
+  })
+  output$runtime_task_button_class <- shiny::renderText({
+    value <- input$runtime_task_button
     if (is.null(value)) {
       return("<NULL>")
     }
@@ -725,6 +752,48 @@ server <- function(input, output, session) {
     update_block_button(
       session = session,
       input_id = "runtime_button",
+      disabled = FALSE
+    )
+  })
+
+  tb_hold <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(input$tb_hold_on, tb_hold(TRUE))
+  shiny::observeEvent(input$tb_hold_off, tb_hold(FALSE))
+
+  # Manual-suppression race: while "hold" is on, the click's reactive flush sets
+  # the task busy. Because that runs before the auto-reset onFlush callback, the
+  # manual-reset map suppresses the automatic ready reset and the button stays
+  # busy until released.
+  shiny::observeEvent(input$runtime_task_button, {
+    if (isTRUE(tb_hold())) {
+      update_block_task_button(
+        session = session,
+        input_id = "runtime_task_button",
+        state = "busy"
+      )
+    }
+  }, ignoreInit = TRUE)
+
+  shiny::observeEvent(input$tb_ready, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      state = "ready"
+    )
+  })
+
+  shiny::observeEvent(input$tb_disable, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$tb_enable, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
       disabled = FALSE
     )
   })

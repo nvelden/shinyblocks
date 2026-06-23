@@ -354,6 +354,55 @@ try {
     )?.disabled === false;
   });
 
+  // Task button: action-button click count classed as a shinyActionButtonValue,
+  // a synchronous click lock, automatic reset, the manual-suppression race, and
+  // disabled preservation across a ready reset.
+  const taskBtn =
+    "[data-sb-component='task-button'][data-sb-input-id='runtime_task_button'] [data-slot='task-button']";
+  await assertText(page, "#runtime_task_button_value", "0");
+  await assertText(page, "#runtime_task_button_class", "shinyActionButtonValue,shiny.actionButton,numeric");
+
+  // Hold busy on click: the click locks synchronously and the manual reset
+  // suppresses the auto-reset, so it stays disabled+busy. A rapid second click
+  // while locked must not reach the server.
+  await page.click("#tb_hold_on");
+  await page.click(taskBtn);
+  await assertText(page, "#runtime_task_button_value", "1");
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b?.disabled === true && b.getAttribute("data-state") === "busy";
+  }, taskBtn);
+  await page.locator(taskBtn).evaluate((node) => node.click());
+  await assertText(page, "#runtime_task_button_value", "1");
+
+  // Release returns it to ready (re-enabled).
+  await page.click("#tb_ready");
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b?.disabled === false && b.getAttribute("data-state") === "ready";
+  }, taskBtn);
+
+  // Automatic reset: without the hold, the click flushes and the button returns
+  // to ready on its own.
+  await page.click("#tb_hold_off");
+  await page.click(taskBtn);
+  await assertText(page, "#runtime_task_button_value", "2");
+  await page.waitForFunction((sel) => {
+    const b = document.querySelector(sel);
+    return b?.disabled === false && b.getAttribute("data-state") === "ready";
+  }, taskBtn);
+
+  // Disabled preservation: an author-disabled button stays disabled across a
+  // ready reset and rejects clicks.
+  await page.click("#tb_disable");
+  await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === true, taskBtn);
+  await page.locator(taskBtn).evaluate((node) => node.click());
+  await assertText(page, "#runtime_task_button_value", "2");
+  await page.click("#tb_ready");
+  await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === true, taskBtn);
+  await page.click("#tb_enable");
+  await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === false, taskBtn);
+
   // Date picker: the binding reports an ISO string typed `shiny.date`, so the
   // server value is a length-1 Date. Covers initial value, user selection,
   // server update, clear, and disabled state.

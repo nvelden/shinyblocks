@@ -27,6 +27,7 @@ import {
   ValueBox
 } from "./components/basic.jsx";
 import { Button } from "./components/button.jsx";
+import { TaskButton } from "./components/task-button.jsx";
 import { Code } from "./components/code.jsx";
 import { Dialog } from "./components/dialog.jsx";
 import { Popover } from "./components/popover.jsx";
@@ -53,6 +54,7 @@ function CardRuntimeMount() {
 
 const COMPONENTS = {
   button: Button,
+  "task-button": TaskButton,
   badge: Badge,
   separator: Separator,
   spinner: Spinner,
