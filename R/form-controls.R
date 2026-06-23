@@ -214,7 +214,7 @@ resolve_dropzone_icon <- function(icon) {
 #'   `img`, a styled `<button>`); nested `block_*()` runtime components are not
 #'   hydrated inside this slot. When supplied, the surface becomes a pure drop
 #'   region: mark the element that should open the file picker with
-#'   `\`data-dropzone-trigger\` = NA` (a real `<button>`/`<a>` for keyboard
+#'   `` `data-dropzone-trigger` = NA `` (a real `<button>`/`<a>` for keyboard
 #'   support). Give it `class = "sb-file-dropzone-trigger"` for the default
 #'   button styling.
 #' @param width Optional CSS width value (applied to the wrapper).

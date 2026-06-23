@@ -37,6 +37,8 @@ source(file.path("R", "server_style.R"), local = TRUE)
 source(file.path("R", "server_layout.R"), local = TRUE)
 source(file.path("R", "server_nav_item.R"), local = TRUE)
 source(file.path("R", "server_field.R"), local = TRUE)
+source(file.path("R", "server_image_output.R"), local = TRUE)
+source(file.path("R", "server_plot_output.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -256,6 +258,28 @@ sections <- list(
       "prefixes, suffixes — via block_input_group() and block_input_group_addon()."
     ),
     file = "input_group.R"
+  ),
+  list(
+    id = "image-output",
+    label = "Image output",
+    icon = "image",
+    title = "Image output",
+    lead = paste(
+      "shadcn-styled frames around Shiny's reactive imageOutput() / renderImage()",
+      "raster outputs."
+    ),
+    file = "image-output.R"
+  ),
+  list(
+    id = "plot-output",
+    label = "Plot output",
+    icon = "chart-bar",
+    title = "Plot output",
+    lead = paste(
+      "shadcn-styled frames around Shiny's reactive plotOutput() / renderPlot()",
+      "graphics outputs."
+    ),
+    file = "plot-output.R"
   ),
   list(
     id = "slider",
@@ -541,6 +565,8 @@ server <- function(input, output, session) {
   register_layout_showcase(input, output, session)
   register_nav_item_showcase(input, output, session)
   register_field_showcase(input, output, session)
+  register_image_output_showcase(input, output, session)
+  register_plot_output_showcase(input, output, session)
 }
 
 shinyApp(ui, server)

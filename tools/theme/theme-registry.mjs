@@ -236,6 +236,20 @@ export const THEME_REGISTRY = {
     bindings: [
       { selector: ".sb-parity-input-group-fixtures", property: "color", token: "--foreground" }
     ]
+  },
+  "image-output": {
+    section: "image-output",
+    bindings: [
+      { selector: ".sb-parity-image-output .sb-output-media", property: "borderColor", token: "--border" },
+      { selector: ".sb-parity-image-output .sb-output-caption", property: "color", token: "--muted-foreground" }
+    ]
+  },
+  "plot-output": {
+    section: "plot-output",
+    bindings: [
+      { selector: ".sb-parity-plot-output .sb-output-media", property: "borderColor", token: "--border" },
+      { selector: ".sb-parity-plot-output .sb-output-caption", property: "color", token: "--muted-foreground" }
+    ]
   }
 };
 
@@ -246,5 +260,7 @@ export const RSIDE_PRIMITIVES = [
   "sidebar",
   "tabs",
   "field",
-  "input-group"
+  "input-group",
+  "image-output",
+  "plot-output"
 ];

@@ -56,7 +56,7 @@ used when \code{variant = "dropzone"}). Use plain \code{htmltools} markup (text,
 \code{img}, a styled \verb{<button>}); nested \verb{block_*()} runtime components are not
 hydrated inside this slot. When supplied, the surface becomes a pure drop
 region: mark the element that should open the file picker with
-\verb{\\}data-dropzone-trigger\\verb{ = NA} (a real \verb{<button>}/\verb{<a>} for keyboard
+\code{`data-dropzone-trigger` = NA} (a real \verb{<button>}/\verb{<a>} for keyboard
 support). Give it \code{class = "sb-file-dropzone-trigger"} for the default
 button styling.}
 
