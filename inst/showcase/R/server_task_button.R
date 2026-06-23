@@ -94,6 +94,33 @@ register_task_button_showcase <- function(input, output, session) {
     suspendWhenHidden = FALSE
   )
 
+  # Simulated work so the busy state is actually visible. The click locks the
+  # button on the client; Shiny holds the outgoing ready-reset message until this
+  # observer's reactive flush finishes, so the button stays busy for the duration
+  # of the work. With auto_reset = TRUE it then clears itself; with
+  # auto_reset = FALSE it stays busy until "Set ready". Without simulated work a
+  # synchronous handler returns instantly and the busy state only flashes.
+  task_result <- shiny::reactiveVal(NULL)
+
+  shiny::observeEvent(input$showcase_task_button_preview, {
+    Sys.sleep(1.5)
+    task_result(sprintf(
+      "Run #%d complete at %s",
+      input$showcase_task_button_preview,
+      format(Sys.time(), "%H:%M:%S")
+    ))
+  }, ignoreInit = TRUE)
+
+  output$showcase_task_button_result <- showcase_render_code({
+    res <- task_result()
+    if (is.null(res)) "# Click the button to run a (simulated) 1.5s task." else res
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_task_button_result",
+    suspendWhenHidden = FALSE
+  )
+
   shiny::observeEvent(input$showcase_task_button_set_busy, {
     update_block_task_button(session, "showcase_task_button_preview", state = "busy")
     reactive_code(paste0(

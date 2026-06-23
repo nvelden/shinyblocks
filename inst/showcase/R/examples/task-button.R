@@ -43,6 +43,13 @@ htmltools::tagList(
       htmltools::tags$div(
         htmltools::tags$div(
           style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Task result"
+        ),
+        shiny::uiOutput("showcase_task_button_result")
+      ),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
           "Server Action"
         ),
         shiny::uiOutput("showcase_task_button_reactive_code")

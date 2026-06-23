@@ -152,6 +152,13 @@ ui <- block_page(
         htmltools::tags$div(
           htmltools::tags$div(
             style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            "Task result"
+          ),
+          uiOutput("task_result_ui")
+        ),
+        htmltools::tags$div(
+          htmltools::tags$div(
+            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
             "Server Action"
           ),
           uiOutput("reactive_code")
@@ -211,6 +218,26 @@ server <- function(input, output, session) {
     paste0("block_task_button(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   outputOptions(output, "preview_code", suspendWhenHidden = FALSE)
+
+  # Simulated work so the busy state is visible. The click locks the button on
+  # the client; Shiny holds the outgoing ready-reset until this observer's flush
+  # finishes, so it stays busy for the duration of the work. With auto_reset it
+  # then clears itself; otherwise it stays busy until "Set ready".
+  task_result <- reactiveVal(NULL)
+  observeEvent(input$preview_task_button, {
+    Sys.sleep(1.5)
+    task_result(sprintf(
+      "Run #%d complete at %s",
+      input$preview_task_button,
+      format(Sys.time(), "%H:%M:%S")
+    ))
+  }, ignoreInit = TRUE)
+
+  output$task_result_ui <- showcase_render_code({
+    res <- task_result()
+    if (is.null(res)) "# Click the button to run a (simulated) 1.5s task." else res
+  })
+  outputOptions(output, "task_result_ui", suspendWhenHidden = FALSE)
 
   reactive_code <- reactiveVal(paste0(
     "# Click an action button to see\n",
