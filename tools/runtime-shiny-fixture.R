@@ -175,8 +175,16 @@ ui <- shiny::fluidPage(
     # ASCII label keeps the assertion locale-independent (the smoke spawns
     # Rscript without forcing a UTF-8 locale).
     label_busy = "Working",
-    class = "runtime-task-button-fixture"
+    class = "runtime-task-button-fixture",
+    # Author passthrough: `title` must reach the button; the reserved
+    # `data-slot` / `type` must NOT override the runtime's own values; and
+    # `aria-labelledby` must be suppressed while busy and restored when ready.
+    title = "Run the task",
+    `aria-labelledby` = "tb_extlabel",
+    `data-slot` = "author-should-not-win",
+    type = "submit"
   ),
+  shiny::span(id = "tb_extlabel", "External label"),
   block_date_picker(
     "runtime_date",
     value = "2026-06-15",

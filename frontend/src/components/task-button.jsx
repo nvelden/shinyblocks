@@ -78,8 +78,11 @@ export function TaskButton({ payload, root }) {
     button.setAttribute("data-state", busy ? "busy" : "ready");
     if (busy) {
       button.setAttribute("aria-busy", "true");
-      // While busy the accessible name is the busy label.
+      // While busy the accessible name is the busy label. aria-labelledby would
+      // otherwise take precedence, so drop it synchronously and restore it when
+      // returning to ready (React commits a frame later).
       button.setAttribute("aria-label", nextLabelBusy || "");
+      button.removeAttribute("aria-labelledby");
     } else {
       button.removeAttribute("aria-busy");
       // Restore the author's accessible name (or clear ours when none).
@@ -87,6 +90,11 @@ export function TaskButton({ payload, root }) {
         button.setAttribute("aria-label", authorAriaLabel);
       } else {
         button.removeAttribute("aria-label");
+      }
+      if (authorAriaLabelledBy != null) {
+        button.setAttribute("aria-labelledby", authorAriaLabelledBy);
+      } else {
+        button.removeAttribute("aria-labelledby");
       }
     }
   }
@@ -167,8 +175,12 @@ export function TaskButton({ payload, root }) {
 
   return (
     <>
+      {/* Author passthrough (`...attrs`) is spread before the controlled props,
+          so a stray data-slot/data-state/aria-busy/type from the author can
+          never override the runtime's own (data-slot drives click detection). */}
       <button
         ref={buttonRef}
+        {...attrs}
         type="button"
         data-slot="task-button"
         data-variant={variant}
@@ -186,7 +198,6 @@ export function TaskButton({ payload, root }) {
         )}
         disabled={disabled}
         style={style}
-        {...attrs}
       >
         {busy ? (
           <>

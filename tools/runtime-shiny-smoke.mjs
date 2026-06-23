@@ -362,6 +362,31 @@ try {
   await assertText(page, "#runtime_task_button_value", "0");
   await assertText(page, "#runtime_task_button_class", "shinyActionButtonValue,shiny.actionButton,numeric");
 
+  // Author passthrough reaches the button (title), but reserved attributes
+  // never override the runtime's controlled values: the spread sits before the
+  // controlled props, so data-slot stays "task-button" (click detection), type
+  // stays "button", and the author aria-labelledby is honored while ready.
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("title"), taskBtn),
+    "Run the task",
+    "author title should pass through to the task button"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("data-slot"), taskBtn),
+    "task-button",
+    "author data-slot must not override the runtime slot"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("type"), taskBtn),
+    "button",
+    "author type must not override the runtime button type"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("aria-labelledby"), taskBtn),
+    "tb_extlabel",
+    "ready task button should keep the author aria-labelledby"
+  );
+
   // Hold busy on click: the click locks synchronously and the manual reset
   // suppresses the auto-reset, so it stays disabled+busy. A rapid second click
   // while locked must not reach the server.
@@ -387,6 +412,11 @@ try {
     "Working",
     "busy task button accessible name should be label_busy"
   );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.hasAttribute("aria-labelledby"), taskBtn),
+    false,
+    "busy task button should drop aria-labelledby so the busy label wins"
+  );
 
   // Release returns it to ready (re-enabled) and drops the busy ARIA state.
   await page.click("#tb_ready");
@@ -403,6 +433,11 @@ try {
     await page.evaluate((s) => document.querySelector(s)?.hasAttribute("aria-label"), taskBtn),
     false,
     "ready task button without an author label should not keep aria-label"
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("aria-labelledby"), taskBtn),
+    "tb_extlabel",
+    "ready task button should restore the author aria-labelledby"
   );
 
   // Automatic reset: without the hold, the click flushes and the button returns
