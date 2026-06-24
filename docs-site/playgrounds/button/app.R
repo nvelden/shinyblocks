@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -79,28 +85,27 @@ string_literal <- function(value) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Button playground",
+  title = "shinyblocks <U+00B7> Button playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css")
   ),
   htmltools::tags$div(
-      `data-shinyblocks-root` = "",
-      style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
-      htmltools::div(
+    `data-shinyblocks-root` = "",
+    style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+    htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
         block_card(
-                  title = "Controls",
-                  class = "showcase-playground__controls",
-                  style = "flex: 1; min-width: 280px; max-width: 320px;",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
             htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              class = "showcase-controls-group__title",
               "Content"
             ),
             block_field(
@@ -135,12 +140,11 @@ block_stack(
               )
             )
           ),
-
           block_stack(
             gap = "sm",
             class = "showcase-controls-group",
             htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              class = "showcase-controls-group__title",
               "State"
             ),
             block_field(
@@ -148,12 +152,11 @@ block_stack(
               block_checkbox("showcase_button_doc_disabled", "Disabled", value = FALSE)
             )
           ),
-
           block_stack(
             gap = "sm",
             class = "showcase-controls-group",
             htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              class = "showcase-controls-group__title",
               "Styling"
             ),
             block_field(
@@ -188,12 +191,11 @@ block_stack(
               )
             )
           ),
-
           block_stack(
             gap = "sm",
             class = "showcase-controls-group",
             htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+              class = "showcase-controls-group__title",
               "Actions (Server Update)"
             ),
             block_cluster(
@@ -207,14 +209,13 @@ block_stack(
             )
           )
         ),
-
         block_stack(
           gap = "lg",
           class = "showcase-playground__main",
           block_stack(
             gap = "sm",
             htmltools::tags$div(
-              style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
+              class = "showcase-playground__label",
               "Preview"
             ),
             htmltools::tags$div(
@@ -227,23 +228,23 @@ block_stack(
             gap = "md",
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "UI Definition"
               ),
               uiOutput("showcase_button_preview_code")
             ),
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "Server Action"
               ),
               uiOutput("showcase_button_reactive_code")
             )
           )
         )
-          )
-)
+      )
     )
+  )
 )
 
 server <- function(input, output, session) {

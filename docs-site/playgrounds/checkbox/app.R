@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -72,7 +78,7 @@ string_literal <- function(value) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Checkbox playground",
+  title = "shinyblocks <U+00B7> Checkbox playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
@@ -85,21 +91,21 @@ ui <- block_page(
     ))
   ),
   htmltools::tags$div(
-      `data-shinyblocks-root` = "",
-      style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
-      htmltools::div(
-        class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
+    `data-shinyblocks-root` = "",
+    style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+    htmltools::div(
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
         block_card(
-                  title = "Controls",
-                  class = "showcase-playground__controls",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-  htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
             block_field(
               block_field_label("label", `for` = "showcase_checkbox_doc_label"),
               block_textarea("showcase_checkbox_doc_label", value = "Email me product updates", rows = 1, resize = "none")
@@ -192,23 +198,23 @@ block_stack(
             gap = "md",
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "UI Definition"
               ),
               uiOutput("showcase_checkbox_preview_code")
             ),
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "Server Action"
               ),
               uiOutput("showcase_checkbox_reactive_code")
             )
           )
         )
+      )
     )
   )
-    )
 )
 
 server <- function(input, output, session) {

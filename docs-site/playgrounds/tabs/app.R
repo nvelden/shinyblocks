@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) {
     webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
@@ -68,80 +71,80 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-          gap = "sm",
-          class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Tab Styles"
-          ),
-          block_field(
-            block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
-            block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
-          ),
-          block_field(
-            block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
-            block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
-          ),
-          block_field(
-            block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
-            block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Actions (Server Update)"
-          ),
-          block_cluster(
-            gap = "sm",
-            showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
-            showcase_action_button("showcase_tabs_select_settings", "Select Settings")
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(class = "showcase-playground__label", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--stretch",
-            style = "padding: 1.5rem; border-style: dashed; min-height: 260px;",
-            uiOutput("showcase_tabs_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Tab Styles"
+            ),
+            block_field(
+              block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
+              block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
+            ),
+            block_field(
+              block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
+              block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
+            ),
+            block_field(
+              block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
+              block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Actions (Server Update)"
+            ),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
+              showcase_action_button("showcase_tabs_select_settings", "Select Settings")
+            )
           )
         ),
-        uiOutput("showcase_tabs_preview_value"),
         block_stack(
-          gap = "md",
-          htmltools::div(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
             htmltools::div(
-              class = "showcase-playground__label showcase-playground__label--code",
-              "UI Definition"
-            ),
-            uiOutput("showcase_tabs_preview_code")
+              class = "showcase-preview-canvas showcase-preview-canvas--stretch",
+              style = "padding: 1.5rem; border-style: dashed; min-height: 260px;",
+              uiOutput("showcase_tabs_preview_ui")
+            )
           ),
-          htmltools::div(
+          uiOutput("showcase_tabs_preview_value"),
+          block_stack(
+            gap = "md",
             htmltools::div(
-              class = "showcase-playground__label showcase-playground__label--code",
-              "Server Action"
+              htmltools::div(
+                class = "showcase-playground__label showcase-playground__label--code",
+                "UI Definition"
+              ),
+              uiOutput("showcase_tabs_preview_code")
             ),
-            uiOutput("showcase_tabs_reactive_code")
+            htmltools::div(
+              htmltools::div(
+                class = "showcase-playground__label showcase-playground__label--code",
+                "Server Action"
+              ),
+              uiOutput("showcase_tabs_reactive_code")
+            )
           )
         )
       )
     )
-  )
   )
 )
 
@@ -206,7 +209,9 @@ server <- function(input, output, session) {
     "# Click an action button to see\n",
     "# the update_block_tabs() code here."
   ))
-  output$showcase_tabs_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_tabs_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
   outputOptions(output, "showcase_tabs_reactive_code", suspendWhenHidden = FALSE)
 
   observeEvent(input$showcase_tabs_select_usage, {

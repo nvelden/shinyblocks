@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
   .libPaths(c("/packages", .libPaths()))
@@ -29,8 +32,7 @@ demo_specs <- function(values) {
   specs <- specs[seq_len(values$count)]
 
   lapply(specs, function(spec) {
-    style <- switch(
-      values$type,
+    style <- switch(values$type,
       stack = if (identical(values$align, "stretch")) {
         NULL
       } else {
@@ -288,8 +290,7 @@ server <- function(input, output, session) {
     items <- demo_items(specs)
     tryCatch(
       {
-        layout <- switch(
-          values$type,
+        layout <- switch(values$type,
           cluster = do.call(
             block_cluster,
             c(items, list(

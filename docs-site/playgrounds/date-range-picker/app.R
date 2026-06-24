@@ -6,25 +6,31 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   # they resolve relative to the main document base URL. We try both to be fully resilient.
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Ignore and try the next path
       }
-    }, error = function(e) {
-      # Ignore and try the next path
-    })
+    )
   }
 
   if (!mounted) {
     # If both relative paths fail, try absolute path as a last resort fallback
     # (works on the default nvelden.github.io/shinyblocks deployment)
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -36,11 +42,17 @@ do.call(library, list("shinyblocks", character.only = TRUE))
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 valid_iso <- function(x) {
-  if (is.null(x)) return(NULL)
+  if (is.null(x)) {
+    return(NULL)
+  }
   x <- trimws(x)
-  if (!nzchar(x)) return(NULL)
+  if (!nzchar(x)) {
+    return(NULL)
+  }
   parsed <- suppressWarnings(as.Date(x, format = "%Y-%m-%d"))
-  if (is.na(parsed) || !identical(format(parsed, "%Y-%m-%d"), x)) return(NULL)
+  if (is.na(parsed) || !identical(format(parsed, "%Y-%m-%d"), x)) {
+    return(NULL)
+  }
   x
 }
 
@@ -82,7 +94,7 @@ showcase_action_button <- function(input_id, label) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Date Range Picker playground",
+  title = "shinyblocks <U+00B7> Date Range Picker playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
@@ -99,164 +111,164 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-
-      # Left Column: Controls Panel
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-
-        # Content Controls Group
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
-          block_field(
-            block_field_label("start", `for` = "showcase_date_range_picker_doc_start"),
-            block_textarea("showcase_date_range_picker_doc_start", value = "2024-01-08", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
-          ),
-          block_field(
-            block_field_label("end", `for` = "showcase_date_range_picker_doc_end"),
-            block_textarea("showcase_date_range_picker_doc_end", value = "2024-01-19", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
-          ),
-          block_field(
-            block_field_label("placeholder", `for` = "showcase_date_range_picker_doc_placeholder"),
-            block_textarea("showcase_date_range_picker_doc_placeholder", value = "Pick a date range", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("format", `for` = "showcase_date_range_picker_doc_format"),
-            block_select(
-              "showcase_date_range_picker_doc_format",
-              choices = c("yyyy-mm-dd", "M d, yyyy" = "M d, yyyy", "DD, MM d, yyyy" = "DD, MM d, yyyy", "dd/mm/yyyy" = "dd/mm/yyyy"),
-              selected = "M d, yyyy",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("separator", `for` = "showcase_date_range_picker_doc_separator"),
-            block_textarea("showcase_date_range_picker_doc_separator", value = " – ", rows = 1, resize = "none")
-          )
-        ),
-
-        # State Controls Group
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
-          block_field(
-            block_field_label("min", `for` = "showcase_date_range_picker_doc_min"),
-            block_textarea("showcase_date_range_picker_doc_min", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
-          ),
-          block_field(
-            block_field_label("max", `for` = "showcase_date_range_picker_doc_max"),
-            block_textarea("showcase_date_range_picker_doc_max", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
-          ),
-          block_field(
-            block_field_label("disabled", `for` = "showcase_date_range_picker_doc_disabled"),
-            block_checkbox("showcase_date_range_picker_doc_disabled", "Disabled", value = FALSE)
-          ),
-          block_field(
-            block_field_label("invalid", `for` = "showcase_date_range_picker_doc_invalid"),
-            block_checkbox("showcase_date_range_picker_doc_invalid", "Invalid", value = FALSE)
-          )
-        ),
-
-        # Styling Controls Group
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
-          block_field(
-            block_field_label("weekstart", `for` = "showcase_date_range_picker_doc_weekstart"),
-            block_select(
-              "showcase_date_range_picker_doc_weekstart",
-              choices = c("Sunday" = "0", "Monday" = "1"),
-              selected = "0",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("width", `for` = "showcase_date_range_picker_doc_width"),
-            block_textarea("showcase_date_range_picker_doc_width", value = "300px", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("style", `for` = "showcase_date_range_picker_doc_style"),
-            block_textarea(
-              "showcase_date_range_picker_doc_style",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., border: 2px dashed red;",
-              resize = "none"
-            )
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_date_range_picker_doc_class"),
-            block_checkbox(
-              "showcase_date_range_picker_doc_class",
-              "Use custom dashed-border class",
-              value = FALSE
-            )
-          )
-        ),
-
-        # Actions (Server Update) Group
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
-          block_cluster(
-            gap = "sm",
-            showcase_action_button("showcase_date_range_picker_set_q4", "Set Q4 2025"),
-            showcase_action_button("showcase_date_range_picker_clear", "Clear"),
-            showcase_action_button("showcase_date_range_picker_disable", "Disable"),
-            showcase_action_button("showcase_date_range_picker_enable", "Enable"),
-            showcase_action_button("showcase_date_range_picker_set_bounds", "Bound to 2025")
-          )
-        )
-      ),
-
-      # Right Column: Preview & Reactive Output Code Blocks
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
+        align = "start",
+        class = "showcase-playground__split",
 
-        # Preview Section
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas",
-            uiOutput("showcase_date_range_picker_preview_ui")
+        # Left Column: Controls Panel
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+
+          # Content Controls Group
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(
+              block_field_label("start", `for` = "showcase_date_range_picker_doc_start"),
+              block_textarea("showcase_date_range_picker_doc_start", value = "2024-01-08", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+            ),
+            block_field(
+              block_field_label("end", `for` = "showcase_date_range_picker_doc_end"),
+              block_textarea("showcase_date_range_picker_doc_end", value = "2024-01-19", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+            ),
+            block_field(
+              block_field_label("placeholder", `for` = "showcase_date_range_picker_doc_placeholder"),
+              block_textarea("showcase_date_range_picker_doc_placeholder", value = "Pick a date range", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("format", `for` = "showcase_date_range_picker_doc_format"),
+              block_select(
+                "showcase_date_range_picker_doc_format",
+                choices = c("yyyy-mm-dd", "M d, yyyy" = "M d, yyyy", "DD, MM d, yyyy" = "DD, MM d, yyyy", "dd/mm/yyyy" = "dd/mm/yyyy"),
+                selected = "M d, yyyy",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("separator", `for` = "showcase_date_range_picker_doc_separator"),
+              block_textarea("showcase_date_range_picker_doc_separator", value = " <U+2013> ", rows = 1, resize = "none")
+            )
+          ),
+
+          # State Controls Group
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(
+              block_field_label("min", `for` = "showcase_date_range_picker_doc_min"),
+              block_textarea("showcase_date_range_picker_doc_min", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+            ),
+            block_field(
+              block_field_label("max", `for` = "showcase_date_range_picker_doc_max"),
+              block_textarea("showcase_date_range_picker_doc_max", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
+            ),
+            block_field(
+              block_field_label("disabled", `for` = "showcase_date_range_picker_doc_disabled"),
+              block_checkbox("showcase_date_range_picker_doc_disabled", "Disabled", value = FALSE)
+            ),
+            block_field(
+              block_field_label("invalid", `for` = "showcase_date_range_picker_doc_invalid"),
+              block_checkbox("showcase_date_range_picker_doc_invalid", "Invalid", value = FALSE)
+            )
+          ),
+
+          # Styling Controls Group
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(
+              block_field_label("weekstart", `for` = "showcase_date_range_picker_doc_weekstart"),
+              block_select(
+                "showcase_date_range_picker_doc_weekstart",
+                choices = c("Sunday" = "0", "Monday" = "1"),
+                selected = "0",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("width", `for` = "showcase_date_range_picker_doc_width"),
+              block_textarea("showcase_date_range_picker_doc_width", value = "300px", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_date_range_picker_doc_style"),
+              block_textarea(
+                "showcase_date_range_picker_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., border: 2px dashed red;",
+                resize = "none"
+              )
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_date_range_picker_doc_class"),
+              block_checkbox(
+                "showcase_date_range_picker_doc_class",
+                "Use custom dashed-border class",
+                value = FALSE
+              )
+            )
+          ),
+
+          # Actions (Server Update) Group
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_date_range_picker_set_q4", "Set Q4 2025"),
+              showcase_action_button("showcase_date_range_picker_clear", "Clear"),
+              showcase_action_button("showcase_date_range_picker_disable", "Disable"),
+              showcase_action_button("showcase_date_range_picker_enable", "Enable"),
+              showcase_action_button("showcase_date_range_picker_set_bounds", "Bound to 2025")
+            )
           )
         ),
 
-        # Reactive Value Readout Indicator
-        uiOutput("showcase_date_range_picker_preview_value"),
-
-        # Code Blocks Panel
+        # Right Column: Preview & Reactive Output Code Blocks
         block_stack(
-          gap = "md",
-          htmltools::tags$div(
+          gap = "lg",
+          class = "showcase-playground__main",
+
+          # Preview Section
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "UI Definition"
-            ),
-            uiOutput("showcase_date_range_picker_preview_code")
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_date_range_picker_preview_ui")
+            )
           ),
-          htmltools::tags$div(
+
+          # Reactive Value Readout Indicator
+          uiOutput("showcase_date_range_picker_preview_value"),
+
+          # Code Blocks Panel
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "Server Action"
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "UI Definition"
+              ),
+              uiOutput("showcase_date_range_picker_preview_code")
             ),
-            uiOutput("showcase_date_range_picker_reactive_code")
+            htmltools::tags$div(
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "Server Action"
+              ),
+              uiOutput("showcase_date_range_picker_reactive_code")
+            )
           )
         )
       )
     )
-  )
   )
 )
 
@@ -276,13 +288,16 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "showcase_date_range_picker_preview_value", suspendWhenHidden = FALSE)
 
-  observeEvent(input$showcase_date_range_picker_doc_class, {
-    update_block_date_range_picker(
-      session,
-      "showcase_date_range_picker_preview",
-      class = if (isTRUE(input$showcase_date_range_picker_doc_class)) "showcase-date-range-picker-preview-custom" else NULL
-    )
-  }, ignoreInit = TRUE)
+  observeEvent(input$showcase_date_range_picker_doc_class,
+    {
+      update_block_date_range_picker(
+        session,
+        "showcase_date_range_picker_preview",
+        class = if (isTRUE(input$showcase_date_range_picker_doc_class)) "showcase-date-range-picker-preview-custom" else NULL
+      )
+    },
+    ignoreInit = TRUE
+  )
 
   output$showcase_date_range_picker_preview_ui <- renderUI({
     start <- valid_iso(input$showcase_date_range_picker_doc_start)
@@ -290,16 +305,25 @@ server <- function(input, output, session) {
     min <- valid_iso(input$showcase_date_range_picker_doc_min)
     max <- valid_iso(input$showcase_date_range_picker_doc_max)
 
-    if (is.null(start) != is.null(end)) { start <- NULL; end <- NULL }
+    if (is.null(start) != is.null(end)) {
+      start <- NULL
+      end <- NULL
+    }
     if (!is.null(min) && !is.null(max) && min > max) max <- NULL
-    if (!is.null(start) && !is.null(min) && start < min) { start <- NULL; end <- NULL }
-    if (!is.null(end) && !is.null(max) && end > max) { start <- NULL; end <- NULL }
+    if (!is.null(start) && !is.null(min) && start < min) {
+      start <- NULL
+      end <- NULL
+    }
+    if (!is.null(end) && !is.null(max) && end > max) {
+      start <- NULL
+      end <- NULL
+    }
 
     placeholder <- input$showcase_date_range_picker_doc_placeholder %||% "Pick a date range"
     if (!nzchar(placeholder)) placeholder <- "Pick a date range"
 
-    separator <- input$showcase_date_range_picker_doc_separator %||% " – "
-    if (!nzchar(separator)) separator <- " – "
+    separator <- input$showcase_date_range_picker_doc_separator %||% " <U+2013> "
+    if (!nzchar(separator)) separator <- " <U+2013> "
 
     format <- input$showcase_date_range_picker_doc_format %||% "yyyy-mm-dd"
     weekstart <- as.integer(input$showcase_date_range_picker_doc_weekstart %||% "0")
@@ -334,7 +358,10 @@ server <- function(input, output, session) {
     end <- valid_iso(input$showcase_date_range_picker_doc_end)
     min <- valid_iso(input$showcase_date_range_picker_doc_min)
     max <- valid_iso(input$showcase_date_range_picker_doc_max)
-    if (is.null(start) != is.null(end)) { start <- NULL; end <- NULL }
+    if (is.null(start) != is.null(end)) {
+      start <- NULL
+      end <- NULL
+    }
     placeholder_val <- input$showcase_date_range_picker_doc_placeholder
     separator_val <- input$showcase_date_range_picker_doc_separator
     format_val <- input$showcase_date_range_picker_doc_format
@@ -353,7 +380,7 @@ server <- function(input, output, session) {
     if (!is.null(placeholder_val) && nzchar(placeholder_val) && placeholder_val != "Pick a date range") {
       args <- c(args, paste0('placeholder = "', placeholder_val, '"'))
     }
-    if (!is.null(separator_val) && nzchar(separator_val) && separator_val != " – ") {
+    if (!is.null(separator_val) && nzchar(separator_val) && separator_val != " <U+2013> ") {
       args <- c(args, paste0('separator = "', separator_val, '"'))
     }
     if (!is.null(format_val) && format_val != "yyyy-mm-dd") {
@@ -380,7 +407,9 @@ server <- function(input, output, session) {
     "# Click an action button to see\n",
     "# the update_block_date_range_picker() code here."
   ))
-  output$showcase_date_range_picker_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_date_range_picker_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
   outputOptions(output, "showcase_date_range_picker_reactive_code", suspendWhenHidden = FALSE)
 
   observeEvent(input$showcase_date_range_picker_set_q4, {

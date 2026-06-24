@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
   .libPaths(c("/packages", .libPaths()))
@@ -45,7 +48,7 @@ control_group <- function(title, ..., first = FALSE) {
   block_stack(
     gap = "sm",
     class = if (first) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group",
-    htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", title),
+    htmltools::tags$h4(class = "showcase-controls-group__title", title),
     ...
   )
 }
@@ -58,61 +61,61 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-control_group(
-          "Content", first = TRUE,
-          block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")),
-          block_field(block_field_label("description", `for` = "showcase_dialog_doc_description"), block_textarea("showcase_dialog_doc_description", value = "This cannot be undone.", rows = 2, resize = "none")),
-          block_field(block_field_label("trigger label", `for` = "showcase_dialog_doc_trigger"), block_textarea("showcase_dialog_doc_trigger", value = "Open dialog", rows = 1, resize = "none")),
-          block_field(block_field_label("footer", `for` = "showcase_dialog_doc_footer"), block_checkbox("showcase_dialog_doc_footer", "Include Cancel + Continue footer", value = TRUE))
-        ),
-        control_group(
-          "State",
-          block_field(block_field_label("hide_title", `for` = "showcase_dialog_doc_hide_title"), block_checkbox("showcase_dialog_doc_hide_title", "Hide title visually", value = FALSE))
-        ),
-        control_group(
-          "Actions (Server Update)",
-          block_cluster(
-            gap = "sm",
-            block_button("Open modal", id = "showcase_dialog_open", variant = "outline", size = "sm"),
-            block_button("Close modal", id = "showcase_dialog_close", variant = "outline", size = "sm"),
-            block_button("Resize sm", id = "showcase_dialog_resize_sm", variant = "outline", size = "sm"),
-            block_button("Resize lg", id = "showcase_dialog_resize_lg", variant = "outline", size = "sm"),
-            block_button("Swap footer", id = "showcase_dialog_swap_footer", variant = "outline", size = "sm")
-          )
-        ),
-        control_group(
-          "Styling",
-          block_field(block_field_label("size", `for` = "showcase_dialog_doc_size"), block_select("showcase_dialog_doc_size", choices = c("default", "sm", "lg", "xl"), selected = "default", size = "sm")),
-          block_field(block_field_label("style", `for` = "showcase_dialog_doc_style"), block_textarea("showcase_dialog_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
-          block_field(block_field_label("class", `for` = "showcase_dialog_doc_class"), block_checkbox("showcase_dialog_doc_class", "Use custom dashed-border class", value = FALSE))
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--muted",
-            uiOutput("showcase_dialog_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          control_group(
+            "Content",
+            first = TRUE,
+            block_field(block_field_label("title", `for` = "showcase_dialog_doc_title"), block_textarea("showcase_dialog_doc_title", value = "Confirm action", rows = 1, resize = "none")),
+            block_field(block_field_label("description", `for` = "showcase_dialog_doc_description"), block_textarea("showcase_dialog_doc_description", value = "This cannot be undone.", rows = 2, resize = "none")),
+            block_field(block_field_label("trigger label", `for` = "showcase_dialog_doc_trigger"), block_textarea("showcase_dialog_doc_trigger", value = "Open dialog", rows = 1, resize = "none")),
+            block_field(block_field_label("footer", `for` = "showcase_dialog_doc_footer"), block_checkbox("showcase_dialog_doc_footer", "Include Cancel + Continue footer", value = TRUE))
+          ),
+          control_group(
+            "State",
+            block_field(block_field_label("hide_title", `for` = "showcase_dialog_doc_hide_title"), block_checkbox("showcase_dialog_doc_hide_title", "Hide title visually", value = FALSE))
+          ),
+          control_group(
+            "Actions (Server Update)",
+            block_cluster(
+              gap = "sm",
+              block_button("Open modal", id = "showcase_dialog_open", variant = "outline", size = "sm"),
+              block_button("Close modal", id = "showcase_dialog_close", variant = "outline", size = "sm"),
+              block_button("Resize sm", id = "showcase_dialog_resize_sm", variant = "outline", size = "sm"),
+              block_button("Resize lg", id = "showcase_dialog_resize_lg", variant = "outline", size = "sm"),
+              block_button("Swap footer", id = "showcase_dialog_swap_footer", variant = "outline", size = "sm")
+            )
+          ),
+          control_group(
+            "Styling",
+            block_field(block_field_label("size", `for` = "showcase_dialog_doc_size"), block_select("showcase_dialog_doc_size", choices = c("default", "sm", "lg", "xl"), selected = "default", size = "sm")),
+            block_field(block_field_label("style", `for` = "showcase_dialog_doc_style"), block_textarea("showcase_dialog_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
+            block_field(block_field_label("class", `for` = "showcase_dialog_doc_class"), block_checkbox("showcase_dialog_doc_class", "Use custom dashed-border class", value = FALSE))
           )
         ),
-        block_cluster(justify = "center", uiOutput("showcase_dialog_trigger_ui")),
-        uiOutput("showcase_dialog_preview_value"),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_dialog_preview_code")),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_dialog_reactive_code"))
-      )
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted",
+              uiOutput("showcase_dialog_preview_ui")
+            )
+          ),
+          block_cluster(justify = "center", uiOutput("showcase_dialog_trigger_ui")),
+          uiOutput("showcase_dialog_preview_value"),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "UI Definition"), uiOutput("showcase_dialog_preview_code")),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "Server Action"), uiOutput("showcase_dialog_reactive_code"))
         )
-),
+      )
+    ),
     block_dialog(
       id = "showcase_dialog_preview",
       title = "Confirm action",
@@ -130,13 +133,17 @@ server <- function(input, output, session) {
   default_footer <- function() htmltools::tagList(block_button("Cancel", variant = "outline"), block_button("Continue"))
   custom_footer <- function() htmltools::tagList(block_button("Discard", variant = "outline"), block_button("Save draft", variant = "secondary"), block_button("Publish"))
   footer_tags <- reactive({
-    if (!isTRUE(input$showcase_dialog_doc_footer)) return(NULL)
+    if (!isTRUE(input$showcase_dialog_doc_footer)) {
+      return(NULL)
+    }
     if (identical(footer_kind(), "custom")) custom_footer() else default_footer()
   })
 
   output$showcase_dialog_trigger_ui <- renderUI({
     label <- input$showcase_dialog_doc_trigger %||% ""
-    if (!nzchar(label)) return(NULL)
+    if (!nzchar(label)) {
+      return(NULL)
+    }
     block_button(label, id = "showcase_dialog_trigger_click")
   })
   observeEvent(input$showcase_dialog_trigger_click, {
@@ -158,7 +165,12 @@ server <- function(input, output, session) {
     title <- input$showcase_dialog_doc_title %||% "Confirm action"
     description <- input$showcase_dialog_doc_description %||% ""
     size <- input$showcase_dialog_doc_size %||% "default"
-    max_width <- switch(size, sm = "24rem", lg = "48rem", xl = "64rem", "32rem")
+    max_width <- switch(size,
+      sm = "24rem",
+      lg = "48rem",
+      xl = "64rem",
+      "32rem"
+    )
     title_style <- if (isTRUE(input$showcase_dialog_doc_hide_title)) {
       "position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);"
     } else {
@@ -188,7 +200,7 @@ server <- function(input, output, session) {
         if (nzchar(description)) htmltools::tags$p(style = "margin: 0; font-size: 0.875rem; color: var(--muted-foreground);", description)
       ),
       htmltools::tags$p(style = "margin: 0; font-size: 0.875rem;", "Adjust the controls to configure this modal."),
-      if (!is.null(footer_tags())) htmltools::div(style = "display: flex; justify-content: flex-end; gap: 0.5rem;", footer_tags())
+      if (!is.null(footer_tags())) block_cluster(justify = "end", gap = "sm", footer_tags())
     )
   })
 
@@ -220,7 +232,9 @@ server <- function(input, output, session) {
     if (isTRUE(input$showcase_dialog_doc_class)) args <- c(args, 'class = "showcase-dialog-preview-custom"')
     paste0("block_dialog(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
-  output$showcase_dialog_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_dialog_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
 
   observeEvent(input$showcase_dialog_open, {
     update_block_dialog(session, "showcase_dialog_preview", open = TRUE)

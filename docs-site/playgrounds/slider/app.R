@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) {
     webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
@@ -54,10 +57,14 @@ showcase_action_button <- function(input_id, label) {
 }
 
 parse_slider_value <- function(text, fallback = 50) {
-  if (is.null(text) || !nzchar(text)) return(fallback)
+  if (is.null(text) || !nzchar(text)) {
+    return(fallback)
+  }
   values <- suppressWarnings(as.numeric(trimws(strsplit(text, ",", fixed = TRUE)[[1]])))
   values <- values[!is.na(values)]
-  if (!length(values)) return(fallback)
+  if (!length(values)) {
+    return(fallback)
+  }
   values[seq_len(min(2, length(values)))]
 }
 
@@ -67,7 +74,9 @@ slider_number <- function(value, fallback) {
 }
 
 slider_code_value <- function(value) {
-  if (length(value) == 1) return(as.character(value))
+  if (length(value) == 1) {
+    return(as.character(value))
+  }
   paste0("c(", paste(value, collapse = ", "), ")")
 }
 
@@ -84,85 +93,85 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Content"),
-          block_field(block_field_label("value", `for` = "showcase_slider_doc_value"), block_input("showcase_slider_doc_value", value = "50", placeholder = "50 or 25,75")),
-          block_field(block_field_label("min", `for` = "showcase_slider_doc_min"), block_input("showcase_slider_doc_min", value = "0", type = "number")),
-          block_field(block_field_label("max", `for` = "showcase_slider_doc_max"), block_input("showcase_slider_doc_max", value = "100", type = "number")),
-          block_field(block_field_label("step", `for` = "showcase_slider_doc_step"), block_input("showcase_slider_doc_step", value = "1", type = "number")),
-          block_field(
-            block_field_label("orientation", `for` = "showcase_slider_doc_orientation"),
-            block_select("showcase_slider_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "State"),
-          block_field(block_field_label("disabled", `for` = "showcase_slider_doc_disabled"), block_checkbox("showcase_slider_doc_disabled", "Disabled")),
-          block_field(block_field_label("invalid", `for` = "showcase_slider_doc_invalid"), block_checkbox("showcase_slider_doc_invalid", "Invalid"))
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Labels"),
-          block_field(block_field_label("show value", `for` = "showcase_slider_doc_show_value"), block_checkbox("showcase_slider_doc_show_value", "Show current value")),
-          block_field(block_field_label("min label", `for` = "showcase_slider_doc_min_label"), block_input("showcase_slider_doc_min_label", value = "Quiet", placeholder = "Optional minimum label")),
-          block_field(block_field_label("max label", `for` = "showcase_slider_doc_max_label"), block_input("showcase_slider_doc_max_label", value = "Loud", placeholder = "Optional maximum label"))
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Styling"),
-          block_field(block_field_label("width", `for` = "showcase_slider_doc_width"), block_input("showcase_slider_doc_width", value = "20rem", placeholder = "100% or 20rem")),
-          block_field(
-            block_field_label("style", `for` = "showcase_slider_doc_style"),
-            block_textarea("showcase_slider_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 20rem;", resize = "none")
-          ),
-          block_field(block_field_label("class", `for` = "showcase_slider_doc_class"), block_checkbox("showcase_slider_doc_class", "Use custom dashed-border class"))
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;", "Actions (Server Update)"),
-          block_cluster(
-            gap = "sm",
-            showcase_action_button("showcase_slider_set_low", "Set 25"),
-            showcase_action_button("showcase_slider_set_range", "Set range"),
-            showcase_action_button("showcase_slider_disable", "Disable"),
-            showcase_action_button("showcase_slider_enable", "Enable"),
-            showcase_action_button("showcase_slider_resize", "Change bounds"),
-            showcase_action_button("showcase_slider_vertical", "Show vertical")
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas showcase-preview-canvas--dashed",
-            style = "min-height: 180px;",
-            uiOutput("showcase_slider_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(block_field_label("value", `for` = "showcase_slider_doc_value"), block_input("showcase_slider_doc_value", value = "50", placeholder = "50 or 25,75")),
+            block_field(block_field_label("min", `for` = "showcase_slider_doc_min"), block_input("showcase_slider_doc_min", value = "0", type = "number")),
+            block_field(block_field_label("max", `for` = "showcase_slider_doc_max"), block_input("showcase_slider_doc_max", value = "100", type = "number")),
+            block_field(block_field_label("step", `for` = "showcase_slider_doc_step"), block_input("showcase_slider_doc_step", value = "1", type = "number")),
+            block_field(
+              block_field_label("orientation", `for` = "showcase_slider_doc_orientation"),
+              block_select("showcase_slider_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(block_field_label("disabled", `for` = "showcase_slider_doc_disabled"), block_checkbox("showcase_slider_doc_disabled", "Disabled")),
+            block_field(block_field_label("invalid", `for` = "showcase_slider_doc_invalid"), block_checkbox("showcase_slider_doc_invalid", "Invalid"))
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Labels"),
+            block_field(block_field_label("show value", `for` = "showcase_slider_doc_show_value"), block_checkbox("showcase_slider_doc_show_value", "Show current value")),
+            block_field(block_field_label("min label", `for` = "showcase_slider_doc_min_label"), block_input("showcase_slider_doc_min_label", value = "Quiet", placeholder = "Optional minimum label")),
+            block_field(block_field_label("max label", `for` = "showcase_slider_doc_max_label"), block_input("showcase_slider_doc_max_label", value = "Loud", placeholder = "Optional maximum label"))
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(block_field_label("width", `for` = "showcase_slider_doc_width"), block_input("showcase_slider_doc_width", value = "20rem", placeholder = "100% or 20rem")),
+            block_field(
+              block_field_label("style", `for` = "showcase_slider_doc_style"),
+              block_textarea("showcase_slider_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 20rem;", resize = "none")
+            ),
+            block_field(block_field_label("class", `for` = "showcase_slider_doc_class"), block_checkbox("showcase_slider_doc_class", "Use custom dashed-border class"))
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_slider_set_low", "Set 25"),
+              showcase_action_button("showcase_slider_set_range", "Set range"),
+              showcase_action_button("showcase_slider_disable", "Disable"),
+              showcase_action_button("showcase_slider_enable", "Enable"),
+              showcase_action_button("showcase_slider_resize", "Change bounds"),
+              showcase_action_button("showcase_slider_vertical", "Show vertical")
+            )
           )
         ),
-        uiOutput("showcase_slider_preview_value"),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_slider_preview_code")),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_slider_reactive_code"))
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas showcase-preview-canvas--dashed",
+              style = "min-height: 180px;",
+              uiOutput("showcase_slider_preview_ui")
+            )
+          ),
+          uiOutput("showcase_slider_preview_value"),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "UI Definition"), uiOutput("showcase_slider_preview_code")),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "Server Action"), uiOutput("showcase_slider_reactive_code"))
+        )
       )
     )
-  )
   )
 )
 
@@ -204,7 +213,8 @@ server <- function(input, output, session) {
   output$showcase_slider_preview_ui <- renderUI({
     args <- preview_args()
     slider <- block_slider(
-      "showcase_slider_preview", value = args$value, min = args$min, max = args$max,
+      "showcase_slider_preview",
+      value = args$value, min = args$min, max = args$max,
       step = args$step, orientation = args$orientation, show_value = args$show_value,
       min_label = args$min_label, max_label = args$max_label,
       width = args$width, disabled = args$disabled, invalid = args$invalid,

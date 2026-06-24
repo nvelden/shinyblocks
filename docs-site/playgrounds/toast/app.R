@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
   .libPaths(c("/packages", .libPaths()))
@@ -45,7 +48,7 @@ control_group <- function(title, ..., first = FALSE) {
   block_stack(
     gap = "sm",
     class = if (first) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group",
-    htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", title),
+    htmltools::tags$h4(class = "showcase-controls-group__title", title),
     ...
   )
 }
@@ -60,59 +63,59 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        control_group(
-          "Content", first = TRUE,
-          block_field(block_field_label("title", `for` = "showcase_toast_doc_title"), block_textarea("showcase_toast_doc_title", value = "Changes saved", rows = 1, resize = "none")),
-          block_field(block_field_label("description", `for` = "showcase_toast_doc_description"), block_textarea("showcase_toast_doc_description", value = "Your profile has been updated.", rows = 2, resize = "none"))
-        ),
-        control_group(
-          "State",
-          block_field(block_field_label("variant", `for` = "showcase_toast_doc_variant"), block_select("showcase_toast_doc_variant", choices = c("default", "destructive", "success", "warning", "info"), selected = "success", size = "sm")),
-          block_field(block_field_label("icon", `for` = "showcase_toast_doc_icon"), block_select("showcase_toast_doc_icon", choices = c("info", "check-circle", "alert-triangle", "x-circle", "bell", "none"), selected = "check-circle", size = "sm")),
-          block_field(block_field_label("dismissible", `for` = "showcase_toast_doc_dismissible"), block_checkbox("showcase_toast_doc_dismissible", "Show close button", value = TRUE))
-        ),
-        control_group(
-          "Styling",
-          block_field(block_field_label("position", `for` = "showcase_toast_doc_position"), block_select("showcase_toast_doc_position", choices = c("bottom-right", "bottom-center", "bottom-left", "top-right", "top-center", "top-left"), selected = "bottom-right", size = "sm")),
-          block_field(block_field_label("duration (ms)", `for` = "showcase_toast_doc_duration"), block_select("showcase_toast_doc_duration", choices = c("3000", "5000", "8000", "0 (sticky)"), selected = "5000", size = "sm"))
-        ),
-        control_group(
-          "Actions (Server)",
-          block_cluster(
-            gap = "sm",
-            block_button("Show toast", id = "showcase_toast_fire", size = "sm"),
-            block_button("Dismiss all", id = "showcase_toast_dismiss", variant = "outline", size = "sm")
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--muted",
-            style = "min-height: 200px;",
-            uiOutput("showcase_toast_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          control_group(
+            "Content",
+            first = TRUE,
+            block_field(block_field_label("title", `for` = "showcase_toast_doc_title"), block_textarea("showcase_toast_doc_title", value = "Changes saved", rows = 1, resize = "none")),
+            block_field(block_field_label("description", `for` = "showcase_toast_doc_description"), block_textarea("showcase_toast_doc_description", value = "Your profile has been updated.", rows = 2, resize = "none"))
+          ),
+          control_group(
+            "State",
+            block_field(block_field_label("variant", `for` = "showcase_toast_doc_variant"), block_select("showcase_toast_doc_variant", choices = c("default", "destructive", "success", "warning", "info"), selected = "success", size = "sm")),
+            block_field(block_field_label("icon", `for` = "showcase_toast_doc_icon"), block_select("showcase_toast_doc_icon", choices = c("info", "check-circle", "alert-triangle", "x-circle", "bell", "none"), selected = "check-circle", size = "sm")),
+            block_field(block_field_label("dismissible", `for` = "showcase_toast_doc_dismissible"), block_checkbox("showcase_toast_doc_dismissible", "Show close button", value = TRUE))
+          ),
+          control_group(
+            "Styling",
+            block_field(block_field_label("position", `for` = "showcase_toast_doc_position"), block_select("showcase_toast_doc_position", choices = c("bottom-right", "bottom-center", "bottom-left", "top-right", "top-center", "top-left"), selected = "bottom-right", size = "sm")),
+            block_field(block_field_label("duration (ms)", `for` = "showcase_toast_doc_duration"), block_select("showcase_toast_doc_duration", choices = c("3000", "5000", "8000", "0 (sticky)"), selected = "5000", size = "sm"))
+          ),
+          control_group(
+            "Actions (Server)",
+            block_cluster(
+              gap = "sm",
+              block_button("Show toast", id = "showcase_toast_fire", size = "sm"),
+              block_button("Dismiss all", id = "showcase_toast_dismiss", variant = "outline", size = "sm")
+            )
           )
         ),
-        htmltools::div(style = "font-size: 0.75rem; color: var(--muted-foreground);", "Click \"Show toast\" to fire a real toast. Changing the position moves it live."),
-        block_toaster(toaster_id),
-        uiOutput("showcase_toast_preview_value"),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_toast_preview_code")),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_toast_reactive_code"))
-      )
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted",
+              style = "min-height: 200px;",
+              uiOutput("showcase_toast_preview_ui")
+            )
+          ),
+          htmltools::div(style = "font-size: 0.75rem; color: var(--muted-foreground);", "Click \"Show toast\" to fire a real toast. Changing the position moves it live."),
+          block_toaster(toaster_id),
+          uiOutput("showcase_toast_preview_value"),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "UI Definition"), uiOutput("showcase_toast_preview_code")),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "Server Action"), uiOutput("showcase_toast_reactive_code"))
         )
-)
+      )
+    )
   )
 )
 
@@ -121,7 +124,9 @@ server <- function(input, output, session) {
 
   parse_duration <- function(value) {
     raw <- value %||% "5000"
-    if (identical(raw, "0 (sticky)")) return(0)
+    if (identical(raw, "0 (sticky)")) {
+      return(0)
+    }
     suppressWarnings(as.numeric(raw)) %||% 5000
   }
   current_icon <- function() {
@@ -129,8 +134,7 @@ server <- function(input, output, session) {
     if (identical(icon, "none")) NULL else icon
   }
   variant_tokens <- function(variant) {
-    switch(
-      variant,
+    switch(variant,
       destructive = list(bg = "var(--card)", fg = "var(--destructive)", border = "var(--destructive-border)"),
       success = list(bg = "var(--success)", fg = "var(--success-foreground)", border = "var(--success-border)"),
       warning = list(bg = "var(--warning)", fg = "var(--warning-foreground)", border = "var(--warning-border)"),

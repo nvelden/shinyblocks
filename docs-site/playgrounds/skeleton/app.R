@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -69,89 +75,87 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Shape"
-          ),
-          block_field(
-            block_field_label("shape", `for` = "showcase_skeleton_doc_shape"),
-            block_select(
-              "showcase_skeleton_doc_shape",
-              choices = c("sharp", "rounded", "circle"),
-              selected = "rounded",
-              size = "sm"
-            )
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Dimensions"
-          ),
-          block_field(
-            block_field_label("width", `for` = "showcase_skeleton_doc_width"),
-            block_select(
-              "showcase_skeleton_doc_width",
-              choices = c("12rem", "8rem", "4rem", "100%"),
-              selected = "12rem",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("height", `for` = "showcase_skeleton_doc_height"),
-            block_select(
-              "showcase_skeleton_doc_height",
-              choices = c("1rem", "2rem", "4rem", "6rem"),
-              selected = "1rem",
-              size = "sm"
-            )
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Shape"
+            ),
+            block_field(
+              block_field_label("shape", `for` = "showcase_skeleton_doc_shape"),
+              block_select(
+                "showcase_skeleton_doc_shape",
+                choices = c("sharp", "rounded", "circle"),
+                selected = "rounded",
+                size = "sm"
+              )
+            )
           ),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas",
-            uiOutput("showcase_skeleton_preview_ui")
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Dimensions"
+            ),
+            block_field(
+              block_field_label("width", `for` = "showcase_skeleton_doc_width"),
+              block_select(
+                "showcase_skeleton_doc_width",
+                choices = c("12rem", "8rem", "4rem", "100%"),
+                selected = "12rem",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("height", `for` = "showcase_skeleton_doc_height"),
+              block_select(
+                "showcase_skeleton_doc_height",
+                choices = c("1rem", "2rem", "4rem", "6rem"),
+                selected = "1rem",
+                size = "sm"
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_skeleton_preview_ui")
+            )
           ),
-          uiOutput("showcase_skeleton_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_skeleton_preview_code")
+          )
         )
       )
-        )
-)
+    )
   )
 )
 
 server <- function(input, output, session) {
   shape_radius <- function(shape) {
-    switch(
-      shape %||% "rounded",
+    switch(shape %||% "rounded",
       sharp = "0",
       circle = "9999px",
       "calc(var(--radius) * 0.8)"

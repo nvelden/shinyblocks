@@ -3,13 +3,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
   .libPaths(c("/packages", .libPaths()))
@@ -50,67 +53,66 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Content"),
-          block_field(block_field_label("trigger label", `for` = "showcase_popover_doc_trigger"), block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1, resize = "none")),
-          block_field(block_field_label("body", `for` = "showcase_popover_doc_body"), block_textarea("showcase_popover_doc_body", value = "Place additional details, a small form, or contextual actions inside the popover.", rows = 3, resize = "none"))
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "State"),
-          block_field(block_field_label("open", `for` = "showcase_popover_doc_open"), block_checkbox("showcase_popover_doc_open", "Open", value = FALSE))
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Actions (Server Update)"),
-          block_cluster(
-            gap = "sm",
-            block_button("Open", id = "showcase_popover_open", variant = "outline", size = "sm"),
-            block_button("Close", id = "showcase_popover_close", variant = "outline", size = "sm"),
-            block_button("Move", id = "showcase_popover_reposition", variant = "outline", size = "sm"),
-            block_button("Swap text", id = "showcase_popover_swap_body", variant = "outline", size = "sm")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", "Styling"),
-          block_field(block_field_label("side", `for` = "showcase_popover_doc_side"), block_select("showcase_popover_doc_side", choices = c("bottom", "top", "left", "right"), selected = "bottom", size = "sm")),
-          block_field(block_field_label("align", `for` = "showcase_popover_doc_align"), block_select("showcase_popover_doc_align", choices = c("center", "start", "end"), selected = "center", size = "sm")),
-          block_field(block_field_label("style", `for` = "showcase_popover_doc_style"), block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
-          block_field(block_field_label("class", `for` = "showcase_popover_doc_class"), block_checkbox("showcase_popover_doc_class", "Use custom dashed-border class", value = FALSE))
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--muted",
-            style = "min-height: 180px;",
-            uiOutput("showcase_popover_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(block_field_label("trigger label", `for` = "showcase_popover_doc_trigger"), block_textarea("showcase_popover_doc_trigger", value = "Open popover", rows = 1, resize = "none")),
+            block_field(block_field_label("body", `for` = "showcase_popover_doc_body"), block_textarea("showcase_popover_doc_body", value = "Place additional details, a small form, or contextual actions inside the popover.", rows = 3, resize = "none"))
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(block_field_label("open", `for` = "showcase_popover_doc_open"), block_checkbox("showcase_popover_doc_open", "Open", value = FALSE))
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
+              block_button("Open", id = "showcase_popover_open", variant = "outline", size = "sm"),
+              block_button("Close", id = "showcase_popover_close", variant = "outline", size = "sm"),
+              block_button("Move", id = "showcase_popover_reposition", variant = "outline", size = "sm"),
+              block_button("Swap text", id = "showcase_popover_swap_body", variant = "outline", size = "sm")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(block_field_label("side", `for` = "showcase_popover_doc_side"), block_select("showcase_popover_doc_side", choices = c("bottom", "top", "left", "right"), selected = "bottom", size = "sm")),
+            block_field(block_field_label("align", `for` = "showcase_popover_doc_align"), block_select("showcase_popover_doc_align", choices = c("center", "start", "end"), selected = "center", size = "sm")),
+            block_field(block_field_label("style", `for` = "showcase_popover_doc_style"), block_textarea("showcase_popover_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")),
+            block_field(block_field_label("class", `for` = "showcase_popover_doc_class"), block_checkbox("showcase_popover_doc_class", "Use custom dashed-border class", value = FALSE))
           )
         ),
-        uiOutput("showcase_popover_preview_value"),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_popover_preview_code")),
-        htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_popover_reactive_code"))
-      )
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted",
+              style = "min-height: 180px;",
+              uiOutput("showcase_popover_preview_ui")
+            )
+          ),
+          uiOutput("showcase_popover_preview_value"),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "UI Definition"), uiOutput("showcase_popover_preview_code")),
+          htmltools::div(htmltools::div(class = "showcase-playground__label--code", "Server Action"), uiOutput("showcase_popover_reactive_code"))
         )
-)
+      )
+    )
   )
 )
 
@@ -119,9 +121,12 @@ server <- function(input, output, session) {
   open_state <- reactiveVal(FALSE)
   reactive_code <- reactiveVal("# Click an action button to see\n# the update_block_popover() code here.")
 
-  observeEvent(input$showcase_popover_doc_open, {
-    open_state(isTRUE(input$showcase_popover_doc_open))
-  }, ignoreNULL = FALSE)
+  observeEvent(input$showcase_popover_doc_open,
+    {
+      open_state(isTRUE(input$showcase_popover_doc_open))
+    },
+    ignoreNULL = FALSE
+  )
 
   current_body <- reactive({
     if (isTRUE(swapped_body())) "Body updated from the server." else input$showcase_popover_doc_body %||% ""
@@ -164,7 +169,9 @@ server <- function(input, output, session) {
     paste0("block_popover(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
 
-  output$showcase_popover_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_popover_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
 
   observeEvent(input$showcase_popover_open, {
     swapped_body(FALSE)

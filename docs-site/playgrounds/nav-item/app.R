@@ -3,13 +3,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
 
   if (!mounted) {
@@ -51,72 +54,72 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-          gap = "sm",
-          class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Navigation Settings"
-          ),
-          block_field(
-            block_field_label("label", `for` = "showcase_nav_item_doc_label"),
-            block_textarea("showcase_nav_item_doc_label", value = "Home", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("href", `for` = "showcase_nav_item_doc_href"),
-            block_textarea("showcase_nav_item_doc_href", value = "#", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("icon", `for` = "showcase_nav_item_doc_icon"),
-            block_select("showcase_nav_item_doc_icon", choices = c("home", "file-text", "users", "settings", "none"), selected = "home", size = "sm")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "State & Styling"
-          ),
-          block_field(
-            block_field_label("selected", `for` = "showcase_nav_item_doc_selected"),
-            block_checkbox("showcase_nav_item_doc_selected", label = "Set active/selected", value = TRUE)
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_nav_item_doc_class"),
-            block_checkbox("showcase_nav_item_doc_class", label = "Use emphasized class", value = FALSE)
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(class = "showcase-playground__label", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--muted",
-            style = "min-height: 220px;",
-            uiOutput("showcase_nav_item_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Navigation Settings"
+            ),
+            block_field(
+              block_field_label("label", `for` = "showcase_nav_item_doc_label"),
+              block_textarea("showcase_nav_item_doc_label", value = "Home", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("href", `for` = "showcase_nav_item_doc_href"),
+              block_textarea("showcase_nav_item_doc_href", value = "#", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("icon", `for` = "showcase_nav_item_doc_icon"),
+              block_select("showcase_nav_item_doc_icon", choices = c("home", "file-text", "users", "settings", "none"), selected = "home", size = "sm")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "State & Styling"
+            ),
+            block_field(
+              block_field_label("selected", `for` = "showcase_nav_item_doc_selected"),
+              block_checkbox("showcase_nav_item_doc_selected", label = "Set active/selected", value = TRUE)
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_nav_item_doc_class"),
+              block_checkbox("showcase_nav_item_doc_class", label = "Use emphasized class", value = FALSE)
+            )
           )
         ),
-        htmltools::div(
-          htmltools::div(
-            class = "showcase-playground__label showcase-playground__label--code",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted",
+              style = "min-height: 220px;",
+              uiOutput("showcase_nav_item_preview_ui")
+            )
           ),
-          uiOutput("showcase_nav_item_preview_code")
+          htmltools::div(
+            htmltools::div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_nav_item_preview_code")
+          )
         )
       )
     )
-  )
   )
 )
 

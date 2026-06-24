@@ -3,13 +3,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
 
   if (!mounted) {
@@ -51,85 +54,84 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Content"
+            ),
+            block_field(
+              block_field_label("trigger label", `for` = "showcase_tooltip_doc_trigger"),
+              block_textarea("showcase_tooltip_doc_trigger", value = "Hover me", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("content", `for` = "showcase_tooltip_doc_content"),
+              block_textarea("showcase_tooltip_doc_content", value = "Tooltip details go here.", rows = 2, resize = "none")
+            ),
+            block_field(
+              block_field_label("delay_duration", `for` = "showcase_tooltip_doc_delay"),
+              block_select(
+                "showcase_tooltip_doc_delay",
+                choices = c("0ms" = 0, "100ms" = 100, "500ms" = 500, "700ms" = 700, "1500ms" = 1500),
+                selected = "700",
+                size = "sm"
+              )
+            )
           ),
-          block_field(
-            block_field_label("trigger label", `for` = "showcase_tooltip_doc_trigger"),
-            block_textarea("showcase_tooltip_doc_trigger", value = "Hover me", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("content", `for` = "showcase_tooltip_doc_content"),
-            block_textarea("showcase_tooltip_doc_content", value = "Tooltip details go here.", rows = 2, resize = "none")
-          ),
-          block_field(
-            block_field_label("delay_duration", `for` = "showcase_tooltip_doc_delay"),
-            block_select(
-              "showcase_tooltip_doc_delay",
-              choices = c("0ms" = 0, "100ms" = 100, "500ms" = 500, "700ms" = 700, "1500ms" = 1500),
-              selected = "700",
-              size = "sm"
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Styling"
+            ),
+            block_field(
+              block_field_label("side", `for` = "showcase_tooltip_doc_side"),
+              block_select("showcase_tooltip_doc_side", choices = c("top", "bottom", "left", "right"), selected = "top", size = "sm")
+            ),
+            block_field(
+              block_field_label("align", `for` = "showcase_tooltip_doc_align"),
+              block_select("showcase_tooltip_doc_align", choices = c("center", "start", "end"), selected = "center", size = "sm")
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_tooltip_doc_style"),
+              block_textarea("showcase_tooltip_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_tooltip_doc_class"),
+              block_checkbox("showcase_tooltip_doc_class", "Use custom dashed-border class", value = FALSE)
             )
           )
         ),
         block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_tooltip_preview_ui")
+            )
           ),
-          block_field(
-            block_field_label("side", `for` = "showcase_tooltip_doc_side"),
-            block_select("showcase_tooltip_doc_side", choices = c("top", "bottom", "left", "right"), selected = "top", size = "sm")
-          ),
-          block_field(
-            block_field_label("align", `for` = "showcase_tooltip_doc_align"),
-            block_select("showcase_tooltip_doc_align", choices = c("center", "start", "end"), selected = "center", size = "sm")
-          ),
-          block_field(
-            block_field_label("style", `for` = "showcase_tooltip_doc_style"),
-            block_textarea("showcase_tooltip_doc_style", value = "", rows = 1, placeholder = "e.g., border: 2px dashed red;", resize = "none")
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_tooltip_doc_class"),
-            block_checkbox("showcase_tooltip_doc_class", "Use custom dashed-border class", value = FALSE)
-          )
-        )
-      ),
-      block_stack(
-        gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
           htmltools::div(
-            class = "showcase-preview-canvas",
-            uiOutput("showcase_tooltip_preview_ui")
+            htmltools::div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_tooltip_preview_code")
           )
-        ),
-        htmltools::div(
-          htmltools::div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
-          ),
-          uiOutput("showcase_tooltip_preview_code")
         )
       )
-        )
-)
+    )
   )
 )
 

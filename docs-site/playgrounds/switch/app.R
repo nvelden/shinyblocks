@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -72,7 +78,7 @@ string_literal <- function(value) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Switch playground",
+  title = "shinyblocks <U+00B7> Switch playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
@@ -90,115 +96,115 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-  htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
-          block_field(
-            block_field_label("label", `for` = "showcase_switch_doc_label"),
-            block_input("showcase_switch_doc_label", value = "Send incident alerts")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
-          block_field(
-            block_field_label("value (checked)", `for` = "showcase_switch_doc_value"),
-            block_checkbox("showcase_switch_doc_value", "Checked", value = FALSE)
-          ),
-          block_field(
-            block_field_label("disabled", `for` = "showcase_switch_doc_disabled"),
-            block_checkbox("showcase_switch_doc_disabled", "Disabled", value = FALSE)
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
-          block_field(
-            block_field_label("size", `for` = "showcase_switch_doc_size"),
-            block_select(
-              "showcase_switch_doc_size",
-              choices = c("default", "sm", "lg"),
-              selected = "default",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("style", `for` = "showcase_switch_doc_style"),
-            block_textarea(
-              "showcase_switch_doc_style",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., padding: 0.5rem;",
-              resize = "none"
-            )
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_switch_doc_class"),
-            block_checkbox(
-              "showcase_switch_doc_class",
-              "Use custom dashed-border class",
-              value = FALSE
-            )
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
-          block_cluster(
-            gap = "sm",
-            showcase_action_button("showcase_switch_turn_on", "Turn on"),
-            showcase_action_button("showcase_switch_turn_off", "Turn off"),
-            showcase_action_button("showcase_switch_disable", "Disable"),
-            showcase_action_button("showcase_switch_enable", "Enable"),
-            showcase_action_button("showcase_switch_large", "Set large"),
-            showcase_action_button("showcase_switch_rename", "Rename label")
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas showcase-preview-canvas--dashed",
-            style = "min-height: 180px;",
-            uiOutput("showcase_switch_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(
+              block_field_label("label", `for` = "showcase_switch_doc_label"),
+              block_input("showcase_switch_doc_label", value = "Send incident alerts")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(
+              block_field_label("value (checked)", `for` = "showcase_switch_doc_value"),
+              block_checkbox("showcase_switch_doc_value", "Checked", value = FALSE)
+            ),
+            block_field(
+              block_field_label("disabled", `for` = "showcase_switch_doc_disabled"),
+              block_checkbox("showcase_switch_doc_disabled", "Disabled", value = FALSE)
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(
+              block_field_label("size", `for` = "showcase_switch_doc_size"),
+              block_select(
+                "showcase_switch_doc_size",
+                choices = c("default", "sm", "lg"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_switch_doc_style"),
+              block_textarea(
+                "showcase_switch_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., padding: 0.5rem;",
+                resize = "none"
+              )
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_switch_doc_class"),
+              block_checkbox(
+                "showcase_switch_doc_class",
+                "Use custom dashed-border class",
+                value = FALSE
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_switch_turn_on", "Turn on"),
+              showcase_action_button("showcase_switch_turn_off", "Turn off"),
+              showcase_action_button("showcase_switch_disable", "Disable"),
+              showcase_action_button("showcase_switch_enable", "Enable"),
+              showcase_action_button("showcase_switch_large", "Set large"),
+              showcase_action_button("showcase_switch_rename", "Rename label")
+            )
           )
         ),
-        uiOutput("showcase_switch_preview_value"),
         block_stack(
-          gap = "md",
-          htmltools::tags$div(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "UI Definition"
-            ),
-            uiOutput("showcase_switch_preview_code")
+              class = "showcase-preview-canvas showcase-preview-canvas--dashed",
+              style = "min-height: 180px;",
+              uiOutput("showcase_switch_preview_ui")
+            )
           ),
-          htmltools::tags$div(
+          uiOutput("showcase_switch_preview_value"),
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "Server Action"
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "UI Definition"
+              ),
+              uiOutput("showcase_switch_preview_code")
             ),
-            uiOutput("showcase_switch_reactive_code")
+            htmltools::tags$div(
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "Server Action"
+              ),
+              uiOutput("showcase_switch_reactive_code")
+            )
           )
         )
       )
     )
-  )
   )
 )
 

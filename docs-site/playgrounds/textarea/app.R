@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -86,131 +92,131 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-  htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
-          block_field(
-            block_field_label("label", `for` = "showcase_textarea_doc_label"),
-            block_textarea("showcase_textarea_doc_label", value = "Notes", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("placeholder", `for` = "showcase_textarea_doc_placeholder"),
-            block_textarea(
-              "showcase_textarea_doc_placeholder",
-              value = "Add release notes here...",
-              rows = 1,
-              resize = "none"
-            )
-          ),
-          block_field(
-            block_field_label("initial value", `for` = "showcase_textarea_doc_value"),
-            block_textarea("showcase_textarea_doc_value", value = "", rows = 2, resize = "none")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
-          block_field(
-            block_field_label("rows", `for` = "showcase_textarea_doc_rows"),
-            block_input("showcase_textarea_doc_rows", value = "3", type = "number")
-          ),
-          block_field(
-            block_field_label("disabled", `for` = "showcase_textarea_doc_disabled"),
-            block_checkbox("showcase_textarea_doc_disabled", "Disabled", value = FALSE)
-          ),
-          block_field(
-            block_field_label("invalid", `for` = "showcase_textarea_doc_invalid"),
-            block_checkbox("showcase_textarea_doc_invalid", "Invalid", value = FALSE)
-          ),
-          block_field(
-            block_field_label("resize", `for` = "showcase_textarea_doc_resize"),
-            block_select(
-              "showcase_textarea_doc_resize",
-              choices = c("vertical", "none", "both", "horizontal"),
-              selected = "vertical",
-              size = "sm"
-            )
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
-          block_field(
-            block_field_label("style", `for` = "showcase_textarea_doc_style"),
-            block_textarea(
-              "showcase_textarea_doc_style",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., font-family: var(--font-mono);",
-              resize = "none"
-            )
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_textarea_doc_class"),
-            block_checkbox(
-              "showcase_textarea_doc_class",
-              "Use custom dashed-border class",
-              value = FALSE
-            )
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
-          block_cluster(
-            gap = "sm",
-            showcase_action_button("showcase_textarea_set_value", "Set value"),
-            showcase_action_button("showcase_textarea_clear", "Clear"),
-            showcase_action_button("showcase_textarea_disable", "Disable"),
-            showcase_action_button("showcase_textarea_enable", "Enable"),
-            showcase_action_button("showcase_textarea_grow", "Resize 6 rows")
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas",
-            style = "min-height: 180px;",
-            uiOutput("showcase_textarea_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(
+              block_field_label("label", `for` = "showcase_textarea_doc_label"),
+              block_textarea("showcase_textarea_doc_label", value = "Notes", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("placeholder", `for` = "showcase_textarea_doc_placeholder"),
+              block_textarea(
+                "showcase_textarea_doc_placeholder",
+                value = "Add release notes here...",
+                rows = 1,
+                resize = "none"
+              )
+            ),
+            block_field(
+              block_field_label("initial value", `for` = "showcase_textarea_doc_value"),
+              block_textarea("showcase_textarea_doc_value", value = "", rows = 2, resize = "none")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(
+              block_field_label("rows", `for` = "showcase_textarea_doc_rows"),
+              block_input("showcase_textarea_doc_rows", value = "3", type = "number")
+            ),
+            block_field(
+              block_field_label("disabled", `for` = "showcase_textarea_doc_disabled"),
+              block_checkbox("showcase_textarea_doc_disabled", "Disabled", value = FALSE)
+            ),
+            block_field(
+              block_field_label("invalid", `for` = "showcase_textarea_doc_invalid"),
+              block_checkbox("showcase_textarea_doc_invalid", "Invalid", value = FALSE)
+            ),
+            block_field(
+              block_field_label("resize", `for` = "showcase_textarea_doc_resize"),
+              block_select(
+                "showcase_textarea_doc_resize",
+                choices = c("vertical", "none", "both", "horizontal"),
+                selected = "vertical",
+                size = "sm"
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(
+              block_field_label("style", `for` = "showcase_textarea_doc_style"),
+              block_textarea(
+                "showcase_textarea_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., font-family: var(--font-mono);",
+                resize = "none"
+              )
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_textarea_doc_class"),
+              block_checkbox(
+                "showcase_textarea_doc_class",
+                "Use custom dashed-border class",
+                value = FALSE
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_textarea_set_value", "Set value"),
+              showcase_action_button("showcase_textarea_clear", "Clear"),
+              showcase_action_button("showcase_textarea_disable", "Disable"),
+              showcase_action_button("showcase_textarea_enable", "Enable"),
+              showcase_action_button("showcase_textarea_grow", "Resize 6 rows")
+            )
           )
         ),
-        uiOutput("showcase_textarea_preview_value"),
         block_stack(
-          gap = "md",
-          htmltools::tags$div(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "UI Definition"
-            ),
-            uiOutput("showcase_textarea_preview_code")
+              class = "showcase-preview-canvas",
+              style = "min-height: 180px;",
+              uiOutput("showcase_textarea_preview_ui")
+            )
           ),
-          htmltools::tags$div(
+          uiOutput("showcase_textarea_preview_value"),
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "Server Action"
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "UI Definition"
+              ),
+              uiOutput("showcase_textarea_preview_code")
             ),
-            uiOutput("showcase_textarea_reactive_code")
+            htmltools::tags$div(
+              htmltools::tags$div(
+                class = "showcase-playground__label--code",
+                "Server Action"
+              ),
+              uiOutput("showcase_textarea_reactive_code")
+            )
           )
         )
       )
     )
-  )
   )
 )
 

@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -59,93 +65,92 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-block_stack(
-  gap = "sm",
-  class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
-          block_field(
-            block_field_label("title", `for` = "showcase_empty_doc_title"),
-            block_textarea("showcase_empty_doc_title", value = "No projects found", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("description", `for` = "showcase_empty_doc_description"),
-            block_textarea("showcase_empty_doc_description", value = "Get started by creating a new repository.", rows = 2, resize = "none")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Settings"
-          ),
-          block_field(
-            block_field_label("icon", `for` = "showcase_empty_doc_icon"),
-            block_select(
-              "showcase_empty_doc_icon",
-              choices = c("folder", "inbox", "search", "alert-circle", "none"),
-              selected = "folder",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("action", `for` = "showcase_empty_doc_action"),
-            block_checkbox("showcase_empty_doc_action", label = "Include action button", value = TRUE)
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_empty_doc_class"),
-            block_select(
-              "showcase_empty_doc_class",
-              choices = c("none", "border-dashed", "bg-transparent"),
-              selected = "none",
-              size = "sm"
-            )
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Content"
+            ),
+            block_field(
+              block_field_label("title", `for` = "showcase_empty_doc_title"),
+              block_textarea("showcase_empty_doc_title", value = "No projects found", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("description", `for` = "showcase_empty_doc_description"),
+              block_textarea("showcase_empty_doc_description", value = "Get started by creating a new repository.", rows = 2, resize = "none")
+            )
           ),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas",
-            uiOutput("showcase_empty_preview_ui")
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Settings"
+            ),
+            block_field(
+              block_field_label("icon", `for` = "showcase_empty_doc_icon"),
+              block_select(
+                "showcase_empty_doc_icon",
+                choices = c("folder", "inbox", "search", "alert-circle", "none"),
+                selected = "folder",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("action", `for` = "showcase_empty_doc_action"),
+              block_checkbox("showcase_empty_doc_action", label = "Include action button", value = TRUE)
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Styling"
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_empty_doc_class"),
+              block_select(
+                "showcase_empty_doc_class",
+                choices = c("none", "border-dashed", "bg-transparent"),
+                selected = "none",
+                size = "sm"
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_empty_preview_ui")
+            )
           ),
-          uiOutput("showcase_empty_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_empty_preview_code")
+          )
         )
       )
-        )
-)
+    )
   )
 )
 

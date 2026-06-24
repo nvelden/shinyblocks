@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -67,86 +73,86 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-          gap = "sm",
-          class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Content"
-          ),
-          block_field(
-            block_field_label("orientation", `for` = "showcase_separator_doc_orientation"),
-            block_select(
-              "showcase_separator_doc_orientation",
-              choices = c("horizontal", "vertical"),
-              selected = "horizontal",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("decorative", `for` = "showcase_separator_doc_decorative"),
-            block_checkbox(
-              "showcase_separator_doc_decorative",
-              "Decorative (Accessibility)",
-              value = TRUE
-            )
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Styling"
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_separator_doc_class"),
-            block_checkbox(
-              "showcase_separator_doc_class",
-              "Use primary separator class",
-              value = FALSE
-            )
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::tags$div(
-            class = "showcase-playground__label",
-            "Preview"
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Content"
+            ),
+            block_field(
+              block_field_label("orientation", `for` = "showcase_separator_doc_orientation"),
+              block_select(
+                "showcase_separator_doc_orientation",
+                choices = c("horizontal", "vertical"),
+                selected = "horizontal",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("decorative", `for` = "showcase_separator_doc_decorative"),
+              block_checkbox(
+                "showcase_separator_doc_decorative",
+                "Decorative (Accessibility)",
+                value = TRUE
+              )
+            )
           ),
-          htmltools::tags$div(
-            class = "showcase-preview-canvas",
-            uiOutput("showcase_separator_preview_ui")
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Styling"
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_separator_doc_class"),
+              block_checkbox(
+                "showcase_separator_doc_class",
+                "Use primary separator class",
+                value = FALSE
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            class = "showcase-playground__label showcase-playground__label--code",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_separator_preview_ui")
+            )
           ),
-          uiOutput("showcase_separator_preview_code")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            class = "showcase-playground__label showcase-playground__label--code",
-            "Rendered accessibility attributes"
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_separator_preview_code")
           ),
-          uiOutput("showcase_separator_accessibility_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "Rendered accessibility attributes"
+            ),
+            uiOutput("showcase_separator_accessibility_code")
+          )
         )
       )
     )
-  )
   )
 )
 

@@ -3,13 +3,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
 
   if (!mounted) {
@@ -51,85 +54,88 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-    block_cluster(
-      gap = "lg",
-      align = "start",
-      class = "showcase-playground__split",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-block_stack(
-          gap = "sm",
-          class = "showcase-controls-group showcase-controls-group--first",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Header & Sidebar"
-          ),
-          block_field(
-            block_field_label("header title", `for` = "showcase_layout_doc_title"),
-            block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
-            block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
-            block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
-          ),
-          block_field(
-            block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
-            block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
-          )
-        ),
-        block_stack(
-          gap = "sm",
-          class = "showcase-controls-group",
-          htmltools::tags$h4(
-            class = "showcase-controls-group__title",
-            "Sidebar State"
-          ),
-          block_field(
-            block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
-            block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
-          ),
-          block_field(
-            block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
-            block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
-          )
-        )
-      ),
-      block_stack(
+      block_cluster(
         gap = "lg",
-        class = "showcase-playground__main",
-        block_stack(
-          gap = "sm",
-          htmltools::div(class = "showcase-playground__label", "Preview"),
-          htmltools::div(
-            class = "showcase-preview-canvas showcase-preview-canvas--muted showcase-preview-canvas--stretch",
-            style = "padding: 1rem; min-height: 332px;",
-            uiOutput("showcase_layout_preview_ui")
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Header & Sidebar"
+            ),
+            block_field(
+              block_field_label("header title", `for` = "showcase_layout_doc_title"),
+              block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
+              block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
+              block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
+            ),
+            block_field(
+              block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
+              block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Sidebar State"
+            ),
+            block_field(
+              block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
+              block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
+            ),
+            block_field(
+              block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
+              block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
+            )
           )
         ),
-        htmltools::div(
-          htmltools::div(
-            class = "showcase-playground__label showcase-playground__label--code",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted showcase-preview-canvas--stretch",
+              style = "padding: 1rem; min-height: 332px;",
+              uiOutput("showcase_layout_preview_ui")
+            )
           ),
-          uiOutput("showcase_layout_preview_code")
+          htmltools::div(
+            htmltools::div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_layout_preview_code")
+          )
         )
       )
     )
-  )
   )
 )
 
 server <- function(input, output, session) {
   collapsed_state <- reactiveVal(FALSE)
 
-  observeEvent(input$showcase_layout_doc_collapsed, {
-    collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
-  }, ignoreInit = FALSE)
+  observeEvent(input$showcase_layout_doc_collapsed,
+    {
+      collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
+    },
+    ignoreInit = FALSE
+  )
 
   observeEvent(input$showcase_layout_preview_toggle, {
     if (isTRUE(input$showcase_layout_doc_collapsible)) {
