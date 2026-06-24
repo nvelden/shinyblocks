@@ -50,11 +50,7 @@ htmltools::tagList(
     ),
     preview_output_id = "showcase_card_preview_ui",
     code_output_id = "showcase_card_preview_code",
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_card_api_table"),
@@ -66,8 +62,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;",
+  block_grid(
+    min_width = "220px",
+    gap = "md",
     block_card(
       class = "sb-parity-card-composed",
       block_card_header(

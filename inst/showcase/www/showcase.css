@@ -227,9 +227,107 @@ pre.shiny-text-output {
   border: none;
 }
 
-/* Premium Playground layout override for modern visual balance and equal heights */
+/* Shared playground chrome. The outer split is a block_cluster()
+   (.showcase-playground__split); these named classes carry only sizing/visual
+   chrome specific to the showcase frame, not generic layout. */
+.showcase-playground__controls {
+  flex: 1;
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.showcase-playground__main {
+  flex: 2;
+  min-width: 320px;
+}
+
+.showcase-playground__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.showcase-playground__label--code {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-bottom: 0.35rem;
+}
+
+.showcase-controls-group {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+
+.showcase-controls-group--first {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.showcase-controls-group__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* Framed preview canvas: centering + default surface chrome. Examples add a
+   modifier class for variant visuals rather than inline layout CSS. */
+.showcase-preview-canvas {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  min-height: 160px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+.showcase-preview-canvas--muted {
+  padding: 2rem;
+  background: color-mix(in oklab, var(--muted) 28%, transparent);
+  border: 0;
+  min-height: 280px;
+  box-shadow: none;
+}
+
+.showcase-preview-canvas--stretch {
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* Separator fixture row: fixed height so the vertical separator reads clearly. */
+.showcase-separator-row {
+  height: 2rem;
+}
+
+/* Icon gallery fixture chrome (layout via block_grid()/block_stack()). */
+.showcase-icon-gallery {
+  padding: 1rem;
+  background: var(--muted);
+  border-radius: 0.5rem;
+}
+
+.showcase-icon-cell {
+  padding: 0.5rem;
+  border-radius: calc(var(--radius) * 0.8);
+  background: var(--background);
+  font-size: 0.625rem;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Premium Playground layout override for modern visual balance and equal heights.
+   On desktop the cluster split collapses to an absolute two-column frame; the
+   controls/main are positioned against it. */
 @media (min-width: 768px) {
-  .showcase-playground {
+  .showcase-playground__split {
     display: block !important;
     position: relative !important;
     padding-left: 360px !important; /* Make room for the 330px wide sidebar + 30px gap */

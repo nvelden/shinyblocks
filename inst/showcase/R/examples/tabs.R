@@ -18,8 +18,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
           showcase_action_button("showcase_tabs_select_settings", "Select Settings")
         )
@@ -37,11 +37,10 @@ htmltools::tagList(
         shiny::uiOutput("showcase_tabs_reactive_code")
       )
     ),
+    preview_canvas_class = "showcase-preview-canvas--stretch",
     preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: stretch; justify-content: stretch;",
-      "padding: 1.5rem; background: var(--card);",
-      "border: 1px dashed var(--border); border-radius: 0.75rem;",
-      "min-height: 260px; box-sizing: border-box; width: 100%;"
+      "padding: 1.5rem; border-style: dashed;",
+      "min-height: 260px; width: 100%;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
@@ -54,8 +53,8 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: grid; gap: 1.5rem;",
+  block_stack(
+    gap = "lg",
     block_tabs(
       id = "showcase_tabs_parity_default",
       selected = "overview",

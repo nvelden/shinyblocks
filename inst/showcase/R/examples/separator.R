@@ -33,11 +33,14 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.75rem;",
+  block_stack(
+    gap = "sm",
     block_separator(class = "sb-parity-separator-horizontal"),
-    htmltools::div(
-      style = "display: flex; height: 2rem; align-items: center; gap: 1rem;",
+    block_cluster(
+      gap = "md",
+      align = "center",
+      wrap = FALSE,
+      class = "showcase-separator-row",
       htmltools::tags$span("Filters"),
       block_separator(orientation = "vertical", class = "sb-parity-separator-vertical"),
       htmltools::tags$span("Sort"),

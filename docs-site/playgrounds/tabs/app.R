@@ -67,15 +67,15 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+block_stack(
+          gap = "sm",
+          class = "showcase-controls-group showcase-controls-group--first",
           htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
+            class = "showcase-controls-group__title",
             "Tab Styles"
           ),
           block_field(
@@ -91,47 +91,45 @@ htmltools::div(
             block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
+            class = "showcase-controls-group__title",
             "Actions (Server Update)"
           ),
-          htmltools::tags$div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          block_cluster(
+            gap = "sm",
             showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
             showcase_action_button("showcase_tabs_select_settings", "Select Settings")
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
+          htmltools::div(class = "showcase-playground__label", "Preview"),
           htmltools::div(
-            style = paste(
-              "position: relative; display: flex; align-items: stretch;",
-              "padding: 1.5rem; background: var(--card);",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 260px; box-sizing: border-box;"
-            ),
+            class = "showcase-preview-canvas showcase-preview-canvas--stretch",
+            style = "padding: 1.5rem; border-style: dashed; min-height: 260px;",
             uiOutput("showcase_tabs_preview_ui")
           )
         ),
         uiOutput("showcase_tabs_preview_value"),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 1rem;",
+        block_stack(
+          gap = "md",
           htmltools::div(
             htmltools::div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              class = "showcase-playground__label showcase-playground__label--code",
               "UI Definition"
             ),
             uiOutput("showcase_tabs_preview_code")
           ),
           htmltools::div(
             htmltools::div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              class = "showcase-playground__label showcase-playground__label--code",
               "Server Action"
             ),
             uiOutput("showcase_tabs_reactive_code")

@@ -28,42 +28,48 @@ htmltools::tagList(
           )
         )
       ),
-      showcase_controls_group(
-        "Cluster",
-        block_field(
-          block_field_label("justify", `for` = "showcase_layout_primitives_justify"),
-          block_select(
-            "showcase_layout_primitives_justify",
-            choices = c("start", "center", "end", "between"),
-            selected = "start"
-          )
-        ),
-        block_field(
-          block_field_label("wrap", `for` = "showcase_layout_primitives_wrap"),
-          block_checkbox(
-            "showcase_layout_primitives_wrap",
-            label = "Allow wrapping",
-            value = TRUE
+      shiny::conditionalPanel(
+        condition = "input.showcase_layout_primitives_type == 'cluster'",
+        showcase_controls_group(
+          "Cluster",
+          block_field(
+            block_field_label("justify", `for` = "showcase_layout_primitives_justify"),
+            block_select(
+              "showcase_layout_primitives_justify",
+              choices = c("start", "center", "end", "between"),
+              selected = "start"
+            )
+          ),
+          block_field(
+            block_field_label("wrap", `for` = "showcase_layout_primitives_wrap"),
+            block_checkbox(
+              "showcase_layout_primitives_wrap",
+              label = "Allow wrapping",
+              value = TRUE
+            )
           )
         )
       ),
-      showcase_controls_group(
-        "Grid",
-        block_field(
-          block_field_label("min_width", `for` = "showcase_layout_primitives_min_width"),
-          block_input(
-            "showcase_layout_primitives_min_width",
-            value = "10rem"
+      shiny::conditionalPanel(
+        condition = "input.showcase_layout_primitives_type == 'grid'",
+        showcase_controls_group(
+          "Grid",
+          block_field(
+            block_field_label("min_width", `for` = "showcase_layout_primitives_min_width"),
+            block_input(
+              "showcase_layout_primitives_min_width",
+              value = "10rem"
+            )
           )
         )
       )
     ),
     preview_output_id = "showcase_layout_primitives_preview_ui",
     code_output_id = "showcase_layout_primitives_preview_code",
+    preview_canvas_class = "showcase-preview-canvas--stretch",
     preview_canvas_style = paste(
       "padding: 2rem; background: color-mix(in oklab, var(--muted) 25%, transparent);",
-      "border: 1px dashed var(--border); border-radius: 0.75rem;",
-      "min-height: 260px; box-sizing: border-box;"
+      "border-style: dashed; min-height: 260px;"
     )
   ),
   htmltools::tags$h3(

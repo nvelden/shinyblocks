@@ -129,8 +129,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Server actions",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+        block_cluster(
+          gap = "sm",
           block_button(
             "Toggle loading",
             id = "showcase_table_act_loading",

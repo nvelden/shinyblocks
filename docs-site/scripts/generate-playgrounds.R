@@ -12,6 +12,12 @@
 # into lib/preview-manifest.json so the detail page knows which slugs
 # have an interactive playground to embed.
 
+# Ensure a UTF-8 locale so non-ASCII literals in playground app.R sources
+# survive export instead of degrading into byte markers under a C/POSIX locale.
+for (loc in c("en_US.UTF-8", "C.UTF-8", "en_US.utf8", "C.utf8")) {
+  if (nzchar(suppressWarnings(Sys.setlocale("LC_CTYPE", loc)))) break
+}
+
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 if (!requireNamespace("shinylive", quietly = TRUE)) {

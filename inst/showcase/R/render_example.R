@@ -17,65 +17,65 @@ showcase_action_button <- function(
 # Compact controls-panel + preview/code layout shared with the docs-site
 # Shinylive playgrounds, so showcase tabs and embedded playgrounds stay
 # visually aligned. Pass groups built with `showcase_controls_group()`.
+#
+# Layout is expressed through the package primitives (`block_stack()`) and
+# purpose-specific showcase classes in `inst/showcase/www/showcase.css`; pass
+# `preview_canvas_class` for a named visual variant and reserve
+# `preview_canvas_style` for non-layout visual overrides only.
 showcase_playground_layout <- function(
   controls,
   preview_output_id,
   code_output_id,
+  preview_canvas_class = NULL,
   preview_canvas_style = NULL,
   extra_outputs = NULL
 ) {
-  default_canvas_style <- paste(
-    "position: relative; display: flex; align-items: center; justify-content: center;",
-    "padding: 3rem 2rem; background: var(--card);",
-    "border: 1px solid var(--border); border-radius: 0.75rem;",
-    "min-height: 160px; box-sizing: border-box;",
-    "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-  )
-
   htmltools::tags$section(
     `aria-label` = "Interactive Playground",
     class = "showcase-playground",
-    style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-    block_card(
-      title = "Controls",
-      class = "showcase-playground__controls",
-      style = "flex: 1; min-width: 280px; max-width: 320px;",
-      controls
-    ),
-    htmltools::tags$div(
-      class = "showcase-playground__main",
-      style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-      htmltools::tags$div(
-        style = "display: flex; flex-direction: column; gap: 0.5rem;",
-        htmltools::tags$div(
-          style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-          "Preview"
-        ),
-        htmltools::tags$div(
-          style = preview_canvas_style %||% default_canvas_style,
-          shiny::uiOutput(preview_output_id)
-        )
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
+      block_card(
+        title = "Controls",
+        class = "showcase-playground__controls",
+        controls
       ),
-      extra_outputs,
-      htmltools::tags$div(
-        htmltools::tags$div(
-          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-          "UI Definition"
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
+          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
+          htmltools::tags$div(
+            class = paste(c("showcase-preview-canvas", preview_canvas_class), collapse = " "),
+            style = preview_canvas_style,
+            shiny::uiOutput(preview_output_id)
+          )
         ),
-        shiny::uiOutput(code_output_id)
+        extra_outputs,
+        htmltools::tags$div(
+          htmltools::tags$div(
+            class = "showcase-playground__label showcase-playground__label--code",
+            "UI Definition"
+          ),
+          shiny::uiOutput(code_output_id)
+        )
       )
     )
   )
 }
 
 showcase_controls_group <- function(title, ..., first = FALSE) {
-  border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
-  htmltools::tags$div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", border_style),
-    htmltools::tags$h4(
-      style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-      title
-    ),
+  block_stack(
+    gap = "sm",
+    class = if (isTRUE(first)) {
+      "showcase-controls-group showcase-controls-group--first"
+    } else {
+      "showcase-controls-group"
+    },
+    htmltools::tags$h4(class = "showcase-controls-group__title", title),
     ...
   )
 }

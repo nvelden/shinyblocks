@@ -41,8 +41,8 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; gap: 0.5rem; flex-wrap: wrap;",
+  block_cluster(
+    gap = "sm",
     block_badge("Default", class = "sb-parity-badge-default"),
     block_badge("Secondary", variant = "secondary", class = "sb-parity-badge-secondary"),
     block_badge("Outline", variant = "outline", class = "sb-parity-badge-outline"),

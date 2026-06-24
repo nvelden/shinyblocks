@@ -34,11 +34,8 @@ htmltools::tagList(
     ),
     preview_output_id = "showcase_layout_preview_ui",
     code_output_id = "showcase_layout_preview_code",
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: stretch; justify-content: stretch;",
-      "padding: 1rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 332px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted showcase-preview-canvas--stretch",
+    preview_canvas_style = "padding: 1rem; min-height: 332px;"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_layout_api_table"),
@@ -50,9 +47,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
+  block_stack(
+    gap = "sm",
     class = "sb-parity-layout-baseline",
-    style = "display: flex; flex-direction: column; gap: 0.75rem;",
     htmltools::tags$p(
       "The page you are viewing is itself built with shinyblocks. ",
       htmltools::tags$code("block_page()"),

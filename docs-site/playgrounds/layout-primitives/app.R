@@ -23,15 +23,23 @@ string_literal <- function(value) {
   paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
 }
 
+# Items of varying height so cross-axis alignment is visible in clusters/grids.
 demo_items <- function() {
-  lapply(c("Analytics", "Reports", "Settings"), function(label) {
+  specs <- list(
+    list(label = "Analytics", height = "5.5rem"),
+    list(label = "Reports", height = "3.5rem"),
+    list(label = "Settings", height = "4.5rem"),
+    list(label = "Billing", height = "6rem")
+  )
+  lapply(specs, function(spec) {
     htmltools::div(
-      style = paste(
-        "padding: 0.875rem; border: 1px solid var(--border);",
-        "border-radius: 0.5rem; background: var(--card);",
-        "color: var(--card-foreground); min-width: 7rem;"
+      style = paste0(
+        "padding: 0.875rem; border: 1px solid var(--border); ",
+        "border-radius: 0.5rem; background: var(--card); ",
+        "color: var(--card-foreground); min-width: 7rem; ",
+        "min-height: ", spec$height, ";"
       ),
-      label
+      spec$label
     )
   })
 }
@@ -45,13 +53,11 @@ ui <- block_page(
   htmltools::div(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",
-    block_cluster(
-      gap = "lg",
-      align = "start",
+    htmltools::div(
+      class = "showcase-playground",
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
         block_stack(
           gap = "md",
           block_field(
@@ -81,25 +87,34 @@ ui <- block_page(
               size = "sm"
             )
           ),
-          block_field(
-            block_field_label("cluster justify", `for` = "layout_primitives_justify"),
-            block_select(
-              "layout_primitives_justify",
-              choices = c("start", "center", "end", "between"),
-              selected = "start",
-              size = "sm"
+          conditionalPanel(
+            condition = "input.layout_primitives_type == 'cluster'",
+            block_stack(
+              gap = "md",
+              block_field(
+                block_field_label("justify", `for` = "layout_primitives_justify"),
+                block_select(
+                  "layout_primitives_justify",
+                  choices = c("start", "center", "end", "between"),
+                  selected = "start",
+                  size = "sm"
+                )
+              ),
+              block_field(
+                block_checkbox(
+                  "layout_primitives_wrap",
+                  label = "Allow cluster wrapping",
+                  value = TRUE
+                )
+              )
             )
           ),
-          block_field(
-            block_checkbox(
-              "layout_primitives_wrap",
-              label = "Allow cluster wrapping",
-              value = TRUE
+          conditionalPanel(
+            condition = "input.layout_primitives_type == 'grid'",
+            block_field(
+              block_field_label("min_width", `for` = "layout_primitives_min_width"),
+              block_input("layout_primitives_min_width", value = "10rem")
             )
-          ),
-          block_field(
-            block_field_label("grid min_width", `for` = "layout_primitives_min_width"),
-            block_input("layout_primitives_min_width", value = "10rem")
           )
         )
       ),
@@ -108,21 +123,18 @@ ui <- block_page(
         class = "showcase-playground__main",
         htmltools::div(
           htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;",
+            class = "showcase-playground__label",
             "Preview"
           ),
           htmltools::div(
-            style = paste(
-              "padding: 2rem; min-height: 240px;",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "background: color-mix(in oklab, var(--muted) 25%, transparent);"
-            ),
+            class = "showcase-preview-canvas showcase-preview-canvas--stretch",
+            style = "padding: 2rem; min-height: 240px; border-style: dashed;",
             uiOutput("layout_primitives_preview")
           )
         ),
         htmltools::div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            class = "showcase-playground__label showcase-playground__label--code",
             "UI Definition"
           ),
           uiOutput("layout_primitives_code")
@@ -137,8 +149,7 @@ ui <- block_page(
               "Responsive auto-fit grid"
             )
           ))
-        ),
-        style = "flex: 1.2; min-width: 320px;"
+        )
       )
     )
   )
@@ -151,7 +162,7 @@ server <- function(input, output, session) {
       gap = input$layout_primitives_gap %||% "md",
       align = input$layout_primitives_align %||% "stretch",
       justify = input$layout_primitives_justify %||% "start",
-      wrap = isTRUE(input$layout_primitives_wrap),
+      wrap = isTRUE(input$layout_primitives_wrap %||% TRUE),
       min_width = input$layout_primitives_min_width %||% "10rem"
     )
   })

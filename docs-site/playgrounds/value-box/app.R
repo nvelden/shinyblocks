@@ -58,15 +58,15 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+block_stack(
+          gap = "sm",
+          class = "showcase-controls-group showcase-controls-group--first",
           htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+            class = "showcase-controls-group__title",
             "Content"
           ),
           block_field(
@@ -82,10 +82,11 @@ htmltools::div(
             block_textarea("showcase_value_box_doc_desc", value = "Up 12% month over month.", rows = 2, resize = "none")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+            class = "showcase-controls-group__title",
             "Styling"
           ),
           block_field(
@@ -127,26 +128,24 @@ htmltools::div(
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
+            class = "showcase-playground__label",
             "Preview"
           ),
           htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-              "border: 0; border-radius: 0.75rem; min-height: 240px; box-sizing: border-box;"
-            ),
+            class = "showcase-preview-canvas showcase-preview-canvas--muted",
+            style = "min-height: 240px;",
             uiOutput("showcase_value_box_preview_ui")
           )
         ),
         htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+            class = "showcase-playground__label showcase-playground__label--code",
             "UI Definition"
           ),
           uiOutput("showcase_value_box_preview_code")

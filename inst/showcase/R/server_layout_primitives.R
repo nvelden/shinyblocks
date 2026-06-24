@@ -1,12 +1,19 @@
 layout_primitives_demo_items <- function() {
-  lapply(c("Analytics", "Reports", "Settings"), function(label) {
+  specs <- list(
+    list(label = "Analytics", height = "5.5rem"),
+    list(label = "Reports", height = "3.5rem"),
+    list(label = "Settings", height = "4.5rem"),
+    list(label = "Billing", height = "6rem")
+  )
+  lapply(specs, function(spec) {
     htmltools::div(
-      style = paste(
-        "padding: 0.875rem; border: 1px solid var(--border);",
-        "border-radius: 0.5rem; background: var(--card);",
-        "color: var(--card-foreground); min-width: 7rem;"
+      style = paste0(
+        "padding: 0.875rem; border: 1px solid var(--border); ",
+        "border-radius: 0.5rem; background: var(--card); ",
+        "color: var(--card-foreground); min-width: 7rem; ",
+        "min-height: ", spec$height, ";"
       ),
-      label
+      spec$label
     )
   })
 }

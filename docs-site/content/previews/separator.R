@@ -13,11 +13,16 @@ htmltools::div(
     shinyblocks::block_separator()
   ),
   htmltools::div(
-    style = "display: flex; height: 1.25rem; align-items: center; gap: 1rem; font-size: 0.875rem; line-height: 1.25rem; color: var(--muted-foreground);",
-    htmltools::div("Blog"),
-    shinyblocks::block_separator(orientation = "vertical"),
-    htmltools::div("Docs"),
-    shinyblocks::block_separator(orientation = "vertical"),
-    htmltools::div("Source")
+    style = "height: 1.25rem; font-size: 0.875rem; line-height: 1.25rem; color: var(--muted-foreground);",
+    shinyblocks::block_cluster(
+      gap = "md",
+      align = "center",
+      wrap = FALSE,
+      htmltools::div("Blog"),
+      shinyblocks::block_separator(orientation = "vertical"),
+      htmltools::div("Docs"),
+      shinyblocks::block_separator(orientation = "vertical"),
+      htmltools::div("Source")
+    )
   )
 )
