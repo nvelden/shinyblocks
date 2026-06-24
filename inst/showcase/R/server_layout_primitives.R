@@ -1,21 +1,94 @@
-layout_primitives_demo_items <- function() {
+layout_primitives_demo_specs <- function(values) {
   specs <- list(
-    list(label = "Analytics", height = "5.5rem"),
-    list(label = "Reports", height = "3.5rem"),
-    list(label = "Settings", height = "4.5rem"),
-    list(label = "Billing", height = "6rem")
+    list(title = "Analytics", description = "Track product usage.", height = "5rem"),
+    list(title = "Reports", description = "Review weekly summaries.", height = "3.5rem"),
+    list(title = "Settings", description = "Manage preferences.", height = "4.5rem"),
+    list(title = "Billing", description = "Update invoices and plans.", height = "6rem")
   )
+  specs <- specs[seq_len(values$count)]
+
   lapply(specs, function(spec) {
-    htmltools::div(
-      style = paste0(
-        "padding: 0.875rem; border: 1px solid var(--border); ",
-        "border-radius: 0.5rem; background: var(--card); ",
-        "color: var(--card-foreground); min-width: 7rem; ",
-        "min-height: ", spec$height, ";"
+    style <- switch(
+      values$type,
+      stack = if (identical(values$align, "stretch")) {
+        NULL
+      } else {
+        "width: min(16rem, 100%);"
+      },
+      cluster = paste0(
+        "width: 10rem;",
+        if (values$vary_heights) paste0(" min-height: ", spec$height, ";") else ""
       ),
-      spec$label
+      grid = if (values$vary_heights) {
+        paste0("min-height: ", spec$height, ";")
+      } else {
+        NULL
+      }
+    )
+
+    c(spec, list(style = style))
+  })
+}
+
+layout_primitives_demo_items <- function(specs) {
+  lapply(specs, function(spec) {
+    block_card(
+      title = spec$title,
+      description = spec$description,
+      style = spec$style
     )
   })
+}
+
+layout_primitives_demo_code <- function(values, specs) {
+  item_code <- vapply(specs, function(spec) {
+    style_arg <- if (is.null(spec$style)) {
+      ""
+    } else {
+      paste0(",\n    style = ", encodeString(spec$style, quote = "\""))
+    }
+    paste0(
+      "  block_card(\n",
+      "    title = ", encodeString(spec$title, quote = "\""), ",\n",
+      "    description = ", encodeString(spec$description, quote = "\""),
+      style_arg, "\n",
+      "  )"
+    )
+  }, character(1))
+
+  args <- c(
+    item_code,
+    sprintf('  gap = "%s"', values$gap),
+    sprintf('  align = "%s"', values$align)
+  )
+  if (identical(values$type, "cluster")) {
+    args <- c(
+      args,
+      sprintf('  justify = "%s"', values$justify),
+      sprintf("  wrap = %s", toupper(as.character(values$wrap)))
+    )
+  }
+  if (identical(values$type, "grid")) {
+    args <- c(args, sprintf('  min_width = "%s"', values$min_width))
+  }
+
+  layout_code <- paste0(
+    "block_", values$type, "(\n",
+    paste(args, collapse = ",\n"),
+    "\n)"
+  )
+
+  if (!identical(values$type, "cluster")) {
+    return(layout_code)
+  }
+
+  paste0(
+    "# The fixed container height makes vertical alignment visible.\n",
+    "htmltools::div(\n",
+    '  style = "height: 16rem;",\n',
+    paste0("  ", gsub("\n", "\n  ", layout_code, fixed = TRUE)), "\n",
+    ")"
+  )
 }
 
 register_layout_primitives_showcase <- function(input, output, session) {
@@ -26,15 +99,18 @@ register_layout_primitives_showcase <- function(input, output, session) {
       align = input$showcase_layout_primitives_align %||% "stretch",
       justify = input$showcase_layout_primitives_justify %||% "start",
       wrap = isTRUE(input$showcase_layout_primitives_wrap),
-      min_width = input$showcase_layout_primitives_min_width %||% "10rem"
+      min_width = input$showcase_layout_primitives_min_width %||% "14rem",
+      count = as.integer(input$showcase_layout_primitives_count %||% "4"),
+      vary_heights = isTRUE(input$showcase_layout_primitives_vary_heights %||% TRUE)
     )
   })
 
   output$showcase_layout_primitives_preview_ui <- shiny::renderUI({
     values <- state()
-    items <- layout_primitives_demo_items()
+    specs <- layout_primitives_demo_specs(values)
+    items <- layout_primitives_demo_items(specs)
 
-    switch(
+    layout <- switch(
       values$type,
       cluster = do.call(
         block_cluster,
@@ -64,6 +140,18 @@ register_layout_primitives_showcase <- function(input, output, session) {
         c(items, list(gap = values$gap, align = values$align))
       )
     )
+
+    if (identical(values$type, "cluster")) {
+      layout <- htmltools::tags$div(
+        class = "showcase-layout-primitives-cluster-frame",
+        layout
+      )
+    }
+
+    htmltools::tags$div(
+      class = "showcase-layout-primitives-viewport",
+      layout
+    )
   })
   shiny::outputOptions(
     output,
@@ -73,28 +161,9 @@ register_layout_primitives_showcase <- function(input, output, session) {
 
   output$showcase_layout_primitives_preview_code <- showcase_render_code({
     values <- state()
-    args <- c(
-      sprintf('gap = "%s"', values$gap),
-      sprintf('align = "%s"', values$align)
-    )
-    if (identical(values$type, "cluster")) {
-      args <- c(
-        args,
-        sprintf('justify = "%s"', values$justify),
-        sprintf("wrap = %s", toupper(as.character(values$wrap)))
-      )
-    }
-    if (identical(values$type, "grid")) {
-      args <- c(sprintf('min_width = "%s"', values$min_width), args)
-    }
-
-    paste0(
-      "block_", values$type, "(\n",
-      "  ", paste(args, collapse = ",\n  "), ",\n",
-      '  block_card(title = "Analytics"),\n',
-      '  block_card(title = "Reports"),\n',
-      '  block_card(title = "Settings")\n',
-      ")"
+    layout_primitives_demo_code(
+      values,
+      layout_primitives_demo_specs(values)
     )
   })
   shiny::outputOptions(

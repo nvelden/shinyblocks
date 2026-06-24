@@ -2,29 +2,46 @@ htmltools::tagList(
   showcase_playground_layout(
     controls = htmltools::tagList(
       showcase_controls_group(
-        "Primitive", first = TRUE,
+        "Layout", first = TRUE,
         block_field(
-          block_field_label("type", `for` = "showcase_layout_primitives_type"),
+          block_field_label("Primitive", `for` = "showcase_layout_primitives_type"),
           block_select(
             "showcase_layout_primitives_type",
-            choices = c("stack", "cluster", "grid"),
+            choices = c(
+              "Stack" = "stack",
+              "Cluster" = "cluster",
+              "Grid" = "grid"
+            ),
             selected = "stack"
           )
         ),
         block_field(
-          block_field_label("gap", `for` = "showcase_layout_primitives_gap"),
+          block_field_label("Gap", `for` = "showcase_layout_primitives_gap"),
           block_select(
             "showcase_layout_primitives_gap",
-            choices = c("sm", "md", "lg"),
+            choices = c("Small" = "sm", "Medium" = "md", "Large" = "lg"),
             selected = "md"
           )
         ),
         block_field(
-          block_field_label("align", `for` = "showcase_layout_primitives_align"),
+          block_field_label("Cross-axis alignment", `for` = "showcase_layout_primitives_align"),
           block_select(
             "showcase_layout_primitives_align",
-            choices = c("stretch", "start", "center", "end"),
+            choices = c(
+              "Stretch" = "stretch",
+              "Start" = "start",
+              "Center" = "center",
+              "End" = "end"
+            ),
             selected = "stretch"
+          )
+        ),
+        block_field(
+          block_field_label("Items", `for` = "showcase_layout_primitives_count"),
+          block_select(
+            "showcase_layout_primitives_count",
+            choices = c("Two" = "2", "Three" = "3", "Four" = "4"),
+            selected = "4"
           )
         )
       ),
@@ -36,7 +53,12 @@ htmltools::tagList(
             block_field_label("justify", `for` = "showcase_layout_primitives_justify"),
             block_select(
               "showcase_layout_primitives_justify",
-              choices = c("start", "center", "end", "between"),
+              choices = c(
+                "Start" = "start",
+                "Center" = "center",
+                "End" = "end",
+                "Space between" = "between"
+              ),
               selected = "start"
             )
           ),
@@ -55,10 +77,29 @@ htmltools::tagList(
         showcase_controls_group(
           "Grid",
           block_field(
-            block_field_label("min_width", `for` = "showcase_layout_primitives_min_width"),
-            block_input(
+            block_field_label("Preferred column width", `for` = "showcase_layout_primitives_min_width"),
+            block_select(
               "showcase_layout_primitives_min_width",
-              value = "10rem"
+              choices = c(
+                "10rem" = "10rem",
+                "14rem" = "14rem",
+                "18rem" = "18rem",
+                "24rem" = "24rem"
+              ),
+              selected = "14rem"
+            )
+          )
+        )
+      ),
+      shiny::conditionalPanel(
+        condition = "input.showcase_layout_primitives_type != 'stack'",
+        showcase_controls_group(
+          "Alignment demo",
+          block_field(
+            block_checkbox(
+              "showcase_layout_primitives_vary_heights",
+              label = "Use different card heights",
+              value = TRUE
             )
           )
         )
@@ -68,8 +109,8 @@ htmltools::tagList(
     code_output_id = "showcase_layout_primitives_preview_code",
     preview_canvas_class = "showcase-preview-canvas--stretch",
     preview_canvas_style = paste(
-      "padding: 2rem; background: color-mix(in oklab, var(--muted) 25%, transparent);",
-      "border-style: dashed; min-height: 260px;"
+      "padding: 1rem; background: color-mix(in oklab, var(--muted) 25%, transparent);",
+      "border-style: dashed; min-height: 160px;"
     )
   ),
   htmltools::tags$h3(
