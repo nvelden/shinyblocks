@@ -388,17 +388,23 @@ try {
   );
 
   // Hold busy on click: the click locks synchronously and the manual reset
-  // suppresses the auto-reset, so it stays disabled+busy. A rapid second click
-  // while locked must not reach the server.
+  // suppresses the auto-reset, so it stays disabled+busy.
+  //
+  // Rapid double-click: dispatch TWO clicks inside a single evaluate, i.e. the
+  // same task, before React (or any awaited round-trip) can reconcile. Only the
+  // synchronous DOM lock installed by the first click can reject the second, so
+  // the server count must be exactly 1. Removing the same-tick lock (and relying
+  // on async React state) would let the second click through and report 2.
   await page.click("#tb_hold_on");
-  await page.click(taskBtn);
+  await page.locator(taskBtn).evaluate((node) => {
+    node.click();
+    node.click();
+  });
   await assertText(page, "#runtime_task_button_value", "1");
   await page.waitForFunction((sel) => {
     const b = document.querySelector(sel);
     return b?.disabled === true && b.getAttribute("data-state") === "busy";
   }, taskBtn);
-  await page.locator(taskBtn).evaluate((node) => node.click());
-  await assertText(page, "#runtime_task_button_value", "1");
 
   // While busy the button advertises aria-busy and takes the busy label as its
   // accessible name.
@@ -508,6 +514,184 @@ try {
   await page.click("#tb_hold_off");
   await page.click("#tb_ready");
   await page.waitForFunction((sel) => document.querySelector(sel)?.disabled === false, taskBtn);
+
+  // Exactly one persistent status region — duplicate live regions would
+  // double-announce the busy transition.
+  const taskRoot =
+    "[data-sb-component='task-button'][data-sb-input-id='runtime_task_button']";
+  assert.equal(
+    await page.evaluate(
+      (s) => document.querySelectorAll(`${s} [role='status']`).length,
+      taskRoot
+    ),
+    1,
+    "task button should render exactly one status region"
+  );
+
+  // Full update coverage: label, variant, size, ready icon, style, and class.
+  await page.click("#tb_set_label");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.textContent.includes("Relabeled"),
+    taskBtn
+  );
+  await page.click("#tb_set_variant");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-variant") === "secondary",
+    taskBtn
+  );
+  await page.click("#tb_set_size");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-size") === "lg",
+    taskBtn
+  );
+  await page.click("#tb_set_icon");
+  await page.waitForFunction(
+    (sel) => !!document.querySelector(sel)?.querySelector("svg"),
+    taskBtn
+  );
+  await page.click("#tb_set_style");
+  await page.waitForFunction(
+    (sel) => /22rem/.test(document.querySelector(sel)?.getAttribute("style") || ""),
+    taskBtn
+  );
+  await page.click("#tb_set_class");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.classList.contains("tb-updated-class"),
+    taskBtn
+  );
+
+  // label_busy update is reflected in the busy accessible name AND the live
+  // status region the next time the button goes busy.
+  await page.click("#tb_set_label_busy");
+  await page.click("#tb_hold_on");
+  await page.locator(taskBtn).evaluate((node) => node.click());
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    taskBtn
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("aria-label"), taskBtn),
+    "New busy label",
+    "busy aria-label should reflect the updated label_busy"
+  );
+  assert.equal(
+    await page.evaluate(
+      (s) => document.querySelector(`${s} [role='status']`)?.textContent?.trim(),
+      taskRoot
+    ),
+    "New busy label",
+    "status region should announce the updated busy label"
+  );
+  await page.click("#tb_hold_off");
+  await page.click("#tb_ready");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "ready",
+    taskBtn
+  );
+
+  // Clear semantics via NULL: ready icon, style, and class are removed.
+  await page.click("#tb_clear_icon");
+  await page.waitForFunction((sel) => !document.querySelector(sel)?.querySelector("svg"), taskBtn);
+  await page.click("#tb_clear_style");
+  await page.waitForFunction(
+    (sel) => !/22rem/.test(document.querySelector(sel)?.getAttribute("style") || ""),
+    taskBtn
+  );
+  await page.click("#tb_clear_class");
+  await page.waitForFunction(
+    (sel) => !document.querySelector(sel)?.classList.contains("tb-updated-class"),
+    taskBtn
+  );
+
+  // Clearing the busy icon falls back to the decorative spinner.
+  await page.click("#tb_clear_icon_busy");
+  await page.click("#tb_hold_on");
+  await page.locator(taskBtn).evaluate((node) => node.click());
+  await page.waitForFunction(
+    (sel) => !!document.querySelector(sel)?.querySelector("svg.sb-task-button-spinner"),
+    taskBtn
+  );
+  await page.click("#tb_hold_off");
+  await page.click("#tb_ready");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "ready",
+    taskBtn
+  );
+
+  // Two modules sharing the local id "task" stay independent: clicking module A
+  // increments only A's count and locks only A busy (auto_reset = FALSE).
+  const modA = "[data-sb-input-id='tbmodA-task'] [data-slot='task-button']";
+  const modB = "[data-sb-input-id='tbmodB-task'] [data-slot='task-button']";
+  await assertText(page, "#tbmodA-task_value", "0");
+  await assertText(page, "#tbmodB-task_value", "0");
+  await page.click(modA);
+  await assertText(page, "#tbmodA-task_value", "1");
+  await assertText(page, "#tbmodB-task_value", "0");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    modA
+  );
+  assert.equal(
+    await page.evaluate((s) => document.querySelector(s)?.getAttribute("data-state"), modB),
+    "ready",
+    "second module instance must stay ready when the first is busy"
+  );
+
+  // Dynamic renderUI remount + rebind: toggle the mount off and on, then a click
+  // on the fresh instance must still report and lock.
+  const dynTask = "[data-sb-input-id='dyn_task'] [data-slot='task-button']";
+  await page.click("#toggle_task_dynamic");
+  await page.waitForSelector(dynTask);
+  await page.click(dynTask);
+  await assertText(page, "#task_dynamic_value", "1");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    dynTask
+  );
+  await page.click("#toggle_task_dynamic"); // unmount
+  await page.waitForFunction(() => !document.querySelector("[data-sb-input-id='dyn_task']"));
+  await page.click("#toggle_task_dynamic"); // remount
+  await page.waitForSelector(dynTask);
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "ready",
+    dynTask
+  );
+  await page.click(dynTask);
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    dynTask
+  );
+  await assertText(page, "#task_dynamic_value", "1");
+
+  // insertUI / removeUI remount + rebind: insert a task button, same-tick
+  // double-click it (rebind + synchronous lock → server count 1), remove it,
+  // then reinsert and confirm the fresh instance rebinds and locks again.
+  const insTask = "[data-sb-input-id='inserted_task'] [data-slot='task-button']";
+  await page.click("#insert_task");
+  await page.waitForSelector(insTask);
+  await page.locator(insTask).evaluate((node) => {
+    node.click();
+    node.click();
+  });
+  await assertText(page, "#task_inserted_value", "1");
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    insTask
+  );
+  await page.click("#remove_task");
+  await page.waitForFunction(() => !document.querySelector("[data-sb-input-id='inserted_task']"));
+  await page.click("#insert_task"); // reinsert
+  await page.waitForSelector(insTask);
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "ready",
+    insTask
+  );
+  await page.locator(insTask).evaluate((node) => node.click());
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    insTask
+  );
+  await assertText(page, "#task_inserted_value", "1");
 
   // Date picker: the binding reports an ISO string typed `shiny.date`, so the
   // server value is a length-1 Date. Covers initial value, user selection,

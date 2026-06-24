@@ -3,7 +3,7 @@
 > Shinyblocks function: `block_task_button()` / `update_block_task_button()`
 > Shadcn reference: <https://ui.shadcn.com/docs/components/button> (visuals)
 > Behavioral reference: bslib `input_task_button()`
-> Status: Runtime input component; Slice 1 (functional default path).
+> Status: Runtime input component; Slice 2 (full API + lifecycle hardening).
 
 A task button is an action button that locks itself the instant it is
 clicked, shows a busy label and spinner while work runs, and reports a
@@ -97,6 +97,22 @@ non-ready state takes manual control. Passing `icon`, `icon_busy`, `style`, or
   ready reset.
 - `update_block_task_button()` routes through `sendInputMessage()` and only
   notifies on supplied fields.
+
+## Visual parity
+
+The ready state has no distinct shadcn upstream, so it is **not** registered in
+`tools/parity/registry.mjs`; visual parity delegates to the existing Button
+fixture. The ready-state button reuses the same `.sb-button` /
+`.sb-button-<variant>` / `.sb-button-size-<size>` classes as `block_button()`,
+so its computed appearance is identical by construction. The shared geometry and
+color are pinned by the theme/style harness against the
+`.sb-parity-task-button-default` fixture:
+
+- `tools/theme/theme-registry.mjs` asserts `background-color == --primary` and
+  `color == --primary-foreground` (the Button default contract) across the
+  palette sweep and every shipped style profile.
+- `tools/theme/style-registry.mjs` asserts the trigger `border-radius` matches
+  the shared base button radius.
 
 ## Deliberate divergences from shadcn
 

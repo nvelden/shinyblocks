@@ -101,6 +101,47 @@ test_that("update_block_task_button() emits only supplied fields", {
   expect_false("disabled" %in% names(payload))
 })
 
+test_that("update_block_task_button() emits the full set of supplied fields", {
+  capture <- local_input_message_session()
+  update_block_task_button(
+    capture$session, "run",
+    label_busy = "Working…",
+    size = "lg",
+    icon_position = "inline-end"
+  )
+  payload <- capture$last_payload()
+
+  expect_identical(payload$labelBusy, "Working…")
+  expect_identical(payload$size, "lg")
+  expect_identical(payload$iconPosition, "inline-end")
+})
+
+test_that("update_block_task_button() validates label_busy", {
+  capture <- local_input_message_session()
+  expect_error(
+    update_block_task_button(capture$session, "run", label_busy = c("a", "b")),
+    "length-one string"
+  )
+})
+
+test_that("update_block_task_button() clears style and class via NULL", {
+  capture <- local_input_message_session()
+  update_block_task_button(capture$session, "run", style = NULL, class = NULL)
+  payload <- capture$last_payload()
+
+  expect_true("style" %in% names(payload))
+  expect_null(payload$style)
+  expect_true("class" %in% names(payload))
+  expect_null(payload$class)
+})
+
+test_that("block_task_button() namespaces the mount id under a module", {
+  ns <- shiny::NS("mod")
+  html <- render_html(block_task_button(ns("run"), "Run"))
+  expect_match(html, 'data-sb-input-id="mod-run"', fixed = TRUE)
+  expect_match(html, 'id="sb-runtime-task-button-mod-run"', fixed = TRUE)
+})
+
 test_that("update_block_task_button() clears icons via NULL", {
   capture <- local_input_message_session()
   update_block_task_button(capture$session, "run", icon = NULL, icon_busy = NULL)

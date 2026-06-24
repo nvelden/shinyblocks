@@ -74,8 +74,14 @@ targets <- list(
     # max_items cap, native-mirror reconciliation) adds ~4 KB raw on top of the
     # shared select-popover hook (extracted, not duplicated). Gzipped (85 KB)
     # stays the binding transfer budget and is unchanged.
+    # Raised 292 -> 296 KB for the #69 task-button runtime: the new
+    # task-button component + binding (synchronous DOM click lock, busy/ready
+    # state machine, decorative spinner, persistent live-status region, and the
+    # author/controlled aria-label arbitration) adds ~2.6 KB raw (lands at
+    # ~294.6 KB). Gzipped (86 KB) stays the meaningful transfer budget and is
+    # within limit; raw remains the headroom guard.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 292,
+    limit_kb = 296,
     metric = "raw",
     group = "runtime"
   ),

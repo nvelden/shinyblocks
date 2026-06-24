@@ -275,6 +275,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "size", type: "'default' | 'sm' | 'lg' | 'icon'", defaultVal: "'default'", description: "Dimension size variant presets." },
         { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional ready-state icon name or tag." },
         { argument: "icon_busy", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional busy-state icon; defaults to a spinner." },
+        { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "'inline-start'", description: "Icon placement relative to the label." },
         { argument: "auto_reset", type: "logical", defaultVal: "TRUE", description: "Return to ready after the click's reactive flush." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Custom styling classes to merge." }
       ]
@@ -289,8 +290,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "label", type: "character", defaultVal: "NULL", description: "New ready-state label." },
         { argument: "label_busy", type: "character", defaultVal: "NULL", description: "New busy label." },
         { argument: "variant", type: "character", defaultVal: "NULL", description: "Update the button's visual preset." },
+        { argument: "size", type: "'default' | 'sm' | 'lg' | 'icon'", defaultVal: "NULL", description: "Update the button's size preset." },
+        { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "New ready icon, or NULL to clear." },
+        { argument: "icon_busy", type: "character | shiny.tag", defaultVal: "NULL", description: "New busy icon, or NULL to clear (back to the spinner)." },
+        { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "NULL", description: "Update icon placement relative to the label." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Enable/disable the button." },
-        { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "New ready icon, or NULL to clear." }
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline CSS string, or NULL to clear." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement wrapper classes, or NULL to clear." }
       ]
     }
   ],

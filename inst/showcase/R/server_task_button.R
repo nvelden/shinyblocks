@@ -7,6 +7,14 @@ register_task_button_showcase <- function(input, output, session) {
     "destructive",
     "link"
   )
+  size_choices <- c("default", "sm", "lg")
+
+  task_button_doc_icon <- function(icon_value) {
+    if (is.null(icon_value) || identical(icon_value, "none")) {
+      return(NULL)
+    }
+    icon_value
+  }
 
   output$showcase_task_button_preview_ui <- shiny::renderUI({
     label <- input$showcase_task_button_doc_label %||% "Run analysis"
@@ -17,13 +25,23 @@ register_task_button_showcase <- function(input, output, session) {
     if (!nzchar(label_busy)) {
       label_busy <- "Crunching…"
     }
+    style <- input$showcase_task_button_doc_style %||% ""
+    if (!nzchar(style)) {
+      style <- NULL
+    }
     block_task_button(
       input_id = "showcase_task_button_preview",
       label = label,
       label_busy = label_busy,
       variant = input$showcase_task_button_doc_variant %||% "default",
+      size = input$showcase_task_button_doc_size %||% "default",
+      icon = task_button_doc_icon(input$showcase_task_button_doc_icon),
+      icon_busy = task_button_doc_icon(input$showcase_task_button_doc_icon_busy),
+      icon_position = input$showcase_task_button_doc_icon_position %||% "inline-start",
       auto_reset = isTRUE(input$showcase_task_button_doc_auto_reset),
-      disabled = isTRUE(input$showcase_task_button_doc_disabled)
+      disabled = isTRUE(input$showcase_task_button_doc_disabled),
+      style = style,
+      class = if (isTRUE(input$showcase_task_button_doc_class)) "border-dashed" else NULL
     )
   })
   shiny::outputOptions(
@@ -56,8 +74,14 @@ register_task_button_showcase <- function(input, output, session) {
       label_busy_val <- "Crunching…"
     }
     variant_val <- input$showcase_task_button_doc_variant %||% "default"
+    size_val <- input$showcase_task_button_doc_size %||% "default"
+    icon_val <- task_button_doc_icon(input$showcase_task_button_doc_icon)
+    icon_busy_val <- task_button_doc_icon(input$showcase_task_button_doc_icon_busy)
+    icon_position_val <- input$showcase_task_button_doc_icon_position %||% "inline-start"
     auto_reset_val <- isTRUE(input$showcase_task_button_doc_auto_reset)
     disabled_val <- isTRUE(input$showcase_task_button_doc_disabled)
+    style_val <- input$showcase_task_button_doc_style %||% ""
+    class_val <- isTRUE(input$showcase_task_button_doc_class)
 
     args <- c(
       'input_id = "showcase_task_button_preview"',
@@ -67,11 +91,29 @@ register_task_button_showcase <- function(input, output, session) {
     if (variant_val != "default") {
       args <- c(args, paste0('variant = "', variant_val, '"'))
     }
+    if (size_val != "default") {
+      args <- c(args, paste0('size = "', size_val, '"'))
+    }
+    if (!is.null(icon_val)) {
+      args <- c(args, paste0('icon = "', icon_val, '"'))
+    }
+    if (!is.null(icon_busy_val)) {
+      args <- c(args, paste0('icon_busy = "', icon_busy_val, '"'))
+    }
+    if ((!is.null(icon_val) || !is.null(icon_busy_val)) && icon_position_val != "inline-start") {
+      args <- c(args, paste0('icon_position = "', icon_position_val, '"'))
+    }
     if (!auto_reset_val) {
       args <- c(args, "auto_reset = FALSE")
     }
     if (disabled_val) {
       args <- c(args, "disabled = TRUE")
+    }
+    if (nzchar(style_val)) {
+      args <- c(args, paste0("style = ", string_literal(style_val)))
+    }
+    if (class_val) {
+      args <- c(args, 'class = "border-dashed"')
     }
     paste0("block_task_button(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
@@ -93,6 +135,17 @@ register_task_button_showcase <- function(input, output, session) {
     "showcase_task_button_reactive_code",
     suspendWhenHidden = FALSE
   )
+
+  show_update <- function(...) {
+    args <- c(...)
+    reactive_code(paste0(
+      "update_block_task_button(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_task_button_preview\",\n",
+      "  ", paste(args, collapse = ",\n  "), "\n",
+      ")"
+    ))
+  }
 
   # Simulated work so the busy state is actually visible. The click locks the
   # button on the client; Shiny holds the outgoing ready-reset message until this
@@ -123,24 +176,86 @@ register_task_button_showcase <- function(input, output, session) {
 
   shiny::observeEvent(input$showcase_task_button_set_busy, {
     update_block_task_button(session, "showcase_task_button_preview", state = "busy")
-    reactive_code(paste0(
-      "update_block_task_button(\n",
-      "  session = session,\n",
-      "  input_id = \"showcase_task_button_preview\",\n",
-      "  state = \"busy\"\n",
-      ")"
-    ))
+    show_update('state = "busy"')
   })
 
   shiny::observeEvent(input$showcase_task_button_set_ready, {
     update_block_task_button(session, "showcase_task_button_preview", state = "ready")
-    reactive_code(paste0(
-      "update_block_task_button(\n",
-      "  session = session,\n",
-      "  input_id = \"showcase_task_button_preview\",\n",
-      "  state = \"ready\"\n",
-      ")"
-    ))
+    show_update('state = "ready"')
+  })
+
+  shiny::observeEvent(input$showcase_task_button_set_label, {
+    update_block_task_button(session, "showcase_task_button_preview", label = "Run again")
+    show_update('label = "Run again"')
+  })
+
+  shiny::observeEvent(input$showcase_task_button_set_label_busy, {
+    update_block_task_button(session, "showcase_task_button_preview", label_busy = "Almost done…")
+    show_update('label_busy = "Almost done…"')
+  })
+
+  shiny::observeEvent(input$showcase_task_button_cycle_variant, {
+    current <- input$showcase_task_button_doc_variant %||% "default"
+    idx <- match(current, variant_choices, nomatch = 0L)
+    next_variant <- variant_choices[(idx %% length(variant_choices)) + 1L]
+    update_block_task_button(session, "showcase_task_button_preview", variant = next_variant)
+    show_update(paste0('variant = "', next_variant, '"'))
+  })
+
+  shiny::observeEvent(input$showcase_task_button_cycle_size, {
+    current <- input$showcase_task_button_doc_size %||% "default"
+    idx <- match(current, size_choices, nomatch = 0L)
+    next_size <- size_choices[(idx %% length(size_choices)) + 1L]
+    update_block_task_button(session, "showcase_task_button_preview", size = next_size)
+    show_update(paste0('size = "', next_size, '"'))
+  })
+
+  icon_position_state <- shiny::reactiveVal("inline-start")
+  shiny::observeEvent(input$showcase_task_button_toggle_icon_position, {
+    next_pos <- if (identical(icon_position_state(), "inline-start")) "inline-end" else "inline-start"
+    icon_position_state(next_pos)
+    update_block_task_button(session, "showcase_task_button_preview", icon_position = next_pos)
+    show_update(paste0('icon_position = "', next_pos, '"'))
+  })
+
+  shiny::observeEvent(input$showcase_task_button_set_icon, {
+    update_block_task_button(session, "showcase_task_button_preview", icon = "check")
+    show_update('icon = "check"')
+  })
+
+  shiny::observeEvent(input$showcase_task_button_clear_icon, {
+    update_block_task_button(session, "showcase_task_button_preview", icon = NULL)
+    show_update("icon = NULL")
+  })
+
+  shiny::observeEvent(input$showcase_task_button_set_busy_icon, {
+    update_block_task_button(session, "showcase_task_button_preview", icon_busy = "refresh-cw")
+    show_update('icon_busy = "refresh-cw"')
+  })
+
+  shiny::observeEvent(input$showcase_task_button_clear_busy_icon, {
+    update_block_task_button(session, "showcase_task_button_preview", icon_busy = NULL)
+    show_update("icon_busy = NULL")
+  })
+
+  shiny::observeEvent(input$showcase_task_button_clear_style, {
+    update_block_task_button(session, "showcase_task_button_preview", style = NULL)
+    show_update("style = NULL")
+  })
+
+  shiny::observeEvent(input$showcase_task_button_clear_class, {
+    update_block_task_button(session, "showcase_task_button_preview", class = NULL)
+    show_update("class = NULL")
+  })
+
+  shiny::observeEvent(input$showcase_task_button_disable, {
+    update_block_task_button(session, "showcase_task_button_preview", disabled = TRUE)
+    show_update("disabled = TRUE")
+  })
+
+  shiny::observeEvent(input$showcase_task_button_enable, {
+    update_block_task_button(session, "showcase_task_button_preview", disabled = FALSE)
+    show_update("disabled = FALSE")
   })
 
   output$showcase_task_button_api_table <- shiny::renderUI({

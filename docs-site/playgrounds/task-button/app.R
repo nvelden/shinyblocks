@@ -53,6 +53,10 @@ string_literal <- function(value) {
   paste0("\"", gsub("([\"\\\\])", "\\\\\\1", value, perl = TRUE), "\"")
 }
 
+icon_or_null <- function(value) {
+  if (is.null(value) || identical(value, "none")) NULL else value
+}
+
 controls_group <- function(title, ..., first = FALSE) {
   border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
   htmltools::div(
@@ -92,6 +96,24 @@ ui <- block_page(
           block_field(
             block_field_label("label_busy", `for` = "label_busy"),
             block_input("label_busy", value = "Crunching…")
+          ),
+          block_field(
+            block_field_label("icon", `for` = "icon"),
+            block_select(
+              "icon",
+              choices = c("<None>" = "none", play = "play", `arrow-right` = "arrow-right", check = "check"),
+              selected = "none",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("icon_busy", `for` = "icon_busy"),
+            block_select(
+              "icon_busy",
+              choices = c("Spinner (default)" = "none", `refresh-cw` = "refresh-cw", check = "check"),
+              selected = "none",
+              size = "sm"
+            )
           )
         ),
         controls_group(
@@ -115,11 +137,53 @@ ui <- block_page(
           )
         ),
         controls_group(
+          "Styling",
+          block_field(
+            block_field_label("size", `for` = "size"),
+            block_select(
+              "size",
+              choices = c("default", "sm", "lg", "icon"),
+              selected = "default",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("icon_position", `for` = "icon_position"),
+            block_select(
+              "icon_position",
+              choices = c("inline-start", "inline-end"),
+              selected = "inline-start",
+              size = "sm"
+            )
+          ),
+          block_field(
+            block_field_label("style", `for` = "style"),
+            block_input("style", value = "", placeholder = "e.g., min-width: 12rem;")
+          ),
+          block_field(
+            block_field_label("class", `for` = "class"),
+            block_checkbox("class", "Use custom dashed-border class", value = FALSE)
+          )
+        ),
+        controls_group(
           "Actions (Server Update)",
           htmltools::div(
             style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
             action_button("set_busy", "Set busy"),
-            action_button("set_ready", "Set ready")
+            action_button("set_ready", "Set ready"),
+            action_button("set_label", "Set label"),
+            action_button("set_label_busy", "Set busy label"),
+            action_button("cycle_variant", "Cycle variant"),
+            action_button("cycle_size", "Cycle size"),
+            action_button("toggle_icon_position", "Toggle icon position"),
+            action_button("set_icon", "Set icon"),
+            action_button("clear_icon", "Clear icon"),
+            action_button("set_busy_icon", "Set busy icon"),
+            action_button("clear_busy_icon", "Clear busy icon"),
+            action_button("clear_style", "Clear style"),
+            action_button("clear_class", "Clear class"),
+            action_button("disable", "Disable"),
+            action_button("enable", "Enable")
           )
         )
       ),
@@ -176,13 +240,22 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
+  variant_choices <- c("default", "secondary", "outline", "ghost", "destructive", "link")
+  size_choices <- c("default", "sm", "lg")
+
   button_state <- reactive({
     list(
       label = blank_to_null(input$label) %||% "Run analysis",
       label_busy = blank_to_null(input$label_busy) %||% "Crunching…",
+      icon = icon_or_null(input$icon),
+      icon_busy = icon_or_null(input$icon_busy),
       variant = input$variant %||% "default",
+      size = input$size %||% "default",
+      icon_position = input$icon_position %||% "inline-start",
       auto_reset = isTRUE(input$auto_reset),
-      disabled = isTRUE(input$disabled)
+      disabled = isTRUE(input$disabled),
+      style = blank_to_null(input$style),
+      class = isTRUE(input$class)
     )
   })
 
@@ -193,8 +266,14 @@ server <- function(input, output, session) {
       label = s$label,
       label_busy = s$label_busy,
       variant = s$variant,
+      size = s$size,
+      icon = s$icon,
+      icon_busy = s$icon_busy,
+      icon_position = s$icon_position,
       auto_reset = s$auto_reset,
-      disabled = s$disabled
+      disabled = s$disabled,
+      style = s$style,
+      class = if (s$class) "border-dashed" else NULL
     )
   })
   outputOptions(output, "preview_ui", suspendWhenHidden = FALSE)
@@ -213,8 +292,16 @@ server <- function(input, output, session) {
       paste0("label_busy = ", string_literal(s$label_busy))
     )
     if (s$variant != "default") args <- c(args, paste0("variant = ", string_literal(s$variant)))
+    if (s$size != "default") args <- c(args, paste0("size = ", string_literal(s$size)))
+    if (!is.null(s$icon)) args <- c(args, paste0("icon = ", string_literal(s$icon)))
+    if (!is.null(s$icon_busy)) args <- c(args, paste0("icon_busy = ", string_literal(s$icon_busy)))
+    if ((!is.null(s$icon) || !is.null(s$icon_busy)) && s$icon_position != "inline-start") {
+      args <- c(args, paste0("icon_position = ", string_literal(s$icon_position)))
+    }
     if (!s$auto_reset) args <- c(args, "auto_reset = FALSE")
     if (s$disabled) args <- c(args, "disabled = TRUE")
+    if (!is.null(s$style)) args <- c(args, paste0("style = ", string_literal(s$style)))
+    if (s$class) args <- c(args, 'class = "border-dashed"')
     paste0("block_task_button(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   outputOptions(output, "preview_code", suspendWhenHidden = FALSE)
@@ -248,13 +335,78 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "reactive_code", suspendWhenHidden = FALSE)
 
+  show_update <- function(arg) {
+    reactive_code(paste0('update_block_task_button(session, "preview_task_button", ', arg, ")"))
+  }
+
   observeEvent(input$set_busy, {
     update_block_task_button(session, "preview_task_button", state = "busy")
-    reactive_code('update_block_task_button(session, "preview_task_button", state = "busy")')
+    show_update('state = "busy"')
   })
   observeEvent(input$set_ready, {
     update_block_task_button(session, "preview_task_button", state = "ready")
-    reactive_code('update_block_task_button(session, "preview_task_button", state = "ready")')
+    show_update('state = "ready"')
+  })
+  observeEvent(input$set_label, {
+    update_block_task_button(session, "preview_task_button", label = "Run again")
+    show_update('label = "Run again"')
+  })
+  observeEvent(input$set_label_busy, {
+    update_block_task_button(session, "preview_task_button", label_busy = "Almost done…")
+    show_update('label_busy = "Almost done…"')
+  })
+  observeEvent(input$cycle_variant, {
+    current <- input$variant %||% "default"
+    idx <- match(current, variant_choices, nomatch = 0L)
+    next_variant <- variant_choices[(idx %% length(variant_choices)) + 1L]
+    update_block_task_button(session, "preview_task_button", variant = next_variant)
+    show_update(paste0('variant = "', next_variant, '"'))
+  })
+  observeEvent(input$cycle_size, {
+    current <- input$size %||% "default"
+    idx <- match(current, size_choices, nomatch = 0L)
+    next_size <- size_choices[(idx %% length(size_choices)) + 1L]
+    update_block_task_button(session, "preview_task_button", size = next_size)
+    show_update(paste0('size = "', next_size, '"'))
+  })
+  icon_position_state <- reactiveVal("inline-start")
+  observeEvent(input$toggle_icon_position, {
+    next_pos <- if (identical(icon_position_state(), "inline-start")) "inline-end" else "inline-start"
+    icon_position_state(next_pos)
+    update_block_task_button(session, "preview_task_button", icon_position = next_pos)
+    show_update(paste0('icon_position = "', next_pos, '"'))
+  })
+  observeEvent(input$set_icon, {
+    update_block_task_button(session, "preview_task_button", icon = "check")
+    show_update('icon = "check"')
+  })
+  observeEvent(input$clear_icon, {
+    update_block_task_button(session, "preview_task_button", icon = NULL)
+    show_update("icon = NULL")
+  })
+  observeEvent(input$set_busy_icon, {
+    update_block_task_button(session, "preview_task_button", icon_busy = "refresh-cw")
+    show_update('icon_busy = "refresh-cw"')
+  })
+  observeEvent(input$clear_busy_icon, {
+    update_block_task_button(session, "preview_task_button", icon_busy = NULL)
+    show_update("icon_busy = NULL")
+  })
+  observeEvent(input$clear_style, {
+    update_block_task_button(session, "preview_task_button", style = NULL)
+    show_update("style = NULL")
+  })
+  observeEvent(input$clear_class, {
+    update_block_task_button(session, "preview_task_button", class = NULL)
+    show_update("class = NULL")
+  })
+  observeEvent(input$disable, {
+    update_block_task_button(session, "preview_task_button", disabled = TRUE)
+    show_update("disabled = TRUE")
+  })
+  observeEvent(input$enable, {
+    update_block_task_button(session, "preview_task_button", disabled = FALSE)
+    show_update("disabled = FALSE")
   })
 }
 

@@ -10,6 +10,14 @@ htmltools::tagList(
         block_field(
           block_field_label("label_busy", `for` = "showcase_task_button_doc_label_busy"),
           block_input("showcase_task_button_doc_label_busy", value = "Crunching…")
+        ),
+        block_field(
+          block_field_label("icon", `for` = "showcase_task_button_doc_icon"),
+          block_select("showcase_task_button_doc_icon", choices = c("<None>" = "none", play = "play", `arrow-right` = "arrow-right", check = "check"), selected = "none")
+        ),
+        block_field(
+          block_field_label("icon_busy", `for` = "showcase_task_button_doc_icon_busy"),
+          block_select("showcase_task_button_doc_icon_busy", choices = c("Spinner (default)" = "none", `refresh-cw` = "refresh-cw", check = "check"), selected = "none")
         )
       ),
       showcase_controls_group(
@@ -28,11 +36,43 @@ htmltools::tagList(
         )
       ),
       showcase_controls_group(
+        "Styling",
+        block_field(
+          block_field_label("size", `for` = "showcase_task_button_doc_size"),
+          block_select("showcase_task_button_doc_size", choices = c("default", "sm", "lg", "icon"), selected = "default")
+        ),
+        block_field(
+          block_field_label("icon_position", `for` = "showcase_task_button_doc_icon_position"),
+          block_select("showcase_task_button_doc_icon_position", choices = c("inline-start", "inline-end"), selected = "inline-start")
+        ),
+        block_field(
+          block_field_label("style", `for` = "showcase_task_button_doc_style"),
+          block_input("showcase_task_button_doc_style", value = "", placeholder = "e.g., min-width: 12rem;")
+        ),
+        block_field(
+          block_field_label("class", `for` = "showcase_task_button_doc_class"),
+          block_checkbox("showcase_task_button_doc_class", "Use custom dashed-border class", value = FALSE)
+        )
+      ),
+      showcase_controls_group(
         "Actions (Server Update)",
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
           showcase_action_button("showcase_task_button_set_busy", "Set busy"),
-          showcase_action_button("showcase_task_button_set_ready", "Set ready")
+          showcase_action_button("showcase_task_button_set_ready", "Set ready"),
+          showcase_action_button("showcase_task_button_set_label", "Set label"),
+          showcase_action_button("showcase_task_button_set_label_busy", "Set busy label"),
+          showcase_action_button("showcase_task_button_cycle_variant", "Cycle variant"),
+          showcase_action_button("showcase_task_button_cycle_size", "Cycle size"),
+          showcase_action_button("showcase_task_button_toggle_icon_position", "Toggle icon position"),
+          showcase_action_button("showcase_task_button_set_icon", "Set icon"),
+          showcase_action_button("showcase_task_button_clear_icon", "Clear icon"),
+          showcase_action_button("showcase_task_button_set_busy_icon", "Set busy icon"),
+          showcase_action_button("showcase_task_button_clear_busy_icon", "Clear busy icon"),
+          showcase_action_button("showcase_task_button_clear_style", "Clear style"),
+          showcase_action_button("showcase_task_button_clear_class", "Clear class"),
+          showcase_action_button("showcase_task_button_disable", "Disable"),
+          showcase_action_button("showcase_task_button_enable", "Enable")
         )
       )
     ),
