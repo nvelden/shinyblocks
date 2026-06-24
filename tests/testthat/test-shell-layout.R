@@ -104,6 +104,21 @@ test_that("layout helpers merge user classes", {
     tag_attr(block_sidebar("Item", class = "custom"), "class"),
     "sb-sidebar custom"
   )
+  expect_identical(
+    tag_attr(block_stack(class = "custom"), "class"),
+    "sb-stack sb-layout-gap-md sb-layout-align-stretch custom"
+  )
+  expect_identical(
+    tag_attr(block_cluster(class = "custom"), "class"),
+    paste(
+      "sb-cluster sb-layout-gap-sm sb-layout-align-center",
+      "sb-layout-justify-start custom"
+    )
+  )
+  expect_identical(
+    tag_attr(block_grid(class = "custom"), "class"),
+    "sb-grid sb-layout-gap-md sb-layout-align-stretch custom"
+  )
 })
 
 test_that("selected nav items expose aria-current", {

@@ -61,6 +61,7 @@ playground_heights <- list(
   table = 720L,
   `nav-item` = 720L,
   layout = 720L,
+  `layout-primitives` = 820L,
   tooltip = 720L,
   popover = 720L,
   dialog = 720L,

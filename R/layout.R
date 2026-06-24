@@ -1,3 +1,142 @@
+LAYOUT_GAPS <- c("sm", "md", "lg")
+LAYOUT_ALIGNS <- c("stretch", "start", "center", "end")
+LAYOUT_JUSTIFIES <- c("start", "center", "end", "between")
+
+layout_gap_class <- function(gap) {
+  paste0("sb-layout-gap-", match_arg(gap, LAYOUT_GAPS, "gap"))
+}
+
+layout_align_class <- function(align) {
+  paste0("sb-layout-align-", match_arg(align, LAYOUT_ALIGNS, "align"))
+}
+
+layout_justify_class <- function(justify) {
+  paste0(
+    "sb-layout-justify-",
+    match_arg(justify, LAYOUT_JUSTIFIES, "justify")
+  )
+}
+
+#' Stack content vertically
+#'
+#' Arrange content in a vertical flow with package-owned semantic spacing.
+#'
+#' @param ... Content to arrange.
+#' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
+#' @param align Cross-axis alignment: `"stretch"`, `"start"`, `"center"`, or
+#'   `"end"`.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family layout
+#' @export
+block_stack <- function(
+  ...,
+  gap = c("md", "sm", "lg"),
+  align = c("stretch", "start", "center", "end"),
+  class = NULL
+) {
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes(
+        "sb-stack",
+        layout_gap_class(gap),
+        layout_align_class(align),
+        class
+      ),
+      ...
+    )
+  )
+}
+
+#' Cluster content horizontally
+#'
+#' Arrange content in a horizontal group with semantic spacing and optional
+#' wrapping.
+#'
+#' @param ... Content to arrange.
+#' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
+#' @param align Cross-axis alignment: `"center"`, `"start"`, `"end"`, or
+#'   `"stretch"`.
+#' @param justify Main-axis distribution: `"start"`, `"center"`, `"end"`, or
+#'   `"between"`.
+#' @param wrap Whether children may wrap onto additional rows.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family layout
+#' @export
+block_cluster <- function(
+  ...,
+  gap = c("sm", "md", "lg"),
+  align = c("center", "start", "end", "stretch"),
+  justify = c("start", "center", "end", "between"),
+  wrap = TRUE,
+  class = NULL
+) {
+  check_flag(wrap, "wrap")
+
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes(
+        "sb-cluster",
+        layout_gap_class(gap),
+        layout_align_class(align),
+        layout_justify_class(justify),
+        class
+      ),
+      `data-wrap` = tolower(as.character(wrap)),
+      ...
+    )
+  )
+}
+
+#' Create a responsive content grid
+#'
+#' Arrange repeated content in a responsive auto-fit grid whose columns shrink
+#' safely to the available width.
+#'
+#' @param ... Content to arrange.
+#' @param min_width Minimum preferred column width as a valid CSS unit.
+#' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
+#' @param align Cross-axis alignment: `"stretch"`, `"start"`, `"center"`, or
+#'   `"end"`.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family layout
+#' @export
+block_grid <- function(
+  ...,
+  min_width = "16rem",
+  gap = c("md", "sm", "lg"),
+  align = c("stretch", "start", "center", "end"),
+  class = NULL
+) {
+  if (length(min_width) != 1 || is.na(min_width)) {
+    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
+  }
+  min_width <- tryCatch(
+    htmltools::validateCssUnit(min_width),
+    error = function(e) {
+      stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
+    }
+  )
+
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes(
+        "sb-grid",
+        layout_gap_class(gap),
+        layout_align_class(align),
+        class
+      ),
+      style = paste0("--sb-grid-min:", min_width, ";"),
+      ...
+    )
+  )
+}
+
 #' Create a dashboard sidebar
 #'
 #' @param ... Sidebar content.

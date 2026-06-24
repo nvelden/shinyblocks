@@ -328,6 +328,30 @@ export const STYLE_REGISTRY = {
     section: "plot-output",
     mode: "profile-neutral",
     reason: "The output-frame media box draws its rounded corners straight from the base --radius token; no shipped profile overrides the base radius (profiles only set per-component *_radius tokens), so the frame geometry is intentionally constant. Border/caption colour conformance is covered by theme-registry.mjs."
+  },
+  stack: {
+    section: "layout-primitives",
+    neutralProfiles: {
+      lyra: "Lyra's overlay gap is 1rem, matching the default medium layout gap.",
+      mira: "Mira's overlay gap is 1rem, matching the default medium layout gap.",
+      nova: "Nova's overlay gap is 1rem, matching the default medium layout gap.",
+      rhea: "Rhea does not override overlay gap, so the medium layout gap remains at its 1rem default."
+    },
+    bindings: [{ selector: ".sb-parity-stack-default", property: "gap" }]
+  },
+  cluster: {
+    section: "layout-primitives",
+    bindings: [{ selector: ".sb-parity-cluster-default", property: "gap" }]
+  },
+  grid: {
+    section: "layout-primitives",
+    neutralProfiles: {
+      lyra: "Lyra's overlay gap is 1rem, matching the default medium layout gap.",
+      mira: "Mira's overlay gap is 1rem, matching the default medium layout gap.",
+      nova: "Nova's overlay gap is 1rem, matching the default medium layout gap.",
+      rhea: "Rhea does not override overlay gap, so the medium layout gap remains at its 1rem default."
+    },
+    bindings: [{ selector: ".sb-parity-grid-default", property: "gap" }]
   }
 };
 

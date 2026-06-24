@@ -21,3 +21,15 @@ test("component detail page displays preview and code block", async ({ page }) =
   await page.getByRole("link", { name: /Back to Components/ }).click();
   await expect(page).toHaveURL(PATH.components);
 });
+
+test("layout primitives page exposes the family API", async ({ page }) => {
+  await page.goto(PATH.componentDetail("layout-primitives"));
+
+  await expect(page.getByRole("heading", { level: 1, name: "Layout Primitives" })).toBeVisible();
+  await expect(page.getByText("block_stack", { exact: true })).toBeVisible();
+  await expect(page.getByText("block_cluster", { exact: true })).toBeVisible();
+  await expect(page.getByText("block_grid", { exact: true })).toBeVisible();
+
+  const playground = page.locator('iframe[title="Layout Primitives playground"]');
+  await expect(playground).toBeVisible();
+});

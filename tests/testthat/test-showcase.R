@@ -399,3 +399,21 @@ test_that("interactive sections use the full playground layout", {
     }
   }
 })
+
+test_that("layout primitives showcase documents all helpers and parity fixtures", {
+  skip_if_no_showcase()
+
+  rendered <- showcase_fixture()$html
+
+  expect_match(rendered, 'data-sb-section="layout-primitives"', fixed = TRUE)
+  for (name in c("block_stack", "block_cluster", "block_grid")) {
+    expect_match(rendered, name, fixed = TRUE)
+  }
+  for (class in c(
+    "sb-parity-stack-default",
+    "sb-parity-cluster-default",
+    "sb-parity-grid-default"
+  )) {
+    expect_match(rendered, class, fixed = TRUE)
+  }
+})
