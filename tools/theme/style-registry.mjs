@@ -64,6 +64,13 @@ export const STYLE_REGISTRY = {
     },
     bindings: [{ selector: ".sb-parity-button-default", property: "borderRadius" }]
   },
+  "task-button": {
+    section: "task-button",
+    neutralProfiles: {
+      nova: "Nova's default button radius maps to rounded-lg; the task button shares the button radius."
+    },
+    bindings: [{ selector: ".sb-parity-task-button-default", property: "borderRadius" }]
+  },
   badge: {
     section: "badge",
     bindings: [{ selector: ".sb-parity-badge-default", property: "borderRadius" }]

@@ -23,6 +23,7 @@ Collate:
     'icon.R'
     'card.R'
     'button.R'
+    'task-button.R'
     'badge.R'
     'code.R'
     'table.R'

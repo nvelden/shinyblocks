@@ -39,6 +39,8 @@ Create a modern button
 }
 \seealso{
 Other action: 
-\code{\link{update_block_button}()}
+\code{\link{block_task_button}()},
+\code{\link{update_block_button}()},
+\code{\link{update_block_task_button}()}
 }
 \concept{action}

@@ -20,6 +20,7 @@ function toMultiSelectedArray(value) {
 
 const RUNTIME_INPUT_COMPONENTS = new Set([
   "button",
+  "task-button",
   "select",
   "dialog",
   "popover",
@@ -187,6 +188,69 @@ const BINDING_CONFIGS = [
       if (!el.__sbButtonClickHandler) return;
       el.removeEventListener("click", el.__sbButtonClickHandler);
       delete el.__sbButtonClickHandler;
+    }
+  },
+  {
+    // Like `button`, the value is a click count classed as a
+    // `shinyActionButtonValue` server-side, but the reported value also carries
+    // `autoReset` so the typed handler knows whether to schedule a post-flush
+    // ready reset. The click handler installs a synchronous DOM lock before
+    // React reconciles, so a rapid second click is rejected immediately.
+    component: "task-button",
+    type: "shinyblocks.task_button",
+    receiveProp: "__sbTaskButtonReceive",
+    getValue(el) {
+      if (typeof el.__sbTaskButtonClickCount === "undefined") el.__sbTaskButtonClickCount = 0;
+      // A per-element mount id, generated once. It uniquely identifies this
+      // instance so the server can detect when a new instance binds to a reused
+      // input id (renderUI/removeUI/insertUI churn) and drop any stale manual
+      // state — even when the click count is unchanged and would otherwise be
+      // deduplicated. It is client-generated (not in the R payload), so it never
+      // affects rendered-HTML snapshots.
+      if (typeof el.__sbTaskButtonMountId === "undefined") {
+        el.__sbTaskButtonMountId =
+          `tb-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      }
+      let autoReset = el.__sbTaskButtonAutoReset;
+      if (typeof autoReset === "undefined") {
+        const payload = readPayload(el);
+        autoReset = Boolean(payload && payload.props && payload.props.autoReset);
+      }
+      return {
+        value: el.__sbTaskButtonClickCount,
+        autoReset: Boolean(autoReset),
+        mountId: el.__sbTaskButtonMountId
+      };
+    },
+    setValue(el, value) {
+      const next = value && typeof value === "object" ? value.value : value;
+      el.__sbTaskButtonClickCount = Number(next) || 0;
+    },
+    subscribe(el, callback) {
+      const handler = (event) => {
+        const button = event.target && event.target.closest
+          ? event.target.closest("[data-slot='task-button']")
+          : null;
+        if (!button || !el.contains(button)) return;
+        if (button.disabled || button.getAttribute("data-state") === "busy") return;
+        if (typeof el.__sbTaskButtonClickCount === "undefined") el.__sbTaskButtonClickCount = 0;
+        el.__sbTaskButtonClickCount += 1;
+        // Synchronous lock: React's setState is async, so mutate the real
+        // button now to reject a same-tick double click and show busy instantly.
+        button.disabled = true;
+        button.setAttribute("data-state", "busy");
+        button.setAttribute("aria-busy", "true");
+        // Reconcile React state (re-applies the lock and busy accessible name).
+        if (typeof el.__sbTaskButtonSetState === "function") el.__sbTaskButtonSetState("busy");
+        callback(false);
+      };
+      el.addEventListener("click", handler);
+      el.__sbTaskButtonClickHandler = handler;
+    },
+    unsubscribe(el) {
+      if (!el.__sbTaskButtonClickHandler) return;
+      el.removeEventListener("click", el.__sbTaskButtonClickHandler);
+      delete el.__sbTaskButtonClickHandler;
     }
   },
   {
@@ -514,6 +578,7 @@ const BINDING_CONFIGS = [
 
 const BINDING_NAMES = [
   "shinyblocks.button",
+  "shinyblocks.task_button",
   "shinyblocks.select",
   "shinyblocks.dialog",
   "shinyblocks.popover",

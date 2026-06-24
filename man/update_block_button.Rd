@@ -48,6 +48,8 @@ Any argument left unspecified is preserved on the client. Pass \code{NULL} for
 }
 \seealso{
 Other action: 
-\code{\link{block_button}()}
+\code{\link{block_button}()},
+\code{\link{block_task_button}()},
+\code{\link{update_block_task_button}()}
 }
 \concept{action}

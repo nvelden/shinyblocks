@@ -63,6 +63,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Task Button",
+    slug = "task-button",
+    file = "task-button.R",
+    description = "An action button that locks on click, shows a busy state, and auto-resets after the click flush.",
+    featured = FALSE
+  ),
+  list(
     name = "Select",
     slug = "select",
     file = "select.R",

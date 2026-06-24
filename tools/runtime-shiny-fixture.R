@@ -50,6 +50,30 @@ module_ui <- function(id) {
   )
 }
 
+# A minimal module that exposes a task button under a *local* id of "task". Two
+# instances mounted with different module ids ("tbmodA", "tbmodB") therefore
+# share the same local id while staying independent — the isolation case the
+# session-local manual-reset map must satisfy.
+task_module_ui <- function(id) {
+  ns <- shiny::NS(id)
+  shiny::div(
+    id = ns("task_root"),
+    block_task_button(
+      ns("task"),
+      "Module run",
+      label_busy = "Module busy",
+      auto_reset = FALSE
+    ),
+    shiny::verbatimTextOutput(ns("task_value"))
+  )
+}
+
+task_module_server <- function(id) {
+  shiny::moduleServer(id, function(input, output, session) {
+    output$task_value <- shiny::renderText(input$task %||% "<NULL>")
+  })
+}
+
 ui <- shiny::fluidPage(
   shiny::tags$style(shiny::HTML(
     "
@@ -169,6 +193,22 @@ ui <- shiny::fluidPage(
     id = "runtime_button",
     class = "runtime-button-fixture"
   ),
+  block_task_button(
+    "runtime_task_button",
+    "Run task",
+    # ASCII label keeps the assertion locale-independent (the smoke spawns
+    # Rscript without forcing a UTF-8 locale).
+    label_busy = "Working",
+    class = "runtime-task-button-fixture",
+    # Author passthrough: `title` must reach the button; the reserved
+    # `data-slot` / `type` must NOT override the runtime's own values; and
+    # `aria-labelledby` must be suppressed while busy and restored when ready.
+    title = "Run the task",
+    `aria-labelledby` = "tb_extlabel",
+    `data-slot` = "author-should-not-win",
+    type = "submit"
+  ),
+  shiny::span(id = "tb_extlabel", "External label"),
   block_date_picker(
     "runtime_date",
     value = "2026-06-15",
@@ -273,6 +313,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_slider_value"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
+  shiny::verbatimTextOutput("runtime_task_button_value"),
+  shiny::verbatimTextOutput("runtime_task_button_class"),
   shiny::verbatimTextOutput("runtime_date_value"),
   shiny::verbatimTextOutput("runtime_date_class"),
   shiny::verbatimTextOutput("runtime_range_value"),
@@ -312,6 +354,26 @@ ui <- shiny::fluidPage(
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
   shiny::actionButton("enable_button", "Enable button"),
+  shiny::actionButton("tb_hold_on", "Hold task busy on click"),
+  shiny::actionButton("tb_hold_off", "Stop holding task busy"),
+  shiny::actionButton("tb_ready", "Release task"),
+  shiny::actionButton("tb_disable", "Disable task"),
+  shiny::actionButton("tb_enable", "Enable task"),
+  shiny::actionButton("tb_combined", "Busy + enable (combined)"),
+  shiny::actionButton("tb_busy_icon", "Set busy icon"),
+  shiny::actionButton("tb_icon_end", "Busy icon inline-end"),
+  shiny::actionButton("tb_icon_start", "Busy icon inline-start"),
+  shiny::actionButton("tb_set_label", "Set task label"),
+  shiny::actionButton("tb_set_variant", "Set task variant"),
+  shiny::actionButton("tb_set_size", "Set task size"),
+  shiny::actionButton("tb_set_icon", "Set task ready icon"),
+  shiny::actionButton("tb_set_style", "Set task style"),
+  shiny::actionButton("tb_set_class", "Set task class"),
+  shiny::actionButton("tb_set_label_busy", "Set task busy label"),
+  shiny::actionButton("tb_clear_icon", "Clear task ready icon"),
+  shiny::actionButton("tb_clear_icon_busy", "Clear task busy icon"),
+  shiny::actionButton("tb_clear_style", "Clear task style"),
+  shiny::actionButton("tb_clear_class", "Clear task class"),
   shiny::actionButton("set_date", "Set date"),
   shiny::actionButton("clear_date", "Clear date"),
   shiny::actionButton("disable_date", "Disable date"),
@@ -330,7 +392,20 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("dynamic_value"),
   shiny::div(id = "insert_target"),
   shiny::verbatimTextOutput("inserted_value"),
-  module_ui("mod")
+  shiny::actionButton("toggle_task_dynamic", "Toggle dynamic task"),
+  shiny::uiOutput("task_dynamic_mount"),
+  shiny::verbatimTextOutput("task_dynamic_value"),
+  shiny::actionButton("insert_task", "Insert task button"),
+  shiny::actionButton("remove_task", "Remove task button"),
+  shiny::div(id = "task_insert_target"),
+  shiny::verbatimTextOutput("task_inserted_value"),
+  shiny::actionButton("toggle_ar_task", "Toggle auto-reset task"),
+  shiny::uiOutput("ar_task_mount"),
+  shiny::verbatimTextOutput("ar_task_value"),
+  shiny::actionButton("ar_task_busy", "Manual busy AR task"),
+  module_ui("mod"),
+  task_module_ui("tbmodA"),
+  task_module_ui("tbmodB")
 )
 
 server <- function(input, output, session) {
@@ -405,6 +480,20 @@ server <- function(input, output, session) {
   })
   output$runtime_button_class <- shiny::renderText({
     value <- input$runtime_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(class(value), collapse = ",")
+  })
+  output$runtime_task_button_value <- shiny::renderText({
+    value <- input$runtime_task_button
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    as.character(value)
+  })
+  output$runtime_task_button_class <- shiny::renderText({
+    value <- input$runtime_task_button
     if (is.null(value)) {
       return("<NULL>")
     }
@@ -729,6 +818,190 @@ server <- function(input, output, session) {
     )
   })
 
+  tb_hold <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(input$tb_hold_on, tb_hold(TRUE))
+  shiny::observeEvent(input$tb_hold_off, tb_hold(FALSE))
+
+  # Manual-suppression race: while "hold" is on, the click's reactive flush sets
+  # the task busy. Because that runs before the auto-reset onFlush callback, the
+  # manual-reset map suppresses the automatic ready reset and the button stays
+  # busy until released.
+  shiny::observeEvent(input$runtime_task_button, {
+    if (isTRUE(tb_hold())) {
+      update_block_task_button(
+        session = session,
+        input_id = "runtime_task_button",
+        state = "busy"
+      )
+    }
+  }, ignoreInit = TRUE)
+
+  shiny::observeEvent(input$tb_ready, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      state = "ready"
+    )
+  })
+
+  shiny::observeEvent(input$tb_disable, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$tb_enable, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      disabled = FALSE
+    )
+  })
+
+  # Combined update: busy must win even though disabled = FALSE is also sent, and
+  # the merged next state must be computed before the DOM is touched (no stale
+  # field-by-field re-enable).
+  shiny::observeEvent(input$tb_combined, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      state = "busy",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$tb_busy_icon, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_busy = "check"
+    )
+  })
+
+  shiny::observeEvent(input$tb_icon_end, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_position = "inline-end"
+    )
+  })
+
+  shiny::observeEvent(input$tb_icon_start, {
+    update_block_task_button(
+      session = session,
+      input_id = "runtime_task_button",
+      icon_position = "inline-start"
+    )
+  })
+
+  # Full update coverage: label, variant, size, ready icon, style, and class all
+  # reach the runtime through update_block_task_button().
+  shiny::observeEvent(input$tb_set_label, {
+    update_block_task_button(session, "runtime_task_button", label = "Relabeled")
+  })
+  shiny::observeEvent(input$tb_set_variant, {
+    update_block_task_button(session, "runtime_task_button", variant = "secondary")
+  })
+  shiny::observeEvent(input$tb_set_size, {
+    update_block_task_button(session, "runtime_task_button", size = "lg")
+  })
+  shiny::observeEvent(input$tb_set_icon, {
+    update_block_task_button(session, "runtime_task_button", icon = "check")
+  })
+  shiny::observeEvent(input$tb_set_style, {
+    update_block_task_button(session, "runtime_task_button", style = "min-width: 22rem;")
+  })
+  shiny::observeEvent(input$tb_set_class, {
+    update_block_task_button(session, "runtime_task_button", class = "tb-updated-class")
+  })
+  shiny::observeEvent(input$tb_set_label_busy, {
+    update_block_task_button(session, "runtime_task_button", label_busy = "New busy label")
+  })
+  # Clear semantics: NULL clears the ready icon, busy icon (back to the spinner),
+  # style, and class.
+  shiny::observeEvent(input$tb_clear_icon, {
+    update_block_task_button(session, "runtime_task_button", icon = NULL)
+  })
+  shiny::observeEvent(input$tb_clear_icon_busy, {
+    update_block_task_button(session, "runtime_task_button", icon_busy = NULL)
+  })
+  shiny::observeEvent(input$tb_clear_style, {
+    update_block_task_button(session, "runtime_task_button", style = NULL)
+  })
+  shiny::observeEvent(input$tb_clear_class, {
+    update_block_task_button(session, "runtime_task_button", class = NULL)
+  })
+
+  # Dynamic remount + rebind: a renderUI mount that toggles on/off. After a
+  # remount the fresh binding must report clicks and re-install the synchronous
+  # lock. auto_reset = FALSE so a click stays busy and is observable.
+  task_dynamic_visible <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(input$toggle_task_dynamic, {
+    task_dynamic_visible(!isTRUE(task_dynamic_visible()))
+  })
+  output$task_dynamic_mount <- shiny::renderUI({
+    if (!isTRUE(task_dynamic_visible())) {
+      return(NULL)
+    }
+    block_task_button(
+      "dyn_task",
+      "Dynamic run",
+      label_busy = "Dynamic busy",
+      auto_reset = FALSE
+    )
+  })
+  output$task_dynamic_value <- shiny::renderText(input$dyn_task %||% "<NULL>")
+
+  # insertUI / removeUI lifecycle: a task button inserted into a target, then
+  # removed and reinserted. Each insertion must rebind so clicks report and the
+  # synchronous lock re-installs. auto_reset = FALSE so a click stays busy.
+  shiny::observeEvent(input$insert_task, {
+    shiny::insertUI(
+      selector = "#task_insert_target",
+      where = "beforeEnd",
+      ui = shiny::div(
+        id = "task_inserted_host",
+        block_task_button(
+          "inserted_task",
+          "Inserted run",
+          label_busy = "Inserted busy",
+          auto_reset = FALSE
+        )
+      ),
+      immediate = TRUE
+    )
+  })
+  shiny::observeEvent(input$remove_task, {
+    shiny::removeUI(selector = "#task_inserted_host", immediate = TRUE)
+  })
+  output$task_inserted_value <- shiny::renderText(input$inserted_task %||% "<NULL>")
+
+  # Regression (#69 review): stale manual state must not survive a remount. An
+  # auto_reset = TRUE button is set to manual busy, removed, then recreated with
+  # the same id. The fresh instance must auto-reset on click — the input handler
+  # clears the stale manual flag when the new instance reports its initial value.
+  ar_task_visible <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(input$toggle_ar_task, {
+    ar_task_visible(!isTRUE(ar_task_visible()))
+  })
+  output$ar_task_mount <- shiny::renderUI({
+    if (!isTRUE(ar_task_visible())) {
+      return(NULL)
+    }
+    block_task_button(
+      "ar_task",
+      "AR run",
+      label_busy = "AR busy",
+      auto_reset = TRUE
+    )
+  })
+  output$ar_task_value <- shiny::renderText(input$ar_task %||% "<NULL>")
+  shiny::observeEvent(input$ar_task_busy, {
+    update_block_task_button(session, "ar_task", state = "busy")
+  })
+
   shiny::observeEvent(input$set_date, {
     update_block_date_picker(
       session = session,
@@ -930,6 +1203,11 @@ server <- function(input, output, session) {
       update_block_progress(session, "progress", value = 0.6)
     })
   })
+
+  # Two task-button modules sharing the local id "task": clicks and busy state
+  # must stay independent across the namespaced sessions.
+  task_module_server("tbmodA")
+  task_module_server("tbmodB")
 }
 
 shiny::runApp(
