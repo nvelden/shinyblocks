@@ -42,8 +42,9 @@ showcase_render_value <- function(expr, env = parent.frame()) {
 }
 
 control_group <- function(title, ..., first = FALSE) {
-  htmltools::div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", if (first) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"),
+  block_stack(
+    gap = "sm",
+    class = if (first) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group",
     htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", title),
     ...
   )
@@ -58,7 +59,11 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
@@ -81,20 +86,22 @@ ui <- block_page(
         ),
         control_group(
           "Actions (Server)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+          block_cluster(
+            gap = "sm",
             block_button("Show toast", id = "showcase_toast_fire", size = "sm"),
             block_button("Dismiss all", id = "showcase_toast_dismiss", variant = "outline", size = "sm")
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
           htmltools::div(
-            style = "position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: color-mix(in oklab, var(--muted) 28%, transparent); border: 0; border-radius: 0.75rem; min-height: 200px; box-sizing: border-box;",
+            class = "showcase-preview-canvas showcase-preview-canvas--muted",
+            style = "min-height: 200px;",
             uiOutput("showcase_toast_preview_ui")
           )
         ),
@@ -104,7 +111,8 @@ ui <- block_page(
         htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_toast_preview_code")),
         htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_toast_reactive_code"))
       )
-    )
+        )
+)
   )
 )
 

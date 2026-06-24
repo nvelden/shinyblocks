@@ -68,13 +68,18 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
                 style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+block_stack(
+  gap = "sm",
+  class = "showcase-controls-group showcase-controls-group--first",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
             "Shape"
@@ -89,8 +94,9 @@ htmltools::div(
             )
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
             "Dimensions"
@@ -115,20 +121,17 @@ htmltools::div(
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::tags$div(
             style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
             "Preview"
           ),
           htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-              "border: 0; border-radius: 0.75rem; min-height: 260px; box-sizing: border-box;"
-            ),
+            class = "showcase-preview-canvas",
             uiOutput("showcase_skeleton_preview_ui")
           )
         ),
@@ -140,7 +143,8 @@ htmltools::div(
           uiOutput("showcase_skeleton_preview_code")
         )
       )
-    )
+        )
+)
   )
 )
 
@@ -175,14 +179,16 @@ server <- function(input, output, session) {
   })
 
   preview_card <- function(args) {
-    htmltools::tags$div(
+    block_stack(
+      gap = "md",
       style = paste(
-        "width: min(100%, 30rem); display: flex; flex-direction: column; gap: 1rem;",
+        "width: min(100%, 30rem);",
         "padding: 1.25rem; border-radius: 0.75rem; background: var(--card);",
         "box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); box-sizing: border-box;"
       ),
-      htmltools::tags$div(
-        style = "display: flex; align-items: center; gap: 0.875rem;",
+      block_cluster(
+        gap = "sm",
+        align = "center",
         block_skeleton(
           style = skeleton_style(
             "3rem",
@@ -191,8 +197,9 @@ server <- function(input, output, session) {
             "flex: 0 0 auto;"
           )
         ),
-        htmltools::tags$div(
-          style = "flex: 1; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0;",
+        block_stack(
+          gap = "sm",
+          style = "flex: 1; min-width: 0;",
           block_skeleton(
             style = skeleton_style(
               args$width,
@@ -209,8 +216,8 @@ server <- function(input, output, session) {
       block_skeleton(
         style = skeleton_style("100%", "5rem", args$radius)
       ),
-      htmltools::tags$div(
-        style = "display: flex; gap: 0.5rem; flex-wrap: wrap;",
+      block_cluster(
+        gap = "sm",
         block_skeleton(
           style = skeleton_style("5rem", args$height, args$radius)
         ),
@@ -230,8 +237,8 @@ server <- function(input, output, session) {
   output$showcase_skeleton_preview_code <- showcase_render_code({
     args <- preview_args()
     paste0(
-      "htmltools::div(\n",
-      "  style = \"display: flex; flex-direction: column; gap: 1rem;\",\n",
+      "block_stack(\n",
+      "  gap = \"md\",\n",
       "  block_skeleton(style = ",
       string_literal(skeleton_style(args$width, args$height, args$radius)),
       "),\n",

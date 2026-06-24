@@ -91,13 +91,66 @@ block_cluster <- function(
   )
 }
 
+# Strict validation for `block_grid(min_width =)`.
+#
+# `min_width` is interpolated verbatim into the inline `style` attribute (inside
+# a `min()`/`minmax()` grid track), so it is a CSS-injection sink:
+# `htmltools::validateCssUnit()` is far too permissive here — its `calc(.*)`
+# branch accepts arbitrary text including `;`, letting callers smuggle extra
+# declarations into `style`, and it also waves through non-length keywords
+# (`"auto"`, `"inherit"`, `"fit-content"`, `"calc(auto)"`) that silently break
+# the responsive track. Accept only a single finite, non-negative numeric or a
+# strict `<number><length-unit>` / `<number>%` string. `calc()` and CSS-wide
+# keywords are rejected outright (no current call site needs them).
+GRID_MIN_WIDTH_PATTERN <- paste0(
+  "^(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)",
+  "(?:px|rem|em|ex|ch|vw|vh|vmin|vmax|cm|mm|in|pt|pc|q|%)$"
+)
+
+validate_grid_min_width <- function(min_width) {
+  reject <- function() {
+    stop(
+      "`min_width` must be a single non-negative CSS length or percentage ",
+      "(e.g. \"16rem\", \"280px\", \"50%\").",
+      call. = FALSE
+    )
+  }
+
+  if (length(min_width) != 1 || is.na(min_width)) {
+    reject()
+  }
+
+  if (is.numeric(min_width)) {
+    if (!is.finite(min_width) || min_width < 0) {
+      reject()
+    }
+    return(paste0(format(min_width, scientific = FALSE, trim = TRUE), "px"))
+  }
+
+  if (!is.character(min_width)) {
+    reject()
+  }
+
+  value <- trimws(min_width)
+  # Unitless zero is the only valid lengthless value in a grid track.
+  if (grepl("^0+(?:\\.0+)?$", value, perl = TRUE)) {
+    return("0")
+  }
+  if (!grepl(GRID_MIN_WIDTH_PATTERN, value, ignore.case = TRUE, perl = TRUE)) {
+    reject()
+  }
+  value
+}
+
 #' Create a responsive content grid
 #'
 #' Arrange repeated content in a responsive auto-fit grid whose columns shrink
 #' safely to the available width.
 #'
 #' @param ... Content to arrange.
-#' @param min_width Minimum preferred column width as a valid CSS unit.
+#' @param min_width Minimum preferred column width as a single non-negative CSS
+#'   length or percentage (e.g. `"16rem"`, `280`, `"50%"`). `calc()` and
+#'   CSS-wide keywords are not accepted.
 #' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
 #' @param align Cross-axis alignment: `"stretch"`, `"start"`, `"center"`, or
 #'   `"end"`.
@@ -113,25 +166,7 @@ block_grid <- function(
   align = c("stretch", "start", "center", "end"),
   class = NULL
 ) {
-  if (length(min_width) != 1 || is.na(min_width)) {
-    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
-  }
-  # `min_width` is interpolated into a `min()`/`minmax()` track, so it must be a
-  # finite, non-negative length. `validateCssUnit()` is too permissive on its
-  # own: it accepts negative/`Inf` numerics ("-1px", "Infpx") and the `"auto"`
-  # keyword, all of which silently break the responsive grid.
-  if (is.numeric(min_width) && (!is.finite(min_width) || min_width < 0)) {
-    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
-  }
-  min_width <- tryCatch(
-    htmltools::validateCssUnit(min_width),
-    error = function(e) {
-      stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
-    }
-  )
-  if (identical(min_width, "auto") || grepl("^-", min_width)) {
-    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
-  }
+  min_width <- validate_grid_min_width(min_width)
 
   attach_shinyblocks_deps(
     htmltools::tags$div(

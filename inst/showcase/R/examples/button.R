@@ -29,8 +29,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+            gap = "sm",
           showcase_action_button("showcase_button_set_label", "Set label \"Saved!\""),
           showcase_action_button("showcase_button_cycle_variant", "Cycle variant"),
           showcase_action_button("showcase_button_disable", "Disable"),
@@ -82,8 +82,8 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; gap: 0.75rem; flex-wrap: wrap;",
+  block_cluster(
+      gap = "sm",
     block_button("Default", class = "sb-parity-button-default"),
     block_button("Disabled", disabled = TRUE, class = "sb-parity-button-disabled")
   )

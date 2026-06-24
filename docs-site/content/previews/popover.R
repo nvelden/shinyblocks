@@ -3,10 +3,11 @@
 # .sb-popover-content / .sb-button classes (under data-shinyblocks-root +
 # -portal-root so both resolve). See the playground for live block_popover()
 # usage.
-htmltools::tags$div(
+shinyblocks::block_stack(
+  gap = "sm",
+  align = "center",
   `data-shinyblocks-root` = NA,
   `data-shinyblocks-portal-root` = NA,
-  style = "display:flex;flex-direction:column;align-items:center;gap:0.625rem;",
   htmltools::tags$button(
     class = "sb-button sb-button-default sb-button-size-default",
     `data-slot` = "popover-trigger",

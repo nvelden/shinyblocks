@@ -87,14 +87,18 @@ ui <- block_page(
       `data-shinyblocks-root` = "",
       style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
       htmltools::div(
-        class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
         block_card(
                   title = "Controls",
                   class = "showcase-playground__controls",
                   style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem;",
+block_stack(
+  gap = "sm",
+  class = "showcase-controls-group showcase-controls-group--first",
             htmltools::tags$h4(
               style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
               "Content"
@@ -132,8 +136,9 @@ htmltools::div(
             )
           ),
 
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
             htmltools::tags$h4(
               style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
               "State"
@@ -144,8 +149,9 @@ htmltools::div(
             )
           ),
 
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
             htmltools::tags$h4(
               style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
               "Styling"
@@ -183,14 +189,15 @@ htmltools::div(
             )
           ),
 
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
             htmltools::tags$h4(
               style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
               "Actions (Server Update)"
             ),
-            htmltools::tags$div(
-              style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+            block_cluster(
+              gap = "sm",
               showcase_action_button("showcase_button_set_label", "Set label"),
               showcase_action_button("showcase_button_cycle_variant", "Cycle variant"),
               showcase_action_button("showcase_button_disable", "Disable"),
@@ -201,28 +208,23 @@ htmltools::div(
           )
         ),
 
-        htmltools::div(
-          class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 0.5rem;",
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
             htmltools::tags$div(
               style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
               "Preview"
             ),
             htmltools::tags$div(
-              style = paste(
-                "position: relative; display: flex; align-items: center; justify-content: center;",
-                "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-                "border: 1px solid var(--border); border-radius: 0.75rem;",
-                "min-height: 160px; box-sizing: border-box;",
-                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-              ),
+              class = "showcase-preview-canvas",
               uiOutput("showcase_button_preview_ui")
             )
           ),
           uiOutput("showcase_button_preview_value"),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
               htmltools::tags$div(
                 style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
@@ -239,7 +241,8 @@ htmltools::div(
             )
           )
         )
-      )
+          )
+)
     )
 )
 

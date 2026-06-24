@@ -28,8 +28,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+        block_cluster(
+            gap = "sm",
           showcase_action_button("showcase_popover_open", "Open"),
           showcase_action_button("showcase_popover_close", "Close"),
           showcase_action_button("showcase_popover_reposition", "Move"),
@@ -68,11 +68,8 @@ htmltools::tagList(
         shiny::uiOutput("showcase_popover_reactive_code")
       )
     ),
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 3rem 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 180px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted",
+    preview_canvas_style = "min-height: 180px;"
     )
   ),
   htmltools::tags$div(

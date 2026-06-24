@@ -159,6 +159,27 @@ test_that("runtime CSS does not target host framework selectors", {
   )
 })
 
+test_that("responsive grid is protected against mobile overflow", {
+  css <- package_source_css()
+  css_flat <- gsub("[[:space:]]+", " ", css)
+
+  # The track must cap each column at the container width so a wide
+  # `--sb-grid-min` never forces a row wider than the viewport.
+  expect_match(
+    css_flat,
+    "repeat(auto-fit, minmax(min(100%, var(--sb-grid-min)), 1fr))",
+    fixed = TRUE
+  )
+
+  # Grid items default to `min-width: auto`; without this they refuse to shrink
+  # below their content min-content size and overflow on narrow viewports.
+  expect_match(
+    css_flat,
+    ".sb-grid > * { min-width: 0; }",
+    fixed = TRUE
+  )
+})
+
 test_that("runtime CSS does not reset all runtime children", {
   css <- runtime_css()
 

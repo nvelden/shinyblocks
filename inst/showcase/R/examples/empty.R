@@ -43,11 +43,7 @@ htmltools::tagList(
     ),
     preview_output_id = "showcase_empty_preview_ui",
     code_output_id = "showcase_empty_preview_code",
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_empty_api_table"),
@@ -59,8 +55,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.75rem; max-width: 400px;",
+  block_stack(
+      gap = "sm",
+      style = "max-width: 400px;",
     block_empty(
       title = "No projects found",
       description = "Get started by creating a new repository.",

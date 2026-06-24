@@ -22,12 +22,10 @@ toast_card <- function(title, description, variant, icon_name) {
   )
 }
 
-htmltools::tags$div(
+shinyblocks::block_stack(
+  gap = "sm",
   `data-shinyblocks-portal-root` = "",
-  style = paste(
-    "position: relative; display: flex; flex-direction: column; gap: 0.625rem;",
-    "width: 100%; max-width: 360px; margin: 0 auto;"
-  ),
+  style = "position: relative; width: 100%; max-width: 360px; margin: 0 auto;",
   toast_card("Changes saved", "Your profile has been updated.", "success", "check-circle"),
   toast_card("Storage almost full", "You have used 90% of your space.", "warning", "alert-triangle")
 )

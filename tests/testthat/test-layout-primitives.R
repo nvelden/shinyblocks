@@ -50,21 +50,62 @@ test_that("layout primitives support their complete semantic class vocabulary", 
 })
 
 test_that("cluster wrapping and grid widths are validated and serialized", {
+  msg <- "`min_width` must be a single non-negative CSS length or percentage"
+
   expect_identical(tag_attr(block_cluster(wrap = FALSE), "data-wrap"), "false")
   expect_identical(tag_attr(block_grid(min_width = 240), "style"), "--sb-grid-min:240px;")
   expect_identical(tag_attr(block_grid(min_width = "14rem"), "style"), "--sb-grid-min:14rem;")
+  expect_identical(tag_attr(block_grid(min_width = "50%"), "style"), "--sb-grid-min:50%;")
 
   expect_error(block_cluster(wrap = NA), "wrap.*single TRUE or FALSE")
   expect_identical(tag_attr(block_grid(min_width = 0), "style"), "--sb-grid-min:0px;")
+  expect_identical(tag_attr(block_grid(min_width = "0"), "style"), "--sb-grid-min:0;")
 
-  expect_error(block_grid(min_width = c("12rem", "16rem")), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
-  expect_error(block_grid(min_width = "wide"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = c("12rem", "16rem")), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "wide"), msg, fixed = TRUE)
   # Reject values that produce invalid `min()`/`minmax()` tracks.
-  expect_error(block_grid(min_width = -1), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
-  expect_error(block_grid(min_width = Inf), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
-  expect_error(block_grid(min_width = NaN), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
-  expect_error(block_grid(min_width = "auto"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
-  expect_error(block_grid(min_width = "-5px"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = -1), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = Inf), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = NaN), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "auto"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "-5px"), msg, fixed = TRUE)
+})
+
+test_that("block_grid() min_width rejects CSS injection and non-length values", {
+  msg <- "`min_width` must be a single non-negative CSS length or percentage"
+
+  # Critical: validateCssUnit() accepted calc(...) containing `;`, letting
+  # callers smuggle extra declarations into the inline `style` attribute.
+  expect_error(
+    block_grid(min_width = "calc(1px);position:fixed;inset:0;z-index:9999;foo:calc(1px)"),
+    msg,
+    fixed = TRUE
+  )
+  expect_error(block_grid(min_width = "16rem;color:red"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "16rem;}body{display:none"), msg, fixed = TRUE)
+
+  # calc() and other functional/keyword values are rejected outright.
+  expect_error(block_grid(min_width = "calc(100% - 1rem)"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "calc(auto)"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "min(100%, 16rem)"), msg, fixed = TRUE)
+
+  # CSS-wide keywords and non-length track values.
+  expect_error(block_grid(min_width = "inherit"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "initial"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "unset"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "fit-content"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "max-content"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "1fr"), msg, fixed = TRUE)
+
+  # Malformed numerics.
+  expect_error(block_grid(min_width = ""), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "16"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "px"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = "16 rem"), msg, fixed = TRUE)
+  expect_error(block_grid(min_width = NA_character_), msg, fixed = TRUE)
+
+  # A whitespace-padded valid length is accepted and trimmed.
+  expect_identical(tag_attr(block_grid(min_width = " 18rem "), "style"), "--sb-grid-min:18rem;")
 })
 
 test_that("layout primitives merge classes, allow empty containers, and nest", {

@@ -48,13 +48,18 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
         style = "flex: 1; min-width: 280px; max-width: 320px;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group showcase-controls-group--first",
           htmltools::tags$h4(style = group_header_style, "Profile"),
           block_field(
             block_field_label("style profile", `for` = "showcase_style_doc_profile"),
@@ -72,8 +77,9 @@ ui <- block_page(
             )
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(style = group_header_style, "Overrides"),
           block_field(
             block_field_label("control height", `for` = "showcase_style_doc_control_height"),
@@ -113,10 +119,11 @@ ui <- block_page(
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
           htmltools::div(
             style = paste(
@@ -135,7 +142,8 @@ ui <- block_page(
           uiOutput("showcase_style_preview_code")
         )
       )
-    )
+        )
+)
   )
 )
 
@@ -173,26 +181,29 @@ server <- function(input, output, session) {
 
     htmltools::tagList(
       style_obj$style,
-      htmltools::div(
+      block_stack(
+        gap = "lg",
         class = "sb-style-demo-scope",
         `data-sb-style` = profile,
-        style = "display: flex; flex-direction: column; gap: var(--sb-surface-gap, 1.1rem); min-width: 0; width: 100%;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.35rem;",
+        style = "min-width: 0; width: 100%;",
+        block_stack(
+          gap = "sm",
           htmltools::span(style = label_style, "Buttons: control height, radius, focus ring follow the profile"),
-          htmltools::div(
-            style = "display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;",
+          block_cluster(
+            gap = "sm",
+            align = "center",
             block_button("Primary", variant = "default"),
             block_button("Secondary", variant = "secondary"),
             block_button("Outline", variant = "outline"),
             block_button("Ghost", variant = "ghost")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.35rem;",
+        block_stack(
+          gap = "sm",
           htmltools::span(style = label_style, "Badges + input control sizing"),
-          htmltools::div(
-            style = "display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;",
+          block_cluster(
+            gap = "sm",
+            align = "center",
             block_badge("Primary", variant = "default"),
             block_badge("Secondary", variant = "secondary"),
             block_badge("Outline", variant = "outline")

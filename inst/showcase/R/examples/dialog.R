@@ -31,8 +31,8 @@ htmltools::tagList(
         ),
         showcase_controls_group(
           "Actions (Server Update)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+          block_cluster(
+              gap = "sm",
             showcase_action_button("showcase_dialog_open", "Open modal"),
             showcase_action_button("showcase_dialog_close", "Close modal"),
             showcase_action_button("showcase_dialog_resize_sm", "Resize sm"),
@@ -59,8 +59,8 @@ htmltools::tagList(
       preview_output_id = "showcase_dialog_preview_ui",
       code_output_id = "showcase_dialog_preview_code",
       extra_outputs = htmltools::tagList(
-        htmltools::div(
-          style = "display: flex; justify-content: center;",
+        block_cluster(
+            justify = "center",
           shiny::uiOutput("showcase_dialog_trigger_ui")
         ),
         shiny::uiOutput("showcase_dialog_preview_value"),
@@ -72,11 +72,7 @@ htmltools::tagList(
           shiny::uiOutput("showcase_dialog_reactive_code")
         )
       ),
-      preview_canvas_style = paste(
-        "position: relative; display: flex; align-items: center; justify-content: center;",
-        "padding: 1.25rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-        "border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;"
-      )
+      preview_canvas_class = "showcase-preview-canvas--muted"
     )
   ),
   block_dialog(

@@ -46,8 +46,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; gap: 1rem; align-items: center;",
+  block_cluster(
+      gap = "md",
+      align = "center",
     block_spinner(class = "sb-parity-spinner-default")
   )
 )

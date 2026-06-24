@@ -15,7 +15,9 @@ block_grid(
 \arguments{
 \item{...}{Content to arrange.}
 
-\item{min_width}{Minimum preferred column width as a valid CSS unit.}
+\item{min_width}{Minimum preferred column width as a single non-negative CSS
+length or percentage (e.g. \code{"16rem"}, \code{280}, \code{"50\%"}). \code{calc()} and
+CSS-wide keywords are not accepted.}
 
 \item{gap}{Spacing between children: \code{"sm"}, \code{"md"}, or \code{"lg"}.}
 

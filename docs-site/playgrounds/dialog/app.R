@@ -42,8 +42,9 @@ showcase_render_value <- function(expr, env = parent.frame()) {
 }
 
 control_group <- function(title, ..., first = FALSE) {
-  htmltools::div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", if (first) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"),
+  block_stack(
+    gap = "sm",
+    class = if (first) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group",
     htmltools::tags$h4(style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;", title),
     ...
   )
@@ -56,7 +57,11 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
@@ -74,8 +79,8 @@ control_group(
         ),
         control_group(
           "Actions (Server Update)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+          block_cluster(
+            gap = "sm",
             block_button("Open modal", id = "showcase_dialog_open", variant = "outline", size = "sm"),
             block_button("Close modal", id = "showcase_dialog_close", variant = "outline", size = "sm"),
             block_button("Resize sm", id = "showcase_dialog_resize_sm", variant = "outline", size = "sm"),
@@ -90,22 +95,24 @@ control_group(
           block_field(block_field_label("class", `for` = "showcase_dialog_doc_class"), block_checkbox("showcase_dialog_doc_class", "Use custom dashed-border class", value = FALSE))
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
           htmltools::div(
-            style = "position: relative; display: flex; align-items: center; justify-content: center; padding: 1.25rem; background: color-mix(in oklab, var(--muted) 28%, transparent); border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;",
+            class = "showcase-preview-canvas showcase-preview-canvas--muted",
             uiOutput("showcase_dialog_preview_ui")
           )
         ),
-        htmltools::div(style = "display: flex; justify-content: center;", uiOutput("showcase_dialog_trigger_ui")),
+        block_cluster(justify = "center", uiOutput("showcase_dialog_trigger_ui")),
         uiOutput("showcase_dialog_preview_value"),
         htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "UI Definition"), uiOutput("showcase_dialog_preview_code")),
         htmltools::div(htmltools::div(style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;", "Server Action"), uiOutput("showcase_dialog_reactive_code"))
       )
-    ),
+        )
+),
     block_dialog(
       id = "showcase_dialog_preview",
       title = "Confirm action",

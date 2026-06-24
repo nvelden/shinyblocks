@@ -5,10 +5,11 @@
 # button and overlay styles resolve), with the fixed-overlay positioning
 # neutralised so it sits inside the card. See the playground for live
 # block_dialog() usage.
-htmltools::tags$div(
+shinyblocks::block_cluster(
+  justify = "center",
   `data-shinyblocks-root` = NA,
   `data-shinyblocks-portal-root` = NA,
-  style = "width:100%;display:flex;justify-content:center;",
+  style = "width:100%;",
   htmltools::tags$div(
     class = "sb-dialog-content sb-dialog-content-size-default",
     `data-slot` = "dialog-content",

@@ -56,8 +56,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+            gap = "sm",
           # The signature server interaction: manual busy/ready control plus
           # disabled-state preservation. The Content / State / Styling controls
           # above already exercise the remaining update fields live.
@@ -98,8 +98,8 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instance used by the theme/style harness. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; gap: 0.75rem; flex-wrap: wrap;",
+  block_cluster(
+      gap = "sm",
     block_task_button("sb_parity_task_button", "Default", class = "sb-parity-task-button-default")
   )
 )
