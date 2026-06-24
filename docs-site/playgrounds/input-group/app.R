@@ -78,13 +78,17 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+block_stack(
+  gap = "sm",
+  class = "showcase-controls-group showcase-controls-group--first",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
             "Content"
@@ -112,8 +116,9 @@ htmltools::div(
             block_textarea("showcase_input_group_doc_value", value = "", rows = 1, resize = "none")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
             "State"
@@ -127,8 +132,9 @@ htmltools::div(
             block_checkbox("showcase_input_group_doc_invalid", label = "Invalid")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
             "Styling"
@@ -148,14 +154,15 @@ htmltools::div(
             block_checkbox("showcase_input_group_doc_class", "Use custom dashed-border class")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           htmltools::tags$h4(
             style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
             "Actions (Server Update)"
           ),
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          block_cluster(
+            gap = "sm",
             showcase_action_button("showcase_input_group_set_value", "Set value"),
             showcase_action_button("showcase_input_group_clear", "Reset"),
             showcase_action_button("showcase_input_group_disable", "Disable"),
@@ -163,21 +170,18 @@ htmltools::div(
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
           htmltools::div(
             style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
             "Preview"
           ),
-          htmltools::div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 3rem 2rem 2.5rem; background: var(--card);",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 180px; box-sizing: border-box;"
-            ),
+          htmltools::tags$div(
+            class = "showcase-preview-canvas showcase-preview-canvas--dashed",
+            style = "min-height: 180px;",
             uiOutput("showcase_input_group_preview_ui")
           )
         ),
@@ -198,6 +202,7 @@ htmltools::div(
         )
       )
     )
+  )
   )
 )
 

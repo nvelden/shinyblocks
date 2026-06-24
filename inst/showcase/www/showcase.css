@@ -301,6 +301,31 @@ pre.shiny-text-output {
   justify-content: stretch;
 }
 
+/* Dashed-border preview canvas variant (used by inputs whose control sits on a
+   sketch surface). Layout/centering comes from .showcase-preview-canvas; this
+   modifier only swaps the border style and tightens the bottom padding.
+   Per-example min-height stays inline (sizing, not layout). */
+.showcase-preview-canvas--dashed {
+  border-style: dashed;
+  padding: 3rem 2rem 2.5rem 2rem;
+}
+
+/* Dashed-border demo frame for parity fixtures. Layout (stack/cluster) comes
+   from the wrapping primitive; this class carries only the sketch chrome. */
+.showcase-demo-frame {
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.5rem;
+}
+
+/* Solid surface panel for grouped parity fixtures laid out with block_grid(). */
+.showcase-demo-panel {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+}
+
 /* Separator fixture row: fixed height so the vertical separator reads clearly. */
 .showcase-separator-row {
   height: 2rem;
@@ -366,34 +391,60 @@ pre.shiny-text-output {
   height: 100%;
 }
 
-/* Desktop playground: a natural two-column flow. Controls stick to the top of
-   the viewport while the page scrolls; the main column flows at its own height
-   so nothing is clipped or floated over the content (e.g. the API table) below
-   the playground. */
+/* Desktop playground: a fixed-height two-column frame. The whole playground is
+   capped so it can't stretch the page; each column (controls / preview+code)
+   scrolls independently within that frame. The split is a block_cluster(), so
+   the height + flex sizing live here rather than on inline styles. The API table
+   and "View source" are siblings *after* the split, so they flow normally below
+   the capped frame. */
 @media (min-width: 768px) {
   .showcase-playground__split {
     display: flex !important;
-    flex-wrap: nowrap !important; /* the split is a block_cluster(); keep the two
-                                     columns on one row instead of wrapping main
-                                     below the controls when the preview is wide */
-    align-items: flex-start !important;
+    flex-wrap: nowrap !important; /* keep the two columns on one row */
+    align-items: stretch !important; /* equal-height columns */
     gap: 2rem !important;
+    height: 680px !important; /* fixed height for visual consistency */
+    min-height: 450px !important;
   }
 
-  /* Controls Panel (Left Column) — sticky so it stays in view while scrolling */
+  /* Controls Panel (Left Column) — independent scroll within the frame */
   .showcase-playground__controls {
-    position: sticky;
-    top: 1rem;
-    flex: 0 0 330px;
-    width: 330px;
-    box-sizing: border-box;
+    flex: 0 0 330px !important;
+    width: 330px !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 
-  /* Preview and Code Stack (Right Column) */
+  /* Preview and Code Stack (Right Column) — independent scroll within the frame */
   .showcase-playground__main {
-    flex: 1 1 auto;
-    min-width: 0; /* allow the column to shrink instead of overflowing */
-    box-sizing: border-box;
+    flex: 1 1 auto !important;
+    min-width: 0 !important; /* allow the column to shrink instead of overflowing */
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Thin custom scrollbars for both columns. */
+  .showcase-playground__controls::-webkit-scrollbar,
+  .showcase-playground__main::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .showcase-playground__controls::-webkit-scrollbar-track,
+  .showcase-playground__main::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .showcase-playground__controls::-webkit-scrollbar-thumb,
+  .showcase-playground__main::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  .showcase-playground__controls::-webkit-scrollbar-thumb:hover,
+  .showcase-playground__main::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
   }
 }
 

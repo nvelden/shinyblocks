@@ -55,8 +55,16 @@ test_that("cluster wrapping and grid widths are validated and serialized", {
   expect_identical(tag_attr(block_grid(min_width = "14rem"), "style"), "--sb-grid-min:14rem;")
 
   expect_error(block_cluster(wrap = NA), "wrap.*single TRUE or FALSE")
+  expect_identical(tag_attr(block_grid(min_width = 0), "style"), "--sb-grid-min:0px;")
+
   expect_error(block_grid(min_width = c("12rem", "16rem")), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
   expect_error(block_grid(min_width = "wide"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  # Reject values that produce invalid `min()`/`minmax()` tracks.
+  expect_error(block_grid(min_width = -1), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = Inf), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = NaN), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = "auto"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
+  expect_error(block_grid(min_width = "-5px"), "`min_width` must be a single valid CSS unit.", fixed = TRUE)
 })
 
 test_that("layout primitives merge classes, allow empty containers, and nest", {

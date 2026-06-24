@@ -37,8 +37,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_date_picker_set_today", "Set today"),
           showcase_action_button("showcase_date_picker_set_xmas", "Set 2025-12-25"),
           showcase_action_button("showcase_date_picker_clear", "Clear"),

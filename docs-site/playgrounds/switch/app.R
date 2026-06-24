@@ -89,28 +89,27 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
                 title = "Controls",
                 class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
+block_stack(
+  gap = "sm",
+  class = "showcase-controls-group showcase-controls-group--first",
+  htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
           block_field(
             block_field_label("label", `for` = "showcase_switch_doc_label"),
             block_input("showcase_switch_doc_label", value = "Send incident alerts")
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "State"
-          ),
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
           block_field(
             block_field_label("value (checked)", `for` = "showcase_switch_doc_value"),
             block_checkbox("showcase_switch_doc_value", "Checked", value = FALSE)
@@ -120,12 +119,10 @@ htmltools::div(
             block_checkbox("showcase_switch_doc_disabled", "Disabled", value = FALSE)
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
           block_field(
             block_field_label("size", `for` = "showcase_switch_doc_size"),
             block_select(
@@ -154,14 +151,12 @@ htmltools::div(
             )
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Actions (Server Update)"
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+          block_cluster(
+            gap = "sm",
             showcase_action_button("showcase_switch_turn_on", "Turn on"),
             showcase_action_button("showcase_switch_turn_off", "Turn off"),
             showcase_action_button("showcase_switch_disable", "Disable"),
@@ -171,27 +166,21 @@ htmltools::div(
           )
         )
       ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
+        block_stack(
+          gap = "sm",
+          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
           htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 180px; box-sizing: border-box;"
-            ),
+            class = "showcase-preview-canvas showcase-preview-canvas--dashed",
+            style = "min-height: 180px;",
             uiOutput("showcase_switch_preview_ui")
           )
         ),
         uiOutput("showcase_switch_preview_value"),
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 1rem;",
+        block_stack(
+          gap = "md",
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
@@ -209,6 +198,7 @@ htmltools::div(
         )
       )
     )
+  )
   )
 )
 

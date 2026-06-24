@@ -116,12 +116,22 @@ block_grid <- function(
   if (length(min_width) != 1 || is.na(min_width)) {
     stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
   }
+  # `min_width` is interpolated into a `min()`/`minmax()` track, so it must be a
+  # finite, non-negative length. `validateCssUnit()` is too permissive on its
+  # own: it accepts negative/`Inf` numerics ("-1px", "Infpx") and the `"auto"`
+  # keyword, all of which silently break the responsive grid.
+  if (is.numeric(min_width) && (!is.finite(min_width) || min_width < 0)) {
+    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
+  }
   min_width <- tryCatch(
     htmltools::validateCssUnit(min_width),
     error = function(e) {
       stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
     }
   )
+  if (identical(min_width, "auto") || grepl("^-", min_width)) {
+    stop("`min_width` must be a single valid CSS unit.", call. = FALSE)
+  }
 
   attach_shinyblocks_deps(
     htmltools::tags$div(

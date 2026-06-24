@@ -98,21 +98,22 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+      class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
 
       # Left Column: Controls Panel
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
 
         # Content Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group showcase-controls-group--first",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
           block_field(
             block_field_label("value", `for` = "showcase_date_picker_doc_value"),
             block_textarea("showcase_date_picker_doc_value", value = "2024-01-15", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
@@ -133,12 +134,10 @@ ui <- block_page(
         ),
 
         # State Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "State"
-          ),
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
           block_field(
             block_field_label("min", `for` = "showcase_date_picker_doc_min"),
             block_textarea("showcase_date_picker_doc_min", value = "", rows = 1, placeholder = "yyyy-mm-dd", resize = "none")
@@ -158,12 +157,10 @@ ui <- block_page(
         ),
 
         # Styling Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
           block_field(
             block_field_label("weekstart", `for` = "showcase_date_picker_doc_weekstart"),
             block_select(
@@ -198,14 +195,12 @@ ui <- block_page(
         ),
 
         # Actions (Server Update) Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Actions (Server Update)"
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
+          htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+          block_cluster(
+            gap = "sm",
             showcase_action_button("showcase_date_picker_set_today", "Set today"),
             showcase_action_button("showcase_date_picker_set_xmas", "Set 2025-12-25"),
             showcase_action_button("showcase_date_picker_clear", "Clear"),
@@ -217,24 +212,16 @@ ui <- block_page(
       ),
 
       # Right Column: Preview & Reactive Output Code Blocks
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
+      block_stack(
+        gap = "lg",
+        class = "showcase-playground__main",
 
         # Preview Section
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+        block_stack(
+          gap = "sm",
+          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
           htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "min-height: 160px; box-sizing: border-box;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-            ),
+            class = "showcase-preview-canvas",
             uiOutput("showcase_date_picker_preview_ui")
           )
         ),
@@ -243,8 +230,8 @@ ui <- block_page(
         uiOutput("showcase_date_picker_preview_value"),
 
         # Code Blocks Panel
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 1rem;",
+        block_stack(
+          gap = "md",
           htmltools::tags$div(
             htmltools::tags$div(
               style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
@@ -262,6 +249,7 @@ ui <- block_page(
         )
       )
     )
+  )
   )
 )
 

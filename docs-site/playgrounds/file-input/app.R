@@ -83,17 +83,20 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
 
       # Left Column: Controls Panel
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
 
         # Content Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group showcase-controls-group--first",
           showcase_controls_heading("Content"),
           block_field(
             block_field_label("variant", `for` = "showcase_file_input_doc_variant"),
@@ -140,8 +143,9 @@ ui <- block_page(
         ),
 
         # State Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           showcase_controls_heading("State"),
           block_field(
             block_field_label("multiple", `for` = "showcase_file_input_doc_multiple"),
@@ -158,8 +162,9 @@ ui <- block_page(
         ),
 
         # Styling Controls Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           showcase_controls_heading("Styling"),
           block_field(
             block_field_label("width", `for` = "showcase_file_input_doc_width"),
@@ -186,11 +191,12 @@ ui <- block_page(
         ),
 
         # Actions (Server Update) Group
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
+        block_stack(
+          gap = "sm",
+          class = "showcase-controls-group",
           showcase_controls_heading("Actions (Server Update)"),
-          htmltools::tags$div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          block_cluster(
+            gap = "sm",
             showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
             showcase_action_button("showcase_file_input_to_button", "Switch to button"),
             showcase_action_button("showcase_file_input_relabel", "Relabel button"),
@@ -206,23 +212,14 @@ ui <- block_page(
       ),
 
       # Right Column: Preview & Code Blocks
-      htmltools::div(
+      block_stack(
+        gap = "lg",
         class = "showcase-playground__main",
-        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
+        block_stack(
+          gap = "sm",
+          htmltools::tags$div(class = "showcase-playground__label", "Preview"),
           htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 3rem 2rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "min-height: 160px; box-sizing: border-box;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-            ),
+            class = "showcase-preview-canvas",
             uiOutput("showcase_file_input_preview_ui")
           )
         ),
@@ -243,6 +240,7 @@ ui <- block_page(
         )
       )
     )
+  )
   )
 )
 

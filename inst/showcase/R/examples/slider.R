@@ -56,8 +56,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_slider_set_low", "Set 25"),
           showcase_action_button("showcase_slider_set_range", "Set range"),
           showcase_action_button("showcase_slider_disable", "Disable"),
@@ -98,12 +98,8 @@ htmltools::tagList(
         shiny::uiOutput("showcase_slider_reactive_code")
       )
     ),
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 3rem 2rem 2.5rem; background: var(--card);",
-      "border: 1px dashed var(--border); border-radius: 0.75rem;",
-      "min-height: 180px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--dashed",
+    preview_canvas_style = "min-height: 180px;"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_slider_api_table"),
@@ -115,8 +111,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances captured by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 1rem; padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+  block_stack(
+    gap = "md",
+    class = "showcase-demo-frame",
     block_slider(
       "showcase_parity_slider_default",
       value = 50,

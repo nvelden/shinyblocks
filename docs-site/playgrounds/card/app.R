@@ -59,6 +59,10 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
+    block_cluster(
+      gap = "lg",
+      align = "start",
+      class = "showcase-playground__split",
       block_card(
         title = "Controls",
         class = "showcase-playground__controls",
@@ -137,6 +141,7 @@ ui <- block_page(
         )
       )
     )
+  )
   )
 )
 

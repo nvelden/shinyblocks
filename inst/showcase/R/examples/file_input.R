@@ -63,8 +63,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
           showcase_action_button("showcase_file_input_to_button", "Switch to button"),
           showcase_action_button("showcase_file_input_relabel", "Relabel button"),

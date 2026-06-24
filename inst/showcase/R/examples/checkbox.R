@@ -33,8 +33,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_checkbox_set_checked", "Set checked"),
           showcase_action_button("showcase_checkbox_clear", "Clear"),
           showcase_action_button("showcase_checkbox_disable", "Disable"),
@@ -76,8 +76,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances captured by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+  block_stack(
+    gap = "sm",
+    class = "showcase-demo-frame",
     block_checkbox(
       "showcase_parity_checkbox_default",
       "Default checkbox",
