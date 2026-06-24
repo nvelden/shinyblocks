@@ -45,7 +45,8 @@ update_block_task_button(
 
 \item{style}{Optional inline CSS styles, or \code{NULL} to clear.}
 
-\item{class}{Optional replacement classes for the wrapper.}
+\item{class}{Optional replacement classes merged onto the runtime button
+element. Pass \code{NULL} to clear.}
 }
 \value{
 Invisibly returns \code{NULL}.

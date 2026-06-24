@@ -28,7 +28,7 @@ on a Shiny input binding. Read the click count with \code{input[[input_id]]}.}
 
 \item{variant}{Visual variant.}
 
-\item{size}{Button size.}
+\item{size}{Button size: one of \code{"default"}, \code{"sm"}, or \code{"lg"}.}
 
 \item{icon}{Optional ready-state icon: a vendored icon name or \code{shiny.tag}.}
 
@@ -44,7 +44,7 @@ manual control via \code{\link[=update_block_task_button]{update_block_task_butt
 \item{...}{Additional attributes passed to the button. Pass \code{disabled = TRUE}
 to render disabled.}
 
-\item{class}{Additional classes.}
+\item{class}{Additional classes merged onto the runtime button element.}
 }
 \value{
 An \code{htmltools} tag.

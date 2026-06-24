@@ -693,6 +693,37 @@ try {
   );
   await assertText(page, "#task_inserted_value", "1");
 
+  // Regression (#69 review): stale manual state must NOT survive a remount.
+  // Set an auto_reset=TRUE button to manual busy, remove it, recreate a fresh
+  // one with the same id, then click it — it must auto-reset to ready. A stale
+  // manual flag would suppress the reset and leave it busy forever.
+  const arTask = "[data-sb-input-id='ar_task'] [data-slot='task-button']";
+  await page.click("#toggle_ar_task"); // show
+  await page.waitForSelector(arTask);
+  await page.click("#ar_task_busy"); // server takes manual control → busy
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "busy",
+    arTask
+  );
+  await page.click("#toggle_ar_task"); // remove while manual-busy
+  await page.waitForFunction(() => !document.querySelector("[data-sb-input-id='ar_task']"));
+  await page.click("#toggle_ar_task"); // recreate a fresh ready instance
+  await page.waitForSelector(arTask);
+  await page.waitForFunction(
+    (sel) => document.querySelector(sel)?.getAttribute("data-state") === "ready",
+    arTask
+  );
+  await page.click(arTask);
+  await assertText(page, "#ar_task_value", "1"); // click registered on the fresh bind
+  // The automatic reset must fire despite the previous instance's manual flag.
+  await page.waitForFunction(
+    (sel) => {
+      const b = document.querySelector(sel);
+      return b?.getAttribute("data-state") === "ready" && b?.disabled === false;
+    },
+    arTask
+  );
+
   // Date picker: the binding reports an ISO string typed `shiny.date`, so the
   // server value is a length-1 Date. Covers initial value, user selection,
   // server update, clear, and disabled state.

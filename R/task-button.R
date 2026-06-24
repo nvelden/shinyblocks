@@ -6,7 +6,10 @@ TASK_BUTTON_VARIANTS <- c(
   "destructive",
   "link"
 )
-TASK_BUTTON_SIZES <- c("default", "sm", "lg", "icon")
+# No "icon" size: a task button always carries a text label (and busy label),
+# which would clip inside the fixed-width icon button. Icon-only is intentionally
+# unsupported; use block_button() for an icon-only trigger.
+TASK_BUTTON_SIZES <- c("default", "sm", "lg")
 TASK_BUTTON_ICON_POSITIONS <- c("inline-start", "inline-end")
 TASK_BUTTON_STATES <- c("ready", "busy")
 
@@ -42,7 +45,7 @@ task_button_icon <- function(icon, icon_position) {
 #' @param label Button label (ready state).
 #' @param label_busy Accessible and visible label shown while busy.
 #' @param variant Visual variant.
-#' @param size Button size.
+#' @param size Button size: one of `"default"`, `"sm"`, or `"lg"`.
 #' @param icon Optional ready-state icon: a vendored icon name or `shiny.tag`.
 #' @param icon_busy Optional busy-state icon: a vendored icon name or
 #'   `shiny.tag`. Defaults to a spinner when `NULL`.
@@ -52,7 +55,7 @@ task_button_icon <- function(icon, icon_position) {
 #'   manual control via [update_block_task_button()].
 #' @param ... Additional attributes passed to the button. Pass `disabled = TRUE`
 #'   to render disabled.
-#' @param class Additional classes.
+#' @param class Additional classes merged onto the runtime button element.
 #'
 #' @return An `htmltools` tag.
 #' @family action
@@ -61,7 +64,9 @@ task_button_icon <- function(icon, icon_position) {
 block_task_button <- function(
   input_id,
   label,
-  label_busy = "Processing…",
+  # Keep the ellipsis locale-independent. A literal non-ASCII character in R
+  # source triggers the portable-code check under R CMD check.
+  label_busy = "Processing\u2026",
   variant = TASK_BUTTON_VARIANTS,
   size = TASK_BUTTON_SIZES,
   icon = NULL,
@@ -161,7 +166,8 @@ block_task_button <- function(
 #' @param icon_position Optional `"inline-start"` / `"inline-end"`.
 #' @param disabled Optional disabled state.
 #' @param style Optional inline CSS styles, or `NULL` to clear.
-#' @param class Optional replacement classes for the wrapper.
+#' @param class Optional replacement classes merged onto the runtime button
+#'   element. Pass `NULL` to clear.
 #'
 #' @return Invisibly returns `NULL`.
 #' @family action
@@ -270,7 +276,7 @@ update_block_task_button <- function(
 # the root session's `userData` (module session proxies delegate `userData` to
 # the root by reference), keyed by the fully namespaced input id, so two
 # concurrent sessions using the same local id stay independent. Uses a base R
-# environment — no new package dependency.
+# environment; no new package dependency.
 
 task_button_manual_env <- function(session) {
   store <- session$userData[["sb_manual_task_button_reset"]]
@@ -307,4 +313,40 @@ task_button_is_manual <- function(session, key) {
   store <- task_button_manual_env(session)
   isTRUE(exists(key, envir = store, inherits = FALSE)) &&
     isTRUE(get(key, envir = store, inherits = FALSE))
+}
+
+# --- Session-local mount-id map ------------------------------------------
+#
+# Tracks the last client mount id seen for each namespaced input id. When a
+# value report carries a mount id different from the stored one, a *new*
+# component instance has bound to a reused id (renderUI/removeUI/insertUI), so
+# any manual state left by the previous instance is stale and must be dropped.
+
+task_button_mount_env <- function(session) {
+  store <- session$userData[["sb_task_button_mount_ids"]]
+  if (is.null(store)) {
+    store <- new.env(parent = emptyenv())
+    session$userData[["sb_task_button_mount_ids"]] <- store
+  }
+  store
+}
+
+# Returns TRUE when `mount_id` is a new instance for `key` (and records it).
+# A NULL mount id (e.g. an older client or a direct unit-test call) is treated
+# as "not new" so behavior is unchanged when no mount id is reported.
+task_button_is_new_mount <- function(session, key, mount_id) {
+  if (is.null(session) || is.null(mount_id)) {
+    return(FALSE)
+  }
+  store <- task_button_mount_env(session)
+  seen <- if (exists(key, envir = store, inherits = FALSE)) {
+    get(key, envir = store, inherits = FALSE)
+  } else {
+    NULL
+  }
+  if (identical(seen, mount_id)) {
+    return(FALSE)
+  }
+  assign(key, mount_id, envir = store)
+  TRUE
 }

@@ -272,12 +272,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "label", type: "character | shiny.tag", defaultVal: "required", description: "Ready-state button label." },
         { argument: "label_busy", type: "character", defaultVal: "'Processing…'", description: "Accessible and visible label shown while busy." },
         { argument: "variant", type: "'default' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link'", defaultVal: "'default'", description: "Thematic button style type." },
-        { argument: "size", type: "'default' | 'sm' | 'lg' | 'icon'", defaultVal: "'default'", description: "Dimension size variant presets." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Dimension size variant presets." },
         { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional ready-state icon name or tag." },
         { argument: "icon_busy", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional busy-state icon; defaults to a spinner." },
         { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "'inline-start'", description: "Icon placement relative to the label." },
         { argument: "auto_reset", type: "logical", defaultVal: "TRUE", description: "Return to ready after the click's reactive flush." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom styling classes to merge." }
+        { argument: "...", type: "named attributes", defaultVal: "none", description: "Additional HTML attributes passed to the button (e.g. disabled = TRUE)." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the runtime button element." }
       ]
     },
     {
@@ -290,13 +291,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "label", type: "character", defaultVal: "NULL", description: "New ready-state label." },
         { argument: "label_busy", type: "character", defaultVal: "NULL", description: "New busy label." },
         { argument: "variant", type: "character", defaultVal: "NULL", description: "Update the button's visual preset." },
-        { argument: "size", type: "'default' | 'sm' | 'lg' | 'icon'", defaultVal: "NULL", description: "Update the button's size preset." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "NULL", description: "Update the button's size preset." },
         { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "New ready icon, or NULL to clear." },
         { argument: "icon_busy", type: "character | shiny.tag", defaultVal: "NULL", description: "New busy icon, or NULL to clear (back to the spinner)." },
         { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "NULL", description: "Update icon placement relative to the label." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Enable/disable the button." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Inline CSS string, or NULL to clear." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement wrapper classes, or NULL to clear." }
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes on the button element, or NULL to clear." }
       ]
     }
   ],

@@ -97,9 +97,12 @@ targets <- list(
     # (292 KB) stays the headroom guard. Raised 85 -> 86 KB for the #64
     # multi-select review follow-up (defensive single-mode coercion + cap
     # clamp): it lands at exactly 85.0 KB locally, which the platform-variant
-    # zlib tips over on CI, so 86 KB restores margin.
+    # zlib tips over on CI, so 86 KB restores margin. Raised 86 -> 87 KB for
+    # the #69 task-button state machine and binding: Linux zlib reports 86.1 KB
+    # while macOS remains at 86.0 KB, so the prior limit had no cross-platform
+    # margin.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 86,
+    limit_kb = 87,
     metric = "gzipped",
     group = "runtime"
   ),

@@ -142,7 +142,7 @@ ui <- block_page(
             block_field_label("size", `for` = "size"),
             block_select(
               "size",
-              choices = c("default", "sm", "lg", "icon"),
+              choices = c("default", "sm", "lg"),
               selected = "default",
               size = "sm"
             )

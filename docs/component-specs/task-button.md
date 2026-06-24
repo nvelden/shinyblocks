@@ -40,6 +40,12 @@ contract (`block_button()`); the behavior follows bslib's `input_task_button()`.
   input in a session-local manual-reset map (keyed by the namespaced input id),
   so the automatic reset leaves it busy. `state = "ready"` clears the entry and
   releases the button. Two sessions using the same local id stay independent.
+- **Instance churn.** Each client mount reports a unique mount id with its
+  value. When a new instance binds to a reused input id (renderUI / removeUI /
+  insertUI), the handler sees the changed mount id and clears any manual state
+  the removed instance left behind — so a fresh button is never stuck busy by a
+  predecessor's stale flag. (The mount id changes even when the click count is
+  unchanged, so it survives Shiny's value deduplication.)
 
 ## Accessibility
 
@@ -62,7 +68,7 @@ contract (`block_button()`); the behavior follows bslib's `input_task_button()`.
 | `label` | Ready-state label (string or tag). |
 | `label_busy` | Accessible + visible label shown while busy. Length-1 string, default `"Processing…"`. |
 | `variant` | One of `default`, `secondary`, `outline`, `ghost`, `destructive`, `link`. |
-| `size` | One of `default`, `sm`, `lg`, `icon`. |
+| `size` | One of `default`, `sm`, `lg`. (No `icon` size — a task button always carries a text label; use `block_button()` for an icon-only trigger.) |
 | `icon` | Optional ready-state vendored icon name or `htmltools` tag. |
 | `icon_busy` | Optional busy-state icon name or tag. Defaults to a spinner. |
 | `icon_position` | `inline-start` (default) or `inline-end`. |

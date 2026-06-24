@@ -399,6 +399,10 @@ ui <- shiny::fluidPage(
   shiny::actionButton("remove_task", "Remove task button"),
   shiny::div(id = "task_insert_target"),
   shiny::verbatimTextOutput("task_inserted_value"),
+  shiny::actionButton("toggle_ar_task", "Toggle auto-reset task"),
+  shiny::uiOutput("ar_task_mount"),
+  shiny::verbatimTextOutput("ar_task_value"),
+  shiny::actionButton("ar_task_busy", "Manual busy AR task"),
   module_ui("mod"),
   task_module_ui("tbmodA"),
   task_module_ui("tbmodB")
@@ -973,6 +977,30 @@ server <- function(input, output, session) {
     shiny::removeUI(selector = "#task_inserted_host", immediate = TRUE)
   })
   output$task_inserted_value <- shiny::renderText(input$inserted_task %||% "<NULL>")
+
+  # Regression (#69 review): stale manual state must not survive a remount. An
+  # auto_reset = TRUE button is set to manual busy, removed, then recreated with
+  # the same id. The fresh instance must auto-reset on click — the input handler
+  # clears the stale manual flag when the new instance reports its initial value.
+  ar_task_visible <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(input$toggle_ar_task, {
+    ar_task_visible(!isTRUE(ar_task_visible()))
+  })
+  output$ar_task_mount <- shiny::renderUI({
+    if (!isTRUE(ar_task_visible())) {
+      return(NULL)
+    }
+    block_task_button(
+      "ar_task",
+      "AR run",
+      label_busy = "AR busy",
+      auto_reset = TRUE
+    )
+  })
+  output$ar_task_value <- shiny::renderText(input$ar_task %||% "<NULL>")
+  shiny::observeEvent(input$ar_task_busy, {
+    update_block_task_button(session, "ar_task", state = "busy")
+  })
 
   shiny::observeEvent(input$set_date, {
     update_block_date_picker(

@@ -39,7 +39,7 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("size", `for` = "showcase_task_button_doc_size"),
-          block_select("showcase_task_button_doc_size", choices = c("default", "sm", "lg", "icon"), selected = "default")
+          block_select("showcase_task_button_doc_size", choices = c("default", "sm", "lg"), selected = "default")
         ),
         block_field(
           block_field_label("icon_position", `for` = "showcase_task_button_doc_icon_position"),

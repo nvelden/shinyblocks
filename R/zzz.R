@@ -20,6 +20,19 @@
 
     count <- val[["value"]]
     auto_reset <- isTRUE(val[["autoReset"]])
+    count_num <- if (is.null(count)) 0 else as.numeric(count)
+
+    # Drop stale manual state when a *new* component instance binds to a reused
+    # input id. Each client mount reports a unique mount id; when it differs from
+    # the last one seen for this id, a previous instance — possibly left
+    # manual-busy via update_block_task_button() and then removed by
+    # renderUI/removeUI/insertUI — has been replaced. Its manual flag would
+    # otherwise suppress the fresh instance's automatic reset forever. The mount
+    # id changes even when the click count is unchanged (so it survives Shiny's
+    # value deduplication), which a count-based check cannot.
+    if (task_button_is_new_mount(session, name, val[["mountId"]])) {
+      task_button_clear_manual(session, name)
+    }
 
     if (auto_reset && !is.null(session) && is.function(session$onFlush)) {
       target <- runtime_mount_id("task-button", name)
@@ -29,9 +42,8 @@
       })
     }
 
-    count <- if (is.null(count)) 0L else as.numeric(count)
-    class(count) <- c("shinyActionButtonValue", "shiny.actionButton", class(count))
-    count
+    class(count_num) <- c("shinyActionButtonValue", "shiny.actionButton", class(count_num))
+    count_num
   }, force = TRUE)
 
   # Progress is display-only: its binding declares `type = "shinyblocks.progress"`

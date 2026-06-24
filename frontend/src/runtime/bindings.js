@@ -201,12 +201,26 @@ const BINDING_CONFIGS = [
     receiveProp: "__sbTaskButtonReceive",
     getValue(el) {
       if (typeof el.__sbTaskButtonClickCount === "undefined") el.__sbTaskButtonClickCount = 0;
+      // A per-element mount id, generated once. It uniquely identifies this
+      // instance so the server can detect when a new instance binds to a reused
+      // input id (renderUI/removeUI/insertUI churn) and drop any stale manual
+      // state — even when the click count is unchanged and would otherwise be
+      // deduplicated. It is client-generated (not in the R payload), so it never
+      // affects rendered-HTML snapshots.
+      if (typeof el.__sbTaskButtonMountId === "undefined") {
+        el.__sbTaskButtonMountId =
+          `tb-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      }
       let autoReset = el.__sbTaskButtonAutoReset;
       if (typeof autoReset === "undefined") {
         const payload = readPayload(el);
         autoReset = Boolean(payload && payload.props && payload.props.autoReset);
       }
-      return { value: el.__sbTaskButtonClickCount, autoReset: Boolean(autoReset) };
+      return {
+        value: el.__sbTaskButtonClickCount,
+        autoReset: Boolean(autoReset),
+        mountId: el.__sbTaskButtonMountId
+      };
     },
     setValue(el, value) {
       const next = value && typeof value === "object" ? value.value : value;

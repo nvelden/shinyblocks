@@ -194,7 +194,7 @@ register_task_button_showcase <- function(input, output, session) {
         "Ready-state label.",
         "Accessible and visible label shown while busy.",
         "Visual variant. One of default, secondary, outline, ghost, destructive, or link.",
-        "Button size. One of default, sm, lg, or icon.",
+        "Button size. One of default, sm, or lg.",
         "Optional ready-state icon name or tag.",
         "Optional busy-state icon name or tag. Defaults to a spinner.",
         "Controls icon placement when an icon is present.",

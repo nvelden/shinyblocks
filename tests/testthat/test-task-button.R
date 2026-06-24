@@ -196,6 +196,32 @@ test_that("manual-reset map is isolated per session and keyed by namespaced id",
   expect_false(task_button_is_manual(mod, "run"))
 })
 
+test_that("input handler drops stale manual state when a new instance mounts", {
+  handler <- task_button_handler()
+  ctx <- fake_task_session()
+  session <- ctx$session
+
+  # Instance A binds, then the server takes manual control.
+  handler(list(value = 0, autoReset = TRUE, mountId = "A"), session, "run")
+  update_block_task_button(session, "run", state = "busy")
+  expect_true(task_button_is_manual(session, "run"))
+
+  # A fresh instance (mount B) binds to the same id: the stale manual flag is
+  # cleared so its automatic reset is no longer suppressed — even though the
+  # click count (0) is unchanged.
+  handler(list(value = 0, autoReset = TRUE, mountId = "B"), session, "run")
+  expect_false(task_button_is_manual(session, "run"))
+
+  # Re-reporting the SAME mount id must not clear a freshly set manual flag.
+  update_block_task_button(session, "run", state = "busy")
+  handler(list(value = 1, autoReset = TRUE, mountId = "B"), session, "run")
+  expect_true(task_button_is_manual(session, "run"))
+
+  # A missing mountId (older client / direct call) leaves manual state intact.
+  handler(list(value = 2, autoReset = TRUE), session, "run")
+  expect_true(task_button_is_manual(session, "run"))
+})
+
 test_that("input handler returns a classed click count", {
   handler <- task_button_handler()
   out <- handler(list(value = 3, autoReset = FALSE), NULL, "run")
