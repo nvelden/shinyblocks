@@ -95,7 +95,7 @@ ui <- block_page(
           ),
           block_field(
             block_field_label("label_busy", `for` = "label_busy"),
-            block_input("label_busy", value = "Crunching…")
+            block_input("label_busy", value = "Crunching...")
           ),
           block_field(
             block_field_label("icon", `for` = "icon"),
@@ -169,19 +169,11 @@ ui <- block_page(
           "Actions (Server Update)",
           htmltools::div(
             style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+            # The signature server interaction: manual busy/ready control plus
+            # disabled-state preservation. The Content / State / Styling controls
+            # above already exercise the remaining update fields live.
             action_button("set_busy", "Set busy"),
             action_button("set_ready", "Set ready"),
-            action_button("set_label", "Set label"),
-            action_button("set_label_busy", "Set busy label"),
-            action_button("cycle_variant", "Cycle variant"),
-            action_button("cycle_size", "Cycle size"),
-            action_button("toggle_icon_position", "Toggle icon position"),
-            action_button("set_icon", "Set icon"),
-            action_button("clear_icon", "Clear icon"),
-            action_button("set_busy_icon", "Set busy icon"),
-            action_button("clear_busy_icon", "Clear busy icon"),
-            action_button("clear_style", "Clear style"),
-            action_button("clear_class", "Clear class"),
             action_button("disable", "Disable"),
             action_button("enable", "Enable")
           )
@@ -240,13 +232,10 @@ ui <- block_page(
 )
 
 server <- function(input, output, session) {
-  variant_choices <- c("default", "secondary", "outline", "ghost", "destructive", "link")
-  size_choices <- c("default", "sm", "lg")
-
   button_state <- reactive({
     list(
       label = blank_to_null(input$label) %||% "Run analysis",
-      label_busy = blank_to_null(input$label_busy) %||% "Crunching…",
+      label_busy = blank_to_null(input$label_busy) %||% "Crunching...",
       icon = icon_or_null(input$icon),
       icon_busy = icon_or_null(input$icon_busy),
       variant = input$variant %||% "default",
@@ -346,59 +335,6 @@ server <- function(input, output, session) {
   observeEvent(input$set_ready, {
     update_block_task_button(session, "preview_task_button", state = "ready")
     show_update('state = "ready"')
-  })
-  observeEvent(input$set_label, {
-    update_block_task_button(session, "preview_task_button", label = "Run again")
-    show_update('label = "Run again"')
-  })
-  observeEvent(input$set_label_busy, {
-    update_block_task_button(session, "preview_task_button", label_busy = "Almost done…")
-    show_update('label_busy = "Almost done…"')
-  })
-  observeEvent(input$cycle_variant, {
-    current <- input$variant %||% "default"
-    idx <- match(current, variant_choices, nomatch = 0L)
-    next_variant <- variant_choices[(idx %% length(variant_choices)) + 1L]
-    update_block_task_button(session, "preview_task_button", variant = next_variant)
-    show_update(paste0('variant = "', next_variant, '"'))
-  })
-  observeEvent(input$cycle_size, {
-    current <- input$size %||% "default"
-    idx <- match(current, size_choices, nomatch = 0L)
-    next_size <- size_choices[(idx %% length(size_choices)) + 1L]
-    update_block_task_button(session, "preview_task_button", size = next_size)
-    show_update(paste0('size = "', next_size, '"'))
-  })
-  icon_position_state <- reactiveVal("inline-start")
-  observeEvent(input$toggle_icon_position, {
-    next_pos <- if (identical(icon_position_state(), "inline-start")) "inline-end" else "inline-start"
-    icon_position_state(next_pos)
-    update_block_task_button(session, "preview_task_button", icon_position = next_pos)
-    show_update(paste0('icon_position = "', next_pos, '"'))
-  })
-  observeEvent(input$set_icon, {
-    update_block_task_button(session, "preview_task_button", icon = "check")
-    show_update('icon = "check"')
-  })
-  observeEvent(input$clear_icon, {
-    update_block_task_button(session, "preview_task_button", icon = NULL)
-    show_update("icon = NULL")
-  })
-  observeEvent(input$set_busy_icon, {
-    update_block_task_button(session, "preview_task_button", icon_busy = "refresh-cw")
-    show_update('icon_busy = "refresh-cw"')
-  })
-  observeEvent(input$clear_busy_icon, {
-    update_block_task_button(session, "preview_task_button", icon_busy = NULL)
-    show_update("icon_busy = NULL")
-  })
-  observeEvent(input$clear_style, {
-    update_block_task_button(session, "preview_task_button", style = NULL)
-    show_update("style = NULL")
-  })
-  observeEvent(input$clear_class, {
-    update_block_task_button(session, "preview_task_button", class = NULL)
-    show_update("class = NULL")
   })
   observeEvent(input$disable, {
     update_block_task_button(session, "preview_task_button", disabled = TRUE)

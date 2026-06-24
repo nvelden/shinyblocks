@@ -9,7 +9,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("label_busy", `for` = "showcase_task_button_doc_label_busy"),
-          block_input("showcase_task_button_doc_label_busy", value = "Crunching…")
+          block_input("showcase_task_button_doc_label_busy", value = "Crunching...")
         ),
         block_field(
           block_field_label("icon", `for` = "showcase_task_button_doc_icon"),
@@ -58,19 +58,11 @@ htmltools::tagList(
         "Actions (Server Update)",
         htmltools::div(
           style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          # The signature server interaction: manual busy/ready control plus
+          # disabled-state preservation. The Content / State / Styling controls
+          # above already exercise the remaining update fields live.
           showcase_action_button("showcase_task_button_set_busy", "Set busy"),
           showcase_action_button("showcase_task_button_set_ready", "Set ready"),
-          showcase_action_button("showcase_task_button_set_label", "Set label"),
-          showcase_action_button("showcase_task_button_set_label_busy", "Set busy label"),
-          showcase_action_button("showcase_task_button_cycle_variant", "Cycle variant"),
-          showcase_action_button("showcase_task_button_cycle_size", "Cycle size"),
-          showcase_action_button("showcase_task_button_toggle_icon_position", "Toggle icon position"),
-          showcase_action_button("showcase_task_button_set_icon", "Set icon"),
-          showcase_action_button("showcase_task_button_clear_icon", "Clear icon"),
-          showcase_action_button("showcase_task_button_set_busy_icon", "Set busy icon"),
-          showcase_action_button("showcase_task_button_clear_busy_icon", "Clear busy icon"),
-          showcase_action_button("showcase_task_button_clear_style", "Clear style"),
-          showcase_action_button("showcase_task_button_clear_class", "Clear class"),
           showcase_action_button("showcase_task_button_disable", "Disable"),
           showcase_action_button("showcase_task_button_enable", "Enable")
         )
