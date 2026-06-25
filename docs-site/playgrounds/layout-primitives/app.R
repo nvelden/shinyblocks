@@ -256,14 +256,32 @@ ui <- block_page(
         ),
         block_card(
           title = "API Reference",
-          block_table(data.frame(
-            Function = c("block_stack()", "block_cluster()", "block_grid()"),
-            Purpose = c(
-              "Vertical flow",
-              "Horizontal/wrapping group",
-              "Responsive auto-fit grid"
+          block_table(
+            data.frame(
+              Argument = c("block_stack", "block_cluster", "block_grid"),
+              Type = c(
+                "..., gap, align, class",
+                "..., gap, align, justify, wrap, class",
+                "..., min_width, gap, align, class"
+              ),
+              Default = c(
+                'gap = "md", align = "stretch"',
+                'gap = "sm", align = "center", justify = "start", wrap = TRUE',
+                'min_width = "16rem", gap = "md", align = "stretch"'
+              ),
+              Description = c(
+                "Vertical flow with semantic spacing.",
+                "Horizontal grouping with optional wrapping and distribution.",
+                "Responsive auto-fit grid protected against mobile overflow."
+              )
+            ),
+            columns = list(
+              Argument = table_column(width = "11rem"),
+              Type = table_column(width = "16rem"),
+              Default = table_column(width = "8rem"),
+              Description = table_column(width = "28rem")
             )
-          ))
+          )
         )
       )
     )
