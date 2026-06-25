@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { GuideCodeBlock } from "@/components/guide-code-block";
+import { GuideToc } from "@/components/guide-toc";
 import { PlaygroundFrame } from "@/components/playground-frame";
 import {
   GET_STARTED_TOC,
@@ -73,18 +74,7 @@ export default function GetStartedPage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               On this page
             </p>
-            <ol className="flex flex-col gap-1.5 text-sm">
-              {GET_STARTED_TOC.map((entry) => (
-                <li key={entry.id}>
-                  <a
-                    href={`#${entry.id}`}
-                    className="text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {entry.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
+            <GuideToc entries={GET_STARTED_TOC} variant="mobile" />
           </nav>
 
           <div className="flex flex-col gap-14">
@@ -417,18 +407,7 @@ block_card(
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               On this page
             </p>
-            <ol className="flex flex-col gap-1.5 border-l border-border text-sm">
-              {GET_STARTED_TOC.map((entry) => (
-                <li key={entry.id}>
-                  <a
-                    href={`#${entry.id}`}
-                    className="-ml-px block border-l border-transparent py-0.5 pl-4 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {entry.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
+            <GuideToc entries={GET_STARTED_TOC} variant="desktop" />
           </nav>
         </aside>
       </div>
