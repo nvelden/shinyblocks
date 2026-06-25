@@ -22,7 +22,7 @@ test("landing page gallery lists featured components", async ({ page }) => {
   expect(app?.content).toContain("gallery:set-style-profile");
   expect(app?.content).toContain("metric_box <- function(...)");
   expect(app?.content).toContain(
-    'uiOutput("gallery_metric", style = "display: flex; flex-direction: column; height: 100%;")',
+    'uiOutput("gallery_metric", style = "height: 100%;")',
   );
   // Regression guard: the theme/style <style> assets live in a hidden
   // container, so the output must opt out of Shiny's suspend-when-hidden or
