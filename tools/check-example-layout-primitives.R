@@ -68,11 +68,6 @@ allowlist <- rbind(
     "Literal CSS inside the Code component's syntax-highlight sample, not layout."
   ),
   allow(
-    "docs-site/playgrounds/dialog/app\\.R$",
-    c("display\\s*:\\s*flex", "flex-direction\\s*:\\s*column", "gap\\s*:\\s*1rem"),
-    "Reproduces the .sb-dialog-content data-slot DOM mock (component-internal geometry)."
-  ),
-  allow(
     "docs-site/playgrounds/layout/app\\.R$",
     c(
       "display\\s*:\\s*flex", "flex-direction\\s*:\\s*column",

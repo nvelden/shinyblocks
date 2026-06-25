@@ -177,7 +177,8 @@ server <- function(input, output, session) {
       "margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.2;"
     }
     style <- input$showcase_dialog_doc_style %||% ""
-    htmltools::div(
+    block_stack(
+      gap = "md",
       class = c(
         "sb-dialog-content",
         if (isTRUE(input$showcase_dialog_doc_class)) "showcase-dialog-preview-custom"
@@ -187,8 +188,10 @@ server <- function(input, output, session) {
       # Render the inline preview at the requested size and only clamp if the
       # canvas is too narrow (the previous `width: 100%; max-width: <size>`
       # collapsed `sm` and `default` to identical widths in narrow iframes).
+      # Vertical flow (display/direction/gap) is owned by block_stack(gap="md");
+      # the inline style keeps only the sizing/surface chrome.
       style = paste0(
-        "position: relative; display: flex; flex-direction: column; gap: 1rem;",
+        "position: relative;",
         " width: min(", max_width, ", 100%); max-width: 100%; max-height: min(32rem, calc(100vh - 4rem));",
         " overflow: auto; margin: 0 auto; border: 1px solid var(--border);",
         " border-radius: calc(var(--radius) * 1.4); background: var(--background);",
