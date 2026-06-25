@@ -77,14 +77,20 @@ const UI = `ui <- block_page(
     )
   ),
   header = block_header(
-    htmltools::div(
-      htmltools::tags$strong("Regional sales"),
-      htmltools::tags$div(
-        style = "color: var(--muted-foreground); font-size: 0.875rem;",
-        "Performance for the first six months"
-      )
-    ),
-    block_dark_mode_toggle()
+    block_cluster(
+      align = "center",
+      justify = "between",
+      wrap = FALSE,
+      style = "width: 100%;",
+      htmltools::div(
+        htmltools::tags$strong("Regional sales"),
+        htmltools::tags$div(
+          style = "color: var(--muted-foreground); font-size: 0.875rem;",
+          "Performance for the first six months"
+        )
+      ),
+      block_dark_mode_toggle()
+    )
   ),
   block_stack(
     id = "overview",
@@ -92,26 +98,28 @@ const UI = `ui <- block_page(
     block_card(
       title = "Dashboard filters",
       description = "Choose a region or restore the default.",
-      block_cluster(
-        gap = "md",
-        align = "end",
-        block_field(
+      block_field(
+        block_cluster(
+          align = "center",
+          justify = "between",
+          wrap = FALSE,
           block_field_label("Region", \`for\` = "region"),
-          block_select(
-            "region",
-            choices = c("Americas", "EMEA", "APAC"),
-            selected = "Americas"
-          ),
-          block_field_description(
-            "All dashboard values use this region."
+          block_task_button(
+            "reset_filters",
+            "Reset",
+            label_busy = "Resetting...",
+            variant = "ghost",
+            size = "sm",
+            icon = "refresh-cw"
           )
         ),
-        block_task_button(
-          "reset_filters",
-          "Reset filters",
-          label_busy = "Resetting...",
-          variant = "outline",
-          icon = "refresh-cw"
+        block_select(
+          "region",
+          choices = c("Americas", "EMEA", "APAC"),
+          selected = "Americas"
+        ),
+        block_field_description(
+          "All dashboard values use this region."
         )
       )
     ),

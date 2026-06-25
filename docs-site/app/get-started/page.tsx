@@ -189,34 +189,32 @@ export default function GetStartedPage() {
             <section className="flex flex-col gap-4">
               <SectionHeading id="controls">Add a filter and reset action</SectionHeading>
               <p className="leading-relaxed text-muted-foreground">
-                A filter card holds a labelled region select and a reset button. Build the
-                field with a matching <code>for</code>/input id so the label is wired to
-                the control:
+                A filter card holds a labelled region select. The compact reset action
+                shares the label row, so it does not create another control column:
               </p>
               <GuideCodeBlock
                 label="Region field"
                 code={`block_field(
-  block_field_label("Region", \`for\` = "region"),
+  block_cluster(
+    align = "center",
+    justify = "between",
+    wrap = FALSE,
+    block_field_label("Region", \`for\` = "region"),
+    block_task_button(
+      "reset_filters",
+      "Reset",
+      label_busy = "Resetting...",
+      variant = "ghost",
+      size = "sm",
+      icon = "refresh-cw"
+    )
+  ),
   block_select(
     "region",
     choices = c("Americas", "EMEA", "APAC"),
     selected = "Americas"
   ),
   block_field_description("All dashboard values use this region.")
-)`}
-              />
-              <p className="leading-relaxed text-muted-foreground">
-                Add a task button. It behaves like an action button and automatically
-                exposes a busy state while its handler runs:
-              </p>
-              <GuideCodeBlock
-                label="Reset task button"
-                code={`block_task_button(
-  "reset_filters",
-  "Reset filters",
-  label_busy = "Resetting...",
-  variant = "outline",
-  icon = "refresh-cw"
 )`}
               />
               <ul className="flex flex-col gap-1.5 pl-5 leading-relaxed text-muted-foreground [&>li]:list-disc">

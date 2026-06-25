@@ -55,6 +55,18 @@ test("complete example contains the canonical API surface", async ({ page }) => 
   }
 });
 
+test("canonical app keeps header and reset actions in compact rows", () => {
+  expect(CODE_COMPLETE).toContain('justify = "between"');
+  expect(CODE_COMPLETE).toContain('style = "width: 100%;"');
+  expect(CODE_COMPLETE).toContain('"Reset",');
+  expect(CODE_COMPLETE).toContain('variant = "ghost"');
+
+  const resetPosition = CODE_COMPLETE.indexOf('"reset_filters"');
+  const selectPosition = CODE_COMPLETE.indexOf('block_select(');
+  expect(resetPosition).toBeGreaterThan(-1);
+  expect(resetPosition).toBeLessThan(selectPosition);
+});
+
 test("copy button writes the full canonical example to the clipboard", async ({
   page,
   context,
@@ -172,13 +184,14 @@ test("long code blocks collapse and expand", async ({ page }) => {
   const region = page.getByRole("region", { name: "Complete app.R" });
   await expect(region).toHaveClass(/guide-code-pre--collapsed/);
 
-  const toggle = page.getByRole("button", { name: "Show all" }).first();
+  const block = region.locator("..");
+  const toggle = block.getByRole("button", { name: "Show all" });
   await expect(toggle).toBeVisible();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 
   await toggle.click();
   await expect(region).not.toHaveClass(/guide-code-pre--collapsed/);
   await expect(
-    page.getByRole("button", { name: "Show less" }).first(),
+    block.getByRole("button", { name: "Show less" }),
   ).toHaveAttribute("aria-expanded", "true");
 });
