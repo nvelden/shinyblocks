@@ -5,6 +5,7 @@ const BASE = "/shinyblocks";
 
 export const PATH = {
   home: `${BASE}/`,
+  getStarted: `${BASE}/get-started/`,
   components: `${BASE}/components/`,
   componentDetail: (slug: string) => `${BASE}/components/${slug}/`,
   changelog: `${BASE}/changelog/`,

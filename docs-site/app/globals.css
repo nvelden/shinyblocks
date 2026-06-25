@@ -115,6 +115,15 @@ pre {
   white-space: pre-wrap;
 }
 
+/* Get Started guide code blocks: keep formatting and scroll horizontally on
+ * narrow screens rather than wrapping (overriding the global `pre` wrap rule
+ * above). This keeps copyable R source faithful and prevents the document from
+ * widening on mobile. */
+.guide-code-pre {
+  overflow-x: auto;
+  white-space: pre;
+}
+
 .component-code-block [data-shinyblocks-root] {
   max-width: 100%;
 }

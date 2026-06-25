@@ -14,12 +14,24 @@ test("landing page renders", async ({ page }) => {
 test("top nav links are present", async ({ page }) => {
   await page.goto(PATH.home);
   await expect(
+    page.getByRole("link", { name: "Get Started", exact: true }),
+  ).toBeVisible();
+  await expect(
     page.getByRole("link", { name: "Components", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Changelog", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /github repository/i })).toBeVisible();
+});
+
+test("get started page reachable from header", async ({ page }) => {
+  await page.goto(PATH.home);
+  await page.getByRole("link", { name: "Get Started", exact: true }).click();
+  await expect(page).toHaveURL(/\/get-started\/?$/);
+  await expect(
+    page.getByRole("heading", { name: "Get Started with shinyblocks" }),
+  ).toBeVisible();
 });
 
 test("theme toggle switches and persists", async ({ page }) => {
