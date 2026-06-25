@@ -1,6 +1,6 @@
 .PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
 	check-fast check-slice lint spell urls test docs check pkgdown budget \
-	doc-links legacy-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
+	doc-links legacy-audit layout-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
 	preview-shinylive
 
@@ -39,6 +39,7 @@ help:
 	@echo "  pkgdown         - deprecated; docs are built from docs-site/"
 	@echo "  budget          - tools/budget.R (asset size report)"
 	@echo "  legacy-audit    - fail on unclassified legacy wrapper/CSS/JS hits"
+	@echo "  layout-audit    - fail on hand-authored generic flex/grid in examples"
 	@echo "  parity-install  - install parity/ React app dependencies"
 	@echo "  parity-build-css- compile parity reference CSS"
 	@echo "  parity-setup    - launch the parity reference app on :5173"
@@ -77,6 +78,7 @@ dev:
 
 check-fast:
 	$(R) -e 'devtools::test(filter = "style|utils")'
+	$(MAKE) layout-audit
 	npm run test:themes-static
 	npm run test:themes-drift
 	npm run test:style-leanness
@@ -86,7 +88,7 @@ check-fast:
 
 # ---------- Slice boundary ----------
 
-check-slice: build-css build-runtime test doc-links legacy-audit theme-static style-leanness style-ownership style-registry
+check-slice: build-css build-runtime test doc-links legacy-audit layout-audit theme-static style-leanness style-ownership style-registry
 	git diff --check
 	@echo "check-slice OK"
 
@@ -147,6 +149,12 @@ doc-links:
 
 legacy-audit:
 	$(R) tools/check-legacy-audit.R
+
+# Fail when example/playground/preview code hand-authors generic flex/grid
+# layout instead of using block_stack()/block_cluster()/block_grid(). Narrow
+# fixed-geometry exceptions live in the script's allowlist.
+layout-audit:
+	$(R) tools/check-example-layout-primitives.R --strict
 
 # Layer 1 of the theme-conformance framework: static, no browser. Fails when
 # component CSS hardcodes a color instead of a theme token.

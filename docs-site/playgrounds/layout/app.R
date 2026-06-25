@@ -161,8 +161,10 @@ server <- function(input, output, session) {
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
           "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
         ),
-        htmltools::div(
-          style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; white-space: nowrap;",
+        block_cluster(
+          align = "center",
+          justify = "between",
+          style = "margin-bottom: 1.5rem; white-space: nowrap;",
           if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
           if (collapsible) {
             block_button(
@@ -178,24 +180,35 @@ server <- function(input, output, session) {
         ),
         block_stack(
           gap = "sm",
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
+          block_cluster(
+            align = "center",
+            gap = "sm",
+            style = "padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
             block_icon("layout-dashboard"),
             if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Dashboard") else NULL
           ),
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 0.375rem; color: var(--muted-foreground);",
+          block_cluster(
+            align = "center",
+            gap = "sm",
+            style = "padding: 0.5rem; border-radius: 0.375rem; color: var(--muted-foreground);",
             block_icon("users"),
             if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Users") else NULL
           )
         )
       ),
+      # Fixed-geometry main column: flex:1 with no inter-region gap (topbar sits
+      # flush above the scrolling content). Not a block_stack target — primitive
+      # gaps cannot be zero.
       htmltools::div(
         style = "flex: 1; display: flex; flex-direction: column;",
-        htmltools::div(
-          style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--background);",
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem;",
+        block_cluster(
+          align = "center",
+          justify = "between",
+          gap = "md",
+          style = "height: 50px; padding: 0 1rem; border-bottom: 1px solid var(--border); background: var(--background);",
+          block_cluster(
+            align = "center",
+            gap = "sm",
             block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
