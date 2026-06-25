@@ -146,6 +146,25 @@ test("embeds the finished app as a Shinylive live preview", async ({ page }) => 
   await expect(frame).toHaveAttribute("src", /\/playgrounds\/get-started\/?$/);
 });
 
+test("sidebar TOC highlights the section in view", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(PATH.getStarted);
+  const toc = page.locator('aside nav[aria-label="On this page"]');
+
+  // The first section is active on load.
+  await expect(
+    toc.getByRole("link", { name: "What you will build" }),
+  ).toHaveAttribute("aria-current", "true");
+
+  // Jumping to a later section moves the highlight to it.
+  const target = toc.getByRole("link", { name: "Connect the server" });
+  await target.click();
+  await expect(target).toHaveAttribute("aria-current", "true");
+  await expect(
+    toc.getByRole("link", { name: "What you will build" }),
+  ).not.toHaveAttribute("aria-current", "true");
+});
+
 test("long code blocks collapse and expand", async ({ page }) => {
   await page.goto(PATH.getStarted);
   // The Complete app.R block is collapsible; it starts clamped with a
