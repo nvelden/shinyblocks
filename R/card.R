@@ -42,6 +42,12 @@ block_card <- function(
   # A card has no runtime behaviour: the React mount only ever rendered `null`,
   # so emit ordinary markup instead of a runtime payload + React root. The
   # `.sb-card` styles attach via the package dependency below.
+  #
+  # Validate `style` against the package-wide contract for parity with every
+  # other block_*(); the raw string is what reaches the DOM, so the normalized
+  # result is only used for its erroring side effect on malformed input.
+  if (!is.null(style)) normalize_runtime_style(style)
+
   attach_shinyblocks_deps(
     htmltools::tags$div(
       class = merge_classes("sb-card", class),
