@@ -1,5 +1,5 @@
 .PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
-	check-fast check-slice lint spell urls test docs check pkgdown budget \
+	check-fast check-slice lint spell urls test docs docs-verify check check-local pkgdown budget \
 	doc-links legacy-audit layout-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
 	preview-shinylive
@@ -20,8 +20,10 @@ help:
 	@echo "  dev             - devtools::load_all() in an R session"
 	@echo "  showcase        - load_all() and run inst/showcase"
 	@echo "  showcase-health - verify the local showcase responds on its configured port"
-	@echo "  check-fast      - focused R tests + cheap static audits"
-	@echo "  check-slice     - full tests + builds/static audits for a vertical slice"
+	@echo "  check-fast      - focused R tests + cheap static audits (quick signal only;"
+	@echo "                    does NOT run the full suite or R CMD check)"
+	@echo "  check-slice     - full tests + builds/static audits for a vertical slice;"
+	@echo "                    fails if built assets in inst/www are not committed"
 	@echo ""
 	@echo "Phase exit:"
 	@echo "  build-css       - compile inst/www/src -> inst/www"
@@ -35,7 +37,9 @@ help:
 	@echo "  urls            - urlchecker::url_check()"
 	@echo "  test            - devtools::test()"
 	@echo "  docs            - devtools::document()"
-	@echo "  check           - R CMD check --as-cran"
+	@echo "  docs-verify     - document() then fail if man/ or NAMESPACE is uncommitted"
+	@echo "  check-local     - R CMD check, offline (no remote/URL checks); in gate"
+	@echo "  check           - R CMD check with remote checks (release-only)"
 	@echo "  pkgdown         - deprecated; docs are built from docs-site/"
 	@echo "  budget          - tools/budget.R (asset size report)"
 	@echo "  legacy-audit    - fail on unclassified legacy wrapper/CSS/JS hits"
@@ -47,7 +51,9 @@ help:
 	@echo "  parity-stop     - stop the parity reference app"
 	@echo "  parity-ci       - automated run across registered parity components"
 	@echo "  doc-links       - tools/check-doc-links.R"
-	@echo "  gate            - run the automated PR/phase-exit gate"
+	@echo "  gate            - automated PR/phase-exit gate (this is what CI runs):"
+	@echo "                    check-slice + runtime/showcase tests + lint + spell +"
+	@echo "                    docs-verify + budget + parity + offline R CMD check"
 	@echo ""
 	@echo "Local preview (visual sanity check after a phase slice):"
 	@echo "  preview            - showcase + docs site side by side"
@@ -89,6 +95,8 @@ check-fast:
 # ---------- Slice boundary ----------
 
 check-slice: build-css build-runtime test doc-links legacy-audit layout-audit theme-static style-leanness style-ownership style-registry
+	@git diff --exit-code -- inst/www/shinyblocks.css inst/www/shinyblocks-runtime.js inst/www/shinyblocks-runtime.css \
+		|| ( echo ""; echo "Built assets differ from what is committed. Rebuild (make build-css build-runtime) and commit the output."; exit 1 )
 	git diff --check
 	@echo "check-slice OK"
 
@@ -135,8 +143,29 @@ docs:
 	LC_ALL=$${SB_DOCS_LOCALE:-$$(locale -a 2>/dev/null | grep -iE '^(C\.UTF-?8|en_US\.UTF-?8)$$' | head -n1)}; \
 	LANG=$${LC_ALL:-C.UTF-8} LC_CTYPE=$${LC_ALL:-C.UTF-8} $(R) -e 'devtools::document()'
 
+# Regenerate roxygen docs, then fail if the result differs from what is
+# committed. `docs` alone mutates man/ + NAMESPACE silently, so a gate that
+# runs it can go green while shipping stale generated docs. This makes
+# staleness a hard error. Used by `gate` in place of `docs`.
+docs-verify: docs
+	@git diff --exit-code -- man NAMESPACE \
+		|| ( echo ""; echo "man/ or NAMESPACE is out of date. Run 'make docs' and commit the result."; exit 1 )
+	@echo "docs-verify OK"
+
+# `document = FALSE`: do not let check re-run roxygen. devtools::check()
+# documents by default, but this recipe runs under `env -u LC_ALL` (no UTF-8
+# LC_CTYPE), so roxygen would rewrite non-ASCII defaults as <U+NNNN> escapes and
+# corrupt man/. Documentation is owned by the `docs` / `docs-verify` targets,
+# which set a UTF-8 locale; `gate` runs `docs-verify` before this.
 check:
-	$(R) -e 'devtools::check(remote = TRUE, manual = FALSE)'
+	$(R) -e 'devtools::check(remote = TRUE, manual = FALSE, document = FALSE)'
+
+# R CMD check without the network-dependent remote checks (CRAN incoming
+# feasibility, remote URL probes). This is the routine correctness gate and
+# is safe to run in CI on every push/PR. The remote superset stays in
+# `gate-release` via `urls` + `check`. See `check` re: `document = FALSE`.
+check-local:
+	$(R) -e 'devtools::check(remote = FALSE, manual = FALSE, document = FALSE)'
 
 pkgdown:
 	@echo "pkgdown has been decommissioned; build the custom docs site under docs-site/."
@@ -195,7 +224,7 @@ style-registry:
 
 # Quality Gate runs automated PR/phase-exit checks. Network and release-only
 # checks stay in gate-release so routine development does not pay for them.
-gate: check-slice runtime-test runtime-shiny-test showcase-test lint spell docs budget parity-ci
+gate: check-slice runtime-test runtime-shiny-test showcase-test lint spell docs-verify budget parity-ci check-local
 	@echo ""
 	@echo "Automated gate steps green! Parity tests passed."
 	@echo "Remaining manual steps for phase exit:"
@@ -320,6 +349,10 @@ preview:
 
 # ---------- Release-only ----------
 
+# `gate` runs the offline R CMD check (check-local); release additionally runs
+# the network-enabled superset (`urls` + remote `check`). The local check is
+# repeated here as part of `gate` — an accepted, infrequent cost so that one
+# command fully clears a release.
 gate-release: gate urls check
 	@echo "gate-release OK"
 

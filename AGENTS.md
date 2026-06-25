@@ -44,9 +44,15 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
   R/Shiny install.
 - After editing runtime JS/CSS, showcase wiring, or update handlers, fully
   restart the showcase.
-- Verification tiers: `make check-fast` while editing · `make check-slice` per
-  slice · `make gate` before PR/phase exit · `make gate-release` before release.
-  Run parity/browser checks at slice boundaries.
+- Verification tiers (each a strict superset of the one above): `make
+  check-fast` while editing (quick signal — no full suite, no `R CMD check`) ·
+  `make check-slice` per slice (full tests + rebuild + committed-asset guard) ·
+  `make gate` before PR/phase exit (what CI runs: adds browser tests, lint,
+  spell, `docs-verify`, budget, parity, and offline `R CMD check`) ·
+  `make gate-release` before release (adds `urls` + remote `R CMD check`).
+  `DESCRIPTION`/roxygen/`NAMESPACE` edits need `make gate` (or at least
+  `check-local` + `docs-verify`) — `check-fast` will not catch them. Run
+  parity/browser checks at slice boundaries.
 
 ### Agent-session gotchas
 

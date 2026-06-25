@@ -42,7 +42,10 @@ const STYLESHEETS = ["frontend/src/styles/runtime.css"];
 // the flagged `property` equals this entry's property.
 const LEANNESS_ALLOWLIST = [
   {
-    selector: '[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root].sb-card',
+    // block_card() renders as static htmltools markup (a bare `.sb-card`, not a
+    // `[data-shinyblocks-root]` mount; see R/card.R), so the selector is no
+    // longer root-scoped.
+    selector: '[data-theme="dark"] [data-sb-style="luma"] .sb-card',
     property: "box-shadow",
     reason:
       "Luma and Rhea use a stronger dark-mode card ring (10% vs 5%). block_style() emits one static token value and cannot vary it per colour mode, so the dark ring stays in CSS."

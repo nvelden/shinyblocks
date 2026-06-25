@@ -58,8 +58,31 @@ source_class_selectors <- function(css) {
   lines[nzchar(lines)]
 }
 
+# Static-markup components emit ordinary htmltools markup with no
+# `[data-shinyblocks-root]` mount (e.g. `block_card()` renders a bare
+# `<div class="sb-card">`; see R/card.R). Their CSS therefore cannot be
+# root-scoped or the component would render unstyled. Such selectors are
+# allowed to target their own `.sb-*` class directly, optionally behind the
+# `[data-theme="dark"]` / `[data-sb-style="..."]` ancestor attributes. Keep
+# this list tight — one entry per static-markup component class root — so it
+# stays an explicit exception, not a blanket `.sb-*` escape hatch.
+static_markup_selector_roots <- c(
+  "\\.sb-card"
+)
+
 test_that("runtime CSS selectors are scoped to shinyblocks roots", {
   selectors <- css_selectors(runtime_css())
+
+  static_markup_prefix <- paste(static_markup_selector_roots, collapse = "|")
+  static_markup_allowed <- paste0(
+    # bare component selector, e.g. `.sb-card` / `.sb-card .sb-card-header`
+    "^(", static_markup_prefix, ")|",
+    # behind a dark-theme and/or style-profile ancestor attribute
+    "^\\[data-theme=\"dark\"\\] (", static_markup_prefix, ")|",
+    "^\\[data-sb-style=\"[^\"]+\"\\] (", static_markup_prefix, ")|",
+    "^\\[data-theme=\"dark\"\\] \\[data-sb-style=\"[^\"]+\"\\] (",
+    static_markup_prefix, ")"
+  )
 
   allowed <- grepl(
     paste0(
@@ -73,6 +96,7 @@ test_that("runtime CSS selectors are scoped to shinyblocks roots", {
       "^\\[data-sb-style=\"[^\"]+\"\\] \\[data-shinyblocks-portal-root\\]|",
       "^\\[data-theme=\"dark\"\\] \\[data-sb-style=\"[^\"]+\"\\] \\[data-shinyblocks-root\\]|",
       "^\\[data-theme=\"dark\"\\] \\[data-sb-style=\"[^\"]+\"\\] \\[data-shinyblocks-portal-root\\]|",
+      static_markup_allowed, "|",
       "^@keyframes |",
       "^@media "
     ),
