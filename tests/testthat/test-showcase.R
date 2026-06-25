@@ -437,7 +437,8 @@ test_that("layout primitives showcase documents all helpers and parity fixtures"
 
   expect_length(grid_specs, 2L)
   expect_match(grid_code, 'min_width = "14rem"', fixed = TRUE)
-  expect_match(grid_code, 'style = "min-height: 5rem;"', fixed = TRUE)
+  expect_match(grid_code, 'style = "min-height: 8rem;"', fixed = TRUE)
+  expect_match(grid_code, 'style = "min-height: 14rem;"', fixed = TRUE)
   expect_equal(
     lengths(regmatches(grid_code, gregexpr("block_card\\(", grid_code))),
     2L
@@ -450,7 +451,7 @@ test_that("layout primitives showcase documents all helpers and parity fixtures"
     cluster_values,
     fixture$env$layout_primitives_demo_specs(cluster_values)
   )
-  expect_match(cluster_code, 'style = "height: 16rem;"', fixed = TRUE)
+  expect_match(cluster_code, 'style = "min-height: 16rem;"', fixed = TRUE)
   expect_match(cluster_code, 'justify = "start"', fixed = TRUE)
   expect_silent(parse(text = cluster_code))
 })

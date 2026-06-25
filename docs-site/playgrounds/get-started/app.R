@@ -86,23 +86,15 @@ ui <- block_page(
     ),
     block_dark_mode_toggle()
   ),
-  htmltools::div(
+  block_stack(
     id = "overview",
-    style = paste(
-      "display: flex;",
-      "flex-direction: column;",
-      "gap: 1rem;"
-    ),
+    gap = "md",
     block_card(
       title = "Dashboard filters",
       description = "Choose a region or restore the default.",
-      htmltools::div(
-        style = paste(
-          "display: grid;",
-          "grid-template-columns: minmax(0, 1fr) auto;",
-          "align-items: end;",
-          "gap: 0.75rem;"
-        ),
+      block_cluster(
+        gap = "md",
+        align = "end",
         block_field(
           block_field_label("Region", `for` = "region"),
           block_select(
@@ -123,12 +115,9 @@ ui <- block_page(
         )
       )
     ),
-    htmltools::div(
-      style = paste(
-        "display: grid;",
-        "grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));",
-        "gap: 1rem;"
-      ),
+    block_grid(
+      min_width = "14rem",
+      gap = "md",
       block_card(
         title = "Revenue",
         description = "Six-month total",
