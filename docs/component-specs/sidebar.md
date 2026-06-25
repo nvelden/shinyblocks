@@ -42,6 +42,9 @@ attributes:
 - Desktop toggle click toggles `data-sidebar-collapsed`.
 - Backdrop click, outside click on the page, and Escape close an open
   mobile sidebar.
+- The mobile backdrop and drawer establish explicit shell overlay layers.
+  The drawer paints above page components and their transient menus; the
+  backdrop paints immediately below the drawer and above normal page content.
 - Arrow/Home/End traversal across child `.sb-nav-item` elements when
   the sidebar contains a nav region (see Nav).
 

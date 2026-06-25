@@ -131,6 +131,21 @@ test_that("package source CSS only owns shell and composition hooks", {
   expect_identical(selectors[!allowed], character())
 })
 
+test_that("mobile sidebar establishes an explicit shell overlay stack", {
+  css <- package_source_css()
+
+  expect_match(
+    css,
+    '\\.sb-page\\[data-sidebar-enhanced="true"\\] \\.sb-sidebar \\{[\\s\\S]*z-index: 80;',
+    perl = TRUE
+  )
+  expect_match(
+    css,
+    '\\.sb-page\\[data-sidebar-enhanced="true"\\] \\.sb-sidebar-backdrop \\{[\\s\\S]*z-index: 79;',
+    perl = TRUE
+  )
+})
+
 test_that("runtime CSS does not target host framework selectors", {
   css <- runtime_css()
   forbidden <- c(

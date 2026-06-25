@@ -213,29 +213,52 @@ try {
     return shell?.getAttribute("data-sidebar-mobile-open") === "true" &&
       getComputedStyle(sidebar).transform === "matrix(1, 0, 0, 1, 0, 0)";
   });
+  await page.evaluate(() => {
+    const main = document.querySelector(".sb-page-main");
+    const blocker = document.createElement("div");
+    blocker.dataset.sidebarStackingProbe = "";
+    Object.assign(blocker.style, {
+      position: "fixed",
+      inset: "0",
+      zIndex: "50",
+      background: "white"
+    });
+    main.append(blocker);
+  });
 
   const mobileSidebar = await page.evaluate(() => {
     const sidebar = document.querySelector(".sb-sidebar");
     const backdrop = document.querySelector(".sb-sidebar-backdrop");
     const sidebarStyle = getComputedStyle(sidebar);
+    const backdropStyle = getComputedStyle(backdrop);
     const rect = sidebar.getBoundingClientRect();
-    const topElement = document.elementFromPoint(
+    const sidebarTopElement = document.elementFromPoint(
       rect.left + rect.width / 2,
-      rect.top + 100
+      rect.top + rect.height - 100
+    );
+    const backdropTopElement = document.elementFromPoint(
+      rect.right + 50,
+      rect.top + rect.height / 2
     );
 
     return {
       backgroundColor: sidebarStyle.backgroundColor,
       sidebarToken: sidebarStyle.getPropertyValue("--sidebar").trim(),
-      topElementIsSidebar: sidebar.contains(topElement),
-      backdropPointerEvents: getComputedStyle(backdrop).pointerEvents
+      sidebarZIndex: sidebarStyle.zIndex,
+      backdropZIndex: backdropStyle.zIndex,
+      sidebarOnTop: sidebar.contains(sidebarTopElement),
+      backdropOnTop: backdrop === backdropTopElement,
+      backdropPointerEvents: backdropStyle.pointerEvents
     };
   });
 
   assert.notEqual(mobileSidebar.backgroundColor, "rgba(0, 0, 0, 0)");
   assert.notEqual(mobileSidebar.backgroundColor, "transparent");
   assert.ok(mobileSidebar.sidebarToken);
-  assert.equal(mobileSidebar.topElementIsSidebar, true);
+  assert.equal(mobileSidebar.sidebarZIndex, "80");
+  assert.equal(mobileSidebar.backdropZIndex, "79");
+  assert.equal(mobileSidebar.sidebarOnTop, true);
+  assert.equal(mobileSidebar.backdropOnTop, true);
   assert.equal(mobileSidebar.backdropPointerEvents, "auto");
 
   console.log("Showcase smoke test passed.");
