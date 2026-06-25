@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { PATH } from "./paths";
+import {
+  isPlaygroundConsoleNoise,
+  isPlaygroundPageError,
+} from "./playground-noise";
 
 // Phase 1 smoke tests — every PR must keep these green.
 // These tests cover the chrome (nav, theme, no errors), NOT page content.
@@ -49,10 +53,16 @@ test("theme toggle switches and persists", async ({ page }) => {
 });
 
 test("no console errors on landing", async ({ page }) => {
+  // The landing page embeds the Shinylive gallery; ignore its webR/WASM runtime
+  // noise (see playground-noise.ts) so this stays a check of the docs chrome.
   const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => {
+    if (!isPlaygroundPageError(e.message)) errors.push(e.message);
+  });
   page.on("console", (m) => {
-    if (m.type() === "error") errors.push(m.text());
+    if (m.type() === "error" && !isPlaygroundConsoleNoise(m.location())) {
+      errors.push(m.text());
+    }
   });
   await page.goto(PATH.home);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
