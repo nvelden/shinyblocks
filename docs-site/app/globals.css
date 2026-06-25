@@ -124,6 +124,32 @@ pre {
   white-space: pre;
 }
 
+/* Collapsed tall blocks: clamp height and reserve room for the toggle pill.
+ * Full source stays in the DOM (and is still copied), so this is purely a
+ * vertical-space affordance. */
+.guide-code-pre--collapsed {
+  max-height: 22rem;
+  overflow-y: hidden;
+  padding-bottom: 3rem;
+}
+
+/* Bottom fade so the clamp reads as "there is more below". Sits above the
+ * <pre> but lets clicks through to the code; the toggle button is on top. */
+.guide-code-block .guide-code-fade {
+  position: absolute;
+  inset-inline: 1px;
+  bottom: 1px;
+  height: 5rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--muted) 40%, transparent) 0%,
+    var(--background) 92%
+  );
+  pointer-events: none;
+}
+
 .component-code-block [data-shinyblocks-root] {
   max-width: 100%;
 }
