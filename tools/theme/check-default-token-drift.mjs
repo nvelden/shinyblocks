@@ -5,9 +5,10 @@
 // Synced:
 //   2026-06-02
 //
-// Runtime roots intentionally redeclare the subset of semantic tokens needed by
-// runtime-rendered components and portals. This audit fails when those defaults
-// drift from the package shell values in inst/www/src/tokens.css.
+// Runtime roots intentionally redeclare the semantic and shared style-profile
+// tokens needed by runtime-rendered components and portals. This audit fails
+// when those defaults drift from the package shell values in
+// inst/www/src/tokens.css.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -56,7 +57,6 @@ for (const [shellSelector, runtimeSelector] of pairs) {
   const expected = declarations(block(shell, shellSelector));
   const actual = declarations(block(runtime, runtimeSelector));
   for (const [token, value] of Object.entries(actual)) {
-    if (token.startsWith("sb-")) continue;
     if (!(token in expected)) {
       failures.push(`${runtimeSelector} --${token}: missing from ${shellSelector}`);
     } else if (normalise(value) !== normalise(expected[token])) {
@@ -72,5 +72,5 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log("Default token drift audit passed: runtime semantic defaults match the vendored shell scaffold.");
+  console.log("Default token drift audit passed: runtime defaults match the shell scaffold.");
 }

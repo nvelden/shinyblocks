@@ -16,6 +16,14 @@ package_source_css <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+shell_token_source_css <- function() {
+  path <- testthat::test_path("..", "..", "inst", "www", "src", "tokens.css")
+  if (!file.exists(path)) {
+    testthat::skip("shell token source is repo-only and not present in R CMD check build")
+  }
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 # Split a comma-separated selector list on top-level commas only, leaving
 # commas inside functional pseudo-classes (`:is(a,b)`, `:where(a,b)`,
 # `:not(a,b)`) intact. A naive split on every comma would tear an `:is()`
@@ -69,6 +77,19 @@ source_class_selectors <- function(css) {
 static_markup_selector_roots <- c(
   "\\.sb-card"
 )
+
+test_that("static card style tokens are defined on the app shell", {
+  css <- shell_token_source_css()
+
+  for (declaration in c(
+    "--sb-font-heading: inherit;",
+    "--sb-surface-padding: 1.5rem;",
+    "--sb-surface-gap: 1.5rem;",
+    "--sb-surface-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+  )) {
+    expect_match(css, declaration, fixed = TRUE)
+  }
+})
 
 test_that("runtime CSS selectors are scoped to shinyblocks roots", {
   selectors <- css_selectors(runtime_css())

@@ -67,7 +67,11 @@ instead of re-wrapping them.
 | Foreground | `--card-foreground` |
 | Border | `--border` |
 | Radius | `--radius-xl` |
+| Surface padding | `--sb-surface-padding` |
+| Region gap | `--sb-surface-gap` |
+| Surface shadow | `--sb-surface-shadow` |
 | Body text | `--muted-foreground` |
+| Heading font | `--sb-font-heading` |
 | Title weight | `--font-weight-semibold` |
 
 ## Deliberate divergences from shadcn

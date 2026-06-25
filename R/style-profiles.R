@@ -5,7 +5,8 @@
 # custom properties. This is separate from `block_theme()`, which owns
 # semantic *colour* tokens. See ADR 0021.
 #
-# The `default` profile's values live in the runtime stylesheet
+# The `default` profile's values live in both the shell token source
+# (`inst/www/src/tokens.css`) and runtime stylesheet
 # (`frontend/src/styles/runtime.css`) as the `--sb-*` defaults, so its built-in
 # override list here is empty: selecting `default` changes nothing unless the
 # caller supplies explicit overrides.

@@ -79,6 +79,36 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
+  /*
+   * Curated shinyblocks style-profile defaults. Runtime roots redeclare the
+   * same values for standalone runtime components; keeping them on `.sb-app`
+   * also makes the tokens available to R-side composition primitives such as
+   * block_card().
+   */
+  --sb-font-body: inherit;
+  --sb-font-heading: inherit;
+  --sb-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sb-control-font-size: 0.875rem;
+  --sb-control-font-weight: 500;
+  --sb-control-height: 2.25rem;
+  --sb-control-height-sm: 2rem;
+  --sb-control-height-lg: 2.5rem;
+  --sb-control-padding-x: 1rem;
+  --sb-control-gap: 0.5rem;
+  --sb-surface-padding: 1.5rem;
+  --sb-surface-gap: 1.5rem;
+  --sb-overlay-padding: 1.5rem;
+  --sb-overlay-gap: 1rem;
+  --sb-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --sb-surface-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  --sb-overlay-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --sb-focus-ring-width: 3px;
+  --sb-focus-ring-opacity: 50%;
+  --sb-disabled-opacity: 0.5;
+  --sb-transition-duration: 0.15s;
 }
 
 [data-theme="dark"] .sb-app {

@@ -154,6 +154,26 @@ try {
       previousPanel?.hasAttribute("hidden");
   });
 
+  await page.goto(`${url}/#card`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#card:not([hidden])");
+  const cardSpacing = await page.locator(".sb-parity-card-composed").evaluate((node) => {
+    const card = getComputedStyle(node);
+    const header = getComputedStyle(node.querySelector(".sb-card-header"));
+    const content = getComputedStyle(node.querySelector(".sb-card-content"));
+    return {
+      gap: card.gap,
+      paddingTop: card.paddingTop,
+      headerPaddingInline: header.paddingInline,
+      contentPaddingInline: content.paddingInline
+    };
+  });
+  assert.deepEqual(cardSpacing, {
+    gap: "24px",
+    paddingTop: "24px",
+    headerPaddingInline: "24px",
+    contentPaddingInline: "24px"
+  });
+
   await page.goto(`${url}/#layout-primitives`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#layout-primitives:not([hidden])");
   await page.waitForFunction(() => window.Shiny?.setInputValue);
