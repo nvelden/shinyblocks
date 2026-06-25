@@ -1,6 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { PATH } from "./paths";
 import {
+  isPlaygroundConsoleNoise,
+  isPlaygroundPageError,
+} from "./playground-noise";
+import {
   GET_STARTED_TOC,
   CODE_COMPLETE,
 } from "../../content/guides/get-started";
@@ -102,10 +106,16 @@ test("next-step links resolve under the base path", async ({ page }) => {
 });
 
 test("no console or page errors on the guide", async ({ page }) => {
+  // The guide embeds a Shinylive live preview; ignore its webR/WASM runtime
+  // noise (see playground-noise.ts) so this stays a check of the docs chrome.
   const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("pageerror", (e) => {
+    if (!isPlaygroundPageError(e.message)) errors.push(e.message);
+  });
   page.on("console", (m) => {
-    if (m.type() === "error") errors.push(m.text());
+    if (m.type() === "error" && !isPlaygroundConsoleNoise(m.location())) {
+      errors.push(m.text());
+    }
   });
   await page.goto(PATH.getStarted);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -125,4 +135,31 @@ test("narrow viewport scrolls code without widening the document", async ({
   });
   // Allow a 1px rounding tolerance.
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("embeds the finished app as a Shinylive live preview", async ({ page }) => {
+  await page.goto(PATH.getStarted);
+  const frame = page.locator(
+    'iframe[title="Live preview of the finished Regional sales dashboard"]',
+  );
+  await expect(frame).toHaveCount(1);
+  await expect(frame).toHaveAttribute("src", /\/playgrounds\/get-started\/?$/);
+});
+
+test("long code blocks collapse and expand", async ({ page }) => {
+  await page.goto(PATH.getStarted);
+  // The Complete app.R block is collapsible; it starts clamped with a
+  // "Show all" toggle, and full source stays in the DOM the whole time.
+  const region = page.getByRole("region", { name: "Complete app.R" });
+  await expect(region).toHaveClass(/guide-code-pre--collapsed/);
+
+  const toggle = page.getByRole("button", { name: "Show all" }).first();
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+  await toggle.click();
+  await expect(region).not.toHaveClass(/guide-code-pre--collapsed/);
+  await expect(
+    page.getByRole("button", { name: "Show less" }).first(),
+  ).toHaveAttribute("aria-expanded", "true");
 });

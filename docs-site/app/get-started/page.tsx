@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { GuideCodeBlock } from "@/components/guide-code-block";
+import { PlaygroundFrame } from "@/components/playground-frame";
 import {
   GET_STARTED_TOC,
   CODE_INSTALL,
@@ -112,6 +113,35 @@ export default function GetStartedPage() {
                 GitHub. You do <em>not</em> need React, Tailwind, Vite, or any Node
                 tooling. Plan on about 10–15 minutes.
               </div>
+
+              {/* Live preview of the finished app, running in the browser via
+                  Shinylive. Source is generated from the same CODE_COMPLETE the
+                  Complete app.R block shows, so it can never drift. */}
+              <figure className="flex flex-col gap-2">
+                <div className="overflow-hidden rounded-lg border border-border bg-card">
+                  <PlaygroundFrame
+                    src="/shinyblocks/playgrounds/get-started/"
+                    title="Live preview of the finished Regional sales dashboard"
+                    className="w-full"
+                    style={{ height: "880px", border: 0 }}
+                  />
+                </div>
+                <figcaption className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                  <span>
+                    The finished app, running live in your browser. It boots in
+                    WebAssembly (no server), so the first load takes a few seconds.
+                  </span>
+                  <a
+                    href="/shinyblocks/playgrounds/get-started/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-medium text-foreground underline underline-offset-4"
+                  >
+                    Open full size
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </figcaption>
+              </figure>
             </section>
 
             {/* 2. Install */}
@@ -138,7 +168,7 @@ export default function GetStartedPage() {
                 with the imports and a small, deterministic sample dataset. Keeping the
                 data local means the first run has no external failure modes.
               </p>
-              <GuideCodeBlock code={CODE_DATA} label="Imports and sample data" />
+              <GuideCodeBlock code={CODE_DATA} label="Imports and sample data" collapsible />
             </section>
 
             {/* 4. Page shell */}
@@ -258,7 +288,7 @@ block_card(
                 render functions fill the cards, one renders the plot, and an observer
                 resets the select.
               </p>
-              <GuideCodeBlock code={CODE_SERVER} label="Server function" />
+              <GuideCodeBlock code={CODE_SERVER} label="Server function" collapsible />
               <ul className="flex flex-col gap-1.5 pl-5 leading-relaxed text-muted-foreground [&>li]:list-disc">
                 <li><code>reactive()</code>, <code>renderText()</code>, <code>renderPlot()</code>, and <code>observeEvent()</code> are unchanged Shiny APIs.</li>
                 <li><code>update_block_select()</code> follows the same server-update pattern as native <code>updateSelectInput()</code>.</li>
@@ -293,7 +323,7 @@ block_card(
                 Here is the entire app in one copyable block. This is the canonical source
                 — the snippets above are slices of it.
               </p>
-              <GuideCodeBlock code={CODE_COMPLETE} label="Complete app.R" />
+              <GuideCodeBlock code={CODE_COMPLETE} label="Complete app.R" collapsible />
             </section>
 
             {/* 10. Composition model */}
