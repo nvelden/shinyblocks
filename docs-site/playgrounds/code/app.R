@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -155,101 +161,109 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
-          block_field(
-            block_field_label("language", `for` = "showcase_code_doc_language"),
-            block_select(
-              "showcase_code_doc_language",
-              choices = language_choices,
-              selected = "r",
-              size = "sm"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Content"
             ),
-            block_field_description(
-              "The sample snippet updates to match the selected language."
-            )
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "State"
-          ),
-          block_field(
-            block_field_label("header", `for` = "showcase_code_doc_header"),
-            block_checkbox("showcase_code_doc_header", "Header with editor dots", value = FALSE)
-          ),
-          block_field(
-            block_field_label("line_numbers", `for` = "showcase_code_doc_line_numbers"),
-            block_checkbox("showcase_code_doc_line_numbers", "Line numbers", value = TRUE)
-          ),
-          block_field(
-            block_field_label("copyable", `for` = "showcase_code_doc_copyable"),
-            block_checkbox("showcase_code_doc_copyable", "Copy button", value = TRUE)
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
-          block_field(
-            block_field_label("variant", `for` = "showcase_code_doc_variant"),
-            block_select(
-              "showcase_code_doc_variant",
-              choices = c("default", "outline"),
-              selected = "default",
-              size = "sm"
+            block_field(
+              block_field_label("language", `for` = "showcase_code_doc_language"),
+              block_select(
+                "showcase_code_doc_language",
+                choices = language_choices,
+                selected = "r",
+                size = "sm"
+              ),
+              block_field_description(
+                "The sample snippet updates to match the selected language."
+              )
             )
           ),
-          block_field(
-            block_field_label("style", `for` = "showcase_code_doc_style"),
-            block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;", resize = "none")
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_code_doc_class"),
-            block_checkbox(
-              "showcase_code_doc_class",
-              "Use custom class (sb-code-custom)",
-              value = FALSE
-            )
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; padding: 1.5rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "State"
             ),
-            uiOutput("showcase_code_preview_ui")
+            block_field(
+              block_field_label("header", `for` = "showcase_code_doc_header"),
+              block_checkbox("showcase_code_doc_header", "Header with editor dots", value = FALSE)
+            ),
+            block_field(
+              block_field_label("line_numbers", `for` = "showcase_code_doc_line_numbers"),
+              block_checkbox("showcase_code_doc_line_numbers", "Line numbers", value = TRUE)
+            ),
+            block_field(
+              block_field_label("copyable", `for` = "showcase_code_doc_copyable"),
+              block_checkbox("showcase_code_doc_copyable", "Copy button", value = TRUE)
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Styling"
+            ),
+            block_field(
+              block_field_label("variant", `for` = "showcase_code_doc_variant"),
+              block_select(
+                "showcase_code_doc_variant",
+                choices = c("default", "outline"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_code_doc_style"),
+              block_textarea("showcase_code_doc_style", value = "", rows = 1, placeholder = "e.g., max-width: 400px;", resize = "none")
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_code_doc_class"),
+              block_checkbox(
+                "showcase_code_doc_class",
+                "Use custom class (sb-code-custom)",
+                value = FALSE
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              style = paste(
+                "position: relative; padding: 1.5rem; background: var(--card);",
+                "border: 1px solid var(--border); border-radius: 0.75rem;",
+                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+              ),
+              uiOutput("showcase_code_preview_ui")
+            )
           ),
-          uiOutput("showcase_code_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_code_preview_code")
+          )
         )
       )
     )

@@ -124,11 +124,8 @@ htmltools::tagList(
       ),
       shiny::uiOutput("showcase_theme_action_code")
     ),
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 1.5rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 330px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted",
+    preview_canvas_style = "min-height: 330px;"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_theme_api_table"),
@@ -140,9 +137,10 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
+  block_cluster(
+    gap = "md",
+    align = "center",
     class = "sb-parity-theme-baseline",
-    style = "display: flex; gap: 1rem; align-items: center;",
     # Scope the override to this fixture's own wrapper. The section-wide
     # auto-scope (scope_showcase_theme -> [data-sb-preview="theme"]) would
     # otherwise apply this accent to *everything* in the Theme section,

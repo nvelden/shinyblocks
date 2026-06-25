@@ -148,14 +148,6 @@ check_finite_number <- function(x, name) {
   invisible(x)
 }
 
-# Length-1 logical, not NA.
-check_flag <- function(x, name) {
-  if (!is.logical(x) || length(x) != 1 || is.na(x)) {
-    stop(sprintf("`%s` must be a single TRUE or FALSE.", name), call. = FALSE)
-  }
-  invisible(x)
-}
-
 clamp <- function(x, lo, hi) max(lo, min(hi, x))
 
 #' Create a progress bar

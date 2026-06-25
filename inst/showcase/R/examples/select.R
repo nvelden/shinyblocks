@@ -41,8 +41,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_select_set_pro", "Set Pro"),
           showcase_action_button("showcase_select_set_two", "Select two"),
           showcase_action_button("showcase_select_clear", "Clear"),
@@ -94,8 +94,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instance captured by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "padding: 1rem; border: 1px dashed var(--border); border-radius: 0.5rem; display: flex; flex-wrap: wrap; gap: 1rem;",
+  block_cluster(
+    gap = "md",
+    class = "showcase-demo-frame",
     block_select(
       "showcase_parity_select",
       choices = c("Apple", "Banana", "Cherry"),

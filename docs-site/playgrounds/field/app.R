@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -45,7 +51,6 @@ showcase_render_code <- function(expr, env = parent.frame()) {
   })
 }
 
-group_header_style <- "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;"
 
 ui <- block_page(
   title = "shinyblocks - Field playground",
@@ -56,79 +61,80 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(style = group_header_style, "Form Layout"),
-          block_field(
-            block_field_label("legend text", `for` = "showcase_field_legend"),
-            block_textarea("showcase_field_legend", value = "Account Details", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("first name label", `for` = "showcase_field_fname_label"),
-            block_textarea("showcase_field_fname_label", value = "First name", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("last name description", `for` = "showcase_field_fname_desc"),
-            block_textarea("showcase_field_fname_desc", value = "Enter your primary name.", rows = 2, resize = "none")
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(style = group_header_style, "State"),
-          block_field(
-            block_field_label("email label", `for` = "showcase_field_email_label"),
-            block_textarea("showcase_field_email_label", value = "Email address", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("email description", `for` = "showcase_field_email_desc"),
-            block_textarea("showcase_field_email_desc", value = "We will never share your email address with anyone.", rows = 2, resize = "none")
-          ),
-          block_field(
-            block_field_label("password error message", `for` = "showcase_field_pw_error"),
-            block_textarea("showcase_field_pw_error", value = "Password must be at least 8 characters long and contain a digit.", rows = 2, resize = "none")
-          ),
-          block_field(
-            block_field_label("password invalid state", `for` = "showcase_field_pw_invalid"),
-            block_checkbox("showcase_field_pw_invalid", label = "Mark password field invalid", value = TRUE)
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(style = group_header_style, "Styling"),
-          block_field(
-            block_field_label("class", `for` = "showcase_field_class"),
-            block_checkbox("showcase_field_class", label = "Use custom dashed-border class", value = FALSE)
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; padding: 1.5rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Form Layout"),
+            block_field(
+              block_field_label("legend text", `for` = "showcase_field_legend"),
+              block_textarea("showcase_field_legend", value = "Account Details", rows = 1, resize = "none")
             ),
-            uiOutput("showcase_field_preview_ui")
+            block_field(
+              block_field_label("first name label", `for` = "showcase_field_fname_label"),
+              block_textarea("showcase_field_fname_label", value = "First name", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("last name description", `for` = "showcase_field_fname_desc"),
+              block_textarea("showcase_field_fname_desc", value = "Enter your primary name.", rows = 2, resize = "none")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
+            block_field(
+              block_field_label("email label", `for` = "showcase_field_email_label"),
+              block_textarea("showcase_field_email_label", value = "Email address", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("email description", `for` = "showcase_field_email_desc"),
+              block_textarea("showcase_field_email_desc", value = "We will never share your email address with anyone.", rows = 2, resize = "none")
+            ),
+            block_field(
+              block_field_label("password error message", `for` = "showcase_field_pw_error"),
+              block_textarea("showcase_field_pw_error", value = "Password must be at least 8 characters long and contain a digit.", rows = 2, resize = "none")
+            ),
+            block_field(
+              block_field_label("password invalid state", `for` = "showcase_field_pw_invalid"),
+              block_checkbox("showcase_field_pw_invalid", label = "Mark password field invalid", value = TRUE)
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(
+              block_field_label("class", `for` = "showcase_field_class"),
+              block_checkbox("showcase_field_class", label = "Use custom dashed-border class", value = FALSE)
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("showcase_field_preview_ui")
+            )
           ),
-          uiOutput("showcase_field_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_field_preview_code")
+          )
         )
       )
     )

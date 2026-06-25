@@ -7,6 +7,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Layout Primitives",
+    slug = "layout-primitives",
+    file = "layout-primitives.R",
+    description = "Stack, cluster, and responsive grid helpers for composing application content.",
+    featured = TRUE
+  ),
+  list(
     name = "Nav Item",
     slug = "nav-item",
     file = "nav_item.R",

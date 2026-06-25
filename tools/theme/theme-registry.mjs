@@ -257,6 +257,21 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-plot-output .sb-output-media", property: "borderColor", token: "--border" },
       { selector: ".sb-parity-plot-output .sb-output-caption", property: "color", token: "--muted-foreground" }
     ]
+  },
+  stack: {
+    section: "layout-primitives",
+    mode: "static-only",
+    reason: "Stack is a color-neutral structural primitive; its profile-sensitive gap is covered by style-registry.mjs."
+  },
+  cluster: {
+    section: "layout-primitives",
+    mode: "static-only",
+    reason: "Cluster is a color-neutral structural primitive; its profile-sensitive gap is covered by style-registry.mjs."
+  },
+  grid: {
+    section: "layout-primitives",
+    mode: "static-only",
+    reason: "Grid is a color-neutral structural primitive; its profile-sensitive gap is covered by style-registry.mjs."
   }
 };
 
@@ -269,5 +284,8 @@ export const RSIDE_PRIMITIVES = [
   "field",
   "input-group",
   "image-output",
-  "plot-output"
+  "plot-output",
+  "stack",
+  "cluster",
+  "grid"
 ];

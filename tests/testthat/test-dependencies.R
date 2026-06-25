@@ -20,7 +20,10 @@ test_that("repeated component dependencies resolve once", {
       block_card("Body"),
       block_button("Button"),
       block_sidebar("Item"),
-      block_body("Body")
+      block_body("Body"),
+      block_stack("Body"),
+      block_cluster("Body"),
+      block_grid("Body")
     )
   )
 

@@ -35,7 +35,7 @@ check_number <- function(x, name, min = NULL, positive = FALSE,
 check_flag <- function(x, name, msg = NULL) {
   if (!is.logical(x) || length(x) != 1 || is.na(x)) {
     stop(
-      msg %||% sprintf("`%s` must be a single `TRUE` or `FALSE`.", name),
+      msg %||% sprintf("`%s` must be a single TRUE or FALSE.", name),
       call. = FALSE
     )
   }

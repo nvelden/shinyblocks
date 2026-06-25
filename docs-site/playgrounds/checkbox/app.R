@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -72,7 +78,7 @@ string_literal <- function(value) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Checkbox playground",
+  title = "shinyblocks <U+00B7> Checkbox playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
@@ -85,20 +91,21 @@ ui <- block_page(
     ))
   ),
   htmltools::tags$div(
-      `data-shinyblocks-root` = "",
-      style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
-      htmltools::div(
-        class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
+    `data-shinyblocks-root` = "",
+    style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+    htmltools::div(
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
         block_card(
-                  title = "Controls",
-                  class = "showcase-playground__controls",
-                  style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Content"
-            ),
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
             block_field(
               block_field_label("label", `for` = "showcase_checkbox_doc_label"),
               block_textarea("showcase_checkbox_doc_label", value = "Email me product updates", rows = 1, resize = "none")
@@ -122,12 +129,10 @@ htmltools::div(
               )
             )
           ),
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "State"
-            ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
             block_field(
               block_field_label("checked", `for` = "showcase_checkbox_doc_checked"),
               block_checkbox("showcase_checkbox_doc_checked", "Checked", value = FALSE)
@@ -141,12 +146,10 @@ htmltools::div(
               block_checkbox("showcase_checkbox_doc_invalid", "Invalid", value = FALSE)
             )
           ),
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Styling"
-            ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
             block_field(
               block_field_label("style", `for` = "showcase_checkbox_doc_style"),
               block_textarea(
@@ -166,14 +169,12 @@ htmltools::div(
               )
             )
           ),
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Actions (Server Update)"
-            ),
-            htmltools::tags$div(
-              style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
               showcase_action_button("showcase_checkbox_set_checked", "Set checked"),
               showcase_action_button("showcase_checkbox_clear", "Clear"),
               showcase_action_button("showcase_checkbox_disable", "Disable"),
@@ -181,38 +182,30 @@ htmltools::div(
             )
           )
         ),
-        htmltools::div(
-          class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 0.5rem;",
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
             htmltools::tags$div(
-              style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-              "Preview"
-            ),
-            htmltools::tags$div(
-              style = paste(
-                "position: relative; display: flex; align-items: center; justify-content: center;",
-                "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-                "border: 1px solid var(--border); border-radius: 0.75rem;",
-                "min-height: 160px; box-sizing: border-box;",
-                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-              ),
+              class = "showcase-preview-canvas",
               uiOutput("showcase_checkbox_preview_ui")
             )
           ),
           uiOutput("showcase_checkbox_preview_value"),
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "UI Definition"
               ),
               uiOutput("showcase_checkbox_preview_code")
             ),
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "Server Action"
               ),
               uiOutput("showcase_checkbox_reactive_code")
@@ -221,6 +214,7 @@ htmltools::div(
         )
       )
     )
+  )
 )
 
 server <- function(input, output, session) {

@@ -3,10 +3,11 @@
 # real .sb-tooltip-content / .sb-button classes (under data-shinyblocks-root +
 # -portal-root so both resolve). See the playground for live block_tooltip()
 # usage.
-htmltools::tags$div(
+shinyblocks::block_stack(
+  gap = "sm",
+  align = "center",
   `data-shinyblocks-root` = NA,
   `data-shinyblocks-portal-root` = NA,
-  style = "display:flex;flex-direction:column;align-items:center;gap:0.5rem;",
   htmltools::tags$div(
     class = "sb-tooltip-content",
     `data-slot` = "tooltip-content",

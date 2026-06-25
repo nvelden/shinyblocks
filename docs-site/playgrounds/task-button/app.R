@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -58,11 +64,12 @@ icon_or_null <- function(value) {
 }
 
 controls_group <- function(title, ..., first = FALSE) {
-  border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
-  htmltools::div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", border_style),
+  grp_class <- if (isTRUE(first)) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group"
+  block_stack(
+    gap = "sm",
+    class = grp_class,
     htmltools::tags$h4(
-      style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+      class = "showcase-controls-group__title",
       title
     ),
     ...
@@ -82,149 +89,149 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        controls_group(
-          "Content", first = TRUE,
-          block_field(
-            block_field_label("label", `for` = "label"),
-            block_input("label", value = "Run analysis")
-          ),
-          block_field(
-            block_field_label("label_busy", `for` = "label_busy"),
-            block_input("label_busy", value = "Crunching...")
-          ),
-          block_field(
-            block_field_label("icon", `for` = "icon"),
-            block_select(
-              "icon",
-              choices = c("<None>" = "none", play = "play", `arrow-right` = "arrow-right", check = "check"),
-              selected = "none",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("icon_busy", `for` = "icon_busy"),
-            block_select(
-              "icon_busy",
-              choices = c("Spinner (default)" = "none", `refresh-cw` = "refresh-cw", check = "check"),
-              selected = "none",
-              size = "sm"
-            )
-          )
-        ),
-        controls_group(
-          "State",
-          block_field(
-            block_field_label("variant", `for` = "variant"),
-            block_select(
-              "variant",
-              choices = c("default", "secondary", "outline", "ghost", "destructive", "link"),
-              selected = "default",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("auto_reset", `for` = "auto_reset"),
-            block_checkbox("auto_reset", "Reset to ready after the click flush", value = TRUE)
-          ),
-          block_field(
-            block_field_label("disabled", `for` = "disabled"),
-            block_checkbox("disabled", "Disabled", value = FALSE)
-          )
-        ),
-        controls_group(
-          "Styling",
-          block_field(
-            block_field_label("size", `for` = "size"),
-            block_select(
-              "size",
-              choices = c("default", "sm", "lg"),
-              selected = "default",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("icon_position", `for` = "icon_position"),
-            block_select(
-              "icon_position",
-              choices = c("inline-start", "inline-end"),
-              selected = "inline-start",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("style", `for` = "style"),
-            block_input("style", value = "", placeholder = "e.g., min-width: 12rem;")
-          ),
-          block_field(
-            block_field_label("class", `for` = "class"),
-            block_checkbox("class", "Use custom dashed-border class", value = FALSE)
-          )
-        ),
-        controls_group(
-          "Actions (Server Update)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
-            # The signature server interaction: manual busy/ready control plus
-            # disabled-state preservation. The Content / State / Styling controls
-            # above already exercise the remaining update fields live.
-            action_button("set_busy", "Set busy"),
-            action_button("set_ready", "Set ready"),
-            action_button("disable", "Disable"),
-            action_button("enable", "Enable")
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 1.5rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "box-sizing: border-box;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          controls_group(
+            "Content",
+            first = TRUE,
+            block_field(
+              block_field_label("label", `for` = "label"),
+              block_input("label", value = "Run analysis")
             ),
-            uiOutput("preview_ui")
+            block_field(
+              block_field_label("label_busy", `for` = "label_busy"),
+              block_input("label_busy", value = "Crunching...")
+            ),
+            block_field(
+              block_field_label("icon", `for` = "icon"),
+              block_select(
+                "icon",
+                choices = c("<None>" = "none", play = "play", `arrow-right` = "arrow-right", check = "check"),
+                selected = "none",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("icon_busy", `for` = "icon_busy"),
+              block_select(
+                "icon_busy",
+                choices = c("Spinner (default)" = "none", `refresh-cw` = "refresh-cw", check = "check"),
+                selected = "none",
+                size = "sm"
+              )
+            )
+          ),
+          controls_group(
+            "State",
+            block_field(
+              block_field_label("variant", `for` = "variant"),
+              block_select(
+                "variant",
+                choices = c("default", "secondary", "outline", "ghost", "destructive", "link"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("auto_reset", `for` = "auto_reset"),
+              block_checkbox("auto_reset", "Reset to ready after the click flush", value = TRUE)
+            ),
+            block_field(
+              block_field_label("disabled", `for` = "disabled"),
+              block_checkbox("disabled", "Disabled", value = FALSE)
+            )
+          ),
+          controls_group(
+            "Styling",
+            block_field(
+              block_field_label("size", `for` = "size"),
+              block_select(
+                "size",
+                choices = c("default", "sm", "lg"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("icon_position", `for` = "icon_position"),
+              block_select(
+                "icon_position",
+                choices = c("inline-start", "inline-end"),
+                selected = "inline-start",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("style", `for` = "style"),
+              block_input("style", value = "", placeholder = "e.g., min-width: 12rem;")
+            ),
+            block_field(
+              block_field_label("class", `for` = "class"),
+              block_checkbox("class", "Use custom dashed-border class", value = FALSE)
+            )
+          ),
+          controls_group(
+            "Actions (Server Update)",
+            block_cluster(
+              gap = "sm",
+              # The signature server interaction: manual busy/ready control plus
+              # disabled-state preservation. The Content / State / Styling controls
+              # above already exercise the remaining update fields live.
+              action_button("set_busy", "Set busy"),
+              action_button("set_ready", "Set ready"),
+              action_button("disable", "Disable"),
+              action_button("enable", "Enable")
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "input$ value"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("preview_ui")
+            )
           ),
-          uiOutput("preview_value")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Task result"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "input$ value"
+            ),
+            uiOutput("preview_value")
           ),
-          uiOutput("task_result_ui")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Server Action"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "Task result"
+            ),
+            uiOutput("task_result_ui")
           ),
-          uiOutput("reactive_code")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "Server Action"
+            ),
+            uiOutput("reactive_code")
           ),
-          uiOutput("preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("preview_code")
+          )
         )
       )
     )
@@ -300,14 +307,17 @@ server <- function(input, output, session) {
   # finishes, so it stays busy for the duration of the work. With auto_reset it
   # then clears itself; otherwise it stays busy until "Set ready".
   task_result <- reactiveVal(NULL)
-  observeEvent(input$preview_task_button, {
-    Sys.sleep(1.5)
-    task_result(sprintf(
-      "Run #%d complete at %s",
-      input$preview_task_button,
-      format(Sys.time(), "%H:%M:%S")
-    ))
-  }, ignoreInit = TRUE)
+  observeEvent(input$preview_task_button,
+    {
+      Sys.sleep(1.5)
+      task_result(sprintf(
+        "Run #%d complete at %s",
+        input$preview_task_button,
+        format(Sys.time(), "%H:%M:%S")
+      ))
+    },
+    ignoreInit = TRUE
+  )
 
   output$task_result_ui <- showcase_render_code({
     res <- task_result()

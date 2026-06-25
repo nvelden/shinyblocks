@@ -154,6 +154,55 @@ try {
       previousPanel?.hasAttribute("hidden");
   });
 
+  await page.goto(`${url}/#layout-primitives`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#layout-primitives:not([hidden])");
+  await page.waitForFunction(() => window.Shiny?.setInputValue);
+
+  const setLayoutInputs = async (values) => {
+    await page.evaluate((nextValues) => {
+      for (const [name, value] of Object.entries(nextValues)) {
+        window.Shiny.setInputValue(`showcase_layout_primitives_${name}`, value, {
+          priority: "event"
+        });
+      }
+    }, values);
+  };
+
+  await setLayoutInputs({
+    type: "grid",
+    count: "2",
+    min_width: "10rem",
+    align: "stretch",
+    vary_heights: true
+  });
+  await page.waitForFunction(() => {
+    const grids = document.querySelectorAll(
+      "#showcase_layout_primitives_preview_ui .showcase-layout-primitives-viewport > .sb-grid"
+    );
+    if (!grids.length) return false;
+    const grid = grids[grids.length - 1];
+    return grid.querySelectorAll(":scope > .sb-card").length === 2 &&
+      grid.style.getPropertyValue("--sb-grid-min") === "10rem" &&
+      getComputedStyle(grid).gridTemplateColumns.split(" ").length === 2;
+  });
+
+  const gridSnapshot = await page.evaluate(() => {
+    const grids = [...document.querySelectorAll(
+      "#showcase_layout_primitives_preview_ui .showcase-layout-primitives-viewport > .sb-grid"
+    )];
+    const grid = grids.findLast((node) => node.isConnected && node.getClientRects().length);
+    return {
+      cards: [...grid.querySelectorAll(":scope > .sb-card")].map((node) => {
+        const box = node.getBoundingClientRect();
+        return { x: box.x, y: box.y, width: box.width, height: box.height };
+      })
+    };
+  });
+  const gridBoxes = gridSnapshot.cards;
+  assert.ok(gridBoxes[1].x > gridBoxes[0].x);
+  assert.ok(Math.abs(gridBoxes[1].y - gridBoxes[0].y) < 2);
+  assert.ok(Math.abs(gridBoxes[1].height - gridBoxes[0].height) < 2);
+
   console.log("Showcase smoke test passed.");
 } catch (error) {
   console.error(stdout);

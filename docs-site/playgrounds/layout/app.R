@@ -3,13 +3,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
 
   if (!mounted) {
@@ -50,70 +53,74 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Header & Sidebar"
-          ),
-          block_field(
-            block_field_label("header title", `for` = "showcase_layout_doc_title"),
-            block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
-            block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
-            block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
-          ),
-          block_field(
-            block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
-            block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Sidebar State"
-          ),
-          block_field(
-            block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
-            block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
-          ),
-          block_field(
-            block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
-            block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::div(
-            style = paste(
-              "position: relative; display: flex; align-items: stretch; justify-content: stretch;",
-              "padding: 1rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-              "border: 0; border-radius: 0.75rem; min-height: 332px; box-sizing: border-box;"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Header & Sidebar"
             ),
-            uiOutput("showcase_layout_preview_ui")
+            block_field(
+              block_field_label("header title", `for` = "showcase_layout_doc_title"),
+              block_textarea("showcase_layout_doc_title", value = "Admin Dashboard", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("sidebar title", `for` = "showcase_layout_doc_sidebar_title"),
+              block_textarea("showcase_layout_doc_sidebar_title", value = "Acme Corp", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("profile avatar", `for` = "showcase_layout_doc_profile"),
+              block_checkbox("showcase_layout_doc_profile", label = "Show profile avatar", value = TRUE)
+            ),
+            block_field(
+              block_field_label("profile label", `for` = "showcase_layout_doc_profile_label"),
+              block_textarea("showcase_layout_doc_profile_label", value = "NV", rows = 1, resize = "none")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Sidebar State"
+            ),
+            block_field(
+              block_field_label("collapsible", `for` = "showcase_layout_doc_collapsible"),
+              block_checkbox("showcase_layout_doc_collapsible", label = "Enable sidebar toggle button", value = TRUE)
+            ),
+            block_field(
+              block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
+              block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
+            )
           )
         ),
-        htmltools::div(
-          htmltools::div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
+            htmltools::div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted showcase-preview-canvas--stretch",
+              style = "padding: 1rem; min-height: 332px;",
+              uiOutput("showcase_layout_preview_ui")
+            )
           ),
-          uiOutput("showcase_layout_preview_code")
+          htmltools::div(
+            htmltools::div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_layout_preview_code")
+          )
         )
       )
     )
@@ -123,9 +130,12 @@ htmltools::div(
 server <- function(input, output, session) {
   collapsed_state <- reactiveVal(FALSE)
 
-  observeEvent(input$showcase_layout_doc_collapsed, {
-    collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
-  }, ignoreInit = FALSE)
+  observeEvent(input$showcase_layout_doc_collapsed,
+    {
+      collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
+    },
+    ignoreInit = FALSE
+  )
 
   observeEvent(input$showcase_layout_preview_toggle, {
     if (isTRUE(input$showcase_layout_doc_collapsible)) {
@@ -151,8 +161,10 @@ server <- function(input, output, session) {
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
           "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
         ),
-        htmltools::div(
-          style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; white-space: nowrap;",
+        block_cluster(
+          align = "center",
+          justify = "between",
+          style = "margin-bottom: 1.5rem; white-space: nowrap;",
           if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
           if (collapsible) {
             block_button(
@@ -166,26 +178,37 @@ server <- function(input, output, session) {
             )
           }
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
+        block_stack(
+          gap = "sm",
+          block_cluster(
+            align = "center",
+            gap = "sm",
+            style = "padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
             block_icon("layout-dashboard"),
             if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Dashboard") else NULL
           ),
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 0.375rem; color: var(--muted-foreground);",
+          block_cluster(
+            align = "center",
+            gap = "sm",
+            style = "padding: 0.5rem; border-radius: 0.375rem; color: var(--muted-foreground);",
             block_icon("users"),
             if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Users") else NULL
           )
         )
       ),
+      # Fixed-geometry main column: flex:1 with no inter-region gap (topbar sits
+      # flush above the scrolling content). Not a block_stack target — primitive
+      # gaps cannot be zero.
       htmltools::div(
         style = "flex: 1; display: flex; flex-direction: column;",
-        htmltools::div(
-          style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--background);",
-          htmltools::div(
-            style = "display: flex; align-items: center; gap: 0.5rem;",
+        block_cluster(
+          align = "center",
+          justify = "between",
+          gap = "md",
+          style = "height: 50px; padding: 0 1rem; border-bottom: 1px solid var(--border); background: var(--background);",
+          block_cluster(
+            align = "center",
+            gap = "sm",
             block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),

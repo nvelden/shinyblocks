@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -46,7 +52,9 @@ showcase_render_code <- function(expr, env = parent.frame()) {
 }
 
 num_or <- function(x, fallback) {
-  if (is.null(x)) return(fallback)
+  if (is.null(x)) {
+    return(fallback)
+  }
   n <- suppressWarnings(as.numeric(x))
   if (length(n) != 1 || !is.finite(n)) fallback else n
 }
@@ -56,11 +64,12 @@ blank_to_null <- function(x) {
 }
 
 controls_group <- function(title, ..., first = FALSE) {
-  border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
-  htmltools::div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", border_style),
+  grp_class <- if (isTRUE(first)) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group"
+  block_stack(
+    gap = "sm",
+    class = grp_class,
     htmltools::tags$h4(
-      style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+      class = "showcase-controls-group__title",
       title
     ),
     ...
@@ -83,130 +92,130 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        controls_group(
-          "Content", first = TRUE,
-          block_field(
-            block_field_label("value", `for` = "value"),
-            block_input("value", value = "0.6", type = "number")
-          ),
-          block_field(
-            block_field_label("min", `for` = "min"),
-            block_input("min", value = "0", type = "number")
-          ),
-          block_field(
-            block_field_label("max", `for` = "max"),
-            block_input("max", value = "1", type = "number")
-          ),
-          block_field(
-            block_field_label("label", `for` = "label"),
-            block_input("label", value = "Upload")
-          ),
-          block_field(
-            block_field_label("message", `for` = "message"),
-            block_input("message", value = "Importing rows...")
-          ),
-          block_field(
-            block_field_label("detail", `for` = "detail"),
-            block_input("detail", value = "", placeholder = "e.g., 1,200 of 3,400")
-          )
-        ),
-        controls_group(
-          "State",
-          block_field(
-            block_field_label("show_value", `for` = "show_value"),
-            block_checkbox("show_value", "Show percent", value = TRUE)
-          ),
-          block_field(
-            block_field_label("indeterminate", `for` = "indeterminate"),
-            block_checkbox("indeterminate", "Indeterminate", value = FALSE)
-          )
-        ),
-        controls_group(
-          "Actions (Server Update)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
-            action_button("set_25", "Set 25%"),
-            action_button("set_75", "Set 75%"),
-            action_button("inc", "Increment"),
-            action_button("reset", "Reset"),
-            action_button("toggle_indeterminate", "Indeterminate")
-          ),
-          htmltools::tags$p(
-            style = "color: var(--muted-foreground); margin: 0.5rem 0 0.35rem 0; font-size: 0.8125rem;",
-            paste(
-              "Long-running task: advance a batch job without blocking the",
-              "session. Run simulates a 20-batch import; the recipe appears",
-              "under Server Action."
-            )
-          ),
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
-            action_button("batch_run", "Run import"),
-            action_button("batch_cancel", "Cancel")
-          )
-        ),
-        controls_group(
-          "Styling",
-          block_field(
-            block_field_label("variant", `for` = "variant"),
-            block_select(
-              "variant",
-              choices = c("default", "success", "warning", "info", "destructive"),
-              selected = "default",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("width", `for` = "width"),
-            block_input("width", value = "", placeholder = "e.g., 320px (blank = 100%)")
-          ),
-          block_field(
-            block_field_label("style", `for` = "style"),
-            block_input("style", value = "", placeholder = "e.g., opacity: 0.8;")
-          ),
-          block_field(
-            block_field_label("class", `for` = "use_class"),
-            block_checkbox("use_class", "Use custom dashed-border class", value = FALSE)
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 2.5rem 2rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "min-height: 160px; box-sizing: border-box;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          controls_group(
+            "Content",
+            first = TRUE,
+            block_field(
+              block_field_label("value", `for` = "value"),
+              block_input("value", value = "0.6", type = "number")
             ),
-            uiOutput("preview_ui")
+            block_field(
+              block_field_label("min", `for` = "min"),
+              block_input("min", value = "0", type = "number")
+            ),
+            block_field(
+              block_field_label("max", `for` = "max"),
+              block_input("max", value = "1", type = "number")
+            ),
+            block_field(
+              block_field_label("label", `for` = "label"),
+              block_input("label", value = "Upload")
+            ),
+            block_field(
+              block_field_label("message", `for` = "message"),
+              block_input("message", value = "Importing rows...")
+            ),
+            block_field(
+              block_field_label("detail", `for` = "detail"),
+              block_input("detail", value = "", placeholder = "e.g., 1,200 of 3,400")
+            )
+          ),
+          controls_group(
+            "State",
+            block_field(
+              block_field_label("show_value", `for` = "show_value"),
+              block_checkbox("show_value", "Show percent", value = TRUE)
+            ),
+            block_field(
+              block_field_label("indeterminate", `for` = "indeterminate"),
+              block_checkbox("indeterminate", "Indeterminate", value = FALSE)
+            )
+          ),
+          controls_group(
+            "Actions (Server Update)",
+            block_cluster(
+              gap = "sm",
+              action_button("set_25", "Set 25%"),
+              action_button("set_75", "Set 75%"),
+              action_button("inc", "Increment"),
+              action_button("reset", "Reset"),
+              action_button("toggle_indeterminate", "Indeterminate")
+            ),
+            htmltools::tags$p(
+              style = "color: var(--muted-foreground); margin: 0.5rem 0 0.35rem 0; font-size: 0.8125rem;",
+              paste(
+                "Long-running task: advance a batch job without blocking the",
+                "session. Run simulates a 20-batch import; the recipe appears",
+                "under Server Action."
+              )
+            ),
+            block_cluster(
+              gap = "sm",
+              action_button("batch_run", "Run import"),
+              action_button("batch_cancel", "Cancel")
+            )
+          ),
+          controls_group(
+            "Styling",
+            block_field(
+              block_field_label("variant", `for` = "variant"),
+              block_select(
+                "variant",
+                choices = c("default", "success", "warning", "info", "destructive"),
+                selected = "default",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("width", `for` = "width"),
+              block_input("width", value = "", placeholder = "e.g., 320px (blank = 100%)")
+            ),
+            block_field(
+              block_field_label("style", `for` = "style"),
+              block_input("style", value = "", placeholder = "e.g., opacity: 0.8;")
+            ),
+            block_field(
+              block_field_label("class", `for` = "use_class"),
+              block_checkbox("use_class", "Use custom dashed-border class", value = FALSE)
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Server Action"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas",
+              uiOutput("preview_ui")
+            )
           ),
-          uiOutput("reactive_code")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "Server Action"
+            ),
+            uiOutput("reactive_code")
           ),
-          uiOutput("preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("preview_code")
+          )
         )
       )
     )
@@ -307,7 +316,7 @@ server <- function(input, output, session) {
   })
 
   # Long-running task recipe, wired into the live preview bar. A stepped,
-  # non-blocking reactive — each tick advances one batch and pushes an update,
+  # non-blocking reactive <U+2014> each tick advances one batch and pushes an update,
   # so Shiny flushes progress to the browser between steps instead of freezing
   # on a blocking loop.
   batch <- reactiveValues(running = FALSE, step = 0, total = 20)
@@ -350,7 +359,9 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$batch_cancel, {
-    if (!batch$running) return()
+    if (!batch$running) {
+      return()
+    }
     batch$running <- FALSE
     update_block_progress(
       session, "preview_progress",
@@ -360,7 +371,9 @@ server <- function(input, output, session) {
   })
 
   observe({
-    if (!batch$running) return()
+    if (!batch$running) {
+      return()
+    }
     invalidateLater(180, session)
     isolate({
       batch$step <- batch$step + 1
@@ -368,7 +381,9 @@ server <- function(input, output, session) {
       update_block_progress(
         session, "preview_progress",
         value = batch$step / batch$total,
-        message = if (done) "Import complete" else {
+        message = if (done) {
+          "Import complete"
+        } else {
           sprintf("Importing batch %d of %d", batch$step, batch$total)
         },
         detail = sprintf("%s rows written", format(batch$step * 500L, big.mark = ","))

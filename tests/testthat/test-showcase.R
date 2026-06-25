@@ -399,3 +399,58 @@ test_that("interactive sections use the full playground layout", {
     }
   }
 })
+
+test_that("layout primitives showcase documents all helpers and parity fixtures", {
+  skip_if_no_showcase()
+
+  fixture <- showcase_fixture()
+  rendered <- fixture$html
+
+  expect_match(rendered, 'data-sb-section="layout-primitives"', fixed = TRUE)
+  for (name in c("block_stack", "block_cluster", "block_grid")) {
+    expect_match(rendered, name, fixed = TRUE)
+  }
+  for (class in c(
+    "sb-parity-stack-default",
+    "sb-parity-cluster-default",
+    "sb-parity-grid-default"
+  )) {
+    expect_match(rendered, class, fixed = TRUE)
+  }
+
+  for (label in c("Primitive", "Cross-axis alignment")) {
+    expect_match(rendered, label, fixed = TRUE)
+  }
+
+  grid_values <- list(
+    type = "grid",
+    gap = "md",
+    align = "start",
+    justify = "start",
+    wrap = TRUE,
+    min_width = "14rem",
+    count = 2L,
+    vary_heights = TRUE
+  )
+  grid_specs <- fixture$env$layout_primitives_demo_specs(grid_values)
+  grid_code <- fixture$env$layout_primitives_demo_code(grid_values, grid_specs)
+
+  expect_length(grid_specs, 2L)
+  expect_match(grid_code, 'min_width = "14rem"', fixed = TRUE)
+  expect_match(grid_code, 'style = "min-height: 5rem;"', fixed = TRUE)
+  expect_equal(
+    lengths(regmatches(grid_code, gregexpr("block_card\\(", grid_code))),
+    2L
+  )
+  expect_silent(parse(text = grid_code))
+
+  cluster_values <- grid_values
+  cluster_values$type <- "cluster"
+  cluster_code <- fixture$env$layout_primitives_demo_code(
+    cluster_values,
+    fixture$env$layout_primitives_demo_specs(cluster_values)
+  )
+  expect_match(cluster_code, 'style = "height: 16rem;"', fixed = TRUE)
+  expect_match(cluster_code, 'justify = "start"', fixed = TRUE)
+  expect_silent(parse(text = cluster_code))
+})

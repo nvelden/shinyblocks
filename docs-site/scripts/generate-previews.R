@@ -1,3 +1,10 @@
+# Ensure a UTF-8 locale so non-ASCII literals (e.g. the ellipsis in
+# "Crunching…") are read and written faithfully instead of degrading into
+# <e2><80><a6> byte markers under a C/POSIX locale.
+for (loc in c("en_US.UTF-8", "C.UTF-8", "en_US.utf8", "C.utf8")) {
+  if (nzchar(suppressWarnings(Sys.setlocale("LC_CTYPE", loc)))) break
+}
+
 # Source registry
 source("content/previews/_registry.R")
 
@@ -26,19 +33,23 @@ render_fragment <- function(ui) {
 }
 
 for (entry in registry) {
-  # Source preview file to get the tag object
+  # Source preview file to get the tag object. Force UTF-8 so non-ASCII
+  # literals (e.g. the ellipsis in "Crunching…") survive into the rendered
+  # HTML and the manifest rather than degrading into <e2><80><a6> byte markers.
   preview_file <- file.path("content/previews", entry$file)
-  ui <- source(preview_file)$value
-  
+  ui <- source(preview_file, encoding = "UTF-8")$value
+
   # Render the tags
   html_cleaned <- render_fragment(ui)
-  
+
   # Write HTML fragment to sibling .html file
   html_file <- file.path("content/previews", paste0(entry$slug, ".html"))
-  writeLines(html_cleaned, html_file)
-  
+  writeLines(html_cleaned, html_file, useBytes = TRUE)
+
   # Read code recipe content
-  code_content <- paste(readLines(preview_file, warn = FALSE), collapse = "\n")
+  code_content <- readLines(preview_file, warn = FALSE, encoding = "UTF-8")
+  Encoding(code_content) <- "UTF-8"
+  code_content <- enc2utf8(paste(code_content, collapse = "\n"))
   code_html <- render_fragment(
     shinyblocks::block_code(
       code = code_content,
@@ -82,6 +93,29 @@ if (length(all_deps) > 0) {
       writeLines(combined_css, "public/runtime/shinyblocks.css")
     }
   }
+}
+
+# Reject byte-marker corruption (e.g. <e2><80><a6>) before it reaches the
+# manifest, displayed code, or runtime payloads. These markers appear when a
+# multibyte UTF-8 sequence (lead/continuation bytes 0x80-0xff) is written as
+# literal text instead of the original character.
+byte_marker_re <- "<[89a-fA-F][0-9a-fA-F]>"
+flatten_strings <- function(x) {
+  if (is.character(x)) return(x)
+  if (is.list(x)) return(unlist(lapply(x, flatten_strings), use.names = FALSE))
+  character()
+}
+offending <- Filter(
+  function(s) grepl(byte_marker_re, s, perl = TRUE),
+  flatten_strings(manifest_list)
+)
+if (length(offending) > 0) {
+  stop(
+    "Preview content contains UTF-8 byte markers (", byte_marker_re, "). ",
+    "Fix encoding handling in the generator. First offender:\n",
+    substr(offending[[1]], 1, 200),
+    call. = FALSE
+  )
 }
 
 # Write preview manifest JSON

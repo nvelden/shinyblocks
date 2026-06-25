@@ -35,7 +35,10 @@ Create a dashboard sidebar
 \seealso{
 Other layout: 
 \code{\link{block_body}()},
+\code{\link{block_cluster}()},
+\code{\link{block_grid}()},
 \code{\link{block_header}()},
-\code{\link{block_page}()}
+\code{\link{block_page}()},
+\code{\link{block_stack}()}
 }
 \concept{layout}

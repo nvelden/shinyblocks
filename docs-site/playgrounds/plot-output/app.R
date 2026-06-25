@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -89,11 +95,12 @@ interaction_values <- function(input, output_id) {
 }
 
 controls_group <- function(title, ..., first = FALSE) {
-  border_style <- if (isTRUE(first)) "" else "border-top: 1px solid var(--border); padding-top: 0.75rem;"
-  htmltools::div(
-    style = paste("display: flex; flex-direction: column; gap: 0.75rem;", border_style),
+  grp_class <- if (isTRUE(first)) "showcase-controls-group showcase-controls-group--first" else "showcase-controls-group"
+  block_stack(
+    gap = "sm",
+    class = grp_class,
     htmltools::tags$h4(
-      style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
+      class = "showcase-controls-group__title",
       title
     ),
     ...
@@ -113,108 +120,114 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        controls_group(
-          "Content", first = TRUE,
-          block_field(
-            block_field_label("caption", `for` = "caption"),
-            block_input("caption", value = "Quarterly revenue by region")
-          ),
-          block_field(
-            block_field_label("width", `for` = "width"),
-            block_input("width", value = "", placeholder = "e.g., 360px (blank = 100%)")
-          ),
-          block_field(
-            block_field_label("height", `for` = "height"),
-            block_input("height", value = "", placeholder = "blank = aspect/Shiny default")
-          )
-        ),
-        controls_group(
-          "State",
-          block_field(
-            block_field_label("aspect", `for` = "aspect"),
-            block_select(
-              "aspect",
-              choices = c("none", "16/9", "4/3", "1/1", "21/9"),
-              selected = "16/9",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("border", `for` = "border"),
-            block_checkbox("border", "Draw border", value = TRUE)
-          ),
-          block_field(
-            block_field_label("rounded", `for` = "rounded"),
-            block_checkbox("rounded", "Rounded corners", value = TRUE)
-          )
-        ),
-        controls_group(
-          "Actions (Server Render)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
-            action_button("regen", "Regenerate")
-          )
-        ),
-        controls_group(
-          "Styling",
-          block_field(
-            block_field_label("class", `for` = "frame_class"),
-            block_checkbox("frame_class", "Use border-dashed class", value = FALSE)
-          ),
-          block_field(
-            block_field_label("style", `for` = "frame_style"),
-            block_input(
-              "frame_style",
-              value = "",
-              placeholder = "e.g., max-width: 34rem; margin-inline: auto;"
-            )
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: block;",
-              "padding: 1.5rem; background: var(--card);",
-              "border: 1px solid var(--border); border-radius: 0.75rem;",
-              "box-sizing: border-box;",
-              "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          controls_group(
+            "Content",
+            first = TRUE,
+            block_field(
+              block_field_label("caption", `for` = "caption"),
+              block_input("caption", value = "Quarterly revenue by region")
             ),
-            uiOutput("preview_ui")
+            block_field(
+              block_field_label("width", `for` = "width"),
+              block_input("width", value = "", placeholder = "e.g., 360px (blank = 100%)")
+            ),
+            block_field(
+              block_field_label("height", `for` = "height"),
+              block_input("height", value = "", placeholder = "blank = aspect/Shiny default")
+            )
+          ),
+          controls_group(
+            "State",
+            block_field(
+              block_field_label("aspect", `for` = "aspect"),
+              block_select(
+                "aspect",
+                choices = c("none", "16/9", "4/3", "1/1", "21/9"),
+                selected = "16/9",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("border", `for` = "border"),
+              block_checkbox("border", "Draw border", value = TRUE)
+            ),
+            block_field(
+              block_field_label("rounded", `for` = "rounded"),
+              block_checkbox("rounded", "Rounded corners", value = TRUE)
+            )
+          ),
+          controls_group(
+            "Actions (Server Render)",
+            block_cluster(
+              gap = "sm",
+              action_button("regen", "Regenerate")
+            )
+          ),
+          controls_group(
+            "Styling",
+            block_field(
+              block_field_label("class", `for` = "frame_class"),
+              block_checkbox("frame_class", "Use border-dashed class", value = FALSE)
+            ),
+            block_field(
+              block_field_label("style", `for` = "frame_style"),
+              block_input(
+                "frame_style",
+                value = "",
+                placeholder = "e.g., max-width: 34rem; margin-inline: auto;"
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Interaction values"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              style = paste(
+                "position: relative; display: block;",
+                "padding: 1.5rem; background: var(--card);",
+                "border: 1px solid var(--border); border-radius: 0.75rem;",
+                "box-sizing: border-box;",
+                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
+              ),
+              uiOutput("preview_ui")
+            )
           ),
-          uiOutput("interaction_value")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Server Render"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "Interaction values"
+            ),
+            uiOutput("interaction_value")
           ),
-          uiOutput("reactive_code")
-        ),
-        htmltools::tags$div(
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "Server Render"
+            ),
+            uiOutput("reactive_code")
           ),
-          uiOutput("preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("preview_code")
+          )
         )
       )
     )
@@ -261,12 +274,15 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "preview_ui", suspendWhenHidden = FALSE)
 
-  output$preview_plot <- renderPlot({
-    v <- demo_values()
-    op <- graphics::par(mar = c(3, 3, 1, 1))
-    on.exit(graphics::par(op), add = TRUE)
-    graphics::barplot(v, col = c("#2563eb", "#16a34a", "#f59e0b", "#dc2626"), border = NA, ylim = c(0, 110))
-  }, alt = "Bar chart of quarterly revenue by region.")
+  output$preview_plot <- renderPlot(
+    {
+      v <- demo_values()
+      op <- graphics::par(mar = c(3, 3, 1, 1))
+      on.exit(graphics::par(op), add = TRUE)
+      graphics::barplot(v, col = c("#2563eb", "#16a34a", "#f59e0b", "#dc2626"), border = NA, ylim = c(0, 110))
+    },
+    alt = "Bar chart of quarterly revenue by region."
+  )
   outputOptions(output, "preview_plot", suspendWhenHidden = FALSE)
 
   output$preview_code <- showcase_render_code({

@@ -39,8 +39,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_input_group_set_value", "Set value"),
           showcase_action_button("showcase_input_group_clear", "Reset"),
           showcase_action_button("showcase_input_group_disable", "Disable"),
@@ -75,12 +75,8 @@ htmltools::tagList(
         shiny::uiOutput("showcase_input_group_reactive_code")
       )
     ),
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-      "border: 1px dashed var(--border); border-radius: 0.75rem;",
-      "min-height: 180px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--dashed",
+    preview_canvas_style = "min-height: 180px;"
   ),
   
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
@@ -92,9 +88,10 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 1rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/ and visual regression checkers. Do not remove."
   ),
-  htmltools::div(
-    class = "sb-parity-input-group-fixtures",
-    style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem; background: var(--background);",
+  block_grid(
+    min_width = "280px",
+    gap = "md",
+    class = "sb-parity-input-group-fixtures showcase-demo-panel",
     block_field(
       block_field_label("Leading icon", `for` = "sb-parity-input-group-search"),
       block_input_group(

@@ -38,8 +38,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Render)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+            gap = "sm",
           showcase_action_button("showcase_plot_output_regen", "Regenerate")
         )
       ),
@@ -95,8 +95,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 1rem; max-width: 28rem;",
+  block_stack(
+      gap = "md",
+      style = "max-width: 28rem;",
     block_plot_output(
       "showcase_parity_plot_output",
       aspect = "16/9",

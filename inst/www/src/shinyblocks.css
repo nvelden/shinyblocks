@@ -133,6 +133,80 @@
    * package-owned layout, navigation, and composition primitives. Keep
    * them independent from runtime component styling. */
 
+  .sb-stack {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .sb-cluster {
+    display: flex;
+    min-width: 0;
+  }
+
+  .sb-cluster[data-wrap="true"] {
+    flex-wrap: wrap;
+  }
+
+  .sb-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(min(100%, var(--sb-grid-min)), 1fr));
+    min-width: 0;
+  }
+
+  /* Grid items default to `min-width: auto`, so a wide or unbreakable child
+   * (long word, image, <pre>, fixed-width widget) keeps the item larger than
+   * its track and overflows the row on narrow viewports. Letting items shrink
+   * to their track is the required companion to the `min(100%, …)` track cap. */
+  .sb-grid > * {
+    min-width: 0;
+  }
+
+  .sb-layout-gap-sm {
+    gap: var(--sb-layout-gap-sm, var(--sb-control-gap, 0.5rem));
+  }
+
+  .sb-layout-gap-md {
+    gap: var(--sb-layout-gap-md, var(--sb-overlay-gap, 1rem));
+  }
+
+  .sb-layout-gap-lg {
+    gap: var(--sb-layout-gap-lg, var(--sb-surface-gap, 1.5rem));
+  }
+
+  .sb-layout-align-start {
+    align-items: flex-start;
+  }
+
+  .sb-layout-align-center {
+    align-items: center;
+  }
+
+  .sb-layout-align-end {
+    align-items: flex-end;
+  }
+
+  .sb-layout-align-stretch {
+    align-items: stretch;
+  }
+
+  .sb-layout-justify-start {
+    justify-content: flex-start;
+  }
+
+  .sb-layout-justify-center {
+    justify-content: center;
+  }
+
+  .sb-layout-justify-end {
+    justify-content: flex-end;
+  }
+
+  .sb-layout-justify-between {
+    justify-content: space-between;
+  }
+
   .sb-page {
     @apply grid min-h-screen bg-background text-foreground;
   }

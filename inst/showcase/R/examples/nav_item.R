@@ -30,11 +30,8 @@ htmltools::tagList(
     ),
     preview_output_id = "showcase_nav_item_preview_ui",
     code_output_id = "showcase_nav_item_preview_code",
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-      "border: 0; border-radius: 0.75rem; min-height: 220px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--muted",
+    preview_canvas_style = "min-height: 220px;"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_nav_item_api_table"),

@@ -43,8 +43,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+          gap = "sm",
           showcase_action_button("showcase_radio_group_select_mentions", "Select mentions"),
           showcase_action_button("showcase_radio_group_clear", "Reset"),
           showcase_action_button("showcase_radio_group_disable", "Disable"),
@@ -80,12 +80,8 @@ htmltools::tagList(
         shiny::uiOutput("showcase_radio_group_reactive_code")
       )
     ),
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-      "border: 1px dashed var(--border); border-radius: 0.75rem;",
-      "min-height: 220px; box-sizing: border-box;"
-    )
+    preview_canvas_class = "showcase-preview-canvas--dashed",
+    preview_canvas_style = "min-height: 220px;"
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_radio_group_api_table"),

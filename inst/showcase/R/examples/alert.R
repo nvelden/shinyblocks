@@ -88,8 +88,8 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.75rem;",
+  block_stack(
+      gap = "sm",
     block_alert("Heads up", description = "shinyblocks alerts surface important inline messages.", class = "sb-parity-alert-default"),
     block_alert(
       "Review requested",

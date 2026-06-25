@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -105,167 +111,174 @@ ui <- block_page(
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
       class = "showcase-playground",
-      style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-        title = "Controls",
-        class = "showcase-playground__controls",
-        style = "flex: 1; min-width: 280px; max-width: 320px;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
-          block_field(
-            block_field_label("caption", `for` = "showcase_table_doc_caption"),
-            block_textarea(
-              "showcase_table_doc_caption",
-              value = "Monthly operating metrics.",
-              rows = 2,
-              resize = "none"
-            )
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "State"
-          ),
-          block_field(
-            block_field_label("selection", `for` = "showcase_table_doc_selection"),
-            block_select(
-              "showcase_table_doc_selection",
-              choices = c("none", "single", "multiple"),
-              selected = "none",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("max_rows", `for` = "showcase_table_doc_max_rows"),
-            block_select(
-              "showcase_table_doc_max_rows",
-              choices = c("All rows" = "all", "2 rows" = "2", "3 rows" = "3"),
-              selected = "all",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("numeric alignment", `for` = "showcase_table_doc_align"),
-            block_select(
-              "showcase_table_doc_align",
-              choices = c("left", "center", "right"),
-              selected = "right",
-              size = "sm"
-            )
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
-          block_field(
-            block_checkbox(
-              "showcase_table_doc_cellintent",
-              "Color values by sign",
-              value = FALSE
-            )
-          ),
-          block_field(
-            block_checkbox(
-              "showcase_table_doc_headerintent",
-              "Header background via intent",
-              value = FALSE
-            )
-          ),
-          block_field(
-            block_checkbox(
-              "showcase_table_doc_headerclass",
-              "Header background via custom class",
-              value = FALSE
-            )
-          ),
-          block_field(
-            block_checkbox(
-              "showcase_table_doc_headrow",
-              "Background on the whole header row",
-              value = FALSE
-            )
-          ),
-          block_field(
-            block_checkbox(
-              "showcase_table_doc_tablebg",
-              "Tint the table background",
-              value = FALSE
-            )
-          ),
-          block_field(
-            block_field_label("style", `for` = "showcase_table_doc_style"),
-            block_textarea(
-              "showcase_table_doc_style",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., max-width: 520px;",
-              resize = "none"
-            )
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_table_doc_class"),
-            block_checkbox(
-              "showcase_table_doc_class",
-              "Use custom dashed-border class",
-              value = FALSE
-            )
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Server actions"
-          ),
-          block_button(
-            "Toggle loading",
-            id = "showcase_table_act_loading",
-            variant = "outline",
-            size = "sm"
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main",
-        style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; padding: 1.5rem; background: var(--card);",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 260px; box-sizing: border-box; overflow-x: auto;"
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Content"
             ),
-            uiOutput("showcase_table_preview_ui")
+            block_field(
+              block_field_label("caption", `for` = "showcase_table_doc_caption"),
+              block_textarea(
+                "showcase_table_doc_caption",
+                value = "Monthly operating metrics.",
+                rows = 2,
+                resize = "none"
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "State"
+            ),
+            block_field(
+              block_field_label("selection", `for` = "showcase_table_doc_selection"),
+              block_select(
+                "showcase_table_doc_selection",
+                choices = c("none", "single", "multiple"),
+                selected = "none",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("max_rows", `for` = "showcase_table_doc_max_rows"),
+              block_select(
+                "showcase_table_doc_max_rows",
+                choices = c("All rows" = "all", "2 rows" = "2", "3 rows" = "3"),
+                selected = "all",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("numeric alignment", `for` = "showcase_table_doc_align"),
+              block_select(
+                "showcase_table_doc_align",
+                choices = c("left", "center", "right"),
+                selected = "right",
+                size = "sm"
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Styling"
+            ),
+            block_field(
+              block_checkbox(
+                "showcase_table_doc_cellintent",
+                "Color values by sign",
+                value = FALSE
+              )
+            ),
+            block_field(
+              block_checkbox(
+                "showcase_table_doc_headerintent",
+                "Header background via intent",
+                value = FALSE
+              )
+            ),
+            block_field(
+              block_checkbox(
+                "showcase_table_doc_headerclass",
+                "Header background via custom class",
+                value = FALSE
+              )
+            ),
+            block_field(
+              block_checkbox(
+                "showcase_table_doc_headrow",
+                "Background on the whole header row",
+                value = FALSE
+              )
+            ),
+            block_field(
+              block_checkbox(
+                "showcase_table_doc_tablebg",
+                "Tint the table background",
+                value = FALSE
+              )
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_table_doc_style"),
+              block_textarea(
+                "showcase_table_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., max-width: 520px;",
+                resize = "none"
+              )
+            ),
+            block_field(
+              block_field_label("class", `for` = "showcase_table_doc_class"),
+              block_checkbox(
+                "showcase_table_doc_class",
+                "Use custom dashed-border class",
+                value = FALSE
+              )
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Server actions"
+            ),
+            block_button(
+              "Toggle loading",
+              id = "showcase_table_act_loading",
+              variant = "outline",
+              size = "sm"
+            )
           )
         ),
-        uiOutput("showcase_table_preview_value"),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "Server Action"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(
+              class = "showcase-playground__label",
+              "Preview"
+            ),
+            htmltools::tags$div(
+              style = paste(
+                "position: relative; padding: 1.5rem; background: var(--card);",
+                "border: 1px dashed var(--border); border-radius: 0.75rem;",
+                "min-height: 260px; box-sizing: border-box; overflow-x: auto;"
+              ),
+              uiOutput("showcase_table_preview_ui")
+            )
           ),
-          uiOutput("showcase_table_reactive_code")
-        ),
-        htmltools::tags$div(
+          uiOutput("showcase_table_preview_value"),
           htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "Server Action"
+            ),
+            uiOutput("showcase_table_reactive_code")
           ),
-          uiOutput("showcase_table_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_table_preview_code")
+          )
         )
       )
     )
@@ -279,16 +292,19 @@ server <- function(input, output, session) {
     "# the update_block_table() code here."
   ))
 
-  observeEvent(input$showcase_table_act_loading, {
-    rv_loading(!rv_loading())
-    reactive_code(paste0(
-      "update_block_table(\n",
-      "  session = session,\n",
-      "  id = \"showcase_table_live\",\n",
-      "  loading = ", if (rv_loading()) "TRUE" else "FALSE", "\n",
-      ")"
-    ))
-  }, ignoreInit = TRUE)
+  observeEvent(input$showcase_table_act_loading,
+    {
+      rv_loading(!rv_loading())
+      reactive_code(paste0(
+        "update_block_table(\n",
+        "  session = session,\n",
+        "  id = \"showcase_table_live\",\n",
+        "  loading = ", if (rv_loading()) "TRUE" else "FALSE", "\n",
+        ")"
+      ))
+    },
+    ignoreInit = TRUE
+  )
 
   output$showcase_table_preview_value <- showcase_render_code({
     fmt <- function(v) {
@@ -448,23 +464,29 @@ server <- function(input, output, session) {
     # escape hatches: the class only does something if the app also ships matching
     # CSS, so emit that CSS alongside the snippet.
     css_rules <- c(
-      if (use_headerclass) paste0(
-        "  .sb-table-head.showcase-table-head-accent {\n",
-        "    background-color: color-mix(in oklch, var(--primary) 14%, transparent);\n",
-        "    color: var(--primary); text-transform: uppercase;\n",
-        "    letter-spacing: 0.08em; border-bottom: 2px solid var(--primary);\n",
-        "  }"
-      ),
-      if (use_headrow) paste0(
-        "  .showcase-table-headrow .sb-table-head {\n",
-        "    background-color: var(--primary); color: var(--primary-foreground);\n",
-        "  }"
-      ),
-      if (use_tablebg) paste0(
-        "  .showcase-table-tinted .sb-table-element {\n",
-        "    background-color: color-mix(in oklch, var(--primary) 8%, var(--card));\n",
-        "  }"
-      )
+      if (use_headerclass) {
+        paste0(
+          "  .sb-table-head.showcase-table-head-accent {\n",
+          "    background-color: color-mix(in oklch, var(--primary) 14%, transparent);\n",
+          "    color: var(--primary); text-transform: uppercase;\n",
+          "    letter-spacing: 0.08em; border-bottom: 2px solid var(--primary);\n",
+          "  }"
+        )
+      },
+      if (use_headrow) {
+        paste0(
+          "  .showcase-table-headrow .sb-table-head {\n",
+          "    background-color: var(--primary); color: var(--primary-foreground);\n",
+          "  }"
+        )
+      },
+      if (use_tablebg) {
+        paste0(
+          "  .showcase-table-tinted .sb-table-element {\n",
+          "    background-color: color-mix(in oklch, var(--primary) 8%, var(--card));\n",
+          "  }"
+        )
+      }
     )
     css_block <- if (length(css_rules)) {
       paste0(

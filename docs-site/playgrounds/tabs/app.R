@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) {
     webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
@@ -67,74 +70,77 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
-            "Tab Styles"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Tab Styles"
+            ),
+            block_field(
+              block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
+              block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
+            ),
+            block_field(
+              block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
+              block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
+            ),
+            block_field(
+              block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
+              block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
+            )
           ),
-          block_field(
-            block_field_label("selected", `for` = "showcase_tabs_doc_selected"),
-            block_select("showcase_tabs_doc_selected", choices = c("overview", "usage", "settings"), selected = "overview", size = "sm")
-          ),
-          block_field(
-            block_field_label("variant", `for` = "showcase_tabs_doc_variant"),
-            block_select("showcase_tabs_doc_variant", choices = c("default", "line"), selected = "default", size = "sm")
-          ),
-          block_field(
-            block_field_label("orientation", `for` = "showcase_tabs_doc_orientation"),
-            block_select("showcase_tabs_doc_orientation", choices = c("horizontal", "vertical"), selected = "horizontal", size = "sm")
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Actions (Server Update)"
+            ),
+            block_cluster(
+              gap = "sm",
+              showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
+              showcase_action_button("showcase_tabs_select_settings", "Select Settings")
+            )
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--muted-foreground); margin: 0;",
-            "Actions (Server Update)"
-          ),
-          htmltools::tags$div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
-            showcase_action_button("showcase_tabs_select_usage", "Select Usage"),
-            showcase_action_button("showcase_tabs_select_settings", "Select Settings")
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::div(style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);", "Preview"),
-          htmltools::div(
-            style = paste(
-              "position: relative; display: flex; align-items: stretch;",
-              "padding: 1.5rem; background: var(--card);",
-              "border: 1px dashed var(--border); border-radius: 0.75rem;",
-              "min-height: 260px; box-sizing: border-box;"
-            ),
-            uiOutput("showcase_tabs_preview_ui")
-          )
-        ),
-        uiOutput("showcase_tabs_preview_value"),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 1rem;",
-          htmltools::div(
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::div(class = "showcase-playground__label", "Preview"),
             htmltools::div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "UI Definition"
-            ),
-            uiOutput("showcase_tabs_preview_code")
+              class = "showcase-preview-canvas showcase-preview-canvas--stretch",
+              style = "padding: 1.5rem; border-style: dashed; min-height: 260px;",
+              uiOutput("showcase_tabs_preview_ui")
+            )
           ),
-          htmltools::div(
+          uiOutput("showcase_tabs_preview_value"),
+          block_stack(
+            gap = "md",
             htmltools::div(
-              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-              "Server Action"
+              htmltools::div(
+                class = "showcase-playground__label showcase-playground__label--code",
+                "UI Definition"
+              ),
+              uiOutput("showcase_tabs_preview_code")
             ),
-            uiOutput("showcase_tabs_reactive_code")
+            htmltools::div(
+              htmltools::div(
+                class = "showcase-playground__label showcase-playground__label--code",
+                "Server Action"
+              ),
+              uiOutput("showcase_tabs_reactive_code")
+            )
           )
         )
       )
@@ -203,7 +209,9 @@ server <- function(input, output, session) {
     "# Click an action button to see\n",
     "# the update_block_tabs() code here."
   ))
-  output$showcase_tabs_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_tabs_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
   outputOptions(output, "showcase_tabs_reactive_code", suspendWhenHidden = FALSE)
 
   observeEvent(input$showcase_tabs_select_usage, {

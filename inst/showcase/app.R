@@ -36,6 +36,7 @@ source(file.path("R", "server_tabs.R"), local = TRUE)
 source(file.path("R", "server_theme.R"), local = TRUE)
 source(file.path("R", "server_style.R"), local = TRUE)
 source(file.path("R", "server_layout.R"), local = TRUE)
+source(file.path("R", "server_layout_primitives.R"), local = TRUE)
 source(file.path("R", "server_nav_item.R"), local = TRUE)
 source(file.path("R", "server_field.R"), local = TRUE)
 source(file.path("R", "server_image_output.R"), local = TRUE)
@@ -55,6 +56,17 @@ sections <- list(
       "block_body() — the dashboard primitives that frame this gallery."
     ),
     file = "layout.R"
+  ),
+  list(
+    id = "layout-primitives",
+    label = "Layout primitives",
+    icon = "layout-grid",
+    title = "Layout primitives",
+    lead = paste(
+      "Composable stack, cluster, and responsive grid helpers",
+      "for ordinary application content."
+    ),
+    file = "layout_primitives.R"
   ),
   list(
     id = "nav-item",
@@ -576,6 +588,7 @@ server <- function(input, output, session) {
   register_theme_showcase(input, output, session)
   register_style_showcase(input, output, session)
   register_layout_showcase(input, output, session)
+  register_layout_primitives_showcase(input, output, session)
   register_nav_item_showcase(input, output, session)
   register_field_showcase(input, output, session)
   register_image_output_showcase(input, output, session)

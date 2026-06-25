@@ -81,10 +81,11 @@ htmltools::tagList(
   # block_style() emits a <style class="sb-style-overrides"> with the luma
   # profile tokens; data-sb-style="luma" on the wrapper activates the scoped
   # component CSS. Stable instance for tools/parity/; do not remove.
-  htmltools::div(
+  block_cluster(
+    gap = "md",
+    align = "center",
     class = "sb-parity-style-baseline",
     `data-sb-style` = "luma",
-    style = "display: flex; gap: 1rem; align-items: center;",
     block_style("luma", scope = ".sb-parity-style-baseline"),
     block_button("Luma Button (Style)"),
     block_badge("Luma", variant = "secondary")

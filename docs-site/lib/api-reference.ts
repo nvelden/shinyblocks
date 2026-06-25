@@ -52,6 +52,41 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "layout-primitives": [
+    {
+      name: "block_stack",
+      description: "Arranges child content in a vertical flow with semantic spacing.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Ordered child content." },
+        { argument: "gap", type: "'sm' | 'md' | 'lg'", defaultVal: "'md'", description: "Semantic spacing between children." },
+        { argument: "align", type: "'stretch' | 'start' | 'center' | 'end'", defaultVal: "'stretch'", description: "Cross-axis child alignment." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the wrapper." }
+      ]
+    },
+    {
+      name: "block_cluster",
+      description: "Groups child content horizontally with optional wrapping and distribution.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Ordered child content." },
+        { argument: "gap", type: "'sm' | 'md' | 'lg'", defaultVal: "'sm'", description: "Semantic spacing between children." },
+        { argument: "align", type: "'center' | 'start' | 'end' | 'stretch'", defaultVal: "'center'", description: "Cross-axis child alignment." },
+        { argument: "justify", type: "'start' | 'center' | 'end' | 'between'", defaultVal: "'start'", description: "Main-axis distribution." },
+        { argument: "wrap", type: "logical", defaultVal: "TRUE", description: "Whether children may wrap onto additional rows." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the wrapper." }
+      ]
+    },
+    {
+      name: "block_grid",
+      description: "Creates a mobile-safe responsive auto-fit grid.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Ordered repeated content." },
+        { argument: "min_width", type: "CSS unit", defaultVal: "'16rem'", description: "Preferred minimum column width." },
+        { argument: "gap", type: "'sm' | 'md' | 'lg'", defaultVal: "'md'", description: "Semantic spacing between rows and columns." },
+        { argument: "align", type: "'stretch' | 'start' | 'center' | 'end'", defaultVal: "'stretch'", description: "Grid item alignment." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes merged onto the wrapper." }
+      ]
+    }
+  ],
   "nav-item": [
     {
       name: "block_nav_item",

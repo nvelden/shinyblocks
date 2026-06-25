@@ -65,8 +65,8 @@ htmltools::tagList(
         ),
         showcase_controls_group(
           "Actions (Server)",
-          htmltools::div(
-            style = "display: flex; flex-wrap: wrap; gap: 0.5rem;",
+          block_cluster(
+              gap = "sm",
             showcase_action_button("showcase_toast_fire", "Show toast", variant = "default"),
             showcase_action_button("showcase_toast_dismiss", "Dismiss all")
           )
@@ -91,11 +91,8 @@ htmltools::tagList(
           shiny::uiOutput("showcase_toast_reactive_code")
         )
       ),
-      preview_canvas_style = paste(
-        "position: relative; display: flex; align-items: center; justify-content: center;",
-        "padding: 1.5rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-        "border: 0; border-radius: 0.75rem; min-height: 200px; box-sizing: border-box;"
-      )
+      preview_canvas_class = "showcase-preview-canvas--muted",
+      preview_canvas_style = "min-height: 200px;"
     )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),

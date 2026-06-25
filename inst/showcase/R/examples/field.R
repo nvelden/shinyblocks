@@ -53,8 +53,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances captured by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; border: 1px dashed var(--border); border-radius: 0.5rem;",
+  block_stack(
+    gap = "md",
+    class = "showcase-demo-frame",
     block_field(
       class = "sb-parity-field-default",
       block_field_label("Baseline Field", `for` = "parity_field_1"),

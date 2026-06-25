@@ -3,23 +3,29 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
 
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Try the next path; Shinylive resolves mount URLs differently by host.
       }
-    }, error = function(e) {
-      # Try the next path; Shinylive resolves mount URLs differently by host.
-    })
+    )
   }
 
   if (!mounted) {
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
 
   .libPaths(c("/packages", .libPaths()))
@@ -58,95 +64,87 @@ ui <- block_page(
     `data-shinyblocks-root` = "",
     style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
     htmltools::div(
-      class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-      block_card(
-                title = "Controls",
-                class = "showcase-playground__controls",
-                style = "flex: 1; min-width: 280px; max-width: 320px;",
-htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Header"
-          ),
-          block_field(
-            block_field_label("title", `for` = "showcase_card_doc_title"),
-            block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("description", `for` = "showcase_card_doc_desc"),
-            block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1, resize = "none")
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Content"
-          ),
-          block_field(
-            block_field_label("value", `for` = "showcase_card_doc_value"),
-            block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1, resize = "none")
-          ),
-          block_field(
-            block_field_label("body content", `for` = "showcase_card_doc_body"),
-            block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 2, resize = "none")
-          ),
-          block_field(
-            block_field_label("footer", `for` = "showcase_card_doc_footer"),
-            block_checkbox("showcase_card_doc_footer", label = "Include footer button", value = TRUE)
-          )
-        ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-          htmltools::tags$h4(
-            style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-            "Styling"
-          ),
-          block_field(
-            block_field_label("class", `for` = "showcase_card_doc_class"),
-            block_select(
-              "showcase_card_doc_class",
-              choices = c("none", "shadow-lg", "border-dashed"),
-              selected = "none",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("style", `for` = "showcase_card_doc_style"),
-            block_textarea(
-              "showcase_card_doc_style",
-              value = "",
-              rows = 1,
-              placeholder = "e.g., max-width: 24rem;",
-              resize = "none"
-            )
-          )
-        )
-      ),
-      htmltools::div(
-        class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-        htmltools::tags$div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::tags$div(
-            style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-            "Preview"
-          ),
-          htmltools::tags$div(
-            style = paste(
-              "position: relative; display: flex; align-items: center; justify-content: center;",
-              "padding: 2rem; background: color-mix(in oklab, var(--muted) 28%, transparent);",
-              "border: 0; border-radius: 0.75rem; min-height: 280px; box-sizing: border-box;"
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+        block_card(
+          title = "Controls",
+          class = "showcase-playground__controls",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Header"),
+            block_field(
+              block_field_label("title", `for` = "showcase_card_doc_title"),
+              block_textarea("showcase_card_doc_title", value = "Card Title", rows = 1, resize = "none")
             ),
-            uiOutput("showcase_card_preview_ui")
+            block_field(
+              block_field_label("description", `for` = "showcase_card_doc_desc"),
+              block_textarea("showcase_card_doc_desc", value = "Card Description", rows = 1, resize = "none")
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
+            block_field(
+              block_field_label("value", `for` = "showcase_card_doc_value"),
+              block_textarea("showcase_card_doc_value", value = "$45,231.89", rows = 1, resize = "none")
+            ),
+            block_field(
+              block_field_label("body content", `for` = "showcase_card_doc_body"),
+              block_textarea("showcase_card_doc_body", value = "+20.1% from last month", rows = 2, resize = "none")
+            ),
+            block_field(
+              block_field_label("footer", `for` = "showcase_card_doc_footer"),
+              block_checkbox("showcase_card_doc_footer", label = "Include footer button", value = TRUE)
+            )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
+            block_field(
+              block_field_label("class", `for` = "showcase_card_doc_class"),
+              block_select(
+                "showcase_card_doc_class",
+                choices = c("none", "shadow-lg", "border-dashed"),
+                selected = "none",
+                size = "sm"
+              )
+            ),
+            block_field(
+              block_field_label("style", `for` = "showcase_card_doc_style"),
+              block_textarea(
+                "showcase_card_doc_style",
+                value = "",
+                rows = 1,
+                placeholder = "e.g., max-width: 24rem;",
+                resize = "none"
+              )
+            )
           )
         ),
-        htmltools::tags$div(
-          htmltools::tags$div(
-            style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
-            "UI Definition"
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
+            htmltools::tags$div(
+              class = "showcase-preview-canvas showcase-preview-canvas--muted",
+              uiOutput("showcase_card_preview_ui")
+            )
           ),
-          uiOutput("showcase_card_preview_code")
+          htmltools::tags$div(
+            htmltools::tags$div(
+              class = "showcase-playground__label showcase-playground__label--code",
+              "UI Definition"
+            ),
+            uiOutput("showcase_card_preview_code")
+          )
         )
       )
     )

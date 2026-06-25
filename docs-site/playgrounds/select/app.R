@@ -1,32 +1,38 @@
 if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-  
+
   # Try mounting from relative paths. In some environments (e.g. standard workers),
   # paths resolve relative to the worker script context. In others (e.g. blob workers/proxied environments),
   # they resolve relative to the main document base URL. We try both to be fully resilient.
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {
+        # Ignore and try the next path
       }
-    }, error = function(e) {
-      # Ignore and try the next path
-    })
+    )
   }
-  
+
   if (!mounted) {
     # If both relative paths fail, try absolute path as a last resort fallback
     # (works on the default nvelden.github.io/shinyblocks deployment)
-    tryCatch({
-      webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-    }, error = function(e) {
-      stop("Failed to mount shinyblocks WASM package library: ", e$message)
-    })
+    tryCatch(
+      {
+        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
+      },
+      error = function(e) {
+        stop("Failed to mount shinyblocks WASM package library: ", e$message)
+      }
+    )
   }
-  
+
   .libPaths(c("/packages", .libPaths()))
 }
 
@@ -73,7 +79,7 @@ showcase_action_button <- function(input_id, label) {
 }
 
 ui <- block_page(
-  title = "shinyblocks · Select playground",
+  title = "shinyblocks <U+00B7> Select playground",
   theme = htmltools::tagList(
     htmltools::tags$link(rel = "stylesheet", href = "../../../shinyblocks-runtime-override.css"),
     htmltools::tags$style(htmltools::HTML(
@@ -86,23 +92,24 @@ ui <- block_page(
     ))
   ),
   htmltools::tags$div(
-      `data-shinyblocks-root` = "",
-      style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
-      htmltools::div(
-        class = "showcase-playground", style = "display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;",
-        
+    `data-shinyblocks-root` = "",
+    style = "padding: 1rem; max-width: 100%; margin: 0; box-sizing: border-box; overflow-x: hidden;",
+    htmltools::div(
+      class = "showcase-playground",
+      block_cluster(
+        gap = "lg",
+        align = "start",
+        class = "showcase-playground__split",
+
         # Left Column: Controls Panel
         block_card(
-                  title = "Controls",
-                  class = "showcase-playground__controls",
-                  style = "flex: 1; min-width: 280px; max-width: 320px;",
-# Content Controls Group
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Content"
-            ),
+          title = "Controls",
+          class = "showcase-playground__controls",
+          # Content Controls Group
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group showcase-controls-group--first",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Content"),
             block_field(
               block_field_label("choices", `for` = "showcase_select_doc_choices"),
               block_select(
@@ -121,14 +128,12 @@ ui <- block_page(
               block_textarea("showcase_select_doc_placeholder", value = "Choose a plan", rows = 1, resize = "none")
             )
           ),
-          
+
           # State Controls Group
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "State"
-            ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
             block_field(
               block_field_label("multiple", `for` = "showcase_select_doc_multiple"),
               block_checkbox("showcase_select_doc_multiple", "Allow multiple values", value = FALSE)
@@ -151,14 +156,12 @@ ui <- block_page(
               block_checkbox("showcase_select_doc_invalid", "Invalid", value = FALSE)
             )
           ),
-          
+
           # Styling Controls Group
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Styling"
-            ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Styling"),
             block_field(
               block_field_label("size", `for` = "showcase_select_doc_size"),
               block_select(
@@ -191,16 +194,14 @@ ui <- block_page(
               )
             )
           ),
-          
+
           # Actions (Server Update) Group
-          htmltools::div(
-            style = "display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;",
-            htmltools::tags$h4(
-              style = "font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin: 0;",
-              "Actions (Server Update)"
-            ),
-            htmltools::tags$div(
-              style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(class = "showcase-controls-group__title", "Actions (Server Update)"),
+            block_cluster(
+              gap = "sm",
               showcase_action_button("showcase_select_set_pro", "Set Pro"),
               showcase_action_button("showcase_select_set_two", "Select two"),
               showcase_action_button("showcase_select_clear", "Clear"),
@@ -210,47 +211,39 @@ ui <- block_page(
             )
           )
         ),
-        
+
         # Right Column: Preview & Reactive Output Code Blocks
-        htmltools::div(
-          class = "showcase-playground__main", style = "flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 1.25rem;",
-          
+        block_stack(
+          gap = "lg",
+          class = "showcase-playground__main",
+
           # Preview Section
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 0.5rem;",
-            htmltools::tags$div(
-              style = "font-size: 0.875rem; font-weight: 600; color: var(--foreground);",
-              "Preview"
-            ),
+          block_stack(
+            gap = "sm",
+            htmltools::tags$div(class = "showcase-playground__label", "Preview"),
             # Interactive Preview Canvas
             htmltools::tags$div(
-              style = paste(
-                "position: relative; display: flex; align-items: center; justify-content: center;",
-                "padding: 3rem 2rem 2.5rem 2rem; background: var(--card);",
-                "border: 1px solid var(--border); border-radius: 0.75rem;",
-                "min-height: 160px; box-sizing: border-box;",
-                "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-              ),
+              class = "showcase-preview-canvas",
               uiOutput("showcase_select_preview_ui")
             )
           ),
-          
+
           # Reactive Value Readout Indicator
           uiOutput("showcase_select_preview_value"),
-          
+
           # Code Blocks Panel
-          htmltools::tags$div(
-            style = "display: flex; flex-direction: column; gap: 1rem;",
+          block_stack(
+            gap = "md",
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "UI Definition"
               ),
               uiOutput("showcase_select_preview_code")
             ),
             htmltools::tags$div(
               htmltools::tags$div(
-                style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+                class = "showcase-playground__label--code",
                 "Server Action"
               ),
               uiOutput("showcase_select_reactive_code")
@@ -259,12 +252,12 @@ ui <- block_page(
         )
       )
     )
+  )
 )
 
 server <- function(input, output, session) {
   select_doc_choices <- function(key) {
-    switch(
-      key %||% "plans",
+    switch(key %||% "plans",
       frameworks = c(React = "react", Vue = "vue", Svelte = "svelte", Angular = "angular"),
       fruits = c(Apple = "apple", Banana = "banana", Blueberry = "blueberry", Grapes = "grapes"),
       c(Free = "free", Pro = "pro", Team = "team")
@@ -321,13 +314,16 @@ server <- function(input, output, session) {
   })
   outputOptions(output, "showcase_select_doc_selected_ui", suspendWhenHidden = FALSE)
 
-  observeEvent(input$showcase_select_doc_class, {
-    update_block_select(
-      session,
-      "showcase_select_preview",
-      class = if (isTRUE(input$showcase_select_doc_class)) "showcase-select-preview-custom" else NULL
-    )
-  }, ignoreInit = TRUE)
+  observeEvent(input$showcase_select_doc_class,
+    {
+      update_block_select(
+        session,
+        "showcase_select_preview",
+        class = if (isTRUE(input$showcase_select_doc_class)) "showcase-select-preview-custom" else NULL
+      )
+    },
+    ignoreInit = TRUE
+  )
 
   output$showcase_select_preview_ui <- renderUI({
     choices <- select_doc_choices(input$showcase_select_doc_choices)
@@ -376,8 +372,7 @@ server <- function(input, output, session) {
 
   output$showcase_select_preview_code <- showcase_render_code({
     choices_val <- input$showcase_select_doc_choices %||% "plans"
-    choices_str <- switch(
-      choices_val,
+    choices_str <- switch(choices_val,
       frameworks = 'c(React = "react", Vue = "vue", Svelte = "svelte", Angular = "angular")',
       fruits = 'c(Apple = "apple", Banana = "banana", Blueberry = "blueberry", Grapes = "grapes")',
       'c(Free = "free", Pro = "pro", Team = "team")'
@@ -441,7 +436,9 @@ server <- function(input, output, session) {
     "# Click an action button to see\n",
     "# the update_block_select() code here."
   ))
-  output$showcase_select_reactive_code <- showcase_render_code({ reactive_code() })
+  output$showcase_select_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
   outputOptions(output, "showcase_select_reactive_code", suspendWhenHidden = FALSE)
 
   observeEvent(input$showcase_select_set_pro, {

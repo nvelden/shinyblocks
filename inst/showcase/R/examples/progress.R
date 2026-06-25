@@ -41,8 +41,8 @@ htmltools::tagList(
       ),
       showcase_controls_group(
         "Actions (Server Update)",
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+            gap = "sm",
           showcase_action_button("showcase_progress_set_25", "Set 25%"),
           showcase_action_button("showcase_progress_set_75", "Set 75%"),
           showcase_action_button("showcase_progress_inc", "Increment"),
@@ -57,8 +57,8 @@ htmltools::tagList(
             "under Server Action."
           )
         ),
-        htmltools::div(
-          style = "display: flex; flex-wrap: wrap; gap: 0.35rem;",
+        block_cluster(
+            gap = "sm",
           showcase_action_button("showcase_progress_batch_run", "Run import"),
           showcase_action_button("showcase_progress_batch_cancel", "Cancel")
         )
@@ -90,13 +90,6 @@ htmltools::tagList(
     ),
     preview_output_id = "showcase_progress_preview_ui",
     code_output_id = "showcase_progress_preview_code",
-    preview_canvas_style = paste(
-      "position: relative; display: flex; align-items: center; justify-content: center;",
-      "padding: 2.5rem 2rem; background: var(--card);",
-      "border: 1px solid var(--border); border-radius: 0.75rem;",
-      "min-height: 160px; box-sizing: border-box;",
-      "box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);"
-    ),
     extra_outputs = htmltools::tagList(
       htmltools::tags$div(
         htmltools::tags$div(
@@ -117,8 +110,9 @@ htmltools::tagList(
     style = "color: var(--muted-foreground); margin: 0 0 0.5rem 0; font-size: 0.875rem;",
     "Stable instances used by tools/parity/. Do not remove."
   ),
-  htmltools::div(
-    style = "display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px;",
+  block_stack(
+      gap = "sm",
+      style = "max-width: 300px;",
     block_progress("showcase_parity_progress_default", value = 0.6, class = "sb-parity-progress-default"),
     block_progress(
       "showcase_parity_progress_success",

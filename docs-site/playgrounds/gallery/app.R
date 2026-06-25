@@ -2,13 +2,16 @@ if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
   dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
   mounted <- FALSE
   for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch({
-      webr::mount("/packages", path)
-      if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-        mounted <- TRUE
-        break
-      }
-    }, error = function(e) {})
+    tryCatch(
+      {
+        webr::mount("/packages", path)
+        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
+          mounted <- TRUE
+          break
+        }
+      },
+      error = function(e) {}
+    )
   }
   if (!mounted) webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
   .libPaths(c("/packages", .libPaths()))
@@ -24,36 +27,21 @@ gallery_theme_presets <- block_theme_presets()
 gallery_default_style_profile <- "luma"
 gallery_default_theme_preset <- "stone"
 
-panel <- function(...) {
-  htmltools::div(style = "display: flex; flex-direction: column; gap: 1rem; min-width: 0;", ...)
-}
-
-stack <- function(..., gap = "0.75rem") {
-  htmltools::div(style = paste0("display: flex; flex-direction: column; gap: ", gap, "; min-width: 0;"), ...)
-}
-
-row <- function(..., gap = "0.5rem", wrap = TRUE) {
-  htmltools::div(
-    style = paste0(
-      "display: flex; align-items: center; gap: ", gap, ";",
-      if (isTRUE(wrap)) " flex-wrap: wrap;" else "",
-      " min-width: 0;"
-    ),
-    ...
-  )
-}
-
 mini_label <- function(label, value) {
-  htmltools::div(
-    style = "display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.875rem;",
+  block_cluster(
+    align = "center",
+    justify = "between",
+    gap = "md",
+    style = "font-size: 0.875rem;",
     htmltools::span(style = "color: var(--muted-foreground);", label),
     htmltools::strong(style = "font-weight: 600;", value)
   )
 }
 
 appearance_control <- function(label, input_id, choices, selected) {
-  htmltools::div(
-    style = "display: flex; align-items: center; gap: 0.5rem; min-width: 0;",
+  block_cluster(
+    align = "center",
+    gap = "sm",
     htmltools::tags$label(
       `for` = input_id,
       style = "font-size: 0.8125rem; font-weight: 500; color: var(--muted-foreground);",
@@ -72,11 +60,11 @@ appearance_control <- function(label, input_id, choices, selected) {
 }
 
 loading_lines <- function() {
-  stack(
+  block_stack(
+    gap = "sm",
     block_skeleton(style = "height: 0.75rem; width: 70%;"),
     block_skeleton(style = "height: 0.75rem; width: 46%;"),
-    block_skeleton(style = "height: 3rem; width: 100%;"),
-    gap = "0.5rem"
+    block_skeleton(style = "height: 3rem; width: 100%;")
   )
 }
 
@@ -104,23 +92,28 @@ ui <- block_page(
   ),
   style = block_style(gallery_default_style_profile),
   htmltools::div(style = "display: none;", uiOutput("gallery_theme_assets")),
-  htmltools::div(
+  block_stack(
+    gap = "lg",
     `data-shinyblocks-root` = "",
-    style = "padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; box-sizing: border-box;",
+    style = "padding: 1.25rem; box-sizing: border-box;",
     # Mounted once; the Refresh button fires a toast onto this region.
     block_toaster("gallery_toaster"),
-    htmltools::div(
-      style = "display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;",
+    block_cluster(
+      align = "center",
+      justify = "between",
+      gap = "md",
       htmltools::div(
         htmltools::tags$h2(style = "margin: 0; font-size: 1.25rem; font-weight: 650;", "Workspace dashboard"),
         htmltools::tags$p(style = "margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--muted-foreground);", "Live package components composed in a Shiny workflow.")
       ),
-      htmltools::div(
-        style = "display: flex; align-items: center; gap: 0.5rem;",
+      block_cluster(
+        align = "center",
+        gap = "sm",
+        wrap = FALSE,
         block_badge("Live", variant = "secondary"),
         block_popover(
           "Notifications",
-          stack(
+          block_stack(
             htmltools::tags$p(style = "margin: 0; font-size: 0.875rem;", "2 deploy events since your last visit."),
             block_badge("All clear", variant = "secondary")
           ),
@@ -130,19 +123,19 @@ ui <- block_page(
         block_button("Refresh", id = "gallery_refresh", icon = "refresh-cw", size = "sm")
       )
     ),
-    htmltools::div(
+    block_cluster(
       `aria-label` = "Appearance",
-      style = paste(
-        "display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap;",
-        "padding-bottom: 0.25rem;"
-      ),
+      align = "center",
+      gap = "lg",
+      style = "padding-bottom: 0.25rem;",
       appearance_control("Style", "gallery_style_profile", gallery_style_profiles, gallery_default_style_profile),
       appearance_control("Theme", "gallery_theme_preset", gallery_theme_presets, gallery_default_theme_preset)
     ),
-    htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: stretch;",
-      uiOutput("gallery_metric", style = "display: flex; flex-direction: column; height: 100%;"),
-      uiOutput("gallery_budget_metric", style = "display: flex; flex-direction: column; height: 100%;"),
+    block_grid(
+      min_width = "190px",
+      gap = "md",
+      uiOutput("gallery_metric", style = "height: 100%;"),
+      uiOutput("gallery_budget_metric", style = "height: 100%;"),
       metric_box(
         title = "Members",
         value = "24",
@@ -158,9 +151,10 @@ ui <- block_page(
         block_badge("Healthy", variant = "outline")
       )
     ),
-    htmltools::div(
-      style = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; align-items: stretch;",
-      panel(
+    block_grid(
+      min_width = "260px",
+      gap = "md",
+      block_stack(
         htmltools::div(
           `data-component-preview` = "card",
           style = "height: 100%;",
@@ -180,7 +174,7 @@ ui <- block_page(
               block_field(block_field_label("Plan"), block_select("gallery_plan", choices = c("Starter", "Professional", "Enterprise"), selected = "Professional", size = "sm")),
               block_field(block_field_label("Notes"), block_textarea("gallery_notes", placeholder = "Billing notes", rows = 2, resize = "none"))
             ),
-            footer = row(
+            footer = block_cluster(
               htmltools::div(
                 `data-component-preview` = "button",
                 block_button("Save payment", id = "gallery_save", size = "sm", icon = "save")
@@ -189,7 +183,7 @@ ui <- block_page(
                 "gallery_invoice_dialog",
                 title = "Invoice preview",
                 description = "A compact dialog using the current dashboard values.",
-                stack(
+                block_stack(
                   mini_label("Plan", "Professional"),
                   mini_label("Budget", "$5,200 / month"),
                   mini_label("Environment", "Production")
@@ -198,35 +192,34 @@ ui <- block_page(
                 trigger = "Preview invoice",
                 size = "sm"
               ),
-              uiOutput("gallery_save_state", inline = TRUE),
-              wrap = TRUE
+              uiOutput("gallery_save_state", inline = TRUE)
             )
           )
         )
       ),
-      panel(
+      block_stack(
         block_card(
           title = "Budget",
           description = "Monthly operating budget",
           style = "height: 100%;",
           block_slider("gallery_budget", min = 1000, max = 10000, value = 5200, step = 100),
           block_separator(),
-          stack(
+          block_stack(
             mini_label("Monthly spend", textOutput("gallery_budget_value", inline = TRUE)),
             mini_label("Forecast", textOutput("gallery_forecast_value", inline = TRUE)),
             mini_label("Refresh jobs", uiOutput("gallery_refresh_state"))
           ),
           block_separator(),
-          stack(
+          block_stack(
             htmltools::strong(style = "font-size: 0.875rem; font-weight: 600;", "Workspace status"),
-            row(
+            block_cluster(
               block_badge("Production"),
               block_badge("Synced", variant = "secondary"),
               block_badge("Verified", variant = "outline")
             )
           ),
           block_separator(),
-          stack(
+          block_stack(
             htmltools::strong(style = "font-size: 0.875rem; font-weight: 600;", "Cost breakdown"),
             block_table(
               data.frame(
@@ -243,7 +236,7 @@ ui <- block_page(
           )
         )
       ),
-      panel(
+      block_stack(
         block_card(
           title = "Preferences",
           description = "Workspace notifications",
@@ -265,11 +258,11 @@ ui <- block_page(
             block_tab(
               "Activity",
               value = "activity",
-              stack(
+              block_stack(
                 block_alert("All systems operational.", description = "Runtime alerts, tabs, badges, and form controls are active."),
                 block_popover(
                   "Deploy notes",
-                  stack(
+                  block_stack(
                     htmltools::tags$p(style = "margin: 0;", "Latest release shipped component previews and budget checks."),
                     block_badge("No incidents", variant = "secondary")
                   ),
@@ -301,12 +294,12 @@ ui <- block_page(
           )
         )
       ),
-      panel(
+      block_stack(
         block_card(
           title = "Pipeline readiness",
           description = "Skeletons, separators, spinners, and alerts in one stack.",
           style = "height: 100%;",
-          stack(
+          block_stack(
             block_badge("Loading surface", variant = "secondary"),
             uiOutput("gallery_pipeline_progress"),
             loading_lines(),
@@ -323,7 +316,7 @@ ui <- block_page(
             mini_label("Runtime CSS", "OK"),
             mini_label("Shiny binding", "OK"),
             block_separator(),
-            row(block_spinner(size = "sm", color = "muted"), htmltools::span("Waiting for changes"), wrap = FALSE),
+            block_cluster(wrap = FALSE, block_spinner(size = "sm", color = "muted"), htmltools::span("Waiting for changes")),
             block_alert("Ready to publish", description = "Refresh to simulate a live update.", icon = "check-circle")
           )
         )
@@ -437,10 +430,9 @@ server <- function(input, output, session) {
     if (refreshes() == 0L) {
       block_badge("Idle", variant = "outline")
     } else {
-      row(block_spinner(size = "sm", color = "muted"), block_badge(paste(refreshes(), "runs"), variant = "secondary"), wrap = FALSE)
+      block_cluster(wrap = FALSE, block_spinner(size = "sm", color = "muted"), block_badge(paste(refreshes(), "runs"), variant = "secondary"))
     }
   })
-
 }
 
 shinyApp(ui, server)

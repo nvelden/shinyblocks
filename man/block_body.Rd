@@ -19,8 +19,11 @@ Create a page body landmark
 }
 \seealso{
 Other layout: 
+\code{\link{block_cluster}()},
+\code{\link{block_grid}()},
 \code{\link{block_header}()},
 \code{\link{block_page}()},
-\code{\link{block_sidebar}()}
+\code{\link{block_sidebar}()},
+\code{\link{block_stack}()}
 }
 \concept{layout}
