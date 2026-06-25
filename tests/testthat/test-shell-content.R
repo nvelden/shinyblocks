@@ -61,10 +61,15 @@ test_that("card composition helpers render expected child markers", {
 
   styled_card <- block_card("Body", class = "custom", style = "max-width: 20rem;")
   card_html <- render_html(card)
-  expect_match(card_html, 'data-sb-component="card"', fixed = TRUE)
-  expect_match(card_html, 'class="sb-runtime-mount sb-card custom"', fixed = TRUE)
+  expect_match(card_html, 'class="sb-card custom"', fixed = TRUE)
+  # Cards are plain markup now, not a runtime React mount: the card's own tag
+  # carries no runtime-root attributes (nested blocks like a footer button may
+  # still be runtime mounts).
+  expect_identical(tag_attr(card, "class"), "sb-card custom")
+  expect_null(tag_attr(card, "data-shinyblocks-root"))
+  expect_null(tag_attr(card, "data-sb-component"))
   expect_identical(tag_attr(styled_card, "style"), "max-width: 20rem;")
-  expect_identical(runtime_payload_from(styled_card)$className, "custom")
+  expect_identical(tag_attr(styled_card, "class"), "sb-card custom")
 })
 
 test_that("card helper classes merge with user classes", {

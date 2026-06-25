@@ -26,8 +26,8 @@
 
 /* Card — only the stronger dark-mode ring stays in CSS because block_style()
  * emits one static token value and cannot vary it by colour mode. */
-[data-theme="dark"] [data-sb-style="luma"] [data-shinyblocks-root].sb-card,
-[data-theme="dark"] [data-sb-style="rhea"] [data-shinyblocks-root].sb-card {
+[data-theme="dark"] [data-sb-style="luma"] .sb-card,
+[data-theme="dark"] [data-sb-style="rhea"] .sb-card {
   box-shadow: var(--sb-surface-shadow), 0 0 0 1px color-mix(in oklch, var(--foreground) 10%, transparent);
 }
 

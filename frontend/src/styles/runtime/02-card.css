@@ -1,4 +1,6 @@
-[data-shinyblocks-root].sb-card {
+/* Cards render as ordinary htmltools markup (not a runtime React mount), so
+ * these rules scope to `.sb-card` rather than `[data-shinyblocks-root]`. */
+.sb-card {
   display: flex;
   flex-direction: column;
   gap: var(--sb-surface-gap);
@@ -11,18 +13,14 @@
   box-shadow: var(--sb-card-shadow, var(--sb-surface-shadow));
 }
 
-[data-shinyblocks-root].sb-card [data-shinyblocks-children] {
-  display: contents;
-}
-
-[data-shinyblocks-root] .sb-card-header {
+.sb-card .sb-card-header {
   display: grid;
   grid-template-columns: 1fr;
   row-gap: 0.375rem;
   padding-inline: var(--sb-surface-padding);
 }
 
-[data-shinyblocks-root] .sb-card-title {
+.sb-card .sb-card-title {
   margin: 0;
   font-family: var(--sb-font-heading);
   font-size: 1rem;
@@ -31,14 +29,14 @@
   letter-spacing: -0.01em;
 }
 
-[data-shinyblocks-root] .sb-card-description {
+.sb-card .sb-card-description {
   margin: 0;
   font-size: 0.875rem;
   color: var(--muted-foreground);
   line-height: 1.4;
 }
 
-[data-shinyblocks-root] .sb-card-value {
+.sb-card .sb-card-value {
   font-family: var(--sb-font-heading);
   font-size: 1.5rem;
   font-weight: 600;
@@ -46,7 +44,7 @@
   padding-inline: var(--sb-surface-padding);
 }
 
-[data-shinyblocks-root] .sb-card-content {
+.sb-card .sb-card-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -54,12 +52,12 @@
   font-size: 0.875rem;
 }
 
-[data-shinyblocks-root] .sb-card-body {
+.sb-card .sb-card-body {
   font-size: 0.875rem;
   color: var(--muted-foreground);
 }
 
-[data-shinyblocks-root] .sb-card-footer {
+.sb-card .sb-card-footer {
   display: flex;
   align-items: center;
   padding-inline: var(--sb-surface-padding);

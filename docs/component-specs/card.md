@@ -4,9 +4,10 @@
 > `block_card_header()`, `block_card_title()`, `block_card_description()`,
 > `block_card_content()`, `block_card_footer()`.
 > Shadcn reference: <https://ui.shadcn.com/docs/components/card>
-> Status: Runtime composition primitive that hosts Shiny outputs and
-> htmlwidgets through the runtime child slot; Phase 7 spec refreshed
-> around shipped flat-argument convenience and child binding lifecycle.
+> Status: Static composition primitive emitted as ordinary htmltools
+> markup (no runtime React mount — the React component only ever
+> rendered `null`). Hosts Shiny outputs and htmlwidgets as plain child
+> tags. Phase 7 spec refreshed around shipped flat-argument convenience.
 
 ## States
 
@@ -32,12 +33,12 @@
 
 | Argument | Purpose |
 | --- | --- |
-| `...` | Card body content. Rendered inside `block_card_content()`. Shiny outputs and htmlwidgets bind here through the runtime child slot. |
+| `...` | Card body content. Rendered inside `block_card_content()`. Shiny outputs and htmlwidgets bind here as ordinary child tags. |
 | `title` | Optional title. String, tag, or `block_card_title()` — bare strings are auto-wrapped. |
 | `description` | Optional description. Same auto-wrap behaviour. |
 | `value` | Optional prominent metric value rendered above the body inside `sb-card-value`. |
 | `footer` | Optional footer. String, tag, or `block_card_footer()`. |
-| `class` | Extra classes merged onto the runtime wrapper. |
+| `class` | Extra classes merged onto the `.sb-card` wrapper. |
 
 ### Composition primitives
 
@@ -49,11 +50,12 @@ instead of re-wrapping them.
 
 ## Runtime mapping
 
-- The card itself is rendered as a React runtime component
-  (`component = "card"`).
-- `header`, `content`, and `footer` regions are serialized as
-  `children` so their nested Shiny outputs and htmlwidgets bind under
-  the runtime mount through `[data-shinyblocks-children]`.
+- The card is **not** a runtime component. `block_card()` emits a plain
+  `<div class="sb-card" data-slot="card">` via htmltools; there is no
+  JSON payload, React root, or mutation tracking.
+- `header`, `content`, and `footer` regions are rendered as ordinary
+  child tags, so nested Shiny outputs and htmlwidgets bind in place with
+  no runtime child slot.
 - The hidden `data-sb-child` markers let `block_card()` distinguish
   prebuilt region tags from bare content.
 

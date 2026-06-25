@@ -1,19 +1,35 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { highlightCodeLine } from "../highlighting/code.jsx";
 import { classNames } from "./shared.jsx";
 
 export function Code({ payload }) {
   const props = payload.props || {};
   const [copied, setCopied] = useState(false);
+  const copyTimer = useRef(null);
+
+  useEffect(
+    () => () => {
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+    },
+    []
+  );
 
   const handleCopy = () => {
     if (!props.code) return;
     const clipboard = window.navigator && window.navigator.clipboard;
     if (!clipboard) return;
-    clipboard.writeText(props.code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    clipboard
+      .writeText(props.code)
+      .then(() => {
+        setCopied(true);
+        if (copyTimer.current) clearTimeout(copyTimer.current);
+        copyTimer.current = setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        // writeText() rejects in insecure contexts or when the user denies
+        // clipboard permission; swallow it rather than leak an unhandled
+        // rejection and leave the button in its default state.
+      });
   };
 
   const hasHeader = props.header === true;

@@ -39,12 +39,18 @@ block_card <- function(
     ...
   )
 
-  runtime_component(
-    component = "card",
-    children = list(header_tag, content_tag, footer_tag),
-    class = class,
-    style = style,
-    root_class = merge_classes("sb-card", class)
+  # A card has no runtime behaviour: the React mount only ever rendered `null`,
+  # so emit ordinary markup instead of a runtime payload + React root. The
+  # `.sb-card` styles attach via the package dependency below.
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes("sb-card", class),
+      style = style,
+      `data-slot` = "card",
+      header_tag,
+      content_tag,
+      footer_tag
+    )
   )
 }
 

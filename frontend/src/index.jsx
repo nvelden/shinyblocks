@@ -48,10 +48,6 @@ import { Tooltip } from "./components/tooltip.jsx";
 
 const mounted = new Map();
 
-function CardRuntimeMount() {
-  return null;
-}
-
 const COMPONENTS = {
   button: Button,
   "task-button": TaskButton,
@@ -63,7 +59,6 @@ const COMPONENTS = {
   code: Code,
   "value-box": ValueBox,
   alert: Alert,
-  card: CardRuntimeMount,
   dialog: Dialog,
   popover: Popover,
   tooltip: Tooltip,
