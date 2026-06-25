@@ -278,6 +278,52 @@ try {
   assert.equal(mobileSidebar.backdropOnTop, true);
   assert.equal(mobileSidebar.backdropPointerEvents, "auto");
 
+  // The open drawer must behave as a modal: dialog semantics, an inert/hidden
+  // background, and a locked body scroll.
+  const modalState = await page.evaluate(() => {
+    const sidebar = document.querySelector(".sb-sidebar");
+    const main = document.querySelector(".sb-page-main");
+    return {
+      role: sidebar.getAttribute("role"),
+      ariaModal: sidebar.getAttribute("aria-modal"),
+      mainInert: main.inert === true,
+      mainHidden: main.getAttribute("aria-hidden"),
+      bodyOverflow: getComputedStyle(document.body).overflow
+    };
+  });
+  assert.equal(modalState.role, "dialog");
+  assert.equal(modalState.ariaModal, "true");
+  assert.equal(modalState.mainInert, true);
+  assert.equal(modalState.mainHidden, "true");
+  assert.equal(modalState.bodyOverflow, "hidden");
+
+  // The in-sidebar toggle has no icon-collapse effect below 768px, so it must
+  // close the open drawer there instead of being a dead button.
+  await page.evaluate(() => {
+    document.querySelector("[data-sidebar-stacking-probe]")?.remove();
+  });
+  await page.locator(".sb-sidebar-toggle").click();
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".sb-page")?.getAttribute(
+        "data-sidebar-mobile-open"
+      ) === "false"
+  );
+
+  // Closing must tear the modal state back down.
+  const restored = await page.evaluate(() => {
+    const sidebar = document.querySelector(".sb-sidebar");
+    const main = document.querySelector(".sb-page-main");
+    return {
+      role: sidebar.getAttribute("role"),
+      mainInert: main.inert === true,
+      bodyOverflow: getComputedStyle(document.body).overflow
+    };
+  });
+  assert.equal(restored.role, null);
+  assert.equal(restored.mainInert, false);
+  assert.notEqual(restored.bodyOverflow, "hidden");
+
   console.log("Showcase smoke test passed.");
 } catch (error) {
   console.error(stdout);

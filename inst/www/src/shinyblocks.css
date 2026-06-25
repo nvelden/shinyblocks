@@ -635,9 +635,24 @@
       grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title-text,
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-label {
+    /* The non-interactive sidebar title can drop out entirely when collapsed. */
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title-text {
       display: none;
+    }
+
+    /* Nav labels must stay in the accessibility tree so each icon-only link keeps
+       its accessible name (the icon is aria-hidden). Hide them visually rather
+       than with `display: none`, which would also remove them from the a11y tree. */
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title {
@@ -687,6 +702,13 @@
 
     .sb-page[data-sidebar-enhanced="true"] .sb-sidebar-mobile-trigger {
       @apply inline-flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sb-page[data-sidebar-enhanced="true"] .sb-sidebar,
+    .sb-page[data-sidebar-enhanced="true"] .sb-sidebar-backdrop {
+      transition: none;
     }
   }
 

@@ -127,6 +127,16 @@ test_that("layout helpers merge user classes", {
   )
 })
 
+test_that("text nav items carry the label as a title for tooltip and a11y name", {
+  # In the collapsed icon rail the visible label is visually hidden and the icon
+  # is aria-hidden, so `title` is the link's accessible-name fallback.
+  expect_identical(tag_attr(block_nav_item("Reports"), "title"), "Reports")
+
+  # Non-character labels (e.g. a tag) must not be coerced into a title.
+  tagged <- block_nav_item(htmltools::tags$span("Reports"))
+  expect_null(tag_attr(tagged, "title"))
+})
+
 test_that("selected nav items expose aria-current", {
   selected <- block_nav_item("Home", selected = TRUE)
   unselected <- block_nav_item("Reports")

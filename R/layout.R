@@ -328,10 +328,17 @@ block_nav_item <- function(
 ) {
   icon <- set_icon_position(icon, "inline-start")
 
+  # A plain-text label doubles as the native hover tooltip and, when the
+  # sidebar collapses to the icon rail, as the link's accessible-name fallback
+  # (the visible `.sb-nav-label` is visually hidden there, and the icon is
+  # `aria-hidden`). Non-character labels (e.g. a tag) are left untitled.
+  tooltip <- if (is.character(label) && length(label) == 1L) label
+
   attach_shinyblocks_deps(
     htmltools::tags$a(
       class = merge_classes("sb-nav-item", if (selected) "is-selected", class),
       href = href,
+      title = tooltip,
       `aria-current` = if (selected) "page" else NULL,
       `data-sb-child` = "nav-item",
       icon,

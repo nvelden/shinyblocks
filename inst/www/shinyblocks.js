@@ -210,15 +210,65 @@
     }
   }
 
+  function focusableIn(container) {
+    return Array.prototype.slice
+      .call(
+        container.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]),' +
+            ' select:not([disabled]), textarea:not([disabled]),' +
+            ' [tabindex]:not([tabindex="-1"])'
+        )
+      )
+      .filter(function (node) {
+        return node.offsetParent !== null || node === document.activeElement;
+      });
+  }
+
   function setMobileOpen(page, open) {
     var sidebar = page.querySelector(".sb-sidebar");
     var trigger = page.querySelector(".sb-sidebar-mobile-trigger");
     if (!sidebar || !trigger) return;
 
+    var wasOpen = page.getAttribute("data-sidebar-mobile-open") === "true";
     var value = open ? "true" : "false";
     page.setAttribute("data-sidebar-mobile-open", value);
     trigger.setAttribute("aria-expanded", open ? "true" : "false");
     trigger.setAttribute("aria-label", open ? "Close sidebar" : "Open sidebar");
+
+    // The mobile drawer is a modal: trap focus, lock background scroll, and
+    // make the rest of the page inert so assistive tech and Tab stay inside it.
+    var main = page.querySelector(".sb-page-main");
+
+    if (open) {
+      // Capture the opener before inerting `main` (the trigger lives inside it
+      // and would be blurred), so focus can return there on close.
+      if (!wasOpen) page._sbReturnFocus = document.activeElement;
+      sidebar.setAttribute("role", "dialog");
+      sidebar.setAttribute("aria-modal", "true");
+      if (main) {
+        main.inert = true;
+        main.setAttribute("aria-hidden", "true");
+      }
+      document.body.style.overflow = "hidden";
+      if (!wasOpen) {
+        var focusables = focusableIn(sidebar);
+        if (focusables.length) focusables[0].focus();
+      }
+    } else {
+      sidebar.removeAttribute("role");
+      sidebar.removeAttribute("aria-modal");
+      if (main) {
+        main.inert = false;
+        main.removeAttribute("aria-hidden");
+      }
+      document.body.style.overflow = "";
+      // Restore focus to whatever opened the drawer (un-inert main first so the
+      // trigger, which lives inside it, is focusable again).
+      if (wasOpen && page._sbReturnFocus && page._sbReturnFocus.focus) {
+        page._sbReturnFocus.focus();
+      }
+      page._sbReturnFocus = null;
+    }
   }
 
   function wireNavKeyboard(container) {
@@ -252,6 +302,14 @@
     var toggle = sidebar.querySelector(".sb-sidebar-toggle");
     if (toggle) {
       toggle.addEventListener("click", function () {
+        // Below the 768px breakpoint the sidebar is an off-canvas drawer and
+        // `data-sidebar-collapsed` has no CSS effect (icon-collapse is a
+        // desktop-only mode). Closing the drawer is the only meaningful action
+        // for the in-sidebar toggle there, so it would otherwise be a no-op.
+        if (window.matchMedia("(max-width: 767px)").matches) {
+          setMobileOpen(page, false);
+          return;
+        }
         var collapsed = page.getAttribute("data-sidebar-collapsed") === "true";
         setCollapsed(page, !collapsed);
       });
@@ -272,6 +330,26 @@
       });
     }
 
+    // Trap Tab within the drawer while it is open (mobile only — the attribute
+    // is never "true" on desktop).
+    sidebar.addEventListener("keydown", function (event) {
+      if (event.key !== "Tab") return;
+      if (page.getAttribute("data-sidebar-mobile-open") !== "true") return;
+
+      var focusables = focusableIn(sidebar);
+      if (!focusables.length) return;
+
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
     Array.prototype.forEach.call(
       page.querySelectorAll(".sb-nav, .sb-sidebar-nav"),
       wireNavKeyboard
@@ -288,6 +366,23 @@
         setMobileOpen(page, false);
       });
     });
+
+    // Crossing up to the desktop breakpoint dissolves the drawer, so clear the
+    // modal state (inert main, scroll lock) that only makes sense on mobile.
+    if (typeof window.matchMedia === "function") {
+      var desktop = window.matchMedia("(min-width: 768px)");
+      var onBreakpoint = function (event) {
+        if (!event.matches) return;
+        sidebarPages().forEach(function (page) {
+          setMobileOpen(page, false);
+        });
+      };
+      if (desktop.addEventListener) {
+        desktop.addEventListener("change", onBreakpoint);
+      } else if (desktop.addListener) {
+        desktop.addListener(onBreakpoint);
+      }
+    }
 
     document.addEventListener("click", function (event) {
       sidebarPages().forEach(function (page) {

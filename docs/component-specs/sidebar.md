@@ -40,9 +40,18 @@ the package `shinyblocks.js` runtime through `.sb-page`'s `data-sidebar-*`
 attributes:
 
 - Mobile trigger click toggles `data-sidebar-mobile-open` on the page.
-- Desktop toggle click toggles `data-sidebar-collapsed`.
+- Desktop toggle click toggles `data-sidebar-collapsed`. Below the mobile
+  breakpoint that toggle has no collapse effect, so it closes the open
+  drawer instead of being inert.
 - Backdrop click, outside click on the page, and Escape close an open
   mobile sidebar.
+- The open mobile drawer behaves as a modal: it takes `role="dialog"` /
+  `aria-modal="true"`, traps Tab focus, returns focus to the trigger on
+  close, marks `.sb-page-main` `inert` + `aria-hidden`, and locks body
+  scroll. Crossing up to the desktop breakpoint tears this state down.
+- Collapsed desktop nav labels are visually hidden (not `display:none`) so
+  each icon-only `block_nav_item()` keeps its accessible name; the label
+  also rides on the link's `title` for a hover tooltip.
 - The mobile backdrop and drawer establish explicit shell overlay layers.
   The drawer paints above page components and their transient menus; the
   backdrop paints immediately below the drawer and above normal page content.
