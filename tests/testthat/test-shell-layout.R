@@ -20,6 +20,12 @@ test_that("block_page renders the shell landmarks", {
   expect_match(html, 'class="sb-sidebar"', fixed = TRUE)
   expect_match(html, 'class="sb-sidebar-backdrop"', fixed = TRUE)
   expect_match(html, 'class="sb-sidebar-mobile-trigger"', fixed = TRUE)
+  expect_match(
+    html,
+    'class="sb-sidebar-backdrop"[\\s\\S]*class="sb-sidebar"',
+    perl = TRUE,
+    info = "the mobile backdrop must paint before and therefore below the sidebar"
+  )
   expect_match(html, '<header class="sb-header">', fixed = TRUE)
   expect_match(html, '<main class="sb-body">', fixed = TRUE)
   expect_match(html, 'data-shinyblocks-portal-root=""', fixed = TRUE)

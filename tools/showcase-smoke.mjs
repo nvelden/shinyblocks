@@ -203,6 +203,41 @@ try {
   assert.ok(Math.abs(gridBoxes[1].y - gridBoxes[0].y) < 2);
   assert.ok(Math.abs(gridBoxes[1].height - gridBoxes[0].height) < 2);
 
+  await page.setViewportSize({ width: 700, height: 800 });
+  await page.goto(`${url}/#layout`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#layout:not([hidden])");
+  await page.locator(".sb-sidebar-mobile-trigger").click();
+  await page.waitForFunction(() => {
+    const shell = document.querySelector(".sb-page");
+    const sidebar = document.querySelector(".sb-sidebar");
+    return shell?.getAttribute("data-sidebar-mobile-open") === "true" &&
+      getComputedStyle(sidebar).transform === "matrix(1, 0, 0, 1, 0, 0)";
+  });
+
+  const mobileSidebar = await page.evaluate(() => {
+    const sidebar = document.querySelector(".sb-sidebar");
+    const backdrop = document.querySelector(".sb-sidebar-backdrop");
+    const sidebarStyle = getComputedStyle(sidebar);
+    const rect = sidebar.getBoundingClientRect();
+    const topElement = document.elementFromPoint(
+      rect.left + rect.width / 2,
+      rect.top + 100
+    );
+
+    return {
+      backgroundColor: sidebarStyle.backgroundColor,
+      sidebarToken: sidebarStyle.getPropertyValue("--sidebar").trim(),
+      topElementIsSidebar: sidebar.contains(topElement),
+      backdropPointerEvents: getComputedStyle(backdrop).pointerEvents
+    };
+  });
+
+  assert.notEqual(mobileSidebar.backgroundColor, "rgba(0, 0, 0, 0)");
+  assert.notEqual(mobileSidebar.backgroundColor, "transparent");
+  assert.ok(mobileSidebar.sidebarToken);
+  assert.equal(mobileSidebar.topElementIsSidebar, true);
+  assert.equal(mobileSidebar.backdropPointerEvents, "auto");
+
   console.log("Showcase smoke test passed.");
 } catch (error) {
   console.error(stdout);

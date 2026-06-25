@@ -34,7 +34,7 @@
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 @import "./tokens.css";
 
-@theme {
+@theme inline {
   /* Map shadcn tokens into Tailwind's color namespace so utilities
    * like bg-card, text-muted-foreground, border-border resolve. */
   --color-background: var(--background);

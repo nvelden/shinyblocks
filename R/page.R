@@ -68,13 +68,13 @@ block_page <- function(
           `data-sidebar-enhanced` = "false",
           `data-sidebar-mobile-open` = "false",
           `data-sidebar-collapsed` = sidebar_collapsed,
-          sidebar,
           if (!is.null(sidebar)) {
             htmltools::tags$div(
               class = "sb-sidebar-backdrop",
               `aria-hidden` = "true"
             )
           },
+          sidebar,
           htmltools::tags$div(
             class = "sb-page-main",
             if (!is.null(header) || !is.null(sidebar_trigger)) {

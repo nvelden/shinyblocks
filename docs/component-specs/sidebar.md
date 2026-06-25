@@ -68,9 +68,9 @@ sidebar behavior only.
 
 | Visual role | Token |
 | --- | --- |
-| Surface | `--background` |
-| Foreground | `--foreground` |
-| Border | `--border` |
+| Surface | `--sidebar` |
+| Foreground | `--sidebar-foreground` |
+| Border | `--sidebar-border` |
 | Focus ring | `--ring` |
 
 ## Deliberate divergences from shadcn

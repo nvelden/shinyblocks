@@ -223,7 +223,8 @@ export const THEME_REGISTRY = {
   sidebar: {
     section: "layout",
     bindings: [
-      { selector: ".sb-parity-layout-baseline", property: "color", token: "--foreground" }
+      { selector: ".sb-sidebar", property: "backgroundColor", token: "--sidebar" },
+      { selector: ".sb-sidebar", property: "color", token: "--sidebar-foreground" }
     ]
   },
   tabs: {

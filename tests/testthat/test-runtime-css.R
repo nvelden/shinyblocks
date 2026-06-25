@@ -180,6 +180,12 @@ test_that("responsive grid is protected against mobile overflow", {
   )
 })
 
+test_that("package theme aliases resolve inside the scoped app root", {
+  css <- package_source_css()
+
+  expect_match(css, "@theme inline {", fixed = TRUE)
+})
+
 test_that("runtime CSS does not reset all runtime children", {
   css <- runtime_css()
 
