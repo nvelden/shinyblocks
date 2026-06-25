@@ -72,18 +72,7 @@ ui <- block_page(
   style = block_style("default"),
   sidebar = block_sidebar(
     title = "Acme Analytics",
-    collapsible = TRUE,
-    block_nav_item(
-      "Overview",
-      href = "#overview",
-      icon = "layout-dashboard",
-      selected = TRUE
-    ),
-    block_nav_item(
-      "Reports",
-      href = "#reports",
-      icon = "file-text"
-    )
+    collapsible = TRUE
   ),
   header = block_header(
     block_cluster(
@@ -102,7 +91,6 @@ ui <- block_page(
     )
   ),
   block_stack(
-    id = "overview",
     gap = "md",
     block_card(
       title = "Dashboard filters",
@@ -132,40 +120,48 @@ ui <- block_page(
         )
       )
     ),
-    block_grid(
-      min_width = "14rem",
-      gap = "md",
-      block_card(
-        title = "Revenue",
-        description = "Six-month total",
-        value = textOutput("revenue", inline = TRUE)
+    block_tabs(
+      id = "view",
+      block_tab(
+        "Overview",
+        block_stack(
+          gap = "md",
+          block_grid(
+            min_width = "14rem",
+            gap = "md",
+            block_card(
+              title = "Revenue",
+              description = "Six-month total",
+              value = textOutput("revenue", inline = TRUE)
+            ),
+            block_card(
+              title = "Orders",
+              description = "Six-month total",
+              value = textOutput("orders", inline = TRUE)
+            )
+          ),
+          block_card(
+            title = "Monthly revenue",
+            description = "Revenue by month for the selected region",
+            block_plot_output(
+              "revenue_plot",
+              aspect = "16/9",
+              border = FALSE
+            )
+          )
+        )
       ),
-      block_card(
-        title = "Orders",
-        description = "Six-month total",
-        value = textOutput("orders", inline = TRUE)
-      )
-    ),
-    block_card(
-      title = "Monthly revenue",
-      description = "Revenue by month for the selected region",
-      block_plot_output(
-        "revenue_plot",
-        aspect = "16/9",
-        border = FALSE
-      )
-    )
-  ),
-  block_stack(
-    id = "reports",
-    gap = "md",
-    block_card(
-      title = "Monthly breakdown",
-      description = "Revenue and orders by month for the selected region",
-      block_table(
-        report_view(sales[sales$region == "Americas", , drop = FALSE]),
-        id = "report_table",
-        striped = TRUE
+      block_tab(
+        "Reports",
+        block_card(
+          title = "Monthly breakdown",
+          description = "Revenue and orders by month for the selected region",
+          block_table(
+            report_view(sales[sales$region == "Americas", , drop = FALSE]),
+            id = "report_table",
+            striped = TRUE
+          )
+        )
       )
     )
   )
