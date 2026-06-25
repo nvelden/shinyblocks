@@ -1,9 +1,9 @@
 layout_primitives_demo_specs <- function(values) {
   specs <- list(
-    list(title = "Analytics", description = "Track product usage.", height = "5rem"),
-    list(title = "Reports", description = "Review weekly summaries.", height = "3.5rem"),
-    list(title = "Settings", description = "Manage preferences.", height = "4.5rem"),
-    list(title = "Billing", description = "Update invoices and plans.", height = "6rem")
+    list(title = "Analytics", description = "Track product usage.", height = "8rem"),
+    list(title = "Reports", description = "Review weekly summaries.", height = "14rem"),
+    list(title = "Settings", description = "Manage preferences.", height = "11rem"),
+    list(title = "Billing", description = "Update invoices and plans.", height = "16rem")
   )
   specs <- specs[seq_len(values$count)]
 
@@ -83,9 +83,9 @@ layout_primitives_demo_code <- function(values, specs) {
   }
 
   paste0(
-    "# The fixed container height makes vertical alignment visible.\n",
+    "# The container min-height gives the row vertical slack so alignment shows.\n",
     "htmltools::div(\n",
-    '  style = "height: 16rem;",\n',
+    '  style = "min-height: 16rem;",\n',
     paste0("  ", gsub("\n", "\n  ", layout_code, fixed = TRUE)), "\n",
     ")"
   )
