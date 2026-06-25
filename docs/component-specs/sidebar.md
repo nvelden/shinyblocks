@@ -12,7 +12,8 @@
 - **collapsible** — `collapsible = TRUE` exposes a desktop collapse
   toggle and sets `data-collapsible="true"` on `<aside>`.
 - **collapsed** — `collapsed = TRUE` starts the sidebar in the
-  desktop-collapsed state with `data-collapsed="true"`.
+  desktop-collapsed state with `data-collapsed="true"`. This state does
+  not hide labels or narrow content inside the mobile drawer.
 - **mobile-open** — the page-level runtime opens the sidebar as a
   sheet through the `data-sidebar-mobile-open` state on `.sb-page`,
   with backdrop click and Escape dismissal.
@@ -45,6 +46,9 @@ attributes:
 - The mobile backdrop and drawer establish explicit shell overlay layers.
   The drawer paints above page components and their transient menus; the
   backdrop paints immediately below the drawer and above normal page content.
+- Desktop collapse presentation is breakpoint-scoped. When the same page is
+  embedded below the mobile breakpoint, opening the drawer restores its title
+  and navigation labels instead of showing a wide icon-only panel.
 - Arrow/Home/End traversal across child `.sb-nav-item` elements when
   the sidebar contains a nav region (see Nav).
 

@@ -206,6 +206,12 @@ try {
   await page.setViewportSize({ width: 700, height: 800 });
   await page.goto(`${url}/#layout`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#layout:not([hidden])");
+  await page.evaluate(() => {
+    const shell = document.querySelector(".sb-page");
+    const sidebar = document.querySelector(".sb-sidebar");
+    shell.setAttribute("data-sidebar-collapsed", "true");
+    sidebar.setAttribute("data-collapsed", "true");
+  });
   await page.locator(".sb-sidebar-mobile-trigger").click();
   await page.waitForFunction(() => {
     const shell = document.querySelector(".sb-page");
@@ -231,6 +237,9 @@ try {
     const backdrop = document.querySelector(".sb-sidebar-backdrop");
     const sidebarStyle = getComputedStyle(sidebar);
     const backdropStyle = getComputedStyle(backdrop);
+    const titleText = sidebar.querySelector(".sb-sidebar-title-text");
+    const navLabel = sidebar.querySelector(".sb-nav-label");
+    const navItem = sidebar.querySelector(".sb-nav-item");
     const rect = sidebar.getBoundingClientRect();
     const sidebarTopElement = document.elementFromPoint(
       rect.left + rect.width / 2,
@@ -246,6 +255,10 @@ try {
       sidebarToken: sidebarStyle.getPropertyValue("--sidebar").trim(),
       sidebarZIndex: sidebarStyle.zIndex,
       backdropZIndex: backdropStyle.zIndex,
+      sidebarWidth: rect.width,
+      titleTextDisplay: getComputedStyle(titleText).display,
+      navLabelDisplay: getComputedStyle(navLabel).display,
+      navItemJustify: getComputedStyle(navItem).justifyContent,
       sidebarOnTop: sidebar.contains(sidebarTopElement),
       backdropOnTop: backdrop === backdropTopElement,
       backdropPointerEvents: backdropStyle.pointerEvents
@@ -257,6 +270,10 @@ try {
   assert.ok(mobileSidebar.sidebarToken);
   assert.equal(mobileSidebar.sidebarZIndex, "80");
   assert.equal(mobileSidebar.backdropZIndex, "79");
+  assert.equal(mobileSidebar.sidebarWidth, 288);
+  assert.notEqual(mobileSidebar.titleTextDisplay, "none");
+  assert.notEqual(mobileSidebar.navLabelDisplay, "none");
+  assert.notEqual(mobileSidebar.navItemJustify, "center");
   assert.equal(mobileSidebar.sidebarOnTop, true);
   assert.equal(mobileSidebar.backdropOnTop, true);
   assert.equal(mobileSidebar.backdropPointerEvents, "auto");

@@ -146,6 +146,29 @@ test_that("mobile sidebar establishes an explicit shell overlay stack", {
   )
 })
 
+test_that("sidebar collapsed styling is desktop-only", {
+  css <- package_source_css()
+  desktop_start <- regexpr(
+    "@media \\(min-width: 768px\\) \\{",
+    css,
+    perl = TRUE
+  )[[1]]
+  mobile_start <- regexpr(
+    "@media \\(max-width: 767px\\) \\{",
+    css,
+    perl = TRUE
+  )[[1]]
+  collapsed_start <- regexpr(
+    '\\.sb-page\\[data-sidebar-enhanced="true"\\]\\[data-sidebar-collapsed="true"\\]',
+    css,
+    perl = TRUE
+  )[[1]]
+
+  expect_gt(desktop_start, 0)
+  expect_gt(collapsed_start, desktop_start)
+  expect_gt(mobile_start, collapsed_start)
+})
+
 test_that("runtime CSS does not target host framework selectors", {
   css <- runtime_css()
   forbidden <- c(
