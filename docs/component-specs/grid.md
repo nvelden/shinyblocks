@@ -14,8 +14,8 @@
 
 | Argument | Purpose |
 | --- | --- |
-| `...` | Ordered repeated content. |
-| `min_width` | Valid CSS unit used as the preferred minimum column width. |
+| `...` | Ordered repeated content; named arguments become container HTML attributes. |
+| `min_width` | Preferred minimum column width: a single non-negative CSS length or percentage (e.g. `"16rem"`, `280`, `"50%"`). `calc()`, CSS-wide keywords, and non-length tracks are rejected. The managed `--sb-grid-min` cannot be overridden by a caller `style`. |
 | `gap` | Semantic spacing: `"sm"`, `"md"`, or `"lg"`. |
 | `align` | Grid item alignment. |
 | `class` | Additional classes. |

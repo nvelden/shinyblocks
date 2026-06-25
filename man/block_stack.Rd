@@ -12,7 +12,11 @@ block_stack(
 )
 }
 \arguments{
-\item{...}{Content to arrange.}
+\item{...}{Child content to arrange. Named arguments are applied to the
+container as HTML attributes (the \code{htmltools} convention), e.g. \code{id},
+\code{style}, or \verb{data-*}. Layout itself (display, direction, gap, alignment) is
+owned by the primitive's classes — use \code{gap}/\code{align}, not an inline
+\code{style}, to control it.}
 
 \item{gap}{Spacing between children: \code{"sm"}, \code{"md"}, or \code{"lg"}.}
 

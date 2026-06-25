@@ -108,6 +108,40 @@ test_that("block_grid() min_width rejects CSS injection and non-length values", 
   expect_identical(tag_attr(block_grid(min_width = " 18rem "), "style"), "--sb-grid-min:18rem;")
 })
 
+test_that("block_grid() track survives a caller-supplied style override", {
+  # `style` may be passed through `...` (htmltools convention), but the
+  # component-owned, validated `--sb-grid-min` must remain authoritative: it is
+  # emitted last so it wins the inline-style cascade.
+  attacked <- tag_attr(
+    block_grid(style = "--sb-grid-min:999rem;position:fixed", min_width = "16rem"),
+    "style"
+  )
+  expect_true(grepl("--sb-grid-min:16rem;$", attacked))
+  # The validated value is the *last* declaration of the property.
+  positions <- gregexpr("--sb-grid-min", attacked, fixed = TRUE)[[1]]
+  last <- substring(attacked, positions[length(positions)])
+  expect_match(last, "^--sb-grid-min:16rem;", fixed = FALSE)
+
+  # A benign caller style is preserved alongside the managed track.
+  benign <- tag_attr(block_grid(style = "color:red", min_width = "20rem"), "style")
+  expect_match(benign, "color:red", fixed = TRUE)
+  expect_true(grepl("--sb-grid-min:20rem;$", benign))
+})
+
+test_that("layout primitives forward named arguments as container attributes", {
+  expect_match(render_html(block_stack(id = "flow")), 'id="flow"', fixed = TRUE)
+  expect_match(
+    render_html(block_cluster(`aria-label` = "Actions")),
+    'aria-label="Actions"',
+    fixed = TRUE
+  )
+  expect_match(
+    render_html(block_grid(`data-region` = "metrics")),
+    'data-region="metrics"',
+    fixed = TRUE
+  )
+})
+
 test_that("layout primitives merge classes, allow empty containers, and nest", {
   nested <- block_stack(
     block_cluster(class = "actions"),

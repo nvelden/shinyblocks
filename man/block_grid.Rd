@@ -13,7 +13,11 @@ block_grid(
 )
 }
 \arguments{
-\item{...}{Content to arrange.}
+\item{...}{Child content to arrange. Named arguments are applied to the
+container as HTML attributes (the \code{htmltools} convention), e.g. \code{id},
+\code{style}, or \verb{data-*}. The grid's responsive track (\code{--sb-grid-min}) is
+managed from the validated \code{min_width} and is authoritative: a caller
+\code{style} cannot override it.}
 
 \item{min_width}{Minimum preferred column width as a single non-negative CSS
 length or percentage (e.g. \code{"16rem"}, \code{280}, \code{"50\%"}). \code{calc()} and

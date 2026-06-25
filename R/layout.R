@@ -21,7 +21,11 @@ layout_justify_class <- function(justify) {
 #'
 #' Arrange content in a vertical flow with package-owned semantic spacing.
 #'
-#' @param ... Content to arrange.
+#' @param ... Child content to arrange. Named arguments are applied to the
+#'   container as HTML attributes (the `htmltools` convention), e.g. `id`,
+#'   `style`, or `data-*`. Layout itself (display, direction, gap, alignment) is
+#'   owned by the primitive's classes — use `gap`/`align`, not an inline
+#'   `style`, to control it.
 #' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
 #' @param align Cross-axis alignment: `"stretch"`, `"start"`, `"center"`, or
 #'   `"end"`.
@@ -54,7 +58,11 @@ block_stack <- function(
 #' Arrange content in a horizontal group with semantic spacing and optional
 #' wrapping.
 #'
-#' @param ... Content to arrange.
+#' @param ... Child content to arrange. Named arguments are applied to the
+#'   container as HTML attributes (the `htmltools` convention), e.g. `id`,
+#'   `style`, or `data-*`. Layout itself (display, wrapping, gap, alignment) is
+#'   owned by the primitive's classes — use `gap`/`align`/`justify`/`wrap`, not
+#'   an inline `style`, to control it.
 #' @param gap Spacing between children: `"sm"`, `"md"`, or `"lg"`.
 #' @param align Cross-axis alignment: `"center"`, `"start"`, `"end"`, or
 #'   `"stretch"`.
@@ -147,7 +155,11 @@ validate_grid_min_width <- function(min_width) {
 #' Arrange repeated content in a responsive auto-fit grid whose columns shrink
 #' safely to the available width.
 #'
-#' @param ... Content to arrange.
+#' @param ... Child content to arrange. Named arguments are applied to the
+#'   container as HTML attributes (the `htmltools` convention), e.g. `id`,
+#'   `style`, or `data-*`. The grid's responsive track (`--sb-grid-min`) is
+#'   managed from the validated `min_width` and is authoritative: a caller
+#'   `style` cannot override it.
 #' @param min_width Minimum preferred column width as a single non-negative CSS
 #'   length or percentage (e.g. `"16rem"`, `280`, `"50%"`). `calc()` and
 #'   CSS-wide keywords are not accepted.
@@ -168,16 +180,48 @@ block_grid <- function(
 ) {
   min_width <- validate_grid_min_width(min_width)
 
+  # A caller may pass `style` through `...` (htmltools convention). The grid
+  # track is component-owned and was validated from `min_width`, so emit
+  # `--sb-grid-min` *after* any caller style: within one inline `style`
+  # attribute the last declaration of a property wins, making the validated
+  # value authoritative and closing the override vector that a trailing
+  # `style = "--sb-grid-min:..."` would otherwise open.
+  dots <- list(...)
+  dot_names <- names(dots)
+  caller_style <- NULL
+  if (!is.null(dot_names)) {
+    is_style <- nzchar(dot_names) & dot_names == "style"
+    if (any(is_style)) {
+      caller_style <- paste(
+        vapply(dots[is_style], function(s) paste(as.character(s), collapse = ""), character(1)),
+        collapse = "; "
+      )
+      dots <- dots[!is_style]
+    }
+  }
+
+  grid_decl <- paste0("--sb-grid-min:", min_width, ";")
+  style <- if (!is.null(caller_style) && nzchar(trimws(caller_style))) {
+    paste0(sub(";?\\s*$", "; ", trimws(caller_style)), grid_decl)
+  } else {
+    grid_decl
+  }
+
   attach_shinyblocks_deps(
-    htmltools::tags$div(
-      class = merge_classes(
-        "sb-grid",
-        layout_gap_class(gap),
-        layout_align_class(align),
-        class
-      ),
-      style = paste0("--sb-grid-min:", min_width, ";"),
-      ...
+    do.call(
+      htmltools::tags$div,
+      c(
+        list(
+          class = merge_classes(
+            "sb-grid",
+            layout_gap_class(gap),
+            layout_align_class(align),
+            class
+          ),
+          style = style
+        ),
+        dots
+      )
     )
   )
 }
