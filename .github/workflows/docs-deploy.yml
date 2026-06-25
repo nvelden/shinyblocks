@@ -40,7 +40,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # R is needed by `Rscript scripts/generate-previews.R` (Phase 2+).
       # Until that script lands the prebuild is a no-op, but the action is
@@ -68,9 +68,9 @@ jobs:
           Rscript -e 'install.packages("webr",
             repos = c("https://r-wasm.r-universe.dev", getOption("repos")))'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: docs-site/package-lock.json
 
@@ -83,7 +83,7 @@ jobs:
       # stay in lockstep; otherwise new component arguments can be exported
       # before webR has a package image that supports them.
       - name: Checkout r-wasm/actions
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: v3
           repository: r-wasm/actions
@@ -130,11 +130,11 @@ jobs:
       # Actions) on first run so the deploy does not 404 on a fresh repo.
       # On a free private repo this still fails until the repo is made
       # public or Pages is otherwise available — see the note above.
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
         with:
           enablement: true
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs-site/out
 
@@ -145,5 +145,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
         id: deployment
