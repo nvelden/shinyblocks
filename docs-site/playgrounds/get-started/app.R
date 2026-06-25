@@ -57,6 +57,15 @@ sales <- data.frame(
   )
 )
 
+report_view <- function(df) {
+  data.frame(
+    Month = df$month,
+    Revenue = sprintf("$%s", format(df$revenue, big.mark = ",", scientific = FALSE)),
+    Orders = format(df$orders, big.mark = ",", scientific = FALSE),
+    check.names = FALSE
+  )
+}
+
 ui <- block_page(
   title = "Regional sales",
   theme = block_theme(preset = "zinc"),
@@ -146,6 +155,19 @@ ui <- block_page(
         border = FALSE
       )
     )
+  ),
+  block_stack(
+    id = "reports",
+    gap = "md",
+    block_card(
+      title = "Monthly breakdown",
+      description = "Revenue and orders by month for the selected region",
+      block_table(
+        report_view(sales[sales$region == "Americas", , drop = FALSE]),
+        id = "report_table",
+        striped = TRUE
+      )
+    )
   )
 )
 
@@ -185,6 +207,15 @@ server <- function(input, output, session) {
     },
     alt = "Monthly revenue bar chart for the selected region"
   )
+
+  observe({
+    update_block_table(
+      session,
+      "report_table",
+      data = report_view(filtered_sales()),
+      striped = TRUE
+    )
+  })
 
   observeEvent(input$reset_filters, {
     update_block_select(
