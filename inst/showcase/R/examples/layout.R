@@ -30,12 +30,35 @@ htmltools::tagList(
           block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
           block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
         )
+      ),
+      showcase_controls_group(
+        "Actions (Server Update)",
+        block_cluster(
+          gap = "sm",
+          showcase_action_button("showcase_layout_select_other", "Select other nav item")
+        )
       )
     ),
     preview_output_id = "showcase_layout_preview_ui",
     code_output_id = "showcase_layout_preview_code",
     preview_canvas_class = "showcase-preview-canvas--muted showcase-preview-canvas--stretch",
-    preview_canvas_style = "padding: 1rem; min-height: 332px;"
+    preview_canvas_style = "padding: 1rem; min-height: 332px;",
+    extra_outputs = htmltools::tagList(
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Nav item clicked"
+        ),
+        shiny::uiOutput("showcase_layout_preview_value")
+      ),
+      htmltools::tags$div(
+        htmltools::tags$div(
+          style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+          "Server Action"
+        ),
+        shiny::uiOutput("showcase_layout_reactive_code")
+      )
+    )
   ),
   htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
   shiny::uiOutput("showcase_layout_api_table"),

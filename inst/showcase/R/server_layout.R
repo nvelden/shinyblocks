@@ -72,6 +72,37 @@ register_layout_showcase <- function(input, output, session) {
     preview_page(input$showcase_layout_preview_nav)
   })
 
+  reactive_code <- shiny::reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_nav() code here."
+  ))
+
+  output$showcase_layout_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_layout_reactive_code",
+    suspendWhenHidden = FALSE
+  )
+
+  shiny::observeEvent(input$showcase_layout_select_other, {
+    current <- preview_page() %||% "dashboard"
+    next_page <- if (identical(current, "users")) "dashboard" else "users"
+    update_block_nav(
+      session = session,
+      input_id = "showcase_layout_preview_nav",
+      selected = next_page
+    )
+    reactive_code(paste0(
+      "update_block_nav(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_layout_preview_nav\",\n",
+      "  selected = \"", next_page, "\"\n",
+      ")"
+    ))
+  })
+
   output$showcase_layout_preview_ui <- shiny::renderUI({
     title <- input$showcase_layout_doc_title %||% "Admin Dashboard"
     sidebar_title <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
@@ -192,6 +223,21 @@ register_layout_showcase <- function(input, output, session) {
   shiny::outputOptions(
     output,
     "showcase_layout_preview_ui",
+    suspendWhenHidden = FALSE
+  )
+
+  output$showcase_layout_preview_value <- showcase_render_code({
+    value <- input$showcase_layout_preview_nav
+    val_str <- if (is.null(value)) {
+      "<NULL>"
+    } else {
+      paste0("\"", value, "\"")
+    }
+    paste0("input$showcase_layout_preview_nav = ", val_str)
+  })
+  shiny::outputOptions(
+    output,
+    "showcase_layout_preview_value",
     suspendWhenHidden = FALSE
   )
 
