@@ -72,7 +72,18 @@ const UI = `ui <- block_page(
   style = block_style("default"),
   sidebar = block_sidebar(
     title = "Acme Analytics",
-    collapsible = TRUE
+    collapsible = TRUE,
+    block_nav_item(
+      "Overview",
+      href = "#overview",
+      icon = "layout-dashboard",
+      selected = TRUE
+    ),
+    block_nav_item(
+      "Reports",
+      href = "#reports",
+      icon = "file-text"
+    )
   ),
   header = block_header(
     block_cluster(
@@ -122,6 +133,7 @@ const UI = `ui <- block_page(
     ),
     block_tabs(
       id = "view",
+      class = "dashboard-views",
       block_tab(
         "Overview",
         block_stack(
@@ -164,7 +176,36 @@ const UI = `ui <- block_page(
         )
       )
     )
-  )
+  ),
+  # Hide the tab strip that block_tabs() draws: the sidebar nav items below are
+  # the navigation, so the tabset only needs its panels.
+  htmltools::tags$style(htmltools::HTML(
+    ".sb-tabs.dashboard-views > .sb-tabs-list { display: none; }"
+  )),
+  # Bridge the sidebar nav items to the tabset: a click activates the matching
+  # tab (which the runtime handles, including setting input$view) and moves the
+  # selected highlight. Plain DOM wiring, no extra dependencies.
+  htmltools::tags$script(htmltools::HTML(
+    "document.addEventListener('click', function (e) {
+      var item = e.target.closest('.sb-sidebar .sb-nav-item');
+      if (!item) return;
+      e.preventDefault();
+      var label = (item.querySelector('.sb-nav-label') || item).textContent.trim();
+      var triggers = document.querySelectorAll('.dashboard-views .sb-tabs-trigger');
+      Array.prototype.forEach.call(triggers, function (t) {
+        if (t.getAttribute('data-value') === label) t.click();
+      });
+      Array.prototype.forEach.call(
+        document.querySelectorAll('.sb-sidebar .sb-nav-item'),
+        function (n) {
+          var active = n === item;
+          n.classList.toggle('is-selected', active);
+          if (active) n.setAttribute('aria-current', 'page');
+          else n.removeAttribute('aria-current');
+        }
+      );
+    });"
+  ))
 )`;
 
 const SERVER = `server <- function(input, output, session) {
@@ -242,7 +283,7 @@ export const CODE_SHELL_TREE = `block_page()
 └── body content`;
 
 export const CODE_COMPOSITION_TREE = `block_page()
-├── sidebar: brand + collapse
+├── sidebar: brand + nav items  → switch block_tabs()
 ├── header: title + theme control
 └── body
     ├── filter card

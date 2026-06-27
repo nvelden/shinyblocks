@@ -85,15 +85,16 @@ export default function GetStartedPage() {
               </SectionHeading>
               <p className="leading-relaxed text-muted-foreground">
                 You will build a single-file <strong>Regional sales dashboard</strong>:
-                a complete app shell with a collapsible sidebar, a header with a dark
-                mode control, a region filter, tabbed Overview and Reports views, two
-                reactive metric cards, a reactive revenue plot, and a reset action. The
-                whole thing is one <code>app.R</code> file with no frontend build step.
+                a complete app shell with a collapsible sidebar that switches between
+                Overview and Reports views, a header with a dark mode control, a region
+                filter, two reactive metric cards, a reactive revenue plot, and a reset
+                action. The whole thing is one <code>app.R</code> file with no frontend
+                build step.
               </p>
               <ul className="flex flex-col gap-1.5 pl-5 leading-relaxed text-muted-foreground [&>li]:list-disc">
                 <li>Responsive page shell with sidebar and header</li>
+                <li>Sidebar nav items that switch the Overview / Reports views</li>
                 <li>Region filter that drives every value on the page</li>
-                <li>Tabbed Overview and Reports views via block_tabs()</li>
                 <li>Reactive metric cards and a reactive plot</li>
                 <li>Reset action with an automatic busy state</li>
                 <li>Light and dark mode toggle</li>
