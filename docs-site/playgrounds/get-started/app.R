@@ -73,17 +73,8 @@ ui <- block_page(
   sidebar = block_sidebar(
     title = "Acme Analytics",
     collapsible = TRUE,
-    block_nav_item(
-      "Overview",
-      href = "#overview",
-      icon = "layout-dashboard",
-      selected = TRUE
-    ),
-    block_nav_item(
-      "Reports",
-      href = "#reports",
-      icon = "file-text"
-    )
+    # The nav is rendered on the server so the active page stays highlighted.
+    uiOutput("sidebar_nav")
   ),
   header = block_header(
     block_cluster(
@@ -131,84 +122,82 @@ ui <- block_page(
         )
       )
     ),
-    block_tabs(
-      id = "view",
-      class = "dashboard-views",
-      block_tab(
-        "Overview",
-        block_stack(
+    # Overview page. conditionalPanel() shows it only when the sidebar selects
+    # it; both pages stay in the document so their outputs keep updating.
+    conditionalPanel(
+      "output.current_page == 'overview'",
+      block_stack(
+        gap = "md",
+        block_grid(
+          min_width = "14rem",
           gap = "md",
-          block_grid(
-            min_width = "14rem",
-            gap = "md",
-            block_card(
-              title = "Revenue",
-              description = "Six-month total",
-              value = textOutput("revenue", inline = TRUE)
-            ),
-            block_card(
-              title = "Orders",
-              description = "Six-month total",
-              value = textOutput("orders", inline = TRUE)
-            )
+          block_card(
+            title = "Revenue",
+            description = "Six-month total",
+            value = textOutput("revenue", inline = TRUE)
           ),
           block_card(
-            title = "Monthly revenue",
-            description = "Revenue by month for the selected region",
-            block_plot_output(
-              "revenue_plot",
-              aspect = "16/9",
-              border = FALSE
-            )
+            title = "Orders",
+            description = "Six-month total",
+            value = textOutput("orders", inline = TRUE)
           )
-        )
-      ),
-      block_tab(
-        "Reports",
+        ),
         block_card(
-          title = "Monthly breakdown",
-          description = "Revenue and orders by month for the selected region",
-          block_table(
-            report_view(sales[sales$region == "Americas", , drop = FALSE]),
-            id = "report_table",
-            striped = TRUE
+          title = "Monthly revenue",
+          description = "Revenue by month for the selected region",
+          block_plot_output(
+            "revenue_plot",
+            aspect = "16/9",
+            border = FALSE
           )
         )
       )
+    ),
+    # Reports page.
+    conditionalPanel(
+      "output.current_page == 'reports'",
+      block_card(
+        title = "Monthly breakdown",
+        description = "Revenue and orders by month for the selected region",
+        block_table(
+          report_view(sales[sales$region == "Americas", , drop = FALSE]),
+          id = "report_table",
+          striped = TRUE
+        )
+      )
     )
-  ),
-  # Hide the tab strip that block_tabs() draws: the sidebar nav items below are
-  # the navigation, so the tabset only needs its panels.
-  htmltools::tags$style(htmltools::HTML(
-    ".sb-tabs.dashboard-views > .sb-tabs-list { display: none; }"
-  )),
-  # Bridge the sidebar nav items to the tabset: a click activates the matching
-  # tab (which the runtime handles, including setting input$view) and moves the
-  # selected highlight. Plain DOM wiring, no extra dependencies.
-  htmltools::tags$script(htmltools::HTML(
-    "document.addEventListener('click', function (e) {
-      var item = e.target.closest('.sb-sidebar .sb-nav-item');
-      if (!item) return;
-      e.preventDefault();
-      var label = (item.querySelector('.sb-nav-label') || item).textContent.trim();
-      var triggers = document.querySelectorAll('.dashboard-views .sb-tabs-trigger');
-      Array.prototype.forEach.call(triggers, function (t) {
-        if (t.getAttribute('data-value') === label) t.click();
-      });
-      Array.prototype.forEach.call(
-        document.querySelectorAll('.sb-sidebar .sb-nav-item'),
-        function (n) {
-          var active = n === item;
-          n.classList.toggle('is-selected', active);
-          if (active) n.setAttribute('aria-current', 'page');
-          else n.removeAttribute('aria-current');
-        }
-      );
-    });"
-  ))
+  )
 )
 
 server <- function(input, output, session) {
+  # Which page the sidebar has selected. The nav items are action links, so each
+  # click bumps its input; we store the choice and expose it for conditionalPanel.
+  current_page <- reactiveVal("overview")
+  observeEvent(input$nav_overview, current_page("overview"))
+  observeEvent(input$nav_reports, current_page("reports"))
+
+  output$current_page <- reactive(current_page())
+  outputOptions(output, "current_page", suspendWhenHidden = FALSE)
+
+  output$sidebar_nav <- renderUI({
+    active <- current_page()
+    nav_item <- function(id, label, icon, value) {
+      shiny::actionLink(
+        id,
+        label = htmltools::tagList(
+          block_icon(icon),
+          htmltools::tags$span(class = "sb-nav-label", label)
+        ),
+        class = paste("sb-nav-item", if (identical(value, active)) "is-selected")
+      )
+    }
+    htmltools::tags$nav(
+      class = "sb-sidebar-nav",
+      nav_item("nav_overview", "Overview", "layout-dashboard", "overview"),
+      nav_item("nav_reports", "Reports", "file-text", "reports")
+    )
+  })
+
   filtered_sales <- reactive({
     sales[sales$region == input$region, , drop = FALSE]
   })

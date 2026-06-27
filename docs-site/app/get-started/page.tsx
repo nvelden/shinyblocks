@@ -93,7 +93,7 @@ export default function GetStartedPage() {
               </p>
               <ul className="flex flex-col gap-1.5 pl-5 leading-relaxed text-muted-foreground [&>li]:list-disc">
                 <li>Responsive page shell with sidebar and header</li>
-                <li>Sidebar nav items that switch the Overview / Reports views</li>
+                <li>Sidebar nav that switches between Overview and Reports pages</li>
                 <li>Region filter that drives every value on the page</li>
                 <li>Reactive metric cards and a reactive plot</li>
                 <li>Reset action with an automatic busy state</li>
