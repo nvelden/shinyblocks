@@ -13,13 +13,18 @@
 - **focus-visible** — component-owned 3px `--ring` focus ring.
 - **selected** — `selected = TRUE` adds `is-selected` and
   `aria-current="page"`.
+- **nav-input child** — carries `data-value` (defaulting to a string
+  `label`). When the parent `block_nav(id = ...)` is an input, clicking
+  reports this `value` as the input and selects the item instead of
+  following `href`.
 
 ## R API
 
 | Argument | Purpose |
 | --- | --- |
 | `label` | Navigation label text. Rendered inside `.sb-nav-label`. |
-| `href` | Destination URL. Defaults to `"#"`. |
+| `value` | Value reported as the input when the parent `block_nav()` has an `id`. Defaults to `label` when it is a single string; required for tag labels. |
+| `href` | Destination URL. Defaults to `"#"`. Ignored when the parent nav is an input. |
 | `icon` | Optional icon tag or vendored icon name. Forced to `inline-start` placement. |
 | `selected` | Marks the item as the active page. |
 | `class` | Extra classes for the `.sb-nav-item` element. |

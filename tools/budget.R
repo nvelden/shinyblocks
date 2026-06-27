@@ -19,8 +19,13 @@ targets <- list(
     group = "compatibility"
   ),
   list(
+    # Raised 15 -> 19 KB for the sidebar-nav Shiny input: clicking a
+    # `block_nav(id = ...)` item reports its value as an input and moves the
+    # selected highlight, plus the `sb:nav` server updater and DOM re-wiring.
+    # This mirrors the existing tab-input wiring (no new dependency) and adds
+    # ~3.4 KB raw, landing at ~18.1 KB. Raw is a headroom guard.
     path = "inst/www/shinyblocks.js",
-    limit_kb = 15,
+    limit_kb = 19,
     metric = "raw",
     group = "compatibility"
   ),

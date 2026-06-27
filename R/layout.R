@@ -290,19 +290,29 @@ block_header <- function(..., class = NULL) {
 
 #' Create a navigation container
 #'
+#' When `id` is supplied the navigation becomes a Shiny input: clicking a
+#' [block_nav_item()] reports that item's `value` as `input[[id]]` and moves the
+#' selected highlight, so the sidebar can drive page navigation the same way a
+#' Shiny tabset does. Without `id` the items stay plain links.
+#'
 #' @param ... Navigation items.
+#' @param id Optional Shiny input id. When set, the selected item's `value` is
+#'   reported as `input[[id]]`; pair it with [shiny::conditionalPanel()] or
+#'   [shiny::renderUI()] to switch pages, and [update_block_nav()] to select
+#'   from the server.
 #' @param class Additional classes.
 #'
 #' @return An `htmltools` tag.
 #' @family navigation
 #' @export
-block_nav <- function(..., class = NULL) {
+block_nav <- function(..., id = NULL, class = NULL) {
   children <- list(...)
   validate_children(children, "nav-item", "block_nav")
 
   attach_shinyblocks_deps(
     htmltools::tags$nav(
       class = merge_classes("sb-nav", class),
+      `data-sb-nav-input-id` = id,
       children
     )
   )
@@ -311,7 +321,10 @@ block_nav <- function(..., class = NULL) {
 #' Create a sidebar navigation item
 #'
 #' @param label Navigation label.
-#' @param href Destination URL.
+#' @param value Value reported as the input when the parent [block_nav()] has an
+#'   `id`. Defaults to `label` when it is a single string.
+#' @param href Destination URL. Ignored when the parent [block_nav()] is an
+#'   input (the click selects the item instead of following the link).
 #' @param icon Optional icon tag or vendored icon name.
 #' @param selected Whether the item is selected.
 #' @param class Additional classes.
@@ -321,6 +334,7 @@ block_nav <- function(..., class = NULL) {
 #' @export
 block_nav_item <- function(
   label,
+  value = NULL,
   href = "#",
   icon = NULL,
   selected = FALSE,
@@ -334,6 +348,11 @@ block_nav_item <- function(
   # `aria-hidden`). Non-character labels (e.g. a tag) are left untitled.
   tooltip <- if (is.character(label) && length(label) == 1L) label
 
+  # The reported input value defaults to the text label; an explicit `value`
+  # is required when the label is a tag.
+  value <- value %||%
+    (if (is.character(label) && length(label) == 1L) label else NULL)
+
   attach_shinyblocks_deps(
     htmltools::tags$a(
       class = merge_classes("sb-nav-item", if (selected) "is-selected", class),
@@ -341,10 +360,59 @@ block_nav_item <- function(
       title = tooltip,
       `aria-current` = if (selected) "page" else NULL,
       `data-sb-child` = "nav-item",
+      `data-value` = value,
       icon,
       htmltools::tags$span(class = "sb-nav-label", label)
     )
   )
+}
+
+#' Select a sidebar navigation item from the server
+#'
+#' Activates an item rendered by [block_nav_item()] inside a [block_nav()] that
+#' was given an `id`, mirroring the click behaviour from the server.
+#'
+#' @param session Shiny session. Defaults to the current reactive domain.
+#' @param input_id Input id passed to [block_nav()].
+#' @param selected Nav item `value` to activate.
+#' @param notify Whether Shiny should receive an input event after the item is
+#'   selected.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family navigation
+#' @export
+update_block_nav <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  selected,
+  notify = TRUE
+) {
+  if (is.null(session)) {
+    stop("`session` is required.", call. = FALSE)
+  }
+  if (!is.function(session$sendCustomMessage)) {
+    stop("`session` must provide a `sendCustomMessage()` method.", call. = FALSE)
+  }
+
+  validate_input_id(input_id)
+  if (
+    missing(selected) ||
+      is.null(selected) ||
+      !nzchar(as.character(selected)[[1]])
+  ) {
+    stop("`selected` must be a single non-empty nav value.", call. = FALSE)
+  }
+
+  ns <- if (is.function(session$ns)) session$ns else identity
+  session$sendCustomMessage(
+    "sb:nav",
+    list(
+      id = ns(input_id),
+      selected = as.character(selected)[[1]],
+      notify = isTRUE(notify)
+    )
+  )
+  invisible(NULL)
 }
 
 sidebar_content <- function(children) {

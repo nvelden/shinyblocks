@@ -4,10 +4,15 @@
 \alias{block_nav}
 \title{Create a navigation container}
 \usage{
-block_nav(..., class = NULL)
+block_nav(..., id = NULL, class = NULL)
 }
 \arguments{
 \item{...}{Navigation items.}
+
+\item{id}{Optional Shiny input id. When set, the selected item's \code{value} is
+reported as \code{input[[id]]}; pair it with \code{\link[shiny:conditionalPanel]{shiny::conditionalPanel()}} or
+\code{\link[shiny:renderUI]{shiny::renderUI()}} to switch pages, and \code{\link[=update_block_nav]{update_block_nav()}} to select
+from the server.}
 
 \item{class}{Additional classes.}
 }
@@ -15,13 +20,17 @@ block_nav(..., class = NULL)
 An \code{htmltools} tag.
 }
 \description{
-Create a navigation container
+When \code{id} is supplied the navigation becomes a Shiny input: clicking a
+\code{\link[=block_nav_item]{block_nav_item()}} reports that item's \code{value} as \code{input[[id]]} and moves the
+selected highlight, so the sidebar can drive page navigation the same way a
+Shiny tabset does. Without \code{id} the items stay plain links.
 }
 \seealso{
 Other navigation: 
 \code{\link{block_nav_item}()},
 \code{\link{block_tab}()},
 \code{\link{block_tabs}()},
+\code{\link{update_block_nav}()},
 \code{\link{update_block_tabs}()}
 }
 \concept{navigation}

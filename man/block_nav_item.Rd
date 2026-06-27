@@ -4,12 +4,23 @@
 \alias{block_nav_item}
 \title{Create a sidebar navigation item}
 \usage{
-block_nav_item(label, href = "#", icon = NULL, selected = FALSE, class = NULL)
+block_nav_item(
+  label,
+  value = NULL,
+  href = "#",
+  icon = NULL,
+  selected = FALSE,
+  class = NULL
+)
 }
 \arguments{
 \item{label}{Navigation label.}
 
-\item{href}{Destination URL.}
+\item{value}{Value reported as the input when the parent \code{\link[=block_nav]{block_nav()}} has an
+\code{id}. Defaults to \code{label} when it is a single string.}
+
+\item{href}{Destination URL. Ignored when the parent \code{\link[=block_nav]{block_nav()}} is an
+input (the click selects the item instead of following the link).}
 
 \item{icon}{Optional icon tag or vendored icon name.}
 
@@ -28,6 +39,7 @@ Other navigation:
 \code{\link{block_nav}()},
 \code{\link{block_tab}()},
 \code{\link{block_tabs}()},
+\code{\link{update_block_nav}()},
 \code{\link{update_block_tabs}()}
 }
 \concept{navigation}

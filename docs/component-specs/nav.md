@@ -17,13 +17,39 @@
   `block_sidebar()`, the existing `<nav>` is promoted to the sidebar
   navigation region (gets `.sb-sidebar-nav` merged into its class)
   instead of being wrapped inside another `<nav>` landmark.
+- **nav-input** — when constructed with `id`, the `<nav>` carries
+  `data-sb-nav-input-id` and becomes a Shiny input. The package runtime
+  reports the selected `block_nav_item()` `value` as `input[[id]]`,
+  moves the `is-selected` highlight on click, and calls
+  `preventDefault()` so the item selects a page instead of following its
+  href. `update_block_nav()` selects an item from the server (the
+  `sb:nav` custom message), mirroring `block_tabs()` / `update_block_tabs()`.
 
 ## R API
 
 | Argument | Purpose |
 | --- | --- |
 | `...` | One or more `block_nav_item()` children. Other children fail validation. |
+| `id` | Optional Shiny input id. When set, the selected item's `value` is reported as `input[[id]]`; pair with `shiny::conditionalPanel()` / `renderUI()` to switch pages and `update_block_nav()` to select from the server. |
 | `class` | Extra classes for the `.sb-nav` element. |
+
+## Page navigation pattern
+
+```r
+ui <- block_page(
+  sidebar = block_sidebar(
+    block_nav(
+      id = "page",
+      block_nav_item("Dashboard", value = "dashboard", selected = TRUE),
+      block_nav_item("Users", value = "users")
+    )
+  ),
+  block_body(
+    conditionalPanel("input.page == 'dashboard'", dashboard_ui),
+    conditionalPanel("input.page == 'users'", users_ui)
+  )
+)
+```
 
 ## Stable shell hooks
 

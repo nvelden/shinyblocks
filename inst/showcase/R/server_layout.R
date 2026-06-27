@@ -1,5 +1,62 @@
+# A small, static user roster shown on the layout preview's "Users" page.
+layout_preview_users_table <- function() {
+  users <- data.frame(
+    Name = c("Ada Lovelace", "Alan Turing", "Grace Hopper", "Katherine Johnson"),
+    Role = c("Admin", "Editor", "Editor", "Viewer"),
+    Status = c("Active", "Active", "Invited", "Active"),
+    stringsAsFactors = FALSE
+  )
+
+  cell <- function(value, muted = FALSE) {
+    htmltools::tags$td(
+      style = paste0(
+        "padding: 0.375rem 0.5rem; border-bottom: 1px solid var(--border);",
+        if (muted) " color: var(--muted-foreground);" else ""
+      ),
+      value
+    )
+  }
+
+  htmltools::tagList(
+    htmltools::tags$h4(
+      style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;",
+      "Users"
+    ),
+    htmltools::tags$table(
+      style = "width: 100%; border-collapse: collapse; font-size: 0.75rem;",
+      htmltools::tags$thead(
+        htmltools::tags$tr(
+          lapply(c("Name", "Role", "Status"), function(heading) {
+            htmltools::tags$th(
+              style = paste(
+                "text-align: left; padding: 0.375rem 0.5rem; font-weight: 600;",
+                "color: var(--muted-foreground); border-bottom: 1px solid var(--border);"
+              ),
+              heading
+            )
+          })
+        )
+      ),
+      htmltools::tags$tbody(
+        lapply(seq_len(nrow(users)), function(i) {
+          htmltools::tags$tr(
+            cell(users$Name[i]),
+            cell(users$Role[i], muted = TRUE),
+            cell(users$Status[i], muted = TRUE)
+          )
+        })
+      )
+    )
+  )
+}
+
 register_layout_showcase <- function(input, output, session) {
   collapsed_state <- shiny::reactiveVal(FALSE)
+
+  # Which page the sidebar nav has selected. `block_nav(id = ...)` reports the
+  # clicked item's value here, and we keep it so the choice survives a preview
+  # re-render when other controls change.
+  preview_page <- shiny::reactiveVal("dashboard")
 
   shiny::observeEvent(input$showcase_layout_doc_collapsed, {
     collapsed_state(isTRUE(input$showcase_layout_doc_collapsed))
@@ -11,6 +68,10 @@ register_layout_showcase <- function(input, output, session) {
     }
   })
 
+  shiny::observeEvent(input$showcase_layout_preview_nav, {
+    preview_page(input$showcase_layout_preview_nav)
+  })
+
   output$showcase_layout_preview_ui <- shiny::renderUI({
     title <- input$showcase_layout_doc_title %||% "Admin Dashboard"
     sidebar_title <- input$showcase_layout_doc_sidebar_title %||% "Acme Corp"
@@ -20,7 +81,8 @@ register_layout_showcase <- function(input, output, session) {
     profile_label <- input$showcase_layout_doc_profile_label %||% "NV"
     profile_label <- trimws(profile_label)
     if (!nzchar(profile_label)) profile_label <- "NV"
-    
+    active_page <- preview_page() %||% "dashboard"
+
     htmltools::div(
       style = "display: flex; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
       
@@ -46,15 +108,21 @@ register_layout_showcase <- function(input, output, session) {
             )
           }
         ),
-        htmltools::div(
-          style = "display: flex; flex-direction: column; gap: 0.5rem;",
-          htmltools::div(style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--accent); border-radius: 0.375rem; color: var(--accent-foreground);",
-            block_icon("layout-dashboard"),
-            if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Dashboard") else NULL
+        # A real navigation input: clicking an item reports its value as
+        # input$showcase_layout_preview_nav and the page below switches.
+        block_nav(
+          id = "showcase_layout_preview_nav",
+          block_nav_item(
+            "Dashboard",
+            value = "dashboard",
+            icon = "layout-dashboard",
+            selected = identical(active_page, "dashboard")
           ),
-          htmltools::div(style = "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 0.375rem; color: var(--muted-foreground);",
-            block_icon("users"),
-            if (!collapsed) htmltools::tags$span(style = "font-size: 0.8125rem;", "Users") else NULL
+          block_nav_item(
+            "Users",
+            value = "users",
+            icon = "users",
+            selected = identical(active_page, "users")
           )
         )
       ),
@@ -85,19 +153,28 @@ register_layout_showcase <- function(input, output, session) {
         
         htmltools::div(
           style = "flex: 1; padding: 1rem; background: var(--background); overflow-y: auto;",
-          htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Overview Metrics"),
-          htmltools::div(
-            style = "display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;",
+          # Dashboard page: shown unless the Users item is selected.
+          shiny::conditionalPanel(
+            condition = "input.showcase_layout_preview_nav != 'users'",
+            htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Overview Metrics"),
             htmltools::div(
-              style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border);",
-              htmltools::tags$div(style = "font-size: 0.6875rem; color: var(--muted-foreground);", "Sales"),
-              htmltools::tags$div(style = "font-size: 0.875rem; font-weight: 700;", "$12,402")
-            ),
-            htmltools::div(
-              style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border);",
-              htmltools::tags$div(style = "font-size: 0.6875rem; color: var(--muted-foreground);", "Active Users"),
-              htmltools::tags$div(style = "font-size: 0.875rem; font-weight: 700;", "1,280")
+              style = "display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;",
+              htmltools::div(
+                style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border);",
+                htmltools::tags$div(style = "font-size: 0.6875rem; color: var(--muted-foreground);", "Sales"),
+                htmltools::tags$div(style = "font-size: 0.875rem; font-weight: 700;", "$12,402")
+              ),
+              htmltools::div(
+                style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border);",
+                htmltools::tags$div(style = "font-size: 0.6875rem; color: var(--muted-foreground);", "Active Users"),
+                htmltools::tags$div(style = "font-size: 0.875rem; font-weight: 700;", "1,280")
+              )
             )
+          ),
+          # Users page: shown when the Users nav item is selected.
+          shiny::conditionalPanel(
+            condition = "input.showcase_layout_preview_nav == 'users'",
+            layout_preview_users_table()
           )
         )
       )
@@ -133,24 +210,33 @@ register_layout_showcase <- function(input, output, session) {
     }
 
     paste0(
-      "block_page(\n",
+      "ui <- block_page(\n",
       "  title = ", string_literal(title_val), ",\n",
       "  sidebar = block_sidebar(\n",
       "    title = ", string_literal(sidebar_title_val), ",\n",
       "    collapsible = ", as.character(collapsible_val), ",\n",
       "    collapsed = ", as.character(collapsed_val), ",\n",
+      "    # block_nav(id = ...) makes the items a Shiny input.\n",
       "    block_nav(\n",
-      "      block_nav_item(\"Dashboard\", icon = \"layout-dashboard\"),\n",
-      "      block_nav_item(\"Users\", icon = \"users\")\n",
+      "      id = \"page\",\n",
+      "      block_nav_item(\"Dashboard\", value = \"dashboard\",\n",
+      "                     icon = \"layout-dashboard\", selected = TRUE),\n",
+      "      block_nav_item(\"Users\", value = \"users\", icon = \"users\")\n",
       "    )\n",
       "  ),\n",
       "  header = block_header(\n",
       "    ", string_literal(title_val), profile_code, "\n",
       "  ),\n",
       "  block_body(\n",
-      "    # Main content here\n",
+      "    # Each page shows when its nav item is selected.\n",
+      "    conditionalPanel(\"input.page == 'dashboard'\", overview_metrics),\n",
+      "    conditionalPanel(\"input.page == 'users'\", users_table)\n",
       "  )\n",
-      ")"
+      ")\n\n",
+      "server <- function(input, output, session) {\n",
+      "  # input$page is \"dashboard\" or \"users\"; drive the server from it,\n",
+      "  # or jump from code with update_block_nav(session, \"page\", \"users\").\n",
+      "}"
     )
   })
   shiny::outputOptions(

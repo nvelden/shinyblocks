@@ -184,6 +184,89 @@
     });
   }
 
+  // Sidebar/page navigation as a Shiny input. A `block_nav(id = ...)` carries
+  // `data-sb-nav-input-id`; clicking one of its `.sb-nav-item` links reports the
+  // item's `data-value` as that input and moves the selected highlight, the same
+  // contract `block_tabs()` uses for its triggers.
+  function navInputs() {
+    return Array.prototype.slice.call(
+      document.querySelectorAll("[data-sb-nav-input-id]")
+    );
+  }
+
+  function navInputItems(nav) {
+    return Array.prototype.slice.call(nav.querySelectorAll(".sb-nav-item"));
+  }
+
+  function selectedNavItem(nav) {
+    var items = navInputItems(nav);
+    return (
+      items.find(function (item) {
+        return item.classList.contains("is-selected");
+      }) || items[0]
+    );
+  }
+
+  function activateNavItem(nav, item, options) {
+    var config = options || {};
+    var updateInput = config.updateInput !== false;
+
+    navInputItems(nav).forEach(function (other) {
+      var active = other === item;
+      other.classList.toggle("is-selected", active);
+      if (active) {
+        other.setAttribute("aria-current", "page");
+      } else {
+        other.removeAttribute("aria-current");
+      }
+    });
+
+    if (updateInput && window.Shiny && window.Shiny.setInputValue) {
+      var navId = nav.getAttribute("data-sb-nav-input-id");
+      var value = item.getAttribute("data-value");
+      if (navId && value != null) {
+        window.Shiny.setInputValue(navId, value, { priority: "event" });
+      }
+    }
+  }
+
+  function activateNavByValue(inputId, value, options) {
+    var selected = String(value == null ? "" : value);
+    if (!inputId || !selected) return;
+
+    navInputs().forEach(function (nav) {
+      if (nav.getAttribute("data-sb-nav-input-id") !== inputId) return;
+      var item = navInputItems(nav).find(function (candidate) {
+        return candidate.getAttribute("data-value") === selected;
+      });
+      if (item) activateNavItem(nav, item, options);
+    });
+  }
+
+  function wireNavInput(nav) {
+    if (nav.getAttribute("data-sb-nav-wired") === "true") return;
+    nav.setAttribute("data-sb-nav-wired", "true");
+
+    nav.addEventListener("click", function (event) {
+      var item = event.target.closest(".sb-nav-item");
+      if (!item || !nav.contains(item)) return;
+      // The item is a navigation control, not a hyperlink: select it instead of
+      // following its href.
+      event.preventDefault();
+      activateNavItem(nav, item);
+    });
+
+    var initial = selectedNavItem(nav);
+    if (initial) activateNavItem(nav, initial, { updateInput: true });
+  }
+
+  function syncNavInputs() {
+    navInputs().forEach(function (nav) {
+      var initial = selectedNavItem(nav);
+      if (initial) activateNavItem(nav, initial, { updateInput: true });
+    });
+  }
+
   function sidebarPages() {
     return Array.prototype.slice.call(
       document.querySelectorAll(".sb-page.has-sidebar")
@@ -405,19 +488,26 @@
     var observer = new MutationObserver(function (mutations) {
       var needsTabs = false;
       var needsPage = false;
+      var needsNav = false;
 
       mutations.forEach(function (mutation) {
         if (!mutation.addedNodes.length) return;
-        
+
         var nodes = Array.prototype.slice.call(mutation.addedNodes);
         nodes.forEach(function (node) {
           if (node.nodeType !== 1) return;
-          
+
           if (node.matches && node.matches(".sb-tabs[data-sb-tabs='true']")) {
             needsTabs = true;
           }
           if (node.querySelector && node.querySelector(".sb-tabs[data-sb-tabs='true']")) {
             needsTabs = true;
+          }
+          if (node.matches && node.matches("[data-sb-nav-input-id]")) {
+            needsNav = true;
+          }
+          if (node.querySelector && node.querySelector("[data-sb-nav-input-id]")) {
+            needsNav = true;
           }
           if (node.matches && node.matches(".sb-page.has-sidebar")) {
             needsPage = true;
@@ -430,6 +520,9 @@
 
       if (needsTabs) {
         tabs().forEach(wireTabs);
+      }
+      if (needsNav) {
+        navInputs().forEach(wireNavInput);
       }
       if (needsPage) {
         sidebarPages().forEach(wirePage);
@@ -448,6 +541,7 @@
     wireThemeToggleEvents();
     wireGlobalSidebarHandlers();
     tabs().forEach(wireTabs);
+    navInputs().forEach(wireNavInput);
     sidebarPages().forEach(wirePage);
     observeDOM();
   }
@@ -463,6 +557,13 @@
         updateInput: message.notify !== false
       });
     });
+
+    window.Shiny.addCustomMessageHandler("sb:nav", function (message) {
+      message = message || {};
+      activateNavByValue(message.id, message.selected, {
+        updateInput: message.notify !== false
+      });
+    });
   }
 
   if (document.readyState === "loading") {
@@ -471,5 +572,8 @@
     init();
   }
 
-  document.addEventListener("shiny:connected", syncTabInputs);
+  document.addEventListener("shiny:connected", function () {
+    syncTabInputs();
+    syncNavInputs();
+  });
 })();

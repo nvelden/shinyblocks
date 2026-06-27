@@ -165,6 +165,26 @@ test_that("nav containers merge classes and wrap items", {
   expect_identical(tag_attr(nav, "class"), "sb-nav custom")
 })
 
+test_that("block_nav(id) marks the container as a nav input", {
+  with_id <- block_nav(block_nav_item("Home"), id = "page")
+  without_id <- block_nav(block_nav_item("Home"))
+
+  expect_identical(tag_attr(with_id, "data-sb-nav-input-id"), "page")
+  expect_null(tag_attr(without_id, "data-sb-nav-input-id"))
+})
+
+test_that("nav items carry a data-value defaulting to the text label", {
+  default_value <- block_nav_item("Users")
+  explicit_value <- block_nav_item("Users", value = "users")
+  tag_label <- block_nav_item(htmltools::tags$span("Users"), value = "users")
+
+  expect_identical(tag_attr(default_value, "data-value"), "Users")
+  expect_identical(tag_attr(explicit_value, "data-value"), "users")
+  expect_identical(tag_attr(tag_label, "data-value"), "users")
+  # A tag label without an explicit value has no input value to report.
+  expect_null(tag_attr(block_nav_item(htmltools::tags$span("Users")), "data-value"))
+})
+
 test_that("sidebar reuses a provided nav container instead of nesting nav landmarks", {
   sidebar <- block_sidebar(
     title = "Navigation",

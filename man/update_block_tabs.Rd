@@ -32,6 +32,7 @@ Other navigation:
 \code{\link{block_nav}()},
 \code{\link{block_nav_item}()},
 \code{\link{block_tab}()},
-\code{\link{block_tabs}()}
+\code{\link{block_tabs}()},
+\code{\link{update_block_nav}()}
 }
 \concept{navigation}
