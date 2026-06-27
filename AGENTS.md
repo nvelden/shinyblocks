@@ -12,8 +12,13 @@ runtime, R API, and assets, not React source dropped into the package.
 - CSS source in `inst/www/src/` builds to `inst/www/shinyblocks.css` and
   `preflight.scoped.css`; app styles scoped under `.sb-app`.
 - Next.js docs site in `docs-site/`.
-- `inst/www/*.js|*.css`, `man/`, and the icon sprite are generated — edit the
-  source and rebuild, never the output.
+- Generated — edit the source and rebuild, never the output:
+  `inst/www/shinyblocks-runtime.{js,css}` (from `frontend/src`),
+  `inst/www/shinyblocks.css` / `preflight.scoped.css` (from `inst/www/src`),
+  `man/`, and the icon sprite.
+- `inst/www/shinyblocks.js` is the exception: **hand-authored** shell runtime
+  (theme, sidebar, tabs, nav-input). No bundler emits it — edit it in place
+  (size-guarded by `make budget`).
 - `components.json` / root `package.json` exist only for shadcn CLI/agent
   context and are excluded from the R package build.
 
@@ -92,7 +97,9 @@ npm exec -- shadcn@latest docs button card sidebar tabs   # shadcn reference
 
 ## Coding constraints
 
-- Do not hand-edit generated `man/` files or build outputs under `inst/www/`.
+- Do not hand-edit generated `man/` files or build outputs under `inst/www/`
+  (the runtime bundle, `shinyblocks.css`, sprite). `inst/www/shinyblocks.js` is
+  the lone hand-authored exception (see Architecture).
 - Do not commit `.Rproj.user`, `.Rhistory`, `.RData`, or check directories.
 - Add tests for each exported helper once behavior is defined.
 

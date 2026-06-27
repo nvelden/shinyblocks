@@ -173,6 +173,25 @@ test_that("block_nav(id) marks the container as a nav input", {
   expect_null(tag_attr(without_id, "data-sb-nav-input-id"))
 })
 
+test_that("input block_nav(id) requires a value on every item", {
+  # A tag label without an explicit value has no input value to report: it
+  # would be a dead item (clickable, never updates the input), so it errors.
+  expect_error(
+    block_nav(
+      block_nav_item("Home", value = "home"),
+      block_nav_item(htmltools::tags$span("Reports")),
+      id = "page"
+    ),
+    "needs a\\s+non-empty `value`"
+  )
+  # The same valueless item is fine in a plain (non-input) nav.
+  expect_silent(block_nav(block_nav_item(htmltools::tags$span("Reports"))))
+  # String labels supply their own value, so this is accepted.
+  expect_silent(
+    block_nav(block_nav_item("Home"), block_nav_item("Reports"), id = "page")
+  )
+})
+
 test_that("nav items carry a data-value defaulting to the text label", {
   default_value <- block_nav_item("Users")
   explicit_value <- block_nav_item("Users", value = "users")

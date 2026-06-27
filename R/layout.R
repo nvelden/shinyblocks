@@ -309,6 +309,28 @@ block_nav <- function(..., id = NULL, class = NULL) {
   children <- list(...)
   validate_children(children, "nav-item", "block_nav")
 
+  # An input nav reports the clicked item's `value`, so every item must carry a
+  # non-empty one. Without this an item with a tag label and no explicit
+  # `value` would look clickable but never update `input[[id]]`.
+  if (!is.null(id)) {
+    missing_value <- vapply(
+      children,
+      function(child) {
+        value <- child$attribs[["data-value"]]
+        is.null(value) || !nzchar(as.character(value))
+      },
+      logical(1)
+    )
+    if (any(missing_value)) {
+      stop(
+        "Every `block_nav_item()` in an input `block_nav(id = ...)` needs a ",
+        "non-empty `value` (it is reported as `input[[id]]`). Items with a ",
+        "tag label must pass `value` explicitly.",
+        call. = FALSE
+      )
+    }
+  }
+
   attach_shinyblocks_deps(
     htmltools::tags$nav(
       class = merge_classes("sb-nav", class),

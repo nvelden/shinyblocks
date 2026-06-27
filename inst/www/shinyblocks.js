@@ -1,3 +1,11 @@
+/*
+ * shinyblocks shell runtime — HAND-AUTHORED SOURCE, not a build output.
+ *
+ * Unlike inst/www/shinyblocks-runtime.{js,css} (built from frontend/src) and
+ * inst/www/shinyblocks.css (built from inst/www/src), no bundler produces this
+ * file. Edit it here. It wires theme, sidebar collapse/drawer, tabs, and the
+ * sidebar nav Shiny input (block_nav(id = ...)). `make budget` guards its size.
+ */
 (function () {
   function currentThemeMode() {
     var initialMode = window.shinyblocksInitialThemeMode;

@@ -90,19 +90,22 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
   "nav-item": [
     {
       name: "block_nav_item",
-      description: "A navigation link element featuring custom glyphs and reactive selection highlight styling.",
+      description: "A navigation link element featuring custom glyphs and reactive selection highlight styling. Inside an input block_nav(id=), clicking it reports its value as input[[id]] and selects the item instead of following href.",
       arguments: [
         { argument: "label", type: "character", defaultVal: "required", description: "Label text shown for the item." },
-        { argument: "href", type: "character", defaultVal: "NULL", description: "Anchor URL reference path when clicked." },
+        { argument: "value", type: "character", defaultVal: "NULL", description: "Value reported as the input when the parent block_nav() has an id. Defaults to label when it is a single string; required for tag labels." },
+        { argument: "href", type: "character", defaultVal: "'#'", description: "Destination URL. Ignored when the parent block_nav() is an input." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "Lucide icon glyph name." },
-        { argument: "selected", type: "logical", defaultVal: "FALSE", description: "Initial selected state class highlight." }
+        { argument: "selected", type: "logical", defaultVal: "FALSE", description: "Initial selected state class highlight." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the .sb-nav-item element." }
       ]
     },
     {
       name: "block_nav",
-      description: "Wraps multiple navigation link items inside a unified structural list.",
+      description: "Wraps navigation items in a list. With an id it becomes a Shiny input: the selected item's value is reported as input[[id]], so a sidebar can drive page navigation like a tabset (pair with conditionalPanel()/renderUI() and update_block_nav()).",
       arguments: [
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "List of block_nav_item() elements." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional Shiny input id. When set, the selected item's value is reported as input[[id]]; every item must then carry a non-empty value." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "CSS class applied to the navigation wrapper." }
       ]
     }
