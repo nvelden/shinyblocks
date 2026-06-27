@@ -143,15 +143,17 @@ ui <- block_page(
         block_grid(
           min_width = "14rem",
           gap = "md",
-          block_card(
+          block_value_box(
             title = "Revenue",
             description = "Six-month total",
-            value = textOutput("revenue", inline = TRUE)
+            value = textOutput("revenue", inline = TRUE),
+            icon = "dollar-sign"
           ),
-          block_card(
+          block_value_box(
             title = "Orders",
             description = "Six-month total",
-            value = textOutput("orders", inline = TRUE)
+            value = textOutput("orders", inline = TRUE),
+            icon = "package"
           )
         ),
         block_card(
