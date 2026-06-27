@@ -35,7 +35,7 @@ htmltools::tagList(
         "Actions (Server Update)",
         block_cluster(
           gap = "sm",
-          showcase_action_button("showcase_layout_select_other", "Select other nav item")
+          showcase_action_button("showcase_layout_select_other", "Toggle nav")
         )
       )
     ),
