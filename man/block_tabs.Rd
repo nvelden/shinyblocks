@@ -33,11 +33,11 @@ An \code{htmltools} tag.
 Create styled tabs
 }
 \seealso{
-Other navigation: 
-\code{\link{block_nav}()},
-\code{\link{block_nav_item}()},
-\code{\link{block_tab}()},
-\code{\link{update_block_nav}()},
-\code{\link{update_block_tabs}()}
+Other navigation:
+\code{\link[=block_nav]{block_nav()}},
+\code{\link[=block_nav_item]{block_nav_item()}},
+\code{\link[=block_tab]{block_tab()}},
+\code{\link[=update_block_nav]{update_block_nav()}},
+\code{\link[=update_block_tabs]{update_block_tabs()}}
 }
 \concept{navigation}

@@ -18,5 +18,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Niels van der Velden \email{n.s.j.vandervelden@gmail.com}
 
+Authors:
+\itemize{
+  \item Niels van der Velden \email{n.s.j.vandervelden@gmail.com}
+}
+
 }
 \keyword{internal}

@@ -64,9 +64,9 @@ behavior.
 \seealso{
 \code{\link[=update_block_task_button]{update_block_task_button()}}
 
-Other action: 
-\code{\link{block_button}()},
-\code{\link{update_block_button}()},
-\code{\link{update_block_task_button}()}
+Other action:
+\code{\link[=block_button]{block_button()}},
+\code{\link[=update_block_button]{update_block_button()}},
+\code{\link[=update_block_task_button]{update_block_task_button()}}
 }
 \concept{action}

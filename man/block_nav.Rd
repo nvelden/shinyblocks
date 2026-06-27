@@ -26,11 +26,11 @@ selected highlight, so the sidebar can drive page navigation the same way a
 Shiny tabset does. Without \code{id} the items stay plain links.
 }
 \seealso{
-Other navigation: 
-\code{\link{block_nav_item}()},
-\code{\link{block_tab}()},
-\code{\link{block_tabs}()},
-\code{\link{update_block_nav}()},
-\code{\link{update_block_tabs}()}
+Other navigation:
+\code{\link[=block_nav_item]{block_nav_item()}},
+\code{\link[=block_tab]{block_tab()}},
+\code{\link[=block_tabs]{block_tabs()}},
+\code{\link[=update_block_nav]{update_block_nav()}},
+\code{\link[=update_block_tabs]{update_block_tabs()}}
 }
 \concept{navigation}
