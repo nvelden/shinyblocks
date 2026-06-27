@@ -129,18 +129,19 @@ export function Calendar({
     // server messages are external inputs, so a malformed value must not crash
     // keyboard handling. Arrow keys lean on `addDays` (which no-ops on invalid
     // input); the month/week branches need the parsed parts, so bail if absent.
-    const cur = parseIso(focused);
+    const activeIso = document.activeElement?.dataset?.sbCalendarDate || focused;
+    const cur = parseIso(activeIso);
     let next = null;
-    if (event.key === "ArrowLeft") next = addDays(focused, -1);
-    else if (event.key === "ArrowRight") next = addDays(focused, 1);
-    else if (event.key === "ArrowUp") next = addDays(focused, -7);
-    else if (event.key === "ArrowDown") next = addDays(focused, 7);
+    if (event.key === "ArrowLeft") next = addDays(activeIso, -1);
+    else if (event.key === "ArrowRight") next = addDays(activeIso, 1);
+    else if (event.key === "ArrowUp") next = addDays(activeIso, -7);
+    else if (event.key === "ArrowDown") next = addDays(activeIso, 7);
     else if (event.key === "Home") {
       if (!cur) return;
       // Jump to the first day of the focused row: subtract the offset of the
       // focused weekday from the configured week start (not day-of-month % 7).
       const weekday = new Date(cur.y, cur.m - 1, cur.d).getDay();
-      next = addDays(focused, -(((weekday - weekstart) % 7 + 7) % 7));
+      next = addDays(activeIso, -(((weekday - weekstart) % 7 + 7) % 7));
     } else if (event.key === "PageUp") {
       if (!cur) return;
       const date = new Date(cur.y, cur.m - 2, cur.d);
@@ -151,7 +152,7 @@ export function Calendar({
       next = toIso(date.getFullYear(), date.getMonth() + 1, date.getDate());
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onSelect(focused);
+      onSelect(activeIso);
       return;
     } else if (event.key === "Escape") {
       onCancel(event);
@@ -248,6 +249,7 @@ export function Calendar({
                     type="button"
                     className={`${classPrefix}-day`}
                     data-slot={`${slotPrefix}-day`}
+                    data-sb-calendar-date={iso}
                     role="gridcell"
                     tabIndex={isFocusable ? 0 : -1}
                     disabled={dayDisabled}
