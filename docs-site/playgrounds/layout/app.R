@@ -211,18 +211,25 @@ server <- function(input, output, session) {
     active_page <- preview_page() %||% "dashboard"
 
     htmltools::div(
-      style = "display: flex; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
+      class = "sb-page has-sidebar",
+      `data-sidebar-enhanced` = "true",
+      `data-sidebar-mobile-open` = "false",
+      `data-sidebar-collapsed` = tolower(as.character(collapsed)),
+      style = "display: flex; min-height: 0; height: 300px; width: 100%; position: relative; overflow: hidden; background: var(--background); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 2px 6px rgb(0 0 0 / 0.08);",
       htmltools::div(
         style = paste0(
-          "width: ", if (collapsed) "60px" else "200px", ";",
+          "width: ", if (collapsed) "4.5rem" else "200px", ";",
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
           "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
         ),
-        block_cluster(
-          align = "center",
-          justify = "between",
-          style = "margin-bottom: 1.5rem; white-space: nowrap;",
-          if (!collapsed) htmltools::tags$span(style = "font-weight: 700; font-size: 0.875rem;", sidebar_title) else NULL,
+        htmltools::div(
+          class = "sb-sidebar-title",
+          style = "border-bottom: 0; padding: 0; margin-bottom: 1.5rem; white-space: nowrap;",
+          htmltools::tags$span(
+            class = "sb-sidebar-title-text",
+            style = "font-weight: 700; font-size: 0.875rem;",
+            sidebar_title
+          ),
           if (collapsible) {
             block_button(
               "",

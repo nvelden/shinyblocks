@@ -172,6 +172,37 @@ test_that("showcase styling controls have matching CSS hooks", {
   )
 })
 
+test_that("layout showcase preview uses real collapsed sidebar hooks", {
+  skip_if_no_showcase()
+
+  server_file <- system.file(
+    "showcase",
+    "R",
+    "server_layout.R",
+    package = "shinyblocks",
+    mustWork = TRUE
+  )
+  source <- paste(readLines(server_file, warn = FALSE), collapse = "\n")
+
+  expect_match(source, 'class = "sb-page has-sidebar"', fixed = TRUE)
+  expect_match(source, '`data-sidebar-enhanced` = "true"', fixed = TRUE)
+  expect_match(
+    source,
+    '`data-sidebar-collapsed` = tolower(as.character(collapsed))',
+    fixed = TRUE
+  )
+  expect_match(source, 'class = "sb-sidebar-title"', fixed = TRUE)
+  expect_match(source, 'class = "sb-sidebar-title-text"', fixed = TRUE)
+  expect_match(source, 'if (collapsed) "4.5rem" else "200px"', fixed = TRUE)
+  expect_false(
+    grepl(
+      'if (!collapsed) htmltools::tags$span',
+      source,
+      fixed = TRUE
+    )
+  )
+})
+
 test_that("showcase icon references are vendored", {
   skip_if_no_showcase()
 
