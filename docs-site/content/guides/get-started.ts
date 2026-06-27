@@ -73,8 +73,20 @@ const UI = `ui <- block_page(
   sidebar = block_sidebar(
     title = "Acme Analytics",
     collapsible = TRUE,
-    # The nav is rendered on the server so the active page stays highlighted.
-    uiOutput("sidebar_nav")
+    block_nav(
+      id = "page",
+      block_nav_item(
+        "Overview",
+        value = "overview",
+        icon = "layout-dashboard",
+        selected = TRUE
+      ),
+      block_nav_item(
+        "Reports",
+        value = "reports",
+        icon = "file-text"
+      )
+    )
   ),
   header = block_header(
     block_cluster(
@@ -170,33 +182,11 @@ const UI = `ui <- block_page(
 )`;
 
 const SERVER = `server <- function(input, output, session) {
-  # Which page the sidebar has selected. The nav items are action links, so each
-  # click bumps its input; we store the choice and expose it for conditionalPanel.
-  current_page <- reactiveVal("overview")
-  observeEvent(input$nav_overview, current_page("overview"))
-  observeEvent(input$nav_reports, current_page("reports"))
-
-  output$current_page <- reactive(current_page())
-  outputOptions(output, "current_page", suspendWhenHidden = FALSE)
-
-  output$sidebar_nav <- renderUI({
-    active <- current_page()
-    nav_item <- function(id, label, icon, value) {
-      shiny::actionLink(
-        id,
-        label = htmltools::tagList(
-          block_icon(icon),
-          htmltools::tags$span(class = "sb-nav-label", label)
-        ),
-        class = paste("sb-nav-item", if (identical(value, active)) "is-selected")
-      )
-    }
-    htmltools::tags$nav(
-      class = "sb-sidebar-nav",
-      nav_item("nav_overview", "Overview", "layout-dashboard", "overview"),
-      nav_item("nav_reports", "Reports", "file-text", "reports")
-    )
+  # block_nav(id = "page") reports "overview" or "reports".
+  output$current_page <- reactive({
+    if (is.null(input$page)) "overview" else input$page
   })
+  outputOptions(output, "current_page", suspendWhenHidden = FALSE)
 
   filtered_sales <- reactive({
     sales[sales$region == input$region, , drop = FALSE]
@@ -272,7 +262,7 @@ export const CODE_SHELL_TREE = `block_page()
 └── body content`;
 
 export const CODE_COMPOSITION_TREE = `block_page()
-├── sidebar: nav items  → input$nav_overview / input$nav_reports
+├── sidebar: block_nav() → input$page
 ├── header: title + theme control
 └── body
     ├── filter card
