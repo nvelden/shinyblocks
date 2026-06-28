@@ -150,6 +150,18 @@ ui <- block_page(
               block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
               block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
             )
+          ),
+          block_stack(
+            gap = "sm",
+            class = "showcase-controls-group",
+            htmltools::tags$h4(
+              class = "showcase-controls-group__title",
+              "Actions (Server Update)"
+            ),
+            block_cluster(
+              gap = "sm",
+              block_button("Toggle nav", id = "showcase_layout_select_other", variant = "outline", size = "sm")
+            )
           )
         ),
         block_stack(
@@ -163,6 +175,20 @@ ui <- block_page(
               style = "padding: 1rem; min-height: 332px;",
               uiOutput("showcase_layout_preview_ui")
             )
+          ),
+          htmltools::div(
+            htmltools::div(
+              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              "Nav item clicked"
+            ),
+            uiOutput("showcase_layout_preview_value")
+          ),
+          htmltools::div(
+            htmltools::div(
+              style = "font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); margin-bottom: 0.35rem;",
+              "Server Action"
+            ),
+            uiOutput("showcase_layout_reactive_code")
           ),
           htmltools::div(
             htmltools::div(
@@ -197,6 +223,38 @@ server <- function(input, output, session) {
 
   observeEvent(input$showcase_layout_preview_nav, {
     preview_page(input$showcase_layout_preview_nav)
+  })
+
+  reactive_code <- reactiveVal(paste0(
+    "# Click an action button to see\n",
+    "# the update_block_nav() code here."
+  ))
+
+  output$showcase_layout_reactive_code <- showcase_render_code({
+    reactive_code()
+  })
+
+  observeEvent(input$showcase_layout_select_other, {
+    current <- preview_page() %||% "dashboard"
+    next_page <- if (identical(current, "users")) "dashboard" else "users"
+    update_block_nav(
+      session = session,
+      input_id = "showcase_layout_preview_nav",
+      selected = next_page
+    )
+    reactive_code(paste0(
+      "update_block_nav(\n",
+      "  session = session,\n",
+      "  input_id = \"showcase_layout_preview_nav\",\n",
+      "  selected = \"", next_page, "\"\n",
+      ")"
+    ))
+  })
+
+  output$showcase_layout_preview_value <- showcase_render_code({
+    value <- input$showcase_layout_preview_nav
+    val_str <- if (is.null(value)) "<NULL>" else paste0("\"", value, "\"")
+    paste0("input$showcase_layout_preview_nav = ", val_str)
   })
 
   output$showcase_layout_preview_ui <- renderUI({

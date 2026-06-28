@@ -65,7 +65,6 @@ playground_heights <- list(
   toast = 720L,
   style = 720L,
   table = 720L,
-  `nav-item` = 720L,
   layout = 720L,
   `layout-primitives` = 820L,
   tooltip = 720L,
