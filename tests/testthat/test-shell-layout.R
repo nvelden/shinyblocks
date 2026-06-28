@@ -205,7 +205,92 @@ test_that("nav items carry a data-value defaulting to the text label", {
   expect_identical(tag_attr(explicit_value, "data-value"), "users")
   expect_identical(tag_attr(tag_label, "data-value"), "users")
   # A tag label without an explicit value has no input value to report.
-  expect_null(tag_attr(block_nav_item(htmltools::tags$span("Users")), "data-value"))
+  expect_null(tag_attr(
+    block_nav_item(htmltools::tags$span("Users")),
+    "data-value"
+  ))
+})
+
+test_that("nav groups render disclosure markup without input values", {
+  group <- block_nav_group(
+    "Admin",
+    block_nav_item("Users", value = "users"),
+    value = "admin",
+    expanded = FALSE,
+    class = "custom"
+  )
+  trigger <- group$children[[1]]
+  items <- group$children[[2]]
+
+  expect_identical(tag_attr(group, "data-sb-child"), "nav-group")
+  expect_identical(tag_attr(group, "data-sb-nav-group-value"), "admin")
+  expect_null(tag_attr(group, "data-value"))
+  expect_identical(tag_attr(group, "class"), "sb-nav-group custom")
+  expect_identical(tag_attr(trigger, "aria-expanded"), "false")
+  expect_identical(tag_attr(trigger, "aria-controls"), tag_attr(items, "id"))
+  # The text label doubles as the icon-rail hover tooltip, mirroring nav items.
+  expect_identical(tag_attr(trigger, "title"), "Admin")
+  expect_identical(tag_attr(items, "role"), "group")
+  expect_identical(tag_attr(items, "aria-label"), "Admin")
+  expect_identical(tag_attr(items, "data-expanded"), "false")
+  expect_identical(tag_attr(items, "hidden"), "hidden")
+})
+
+test_that("expanded nav groups keep their item container visible", {
+  group <- block_nav_group(
+    "Admin",
+    block_nav_item("Users", value = "users"),
+    expanded = TRUE
+  )
+  items <- group$children[[2]]
+
+  expect_identical(tag_attr(group, "data-expanded"), "true")
+  expect_identical(tag_attr(items, "data-expanded"), "true")
+  expect_null(tag_attr(items, "hidden"))
+})
+
+test_that("nav labels render non-interactive section captions", {
+  label <- block_nav_label("Project Management", class = "custom")
+
+  expect_identical(tag_attr(label, "data-sb-child"), "nav-label")
+  expect_identical(tag_attr(label, "class"), "sb-nav-section-label custom")
+  expect_null(tag_attr(label, "data-value"))
+})
+
+test_that("block_nav accepts labels and groups and validates nested values", {
+  expect_silent(
+    block_nav(
+      block_nav_label("Project Management"),
+      block_nav_group(
+        "Admin",
+        block_nav_item("Users", value = "users")
+      ),
+      id = "page"
+    )
+  )
+
+  expect_error(
+    block_nav(
+      block_nav_group(
+        "Admin",
+        block_nav_item(htmltools::tags$span("Users"))
+      ),
+      id = "page"
+    ),
+    "needs a\\s+non-empty `value`"
+  )
+
+  expect_error(
+    block_nav(
+      block_nav_item("Users", value = "users"),
+      block_nav_group(
+        "Admin",
+        block_nav_item("People", value = "users")
+      ),
+      id = "page"
+    ),
+    "duplicate value: `users`"
+  )
 })
 
 test_that("sidebar reuses a provided nav container instead of nesting nav landmarks", {
@@ -220,6 +305,28 @@ test_that("sidebar reuses a provided nav container instead of nesting nav landma
 
   expect_match(html, '<nav class="sb-nav sb-sidebar-nav">', fixed = TRUE)
   expect_false(grepl('<nav class="sb-sidebar-nav">\\s*<nav', html, perl = TRUE))
+})
+
+test_that("sidebar wraps direct nav groups and labels as one sidebar nav", {
+  sidebar <- block_sidebar(
+    block_nav_label("Project Management"),
+    block_nav_group(
+      "Admin",
+      block_nav_item("Users", value = "users")
+    )
+  )
+  html <- render_html(sidebar)
+
+  expect_match(html, '<nav class="sb-sidebar-nav">', fixed = TRUE)
+  expect_match(html, 'data-sb-child="nav-label"', fixed = TRUE)
+  expect_match(html, 'data-sb-child="nav-group"', fixed = TRUE)
+})
+
+test_that("nav groups validate direct children", {
+  expect_error(
+    block_nav_group("Admin", block_nav_label("Section")),
+    "All children of `block_nav_group\\(\\)` must be `nav-item` items"
+  )
 })
 
 test_that("block_tabs emits package-owned tab markup", {

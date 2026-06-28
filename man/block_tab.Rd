@@ -22,7 +22,9 @@ Create a tab
 \seealso{
 Other navigation: 
 \code{\link{block_nav}()},
+\code{\link{block_nav_group}()},
 \code{\link{block_nav_item}()},
+\code{\link{block_nav_label}()},
 \code{\link{block_tabs}()},
 \code{\link{update_block_nav}()},
 \code{\link{update_block_tabs}()}

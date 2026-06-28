@@ -148,6 +148,10 @@ test_that("package source CSS only owns shell and composition hooks", {
       "^\\.sb-sidebar-backdrop\\b|",
       "^\\.sb-nav\\b|",
       "^\\.sb-nav-item\\b|",
+      "^\\.sb-nav-group\\b|",
+      "^\\.sb-nav-group-trigger\\b|",
+      "^\\.sb-nav-group-items\\b|",
+      "^\\.sb-nav-section-label\\b|",
       "^\\.sb-body\\b|",
       "^\\.sb-stack\\b|",
       "^\\.sb-cluster\\b|",
@@ -212,6 +216,18 @@ test_that("sidebar collapsed styling is desktop-only", {
   expect_gt(desktop_start, 0)
   expect_gt(collapsed_start, desktop_start)
   expect_gt(mobile_start, collapsed_start)
+})
+
+test_that("nav group CSS keeps expansion state class-owned", {
+  css <- package_source_css()
+
+  expect_match(css, ".sb-nav-group-trigger", fixed = TRUE)
+  expect_match(css, ".sb-nav-group-items", fixed = TRUE)
+  expect_match(css, ".sb-nav-section-label", fixed = TRUE)
+  expect_match(css, '.sb-nav-group-trigger[data-expanded="true"] > [data-icon="inline-end"]', fixed = TRUE)
+  expect_match(css, "transform: rotate(180deg);", fixed = TRUE)
+  expect_match(css, '.sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-section-label', fixed = TRUE)
+  expect_no_match(css, ".sb-nav-group-items[hidden]", fixed = TRUE)
 })
 
 test_that("runtime CSS does not target host framework selectors", {

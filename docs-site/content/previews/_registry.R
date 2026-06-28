@@ -14,6 +14,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Nav Group",
+    slug = "nav-group",
+    file = "nav-group.R",
+    description = "Collapsible sidebar groups, section labels, and nested leaf items for block_nav().",
+    featured = FALSE
+  ),
+  list(
     name = "Card",
     slug = "card",
     file = "card.R",
