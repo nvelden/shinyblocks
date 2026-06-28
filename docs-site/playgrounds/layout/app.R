@@ -278,7 +278,7 @@ server <- function(input, output, session) {
         style = paste0(
           "width: ", if (collapsed) "4.5rem" else "200px", ";",
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
-          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
+          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--sidebar);"
         ),
         htmltools::div(
           class = "sb-sidebar-title",
