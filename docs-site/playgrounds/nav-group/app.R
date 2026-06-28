@@ -89,7 +89,7 @@ ui <- block_page(
             htmltools::tags$h4(class = "showcase-controls-group__title", "State"),
             block_field(
               block_field_label("expanded", `for` = "nav_group_expanded"),
-              block_checkbox("nav_group_expanded", label = "Start expanded", value = TRUE)
+              block_checkbox("nav_group_expanded", label = "Start expanded", value = FALSE)
             )
           ),
           block_stack(
@@ -191,6 +191,7 @@ server <- function(input, output, session) {
           icon = "layout-dashboard",
           selected = identical(active, "dashboard")
         ),
+        block_nav_label("Management"),
         block_nav_group(
           group,
           block_nav_item(
@@ -237,6 +238,7 @@ server <- function(input, output, session) {
       "  block_nav_label(", string_literal(section), "),\n",
       "  block_nav_item(\"Dashboard\", value = \"dashboard\",\n",
       "                 icon = \"layout-dashboard\", selected = TRUE),\n",
+      "  block_nav_label(\"Management\"),\n",
       "  block_nav_group(\n",
       "    ", string_literal(group), ",\n",
       "    block_nav_item(\"Users\", value = \"users\", icon = \"users\"),\n",

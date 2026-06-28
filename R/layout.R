@@ -417,7 +417,9 @@ block_nav_group <- function(
     `data-state` = if (isTRUE(expanded)) "open" else "closed",
     set_icon_position(icon, "inline-start"),
     htmltools::tags$span(class = "sb-nav-label", label),
-    set_icon_position("chevron-down", "inline-end")
+    # Collapsed shows a right-pointing chevron; CSS rotates it to point down
+    # when the group is expanded (matching the shadcn admin sidebar).
+    set_icon_position("chevron-right", "inline-end")
   )
 
   items <- do.call(

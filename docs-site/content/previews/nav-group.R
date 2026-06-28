@@ -13,12 +13,14 @@ htmltools::div(
       icon = "layout-dashboard",
       selected = TRUE
     ),
+    shinyblocks::block_nav_label("Management"),
     shinyblocks::block_nav_group(
       "Operations",
       shinyblocks::block_nav_item("Users", value = "users", icon = "users"),
       shinyblocks::block_nav_item("Orders", value = "orders", icon = "clipboard"),
       icon = "folder",
-      value = "operations"
+      value = "operations",
+      expanded = FALSE
     )
   )
 )

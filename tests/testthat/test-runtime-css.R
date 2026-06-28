@@ -225,7 +225,7 @@ test_that("nav group CSS keeps expansion state class-owned", {
   expect_match(css, ".sb-nav-group-items", fixed = TRUE)
   expect_match(css, ".sb-nav-section-label", fixed = TRUE)
   expect_match(css, '.sb-nav-group-trigger[data-expanded="true"] > [data-icon="inline-end"]', fixed = TRUE)
-  expect_match(css, "transform: rotate(180deg);", fixed = TRUE)
+  expect_match(css, "transform: rotate(90deg);", fixed = TRUE)
   expect_match(css, '.sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-section-label', fixed = TRUE)
   expect_no_match(css, ".sb-nav-group-items[hidden]", fixed = TRUE)
 })

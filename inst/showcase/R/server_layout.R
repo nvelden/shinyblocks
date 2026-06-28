@@ -160,6 +160,7 @@ register_layout_showcase <- function(input, output, session) {
             icon = "layout-dashboard",
             selected = identical(active_page, "dashboard")
           ),
+          block_nav_label("Management"),
           block_nav_group(
             "Operations",
             block_nav_item(
@@ -176,7 +177,7 @@ register_layout_showcase <- function(input, output, session) {
             ),
             icon = "folder",
             value = "operations",
-            expanded = TRUE
+            expanded = FALSE
           )
         )
       ),
@@ -296,12 +297,14 @@ register_layout_showcase <- function(input, output, session) {
       "      block_nav_label(\"Workspace\"),\n",
       "      block_nav_item(\"Dashboard\", value = \"dashboard\",\n",
       "                     icon = \"layout-dashboard\", selected = TRUE),\n",
+      "      block_nav_label(\"Management\"),\n",
       "      block_nav_group(\n",
       "        \"Operations\",\n",
       "        block_nav_item(\"Users\", value = \"users\", icon = \"users\"),\n",
       "        block_nav_item(\"Orders\", value = \"orders\", icon = \"clipboard\"),\n",
       "        icon = \"folder\",\n",
-      "        value = \"operations\"\n",
+      "        value = \"operations\",\n",
+      "        expanded = FALSE\n",
       "      )\n",
       "    )\n",
       "  ),\n",
@@ -351,19 +354,45 @@ register_layout_showcase <- function(input, output, session) {
   # API Reference table
   output$showcase_layout_api_table <- shiny::renderUI({
     showcase_api_table(data.frame(
-      Argument = c("block_page", "block_sidebar", "block_header", "block_body"),
+      Argument = c(
+        "block_page",
+        "block_sidebar",
+        "block_header",
+        "block_body",
+        "block_nav",
+        "block_nav_item",
+        "block_nav_group",
+        "block_nav_label"
+      ),
       Type = c(
         "..., title, sidebar, header, theme_mode, theme, class",
         "..., title, collapsible, collapsed, id, class",
         "..., class",
-        "..., class"
+        "..., class",
+        "..., id, class",
+        "label, value, href, icon, selected, class",
+        "label, ..., icon, value, expanded, class",
+        "text, class"
       ),
-      Default = c("none", "none", "none", "none"),
+      Default = c(
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "expanded = TRUE",
+        "none"
+      ),
       Description = c(
         "Main modern layout page shell. Injects and handles responsive sheet-drawers.",
         "Dashboard left sidebar with collapsible mode support and built-in menu toggles.",
         "Top navigation/action header shell.",
-        "Central page landmark wrapper for nested sections/grids."
+        "Central page landmark wrapper for nested sections/grids.",
+        "Wraps nav items/groups/labels. With an id, the selected leaf value is reported as input[[id]].",
+        "Leaf navigation link. Reports its value as the nav input when clicked; only leaves set the input.",
+        "Collapsible parent row wrapping nested items. Toggles disclosure only; never reports an input value.",
+        "Non-interactive section caption placed above items or a group; reports no input value."
       )
     ))
   })
