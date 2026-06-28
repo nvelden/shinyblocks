@@ -37,7 +37,6 @@ source(file.path("R", "server_theme.R"), local = TRUE)
 source(file.path("R", "server_style.R"), local = TRUE)
 source(file.path("R", "server_layout.R"), local = TRUE)
 source(file.path("R", "server_layout_primitives.R"), local = TRUE)
-source(file.path("R", "server_nav_item.R"), local = TRUE)
 source(file.path("R", "server_field.R"), local = TRUE)
 source(file.path("R", "server_image_output.R"), local = TRUE)
 source(file.path("R", "server_plot_output.R"), local = TRUE)
@@ -67,17 +66,6 @@ sections <- list(
       "for ordinary application content."
     ),
     file = "layout_primitives.R"
-  ),
-  list(
-    id = "nav-item",
-    label = "Nav item",
-    icon = "list",
-    title = "Navigation items",
-    lead = paste(
-      "Sidebar links with a selected state.",
-      "The same primitive powers this app's own sidebar."
-    ),
-    file = "nav_item.R"
   ),
   list(
     id = "card",
@@ -589,7 +577,6 @@ server <- function(input, output, session) {
   register_style_showcase(input, output, session)
   register_layout_showcase(input, output, session)
   register_layout_primitives_showcase(input, output, session)
-  register_nav_item_showcase(input, output, session)
   register_field_showcase(input, output, session)
   register_image_output_showcase(input, output, session)
   register_plot_output_showcase(input, output, session)

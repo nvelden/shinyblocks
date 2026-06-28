@@ -18,12 +18,12 @@ An \code{htmltools} tag.
 Create a dashboard header
 }
 \seealso{
-Other layout:
-\code{\link[=block_body]{block_body()}},
-\code{\link[=block_cluster]{block_cluster()}},
-\code{\link[=block_grid]{block_grid()}},
-\code{\link[=block_page]{block_page()}},
-\code{\link[=block_sidebar]{block_sidebar()}},
-\code{\link[=block_stack]{block_stack()}}
+Other layout: 
+\code{\link{block_body}()},
+\code{\link{block_cluster}()},
+\code{\link{block_grid}()},
+\code{\link{block_page}()},
+\code{\link{block_sidebar}()},
+\code{\link{block_stack}()}
 }
 \concept{layout}

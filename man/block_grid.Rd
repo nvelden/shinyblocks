@@ -38,12 +38,12 @@ Arrange repeated content in a responsive auto-fit grid whose columns shrink
 safely to the available width.
 }
 \seealso{
-Other layout:
-\code{\link[=block_body]{block_body()}},
-\code{\link[=block_cluster]{block_cluster()}},
-\code{\link[=block_header]{block_header()}},
-\code{\link[=block_page]{block_page()}},
-\code{\link[=block_sidebar]{block_sidebar()}},
-\code{\link[=block_stack]{block_stack()}}
+Other layout: 
+\code{\link{block_body}()},
+\code{\link{block_cluster}()},
+\code{\link{block_header}()},
+\code{\link{block_page}()},
+\code{\link{block_sidebar}()},
+\code{\link{block_stack}()}
 }
 \concept{layout}

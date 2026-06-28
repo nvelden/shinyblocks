@@ -14,13 +14,6 @@ registry <- list(
     featured = TRUE
   ),
   list(
-    name = "Nav Item",
-    slug = "nav-item",
-    file = "nav_item.R",
-    description = "Sidebar navigation links with support for active selection states.",
-    featured = FALSE
-  ),
-  list(
     name = "Card",
     slug = "card",
     file = "card.R",

@@ -42,12 +42,12 @@ An \code{htmltools} tag list suitable for a Shiny UI.
 Create a modern Shiny page
 }
 \seealso{
-Other layout:
-\code{\link[=block_body]{block_body()}},
-\code{\link[=block_cluster]{block_cluster()}},
-\code{\link[=block_grid]{block_grid()}},
-\code{\link[=block_header]{block_header()}},
-\code{\link[=block_sidebar]{block_sidebar()}},
-\code{\link[=block_stack]{block_stack()}}
+Other layout: 
+\code{\link{block_body}()},
+\code{\link{block_cluster}()},
+\code{\link{block_grid}()},
+\code{\link{block_header}()},
+\code{\link{block_sidebar}()},
+\code{\link{block_stack}()}
 }
 \concept{layout}

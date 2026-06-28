@@ -63,9 +63,9 @@ by a click will not release the button. Send \code{state = "ready"} to release i
 \seealso{
 \code{\link[=block_task_button]{block_task_button()}}
 
-Other action:
-\code{\link[=block_button]{block_button()}},
-\code{\link[=block_task_button]{block_task_button()}},
-\code{\link[=update_block_button]{update_block_button()}}
+Other action: 
+\code{\link{block_button}()},
+\code{\link{block_task_button}()},
+\code{\link{update_block_button}()}
 }
 \concept{action}
