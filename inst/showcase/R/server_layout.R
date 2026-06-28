@@ -174,7 +174,6 @@ register_layout_showcase <- function(input, output, session) {
           style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--background);",
           htmltools::div(
             style = "display: flex; align-items: center; gap: 0.5rem;",
-            block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
           if (show_profile) {

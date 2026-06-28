@@ -331,7 +331,6 @@ server <- function(input, output, session) {
           block_cluster(
             align = "center",
             gap = "sm",
-            block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
           if (show_profile) {
