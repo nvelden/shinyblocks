@@ -333,6 +333,10 @@ block_nav <- function(..., id = NULL, class = NULL) {
 
   attach_shinyblocks_deps(
     htmltools::tags$nav(
+      # The DOM id is the routing target for `update_block_nav()`
+      # (`sendInputMessage` dispatches by element id); the data attribute marks
+      # the nav as a Shiny input for the runtime binding to find.
+      id = id,
       class = merge_classes("sb-nav", class),
       `data-sb-nav-input-id` = id,
       children
@@ -409,30 +413,36 @@ update_block_nav <- function(
   selected,
   notify = TRUE
 ) {
+  selected <- if (missing(selected)) NULL else selected
+  shell_selection_update(session, input_id, selected, notify, "nav")
+}
+
+# Shared server-side selector for the tab and sidebar-nav inputs. Both are real
+# runtime InputBindings keyed by their element's DOM id, so the update routes via
+# `sendInputMessage()` (mirroring the runtime-component updaters). Delivery goes
+# through the root session: a `moduleServer` proxy re-namespaces the first arg of
+# its own `sendInputMessage()`, which would double-prefix the already-namespaced
+# target and silently drop the update.
+shell_selection_update <- function(session, input_id, selected, notify, noun) {
   if (is.null(session)) {
     stop("`session` is required.", call. = FALSE)
   }
-  if (!is.function(session$sendCustomMessage)) {
-    stop("`session` must provide a `sendCustomMessage()` method.", call. = FALSE)
+  if (!is.function(session$sendInputMessage)) {
+    stop("`session` must provide a `sendInputMessage()` method.", call. = FALSE)
   }
 
   validate_input_id(input_id)
-  if (
-    missing(selected) ||
-      is.null(selected) ||
-      !nzchar(as.character(selected)[[1]])
-  ) {
-    stop("`selected` must be a single non-empty nav value.", call. = FALSE)
+  if (is.null(selected) || !nzchar(as.character(selected)[[1]])) {
+    stop(
+      sprintf("`selected` must be a single non-empty %s value.", noun),
+      call. = FALSE
+    )
   }
 
-  ns <- if (is.function(session$ns)) session$ns else identity
-  session$sendCustomMessage(
-    "sb:nav",
-    list(
-      id = ns(input_id),
-      selected = as.character(selected)[[1]],
-      notify = isTRUE(notify)
-    )
+  target <- if (is.function(session$ns)) session$ns(input_id) else input_id
+  runtime_root_session(session)$sendInputMessage(
+    target,
+    list(selected = as.character(selected)[[1]], notify = isTRUE(notify))
   )
   invisible(NULL)
 }

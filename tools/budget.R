@@ -19,13 +19,14 @@ targets <- list(
     group = "compatibility"
   ),
   list(
-    # Raised 15 -> 19 KB for the sidebar-nav Shiny input: clicking a
-    # `block_nav(id = ...)` item reports its value as an input and moves the
-    # selected highlight, plus the `sb:nav` server updater and DOM re-wiring.
-    # This mirrors the existing tab-input wiring (no new dependency) and adds
-    # ~3.4 KB raw, landing at ~18.1 KB. Raw is a headroom guard.
+    # Raised 15 -> 19 KB for the sidebar-nav Shiny input, then 19 -> 21 KB when
+    # tabs and sidebar-nav became real Shiny InputBindings (`shinyblocks.tabs` /
+    # `shinyblocks.nav`) driven by delegated DOM events: this retired the
+    # per-element wiring guards, the `sb:tabs`/`sb:nav` custom-message handlers,
+    # and the `shiny:connected` re-sync in favour of one shared binding factory,
+    # landing at ~20.4 KB. Raw is a headroom guard, not a transfer budget.
     path = "inst/www/shinyblocks.js",
-    limit_kb = 19,
+    limit_kb = 21,
     metric = "raw",
     group = "compatibility"
   ),

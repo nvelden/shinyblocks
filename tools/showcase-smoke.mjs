@@ -154,6 +154,43 @@ try {
       previousPanel?.hasAttribute("hidden");
   });
 
+  // Sidebar-nav Shiny input (#layout). The nav is rendered through renderUI, so
+  // this exercises the InputBinding binding on dynamically inserted markup
+  // (Shiny.bindAll), delegated click selection, and the update_block_nav()
+  // server round-trip (sendInputMessage -> receiveMessage).
+  await page.goto(`${url}/#layout`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#layout:not([hidden])");
+  // The renderUI'd nav binds as a Shiny input and reports its initial value.
+  await page.waitForFunction(() => {
+    const nav = document.querySelector("#showcase_layout_preview_nav");
+    const echo = document.querySelector("#showcase_layout_preview_value");
+    return nav?.classList.contains("shiny-bound-input") &&
+      echo?.textContent.includes('"dashboard"');
+  });
+  // Clicking an item selects it (delegated) and reports the new value.
+  await page
+    .locator("#showcase_layout_preview_nav .sb-nav-item[data-value='users']")
+    .click();
+  await page.waitForFunction(() => {
+    const item = document.querySelector(
+      "#showcase_layout_preview_nav .sb-nav-item[data-value='users']"
+    );
+    const echo = document.querySelector("#showcase_layout_preview_value");
+    return item?.classList.contains("is-selected") &&
+      item?.getAttribute("aria-current") === "page" &&
+      echo?.textContent.includes('"users"');
+  });
+  // update_block_nav() from the server selects an item (receiveMessage).
+  await page.getByRole("button", { name: "Toggle nav" }).click();
+  await page.waitForFunction(() => {
+    const item = document.querySelector(
+      "#showcase_layout_preview_nav .sb-nav-item[data-value='dashboard']"
+    );
+    const echo = document.querySelector("#showcase_layout_preview_value");
+    return item?.classList.contains("is-selected") &&
+      echo?.textContent.includes('"dashboard"');
+  });
+
   await page.goto(`${url}/#card`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#card:not([hidden])");
   const cardSpacing = await page.locator(".sb-parity-card-composed").evaluate((node) => {

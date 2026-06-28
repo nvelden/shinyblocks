@@ -17,13 +17,16 @@
   `block_sidebar()`, the existing `<nav>` is promoted to the sidebar
   navigation region (gets `.sb-sidebar-nav` merged into its class)
   instead of being wrapped inside another `<nav>` landmark.
-- **nav-input** — when constructed with `id`, the `<nav>` carries
-  `data-sb-nav-input-id` and becomes a Shiny input. The package runtime
-  reports the selected `block_nav_item()` `value` as `input[[id]]`,
-  moves the `is-selected` highlight on click, and calls
-  `preventDefault()` so the item selects a page instead of following its
-  href. `update_block_nav()` selects an item from the server (the
-  `sb:nav` custom message), mirroring `block_tabs()` / `update_block_tabs()`.
+- **nav-input** — when constructed with `id`, the `<nav>` carries that
+  `id` plus `data-sb-nav-input-id` and is registered as a real Shiny
+  InputBinding (`shinyblocks.nav`). The runtime reports the selected
+  `block_nav_item()` `value` as `input[[id]]`, moves the `is-selected`
+  highlight on click (a delegated handler that calls `preventDefault()`
+  so the item selects a page instead of following its href), and re-binds
+  inserted markup via `Shiny.bindAll`. `update_block_nav()` selects an
+  item from the server through `sendInputMessage()` (routed by the
+  element's DOM id), mirroring `block_tabs()` / `update_block_tabs()` and
+  the runtime-component updaters.
 
 ## R API
 

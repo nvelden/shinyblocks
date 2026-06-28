@@ -210,17 +210,19 @@ export function Dialog({ payload, root }) {
                 )}
               </div>
               {props.bodyHtml && (
-                <div
+                <HtmlSlot
+                  as="div"
                   className="sb-dialog-body"
                   data-slot="dialog-body"
-                  dangerouslySetInnerHTML={{ __html: props.bodyHtml }}
+                  html={props.bodyHtml}
                 />
               )}
               {footerHtml && (
-                <div
+                <HtmlSlot
+                  as="div"
                   className="sb-dialog-footer"
                   data-slot="dialog-footer"
-                  dangerouslySetInnerHTML={{ __html: footerHtml }}
+                  html={footerHtml}
                 />
               )}
               <button

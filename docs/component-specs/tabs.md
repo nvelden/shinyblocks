@@ -55,13 +55,17 @@ part of the rendered contract.
 
 ## Shiny state contract
 
-- When `id` is supplied, the local `shinyblocks.js` tabs runtime
-  pushes the active `data-value` to `input$<id>`.
+- When `id` is supplied, the tabset is registered as a Shiny
+  InputBinding (`shinyblocks.tabs`) keyed by its DOM id; the active
+  `data-value` is reported as `input$<id>` and re-bound on inserted UI
+  via `Shiny.bindAll`.
 - `update_block_tabs(session, input_id, selected, notify = TRUE)`
-  selects the matching tab from the server and optionally pushes the
-  selected value back to Shiny.
-- Selection, keyboard behaviour (Arrow/Home/End), `aria-selected`,
-  `data-state`, and panel visibility are owned by the local runtime.
+  selects the matching tab from the server via `sendInputMessage()`
+  (routed by the element's DOM id); `notify = TRUE` reports the new value
+  back to Shiny, `notify = FALSE` moves the highlight silently.
+- Selection and keyboard behaviour (Arrow/Home/End) are delegated at the
+  document, so `aria-selected`, `data-state`, and panel visibility update
+  for static and dynamically inserted tabsets without per-element wiring.
 
 ## Token contract
 

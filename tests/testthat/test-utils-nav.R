@@ -1,19 +1,18 @@
-test_that("update_block_nav sends a custom message", {
-  capture <- local_custom_message_session()
+test_that("update_block_nav sends an input message", {
+  capture <- local_input_message_session()
 
   expect_invisible(update_block_nav(capture$session, "page", selected = "users"))
   message <- capture$last_message()
 
-  expect_identical(message$type, "sb:nav")
+  expect_identical(message$input_id, "page")
   expect_identical(
     message$payload,
-    list(id = "page", selected = "users", notify = TRUE)
+    list(selected = "users", notify = TRUE)
   )
 })
 
 test_that("update_block_nav respects namespaces and notify", {
-  capture <- local_custom_message_session()
-  capture$session$ns <- function(id) paste0("mod-", id)
+  capture <- local_input_message_session(ns = function(id) paste0("mod-", id))
 
   update_block_nav(
     capture$session,
@@ -22,14 +21,26 @@ test_that("update_block_nav respects namespaces and notify", {
     notify = FALSE
   )
 
+  message <- capture$last_message()
+  expect_identical(message$input_id, "mod-page")
   expect_identical(
-    capture$last_message()$payload,
-    list(id = "mod-page", selected = "dashboard", notify = FALSE)
+    message$payload,
+    list(selected = "dashboard", notify = FALSE)
   )
 })
 
+test_that("update_block_nav routes module updates through the root session once", {
+  capture <- local_module_message_session("mod")
+
+  update_block_nav(capture$session, "page", selected = "users")
+
+  # The module proxy would re-namespace its own `sendInputMessage()`; routing via
+  # the root session keeps the already-namespaced target prefixed exactly once.
+  expect_identical(capture$last_target(), "mod-page")
+})
+
 test_that("update_block_nav validates inputs", {
-  capture <- local_custom_message_session()
+  capture <- local_input_message_session()
 
   expect_error(
     update_block_nav(NULL, "page", selected = "users"),
@@ -37,8 +48,9 @@ test_that("update_block_nav validates inputs", {
   )
   expect_error(
     update_block_nav(list(), "page", selected = "users"),
-    "sendCustomMessage"
+    "sendInputMessage"
   )
   expect_error(update_block_nav(capture$session, "", selected = "users"), "input_id")
   expect_error(update_block_nav(capture$session, "page", selected = ""), "`selected`")
+  expect_error(update_block_nav(capture$session, "page"), "`selected`")
 })

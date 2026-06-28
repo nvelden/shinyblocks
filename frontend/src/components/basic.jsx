@@ -102,20 +102,23 @@ export function Empty({ payload }) {
         </div>
       )}
       <div className="sb-empty-body">
-        <h3
+        <HtmlSlot
+          as="h3"
+          html={props.titleHtml}
           className="sb-empty-title"
-          dangerouslySetInnerHTML={{ __html: props.titleHtml || "" }}
         />
         {props.descriptionHtml && (
-          <p
+          <HtmlSlot
+            as="p"
+            html={props.descriptionHtml}
             className="sb-empty-description"
-            dangerouslySetInnerHTML={{ __html: props.descriptionHtml }}
           />
         )}
         {props.contentHtml && (
-          <div
+          <HtmlSlot
+            as="div"
+            html={props.contentHtml}
             className="sb-empty-content"
-            dangerouslySetInnerHTML={{ __html: props.contentHtml }}
           />
         )}
         {props.actionHtml && (
@@ -152,24 +155,28 @@ export function ValueBox({ payload }) {
         </div>
       )}
       <div className="sb-value-box-body">
-        <p
+        <HtmlSlot
+          as="p"
+          html={props.titleHtml}
           className="sb-value-box-title"
-          dangerouslySetInnerHTML={{ __html: props.titleHtml || "" }}
         />
-        <div
+        <HtmlSlot
+          as="div"
+          html={props.valueHtml}
           className="sb-value-box-value"
-          dangerouslySetInnerHTML={{ __html: props.valueHtml || "" }}
         />
         {props.descriptionHtml && (
-          <p
+          <HtmlSlot
+            as="p"
+            html={props.descriptionHtml}
             className="sb-value-box-description"
-            dangerouslySetInnerHTML={{ __html: props.descriptionHtml }}
           />
         )}
         {props.contentHtml && (
-          <div
+          <HtmlSlot
+            as="div"
+            html={props.contentHtml}
             className="sb-value-box-content"
-            dangerouslySetInnerHTML={{ __html: props.contentHtml }}
           />
         )}
       </div>
@@ -206,21 +213,18 @@ export function Alert({ payload }) {
           <HtmlSlot html={props.iconHtml} />
         </div>
       )}
-      <div
+      <HtmlSlot
+        as="div"
         className="sb-alert-content"
-        dangerouslySetInnerHTML={{
-          __html:
-            (props.titleHtml || "") +
-            (props.descriptionHtml || "") +
-            (props.contentHtml || "")
-        }}
+        html={(props.titleHtml || "") + (props.descriptionHtml || "") + (props.contentHtml || "")}
       />
       {props.actionHtml && (
-        <div
+        <HtmlSlot
+          as="div"
           className="sb-alert-action"
           data-slot="alert-action"
           style={actionStyle}
-          dangerouslySetInnerHTML={{ __html: props.actionHtml }}
+          html={props.actionHtml}
         />
       )}
     </div>

@@ -6,7 +6,7 @@ import {
   focusableChildren,
   useFloatingPosition
 } from "../runtime/overlays.js";
-import { classNames } from "./shared.jsx";
+import { classNames, HtmlSlot } from "./shared.jsx";
 
 export function Popover({ payload, root }) {
   const props = payload.props || {};
@@ -27,7 +27,9 @@ export function Popover({ payload, root }) {
   function setOpen(next, notify) {
     const nextOpen = Boolean(next);
     if (nextOpen && !open) {
-      returnFocusRef.current = document.activeElement;
+      const active = document.activeElement;
+      returnFocusRef.current =
+        active && active !== document.body ? active : triggerRef.current;
     }
     setOpenState(nextOpen);
     if (root) {
@@ -108,9 +110,12 @@ export function Popover({ payload, root }) {
       document.removeEventListener("pointerdown", onDocumentPointerDown);
       document.removeEventListener("keydown", onDocumentKeyDown);
 
-      const target = returnFocusRef.current;
+      const storedTarget = returnFocusRef.current;
+      const target =
+        storedTarget && storedTarget !== document.body ? storedTarget : triggerRef.current;
       returnFocusRef.current = null;
       if (target && typeof target.focus === "function") {
+        target.focus({ preventScroll: true });
         requestAnimationFrame(() => target.focus({ preventScroll: true }));
       }
     };
@@ -150,8 +155,9 @@ export function Popover({ payload, root }) {
               transform: floatingTransform(side, align),
               ...(contentStyle || {})
             }}
-            dangerouslySetInnerHTML={{ __html: bodyHtml || "" }}
-          />,
+          >
+            <HtmlSlot as="div" html={bodyHtml} />
+          </div>,
           portal
         )}
     </>

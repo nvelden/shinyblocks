@@ -5,7 +5,7 @@ import {
   floatingTransform,
   useFloatingPosition
 } from "../runtime/overlays.js";
-import { classNames } from "./shared.jsx";
+import { classNames, HtmlSlot } from "./shared.jsx";
 
 export function Tooltip({ payload }) {
   const props = payload.props || {};
@@ -107,8 +107,9 @@ export function Tooltip({ payload }) {
               transform: floatingTransform(side, align),
               ...(contentStyle || {})
             }}
-            dangerouslySetInnerHTML={{ __html: bodyHtml || "" }}
-          />,
+          >
+            <HtmlSlot as="div" html={bodyHtml} />
+          </div>,
           portal
         )}
     </>

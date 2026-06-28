@@ -136,32 +136,8 @@ update_block_tabs <- function(
   selected,
   notify = TRUE
 ) {
-  if (is.null(session)) {
-    stop("`session` is required.", call. = FALSE)
-  }
-  if (!is.function(session$sendCustomMessage)) {
-    stop("`session` must provide a `sendCustomMessage()` method.", call. = FALSE)
-  }
-
-  validate_input_id(input_id)
-  if (
-    missing(selected) ||
-      is.null(selected) ||
-      !nzchar(as.character(selected)[[1]])
-  ) {
-    stop("`selected` must be a single non-empty tab value.", call. = FALSE)
-  }
-
-  ns <- if (is.function(session$ns)) session$ns else identity
-  session$sendCustomMessage(
-    "sb:tabs",
-    list(
-      id = ns(input_id),
-      selected = as.character(selected)[[1]],
-      notify = isTRUE(notify)
-    )
-  )
-  invisible(NULL)
+  selected <- if (missing(selected)) NULL else selected
+  shell_selection_update(session, input_id, selected, notify, "tab")
 }
 
 normalize_block_tab <- function(tab) {

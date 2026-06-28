@@ -58,6 +58,8 @@ try {
 
   await page.locator("#child_text").waitFor({ state: "visible" });
   await assertText(page, "#child_text", "child-ready");
+  await page.locator("#runtime_slot_value").waitFor({ state: "visible" });
+  await assertText(page, "#runtime_slot_value", "slot-ready");
   await assertText(page, "#choice_value", "a");
   await page.waitForFunction(() => {
     return document.querySelector("#fixture-widget")?.dataset.runtimeFixtureReady === "true";
@@ -1013,6 +1015,7 @@ try {
     state: "visible"
   });
   await assertText(page, "#runtime_popover_value", "TRUE");
+  await assertText(page, "#runtime_popover_slot_value", "popover-slot-ready");
   await page.click("#runtime_popover_inner");
   assert.equal(
     await page.evaluate(() => document.activeElement?.id),

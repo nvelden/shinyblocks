@@ -53,12 +53,22 @@ test_that("runtime JS includes Shiny bridge hooks", {
   expect_match(js, "sb:slider-change", fixed = TRUE)
 })
 
-test_that("app JS includes tabs update hooks", {
+test_that("app JS registers tab and nav selection input bindings", {
   js <- app_js()
 
-  expect_match(js, 'addCustomMessageHandler("sb:tabs"', fixed = TRUE)
-  expect_match(js, "activateTabByValue", fixed = TRUE)
-  expect_match(js, "updateInput: message.notify !== false", fixed = TRUE)
+  # Tabs and sidebar-nav are real Shiny InputBindings driven by delegated DOM
+  # events, not the legacy sb:tabs/sb:nav custom-message + per-element wiring.
+  expect_match(js, "inputBindings.register", fixed = TRUE)
+  expect_match(js, '"shinyblocks.tabs"', fixed = TRUE)
+  expect_match(js, '"shinyblocks.nav"', fixed = TRUE)
+  expect_match(js, "sb:tabs-change", fixed = TRUE)
+  expect_match(js, "sb:nav-change", fixed = TRUE)
+  expect_match(js, "wireSelectionDelegation", fixed = TRUE)
+
+  expect_no_match(js, 'addCustomMessageHandler("sb:tabs"', fixed = TRUE)
+  expect_no_match(js, 'addCustomMessageHandler("sb:nav"', fixed = TRUE)
+  expect_no_match(js, "data-sb-tabs-wired", fixed = TRUE)
+  expect_no_match(js, "data-sb-nav-wired", fixed = TRUE)
 })
 
 test_that("runtime bindings fall back to the payload's initial state.value", {
@@ -120,6 +130,41 @@ test_that("runtime JS preserves Shiny child binding hooks", {
   expect_match(js, "Shiny.bindAll", fixed = TRUE)
   expect_match(js, "Shiny.unbindAll", fixed = TRUE)
   expect_match(js, "data-shinyblocks-children", fixed = TRUE)
+  expect_match(js, "data-shinyblocks-react", fixed = TRUE)
+})
+
+test_that("runtime HTML slots own Shiny binding for inserted markup", {
+  components_dir <- testthat::test_path("..", "..", "frontend", "src", "components")
+  if (!dir.exists(components_dir)) {
+    testthat::skip("runtime component source is repo-only and not present in R CMD check build")
+  }
+
+  shared_source <- paste(
+    readLines(file.path(components_dir, "shared.jsx"), warn = FALSE),
+    collapse = "\n"
+  )
+  component_files <- list.files(
+    components_dir,
+    pattern = "\\.(jsx|js)$",
+    full.names = TRUE
+  )
+  direct_html_files <- component_files[
+    basename(component_files) != "shared.jsx" &
+      vapply(
+        component_files,
+        function(path) {
+          any(grepl("dangerouslySetInnerHTML", readLines(path, warn = FALSE), fixed = TRUE))
+        },
+        logical(1)
+      )
+  ]
+
+  # The bind/unbind effect captures the node at bind time so cleanup cannot
+  # target a mutated `ref.current` (wrong node or null) on a later unmount.
+  expect_match(shared_source, "const node = ref.current;", fixed = TRUE)
+  expect_match(shared_source, "bindShinyChildren(node)", fixed = TRUE)
+  expect_match(shared_source, "unbindShinyChildren(node)", fixed = TRUE)
+  expect_length(direct_html_files, 0)
 })
 
 test_that("runtime JS includes the React mount path", {

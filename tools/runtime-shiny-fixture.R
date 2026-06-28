@@ -151,6 +151,13 @@ ui <- shiny::fluidPage(
       htmlwidget_fixture()
     )
   ),
+  block_value_box(
+    title = "Slot value",
+    value = shiny::textOutput("runtime_slot_value", inline = TRUE),
+    description = "Rendered through a runtime HTML slot",
+    icon = "hash",
+    class = "runtime-slot-value-fixture"
+  ),
   block_select(
     "runtime_select",
     choices = c(Free = "free", Pro = "pro"),
@@ -292,6 +299,7 @@ ui <- shiny::fluidPage(
     side = "bottom",
     align = "center",
     htmltools::tags$p("Popover body"),
+    htmltools::tags$p(shiny::textOutput("runtime_popover_slot_value", inline = TRUE)),
     htmltools::tags$button(
       id = "runtime_popover_inner",
       type = "button",
@@ -410,6 +418,8 @@ ui <- shiny::fluidPage(
 
 server <- function(input, output, session) {
   output$child_text <- shiny::renderText("child-ready")
+  output$runtime_slot_value <- shiny::renderText("slot-ready")
+  output$runtime_popover_slot_value <- shiny::renderText("popover-slot-ready")
   output$nested_plot <- shiny::renderPlot({
     graphics::par(mar = c(1, 1, 1, 1))
     graphics::plot(1:3, 1:3, type = "b", xlab = "", ylab = "")

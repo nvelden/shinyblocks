@@ -171,6 +171,10 @@ test_that("block_nav(id) marks the container as a nav input", {
 
   expect_identical(tag_attr(with_id, "data-sb-nav-input-id"), "page")
   expect_null(tag_attr(without_id, "data-sb-nav-input-id"))
+  # The DOM id is the routing target for update_block_nav() (sendInputMessage
+  # dispatches by element id); a plain nav carries none.
+  expect_identical(tag_attr(with_id, "id"), "page")
+  expect_null(tag_attr(without_id, "id"))
 })
 
 test_that("input block_nav(id) requires a value on every item", {

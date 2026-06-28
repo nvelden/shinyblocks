@@ -3,8 +3,9 @@
  *
  * Unlike inst/www/shinyblocks-runtime.{js,css} (built from frontend/src) and
  * inst/www/shinyblocks.css (built from inst/www/src), no bundler produces this
- * file. Edit it here. It wires theme, sidebar collapse/drawer, tabs, and the
- * sidebar nav Shiny input (block_nav(id = ...)). `make budget` guards its size.
+ * file. Edit it here. It wires theme, sidebar collapse/drawer, and the tab and
+ * sidebar-nav Shiny inputs (block_tabs(id = ...) / block_nav(id = ...)) as real
+ * Shiny InputBindings driven by delegated DOM events. `make budget` guards size.
  */
 (function () {
   function currentThemeMode() {
@@ -81,21 +82,27 @@
     });
   }
 
-  function tabs() {
-    return Array.prototype.slice.call(
-      document.querySelectorAll(".sb-tabs[data-sb-tabs='true']")
-    );
-  }
-
   function tabTriggers(tabset) {
     return Array.prototype.slice.call(
       tabset.querySelectorAll(".sb-tabs-list [role='tab']")
     );
   }
 
-  function activateTab(tabset, trigger, options) {
-    var config = options || {};
-    var updateInput = config.updateInput !== false;
+  function selectedTab(tabset) {
+    var triggers = tabTriggers(tabset);
+    return (
+      triggers.find(function (trigger) {
+        return trigger.getAttribute("aria-selected") === "true" ||
+          trigger.getAttribute("data-state") === "active";
+      }) || triggers[0]
+    );
+  }
+
+  // Move the active highlight and panes to `trigger`. Pure DOM: when the tabset
+  // is a Shiny input, value reporting is the binding's job (it reads
+  // `selectedTab()` from `getValue`), so this never calls `setInputValue`.
+  function activateTab(tabset, trigger) {
+    if (!trigger) return;
     var triggers = tabTriggers(tabset);
     var targetId = (trigger.getAttribute("aria-controls") || "")
       .replace(/^#/, "");
@@ -119,89 +126,25 @@
         pane.setAttribute("hidden", "hidden");
       }
     });
-
-    if (updateInput && window.Shiny && window.Shiny.setInputValue) {
-      var tabsetId = tabset.getAttribute("data-sb-tabs-input-id");
-      var value = trigger.getAttribute("data-value");
-      if (tabsetId && value) {
-        window.Shiny.setInputValue(tabsetId, value, { priority: "event" });
-      }
-    }
   }
 
-  function activateTabByValue(inputId, value, options) {
-    var selected = String(value || "");
-    if (!inputId || !selected) return;
-
-    tabs().forEach(function (tabset) {
-      if (tabset.getAttribute("data-sb-tabs-input-id") !== inputId) return;
-
-      var trigger = tabTriggers(tabset).find(function (item) {
-        return item.getAttribute("data-value") === selected;
-      });
-      if (!trigger) return;
-
-      activateTab(tabset, trigger, options);
+  // Returns whether an item matched and was selected, so callers can avoid
+  // reporting an input event for an unknown value.
+  function activateTabByValue(tabset, value) {
+    var selected = String(value == null ? "" : value);
+    var trigger = tabTriggers(tabset).find(function (item) {
+      return item.getAttribute("data-value") === selected;
     });
+    if (!trigger) return false;
+    activateTab(tabset, trigger);
+    return true;
   }
 
-  function wireTabs(tabset) {
-    if (tabset.getAttribute("data-sb-tabs-wired") === "true") return;
-    tabset.setAttribute("data-sb-tabs-wired", "true");
-
-    var triggers = tabTriggers(tabset);
-    if (!triggers.length) return;
-
-    triggers.forEach(function (trigger) {
-      trigger.addEventListener("click", function (event) {
-        event.preventDefault();
-        activateTab(tabset, trigger);
-      });
-
-      trigger.addEventListener("keydown", function (event) {
-        var index = triggers.indexOf(trigger);
-        var next = null;
-
-        if (event.key === "ArrowRight") next = triggers[index + 1] || triggers[0];
-        if (event.key === "ArrowLeft") next = triggers[index - 1] || triggers[triggers.length - 1];
-        if (event.key === "Home") next = triggers[0];
-        if (event.key === "End") next = triggers[triggers.length - 1];
-
-        if (!next) return;
-        event.preventDefault();
-        next.focus();
-        activateTab(tabset, next);
-      });
-    });
-
-    var initial = triggers.find(function (trigger) {
-      return trigger.getAttribute("aria-selected") === "true" ||
-        trigger.getAttribute("data-state") === "active";
-    }) || triggers[0];
-
-    activateTab(tabset, initial, { updateInput: true });
-  }
-
-  function syncTabInputs() {
-    tabs().forEach(function (tabset) {
-      var active = tabTriggers(tabset).find(function (trigger) {
-        return trigger.getAttribute("aria-selected") === "true" ||
-          trigger.getAttribute("data-state") === "active";
-      });
-      if (active) activateTab(tabset, active, { updateInput: true });
-    });
-  }
-
-  // Sidebar/page navigation as a Shiny input. A `block_nav(id = ...)` carries
-  // `data-sb-nav-input-id`; clicking one of its `.sb-nav-item` links reports the
-  // item's `data-value` as that input and moves the selected highlight, the same
-  // contract `block_tabs()` uses for its triggers.
-  function navInputs() {
-    return Array.prototype.slice.call(
-      document.querySelectorAll("[data-sb-nav-input-id]")
-    );
-  }
-
+  // Sidebar/page navigation. A `block_nav(id = ...)` carries
+  // `data-sb-nav-input-id` (plus a matching DOM id) and becomes a Shiny input;
+  // clicking one of its `.sb-nav-item` links selects it (the binding reports the
+  // item's `data-value`, the same contract `block_tabs()` uses). Plain navs (no
+  // id) stay ordinary links.
   function navInputItems(nav) {
     return Array.prototype.slice.call(nav.querySelectorAll(".sb-nav-item"));
   }
@@ -215,10 +158,8 @@
     );
   }
 
-  function activateNavItem(nav, item, options) {
-    var config = options || {};
-    var updateInput = config.updateInput !== false;
-
+  function activateNavItem(nav, item) {
+    if (!item) return;
     navInputItems(nav).forEach(function (other) {
       var active = other === item;
       other.classList.toggle("is-selected", active);
@@ -228,50 +169,181 @@
         other.removeAttribute("aria-current");
       }
     });
-
-    if (updateInput && window.Shiny && window.Shiny.setInputValue) {
-      var navId = nav.getAttribute("data-sb-nav-input-id");
-      var value = item.getAttribute("data-value");
-      if (navId && value != null) {
-        window.Shiny.setInputValue(navId, value, { priority: "event" });
-      }
-    }
   }
 
-  function activateNavByValue(inputId, value, options) {
+  function activateNavByValue(nav, value) {
     var selected = String(value == null ? "" : value);
-    if (!inputId || !selected) return;
-
-    navInputs().forEach(function (nav) {
-      if (nav.getAttribute("data-sb-nav-input-id") !== inputId) return;
-      var item = navInputItems(nav).find(function (candidate) {
-        return candidate.getAttribute("data-value") === selected;
-      });
-      if (item) activateNavItem(nav, item, options);
+    if (!selected) return false;
+    var item = navInputItems(nav).find(function (candidate) {
+      return candidate.getAttribute("data-value") === selected;
     });
+    if (!item) return false;
+    activateNavItem(nav, item);
+    return true;
   }
 
-  function wireNavInput(nav) {
-    if (nav.getAttribute("data-sb-nav-wired") === "true") return;
-    nav.setAttribute("data-sb-nav-wired", "true");
+  function dispatchSelectionChange(el, name) {
+    if (typeof Event === "function") {
+      el.dispatchEvent(new Event(name));
+      return;
+    }
+    var evt = document.createEvent("Event");
+    evt.initEvent(name, false, false);
+    el.dispatchEvent(evt);
+  }
 
-    nav.addEventListener("click", function (event) {
-      var item = event.target.closest(".sb-nav-item");
-      if (!item || !nav.contains(item)) return;
-      // The item is a navigation control, not a hyperlink: select it instead of
-      // following its href.
+  // Local interactivity for tabs and sidebar-nav inputs is delegated at the
+  // document, so dynamically inserted markup needs no per-element wiring. A user
+  // selection mutates the DOM and dispatches `sb:tabs-change`/`sb:nav-change`;
+  // the Shiny InputBinding listens for that event to report the value. Plain
+  // navs (no `data-sb-nav-input-id`) are left as ordinary links.
+  function wireSelectionDelegation() {
+    if (window.shinyblocksSelectionWired) return;
+    window.shinyblocksSelectionWired = true;
+
+    document.addEventListener("click", function (event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+
+      var navItem = target.closest(".sb-nav-item");
+      if (navItem) {
+        var inputNav = navItem.closest("[data-sb-nav-input-id]");
+        if (inputNav) {
+          // A navigation control, not a hyperlink: select it instead of
+          // following its href.
+          event.preventDefault();
+          activateNavItem(inputNav, navItem);
+          dispatchSelectionChange(inputNav, "sb:nav-change");
+        }
+        return;
+      }
+
+      var trigger = target.closest(".sb-tabs-list [role='tab']");
+      if (!trigger) return;
+      var tabset = trigger.closest(".sb-tabs");
+      if (!tabset) return;
       event.preventDefault();
-      activateNavItem(nav, item);
+      activateTab(tabset, trigger);
+      if (tabset.hasAttribute("data-sb-tabs-input-id")) {
+        dispatchSelectionChange(tabset, "sb:tabs-change");
+      }
     });
 
-    var initial = selectedNavItem(nav);
-    if (initial) activateNavItem(nav, initial, { updateInput: true });
+    document.addEventListener("keydown", function (event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+
+      var trigger = target.closest(".sb-tabs-list [role='tab']");
+      if (trigger) {
+        var tabset = trigger.closest(".sb-tabs");
+        if (!tabset) return;
+        var triggers = tabTriggers(tabset);
+        var i = triggers.indexOf(trigger);
+        var nextTab = null;
+        if (event.key === "ArrowRight") nextTab = triggers[i + 1] || triggers[0];
+        if (event.key === "ArrowLeft") nextTab = triggers[i - 1] || triggers[triggers.length - 1];
+        if (event.key === "Home") nextTab = triggers[0];
+        if (event.key === "End") nextTab = triggers[triggers.length - 1];
+        if (!nextTab) return;
+        event.preventDefault();
+        nextTab.focus();
+        activateTab(tabset, nextTab);
+        if (tabset.hasAttribute("data-sb-tabs-input-id")) {
+          dispatchSelectionChange(tabset, "sb:tabs-change");
+        }
+        return;
+      }
+
+      var item = target.closest(".sb-nav-item");
+      if (!item) return;
+      var container = item.closest(".sb-nav, .sb-sidebar-nav");
+      if (!container) return;
+      var items = navItems(container);
+      var index = items.indexOf(item);
+      if (index === -1) return;
+      var nextItem = null;
+      if (event.key === "ArrowDown") nextItem = items[index + 1] || items[0];
+      if (event.key === "ArrowUp") nextItem = items[index - 1] || items[items.length - 1];
+      if (event.key === "Home") nextItem = items[0];
+      if (event.key === "End") nextItem = items[items.length - 1];
+      if (!nextItem) return;
+      event.preventDefault();
+      nextItem.focus();
+    });
   }
 
-  function syncNavInputs() {
-    navInputs().forEach(function (nav) {
-      var initial = selectedNavItem(nav);
-      if (initial) activateNavItem(nav, initial, { updateInput: true });
+  // Real Shiny InputBindings for the tab and sidebar-nav selection inputs. The
+  // binding reports the selected `data-value` (`getValue`), reflects server
+  // updates from `update_block_tabs()`/`update_block_nav()` (`receiveMessage`,
+  // routed by the element's DOM id), and re-binds on inserted UI via
+  // `Shiny.bindAll`. A user selection arrives through the delegated change event.
+  function registerSelectionBinding(name, config) {
+    function Binding() {}
+    Binding.prototype = Object.create(window.Shiny.InputBinding.prototype);
+    Binding.prototype.find = function (scope) {
+      var root = scope || document;
+      var els = Array.prototype.slice.call(root.querySelectorAll(config.selector));
+      if (root.matches && root.matches(config.selector)) els.unshift(root);
+      return els;
+    };
+    Binding.prototype.getId = function (el) {
+      return el.getAttribute(config.idAttr);
+    };
+    Binding.prototype.getValue = function (el) {
+      var selected = config.selected(el);
+      return selected ? selected.getAttribute("data-value") : null;
+    };
+    Binding.prototype.initialize = function (el) {
+      config.activate(el, config.selected(el));
+    };
+    Binding.prototype.subscribe = function (el, callback) {
+      el.__sbSelectionHandler = function () {
+        callback(false);
+      };
+      el.addEventListener(config.changeEvent, el.__sbSelectionHandler);
+    };
+    Binding.prototype.unsubscribe = function (el) {
+      if (!el.__sbSelectionHandler) return;
+      el.removeEventListener(config.changeEvent, el.__sbSelectionHandler);
+      delete el.__sbSelectionHandler;
+    };
+    Binding.prototype.receiveMessage = function (el, data) {
+      data = data || {};
+      // Only report an input event when an item actually matched: an unknown
+      // value is a no-op, so dispatching would re-report the previous selection
+      // and fire observers for a failed update. notify === false updates the
+      // highlight without reporting an input event.
+      var applied = config.activateValue(el, data.selected);
+      if (applied && data.notify !== false) {
+        dispatchSelectionChange(el, config.changeEvent);
+      }
+    };
+    window.Shiny.inputBindings.register(new Binding(), name);
+  }
+
+  function registerSelectionBindings() {
+    if (window.shinyblocksSelectionBound) return;
+    if (!window.Shiny || !window.Shiny.InputBinding || !window.Shiny.inputBindings) {
+      return;
+    }
+    window.shinyblocksSelectionBound = true;
+
+    registerSelectionBinding("shinyblocks.tabs", {
+      selector: ".sb-tabs[data-sb-tabs-input-id]",
+      idAttr: "data-sb-tabs-input-id",
+      changeEvent: "sb:tabs-change",
+      selected: selectedTab,
+      activate: activateTab,
+      activateValue: activateTabByValue
+    });
+
+    registerSelectionBinding("shinyblocks.nav", {
+      selector: "[data-sb-nav-input-id]",
+      idAttr: "data-sb-nav-input-id",
+      changeEvent: "sb:nav-change",
+      selected: selectedNavItem,
+      activate: activateNavItem,
+      activateValue: activateNavByValue
     });
   }
 
@@ -362,27 +434,6 @@
     }
   }
 
-  function wireNavKeyboard(container) {
-    container.addEventListener("keydown", function (event) {
-      var current = event.target.closest(".sb-nav-item");
-      if (!current) return;
-
-      var items = navItems(container);
-      var index = items.indexOf(current);
-      if (index === -1) return;
-
-      var next = null;
-      if (event.key === "ArrowDown") next = items[index + 1] || items[0];
-      if (event.key === "ArrowUp") next = items[index - 1] || items[items.length - 1];
-      if (event.key === "Home") next = items[0];
-      if (event.key === "End") next = items[items.length - 1];
-
-      if (!next) return;
-      event.preventDefault();
-      next.focus();
-    });
-  }
-
   function wirePage(page) {
     if (page.getAttribute("data-sidebar-enhanced") === "true") return;
     page.setAttribute("data-sidebar-enhanced", "true");
@@ -440,11 +491,6 @@
         first.focus();
       }
     });
-
-    Array.prototype.forEach.call(
-      page.querySelectorAll(".sb-nav, .sb-sidebar-nav"),
-      wireNavKeyboard
-    );
   }
 
   function wireGlobalSidebarHandlers() {
@@ -493,10 +539,12 @@
   function observeDOM() {
     if (typeof MutationObserver === "undefined") return;
 
+    // Tabs and sidebar-nav inputs need no observer: interactivity is delegated
+    // and Shiny re-binds inserted inputs via `bindAll`. The observer only marks
+    // dynamically inserted sidebar pages as enhanced, the progressive-enhancement
+    // gate the layout CSS keys off (`data-sidebar-enhanced="true"`).
     var observer = new MutationObserver(function (mutations) {
-      var needsTabs = false;
       var needsPage = false;
-      var needsNav = false;
 
       mutations.forEach(function (mutation) {
         if (!mutation.addedNodes.length) return;
@@ -505,18 +553,6 @@
         nodes.forEach(function (node) {
           if (node.nodeType !== 1) return;
 
-          if (node.matches && node.matches(".sb-tabs[data-sb-tabs='true']")) {
-            needsTabs = true;
-          }
-          if (node.querySelector && node.querySelector(".sb-tabs[data-sb-tabs='true']")) {
-            needsTabs = true;
-          }
-          if (node.matches && node.matches("[data-sb-nav-input-id]")) {
-            needsNav = true;
-          }
-          if (node.querySelector && node.querySelector("[data-sb-nav-input-id]")) {
-            needsNav = true;
-          }
           if (node.matches && node.matches(".sb-page.has-sidebar")) {
             needsPage = true;
           }
@@ -526,12 +562,6 @@
         });
       });
 
-      if (needsTabs) {
-        tabs().forEach(wireTabs);
-      }
-      if (needsNav) {
-        navInputs().forEach(wireNavInput);
-      }
       if (needsPage) {
         sidebarPages().forEach(wirePage);
       }
@@ -548,8 +578,7 @@
     applyTheme(currentThemeMode());
     wireThemeToggleEvents();
     wireGlobalSidebarHandlers();
-    tabs().forEach(wireTabs);
-    navInputs().forEach(wireNavInput);
+    wireSelectionDelegation();
     sidebarPages().forEach(wirePage);
     observeDOM();
   }
@@ -559,19 +588,9 @@
       applyTheme(message.mode || "system");
     });
 
-    window.Shiny.addCustomMessageHandler("sb:tabs", function (message) {
-      message = message || {};
-      activateTabByValue(message.id, message.selected, {
-        updateInput: message.notify !== false
-      });
-    });
-
-    window.Shiny.addCustomMessageHandler("sb:nav", function (message) {
-      message = message || {};
-      activateNavByValue(message.id, message.selected, {
-        updateInput: message.notify !== false
-      });
-    });
+    // Register before Shiny's initial `bindAll` so the first tabs/nav inputs are
+    // bound and report their selected value on connect.
+    registerSelectionBindings();
   }
 
   if (document.readyState === "loading") {
@@ -579,9 +598,4 @@
   } else {
     init();
   }
-
-  document.addEventListener("shiny:connected", function () {
-    syncTabInputs();
-    syncNavInputs();
-  });
 })();
