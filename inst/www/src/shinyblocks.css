@@ -238,7 +238,7 @@
 
   .sb-nav,
   .sb-sidebar-nav {
-    @apply flex flex-col gap-1 p-3;
+    @apply flex flex-col gap-1 p-2;
   }
 
   .sb-body {
@@ -246,7 +246,7 @@
   }
 
   .sb-nav-item {
-    @apply flex min-h-9 items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground;
+    @apply flex min-h-9 items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground;
     outline: none;
     transition:
       color 0.15s ease,
@@ -259,11 +259,11 @@
   }
 
   .sb-nav-section-label {
-    @apply px-3 pb-1 pt-3 text-xs font-medium text-sidebar-foreground/60;
+    @apply px-2 pb-1 pt-3 text-xs font-medium text-sidebar-foreground/60;
   }
 
   .sb-nav-group-trigger {
-    @apply flex min-h-9 w-full items-center gap-2 rounded-md bg-transparent px-3 py-2 text-left text-sm text-sidebar-foreground;
+    @apply flex min-h-9 w-full items-center gap-2 rounded-md bg-transparent px-2 py-2 text-left text-sm text-sidebar-foreground;
     outline: none;
     transition:
       color 0.15s ease,
@@ -286,11 +286,11 @@
   }
 
   .sb-nav-group-trigger[data-expanded="true"] > [data-icon="inline-end"] {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
   }
 
   .sb-nav-group-items {
-    @apply flex flex-col gap-1 pl-6;
+    @apply ml-4 flex flex-col gap-1 border-l border-sidebar-border pl-2;
   }
 
   .sb-nav-item:hover {
@@ -712,7 +712,7 @@
     }
 
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-items {
-      @apply pl-0;
+      @apply ml-0 border-l-0 pl-0;
     }
 
     /* The icon rail shows only the leading icon; drop the trailing chevron so
