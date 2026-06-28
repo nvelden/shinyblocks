@@ -238,7 +238,7 @@
 
   .sb-nav,
   .sb-sidebar-nav {
-    @apply flex flex-col gap-1 p-3;
+    @apply flex flex-col gap-1 p-2;
   }
 
   .sb-body {
@@ -246,12 +246,51 @@
   }
 
   .sb-nav-item {
-    @apply flex min-h-9 items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground;
+    @apply flex min-h-9 items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground;
     outline: none;
     transition:
       color 0.15s ease,
       background-color 0.15s ease,
       box-shadow 0.15s ease;
+  }
+
+  .sb-nav-group {
+    @apply flex flex-col gap-1;
+  }
+
+  .sb-nav-section-label {
+    @apply px-2 pb-1 pt-3 text-xs font-medium text-sidebar-foreground/60;
+  }
+
+  .sb-nav-group-trigger {
+    @apply flex min-h-9 w-full items-center gap-2 rounded-md bg-transparent px-2 py-2 text-left text-sm text-sidebar-foreground;
+    outline: none;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .sb-nav-group-trigger:hover,
+  .sb-nav-group-trigger[data-expanded="true"] {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .sb-nav-group-trigger:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+
+  .sb-nav-group-trigger > [data-icon="inline-end"] {
+    @apply ml-auto;
+    transition: transform 0.15s ease;
+  }
+
+  .sb-nav-group-trigger[data-expanded="true"] > [data-icon="inline-end"] {
+    transform: rotate(90deg);
+  }
+
+  .sb-nav-group-items {
+    @apply ml-4 flex flex-col gap-1 border-l border-sidebar-border pl-2;
   }
 
   .sb-nav-item:hover {
@@ -339,6 +378,10 @@
   }
 
   .sb-nav-item > [data-icon] {
+    @apply size-4 shrink-0;
+  }
+
+  .sb-nav-group-trigger > [data-icon] {
     @apply size-4 shrink-0;
   }
 
@@ -655,12 +698,27 @@
       border: 0;
     }
 
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-section-label {
+      display: none;
+    }
+
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title {
       @apply justify-center;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger {
       @apply justify-center px-2;
+    }
+
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-items {
+      @apply ml-0 border-l-0 pl-0;
+    }
+
+    /* The icon rail shows only the leading icon; drop the trailing chevron so
+       the trigger reads as a single centered glyph like a leaf item. */
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger > [data-icon="inline-end"] {
+      display: none;
     }
   }
 

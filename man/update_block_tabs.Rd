@@ -30,7 +30,9 @@ Selects a tab rendered by \code{\link[=block_tabs]{block_tabs()}} from the serve
 \seealso{
 Other navigation: 
 \code{\link{block_nav}()},
+\code{\link{block_nav_group}()},
 \code{\link{block_nav_item}()},
+\code{\link{block_nav_label}()},
 \code{\link{block_tab}()},
 \code{\link{block_tabs}()},
 \code{\link{update_block_nav}()}

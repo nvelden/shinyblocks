@@ -167,21 +167,51 @@ try {
     return nav?.classList.contains("shiny-bound-input") &&
       echo?.textContent.includes('"dashboard"');
   });
-  // Clicking an item selects it (delegated) and reports the new value.
+  // Toggling a group updates disclosure state only; it must not report a nav
+  // input value or leave collapsed leaves focusable.
   await page
-    .locator("#showcase_layout_preview_nav .sb-nav-item[data-value='users']")
+    .locator("#showcase_layout_preview_nav .sb-nav-group-trigger")
+    .filter({ hasText: "Operations" })
     .click();
+  await page.waitForFunction(() => {
+    const group = document.querySelector(
+      "#showcase_layout_preview_nav .sb-nav-group[data-sb-nav-group-value='operations']"
+    );
+    const trigger = group?.querySelector(".sb-nav-group-trigger");
+    const items = group?.querySelector(".sb-nav-group-items");
+    const echo = document.querySelector("#showcase_layout_preview_value");
+    return trigger?.getAttribute("aria-expanded") === "false" &&
+      items?.hasAttribute("hidden") &&
+      echo?.textContent.includes('"dashboard"');
+  });
+  assert.equal(
+    await page.locator(
+      "#showcase_layout_preview_nav .sb-nav-group-items[hidden] .sb-nav-item[data-value='users']"
+    ).count(),
+    1,
+    "collapsed group should hide nested leaf items"
+  );
+  // update_block_nav() from the server selects a nested item and expands its
+  // ancestor group (receiveMessage -> activateNavByValue).
+  await page.getByRole("button", { name: "Toggle nav" }).click();
   await page.waitForFunction(() => {
     const item = document.querySelector(
       "#showcase_layout_preview_nav .sb-nav-item[data-value='users']"
     );
+    const group = document.querySelector(
+      "#showcase_layout_preview_nav .sb-nav-group[data-sb-nav-group-value='operations']"
+    );
+    const items = group?.querySelector(".sb-nav-group-items");
     const echo = document.querySelector("#showcase_layout_preview_value");
     return item?.classList.contains("is-selected") &&
       item?.getAttribute("aria-current") === "page" &&
+      !items?.hasAttribute("hidden") &&
       echo?.textContent.includes('"users"');
   });
-  // update_block_nav() from the server selects an item (receiveMessage).
-  await page.getByRole("button", { name: "Toggle nav" }).click();
+  // Clicking a leaf still selects it through the existing delegated binding.
+  await page
+    .locator("#showcase_layout_preview_nav .sb-nav-item[data-value='dashboard']")
+    .click();
   await page.waitForFunction(() => {
     const item = document.querySelector(
       "#showcase_layout_preview_nav .sb-nav-item[data-value='dashboard']"

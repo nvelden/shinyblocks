@@ -7,7 +7,7 @@
 block_task_button(
   input_id,
   label,
-  label_busy = "Processing…",
+  label_busy = "Processing<U+2026>",
   variant = TASK_BUTTON_VARIANTS,
   size = TASK_BUTTON_SIZES,
   icon = NULL,

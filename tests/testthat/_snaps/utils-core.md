@@ -92,7 +92,7 @@
       block_nav(htmltools::tags$div("Bad child"))
     Condition
       Error:
-      ! All children of `block_nav()` must be `nav-item` items.
+      ! All children of `block_nav()` must be `nav-item`, `nav-group`, `nav-label` items.
 
 # block_field_invalid validates field input
 

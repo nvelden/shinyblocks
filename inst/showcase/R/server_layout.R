@@ -125,7 +125,7 @@ register_layout_showcase <- function(input, output, session) {
         style = paste0(
           "width: ", if (collapsed) "4.5rem" else "200px", ";",
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
-          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
+          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--sidebar);"
         ),
         
         htmltools::div(
@@ -148,21 +148,36 @@ register_layout_showcase <- function(input, output, session) {
             )
           }
         ),
-        # A real navigation input: clicking an item reports its value as
-        # input$showcase_layout_preview_nav and the page below switches.
+        # A real navigation input: leaf clicks report their value as
+        # input$showcase_layout_preview_nav and the page below switches. Groups
+        # only toggle disclosure state.
         block_nav(
           id = "showcase_layout_preview_nav",
+          block_nav_label("Workspace"),
           block_nav_item(
             "Dashboard",
             value = "dashboard",
             icon = "layout-dashboard",
             selected = identical(active_page, "dashboard")
           ),
-          block_nav_item(
-            "Users",
-            value = "users",
-            icon = "users",
-            selected = identical(active_page, "users")
+          block_nav_label("Management"),
+          block_nav_group(
+            "Operations",
+            block_nav_item(
+              "Users",
+              value = "users",
+              icon = "users",
+              selected = identical(active_page, "users")
+            ),
+            block_nav_item(
+              "Orders",
+              value = "orders",
+              icon = "clipboard",
+              selected = identical(active_page, "orders")
+            ),
+            icon = "folder",
+            value = "operations",
+            expanded = FALSE
           )
         )
       ),
@@ -174,7 +189,6 @@ register_layout_showcase <- function(input, output, session) {
           style = "height: 50px; display: flex; align-items: center; padding: 0 1rem; gap: 0.75rem; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--background);",
           htmltools::div(
             style = "display: flex; align-items: center; gap: 0.5rem;",
-            block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
           if (show_profile) {
@@ -193,9 +207,8 @@ register_layout_showcase <- function(input, output, session) {
         
         htmltools::div(
           style = "flex: 1; padding: 1rem; background: var(--background); overflow-y: auto;",
-          # Dashboard page: shown unless the Users item is selected.
           shiny::conditionalPanel(
-            condition = "input.showcase_layout_preview_nav != 'users'",
+            condition = "input.showcase_layout_preview_nav != 'users' && input.showcase_layout_preview_nav != 'orders'",
             htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Overview Metrics"),
             htmltools::div(
               style = "display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;",
@@ -211,10 +224,17 @@ register_layout_showcase <- function(input, output, session) {
               )
             )
           ),
-          # Users page: shown when the Users nav item is selected.
           shiny::conditionalPanel(
             condition = "input.showcase_layout_preview_nav == 'users'",
             layout_preview_users_table()
+          ),
+          shiny::conditionalPanel(
+            condition = "input.showcase_layout_preview_nav == 'orders'",
+            htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Orders"),
+            htmltools::div(
+              style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.75rem; color: var(--muted-foreground);",
+              "Server-driven selections expand the Operations group before selecting this nested leaf."
+            )
           )
         )
       )
@@ -271,26 +291,39 @@ register_layout_showcase <- function(input, output, session) {
       "    title = ", string_literal(sidebar_title_val), ",\n",
       "    collapsible = ", as.character(collapsible_val), ",\n",
       "    collapsed = ", as.character(collapsed_val), ",\n",
-      "    # block_nav(id = ...) makes the items a Shiny input.\n",
+      "    # block_nav(id = ...) makes leaf items a Shiny input.\n",
       "    block_nav(\n",
       "      id = \"page\",\n",
+      "      block_nav_label(\"Workspace\"),\n",
       "      block_nav_item(\"Dashboard\", value = \"dashboard\",\n",
       "                     icon = \"layout-dashboard\", selected = TRUE),\n",
-      "      block_nav_item(\"Users\", value = \"users\", icon = \"users\")\n",
+      "      block_nav_label(\"Management\"),\n",
+      "      block_nav_group(\n",
+      "        \"Operations\",\n",
+      "        block_nav_item(\"Users\", value = \"users\", icon = \"users\"),\n",
+      "        block_nav_item(\"Orders\", value = \"orders\", icon = \"clipboard\"),\n",
+      "        icon = \"folder\",\n",
+      "        value = \"operations\",\n",
+      "        expanded = FALSE\n",
+      "      )\n",
       "    )\n",
       "  ),\n",
       "  header = block_header(\n",
       "    ", string_literal(title_val), profile_code, "\n",
       "  ),\n",
       "  block_body(\n",
-      "    # Each page shows when its nav item is selected.\n",
+      "    # Each page shows when its leaf nav item is selected.\n",
       "    conditionalPanel(\n",
-      "      \"input.page == 'dashboard'\",\n",
+      "      \"input.page != 'users' && input.page != 'orders'\",\n",
       "      block_card(title = \"Overview Metrics\", textOutput(\"summary\"))\n",
       "    ),\n",
       "    conditionalPanel(\n",
       "      \"input.page == 'users'\",\n",
       "      block_card(title = \"Users\", tableOutput(\"users\"))\n",
+      "    ),\n",
+      "    conditionalPanel(\n",
+      "      \"input.page == 'orders'\",\n",
+      "      block_card(title = \"Orders\", textOutput(\"orders\"))\n",
       "    )\n",
       "  )\n",
       ")\n\n",
@@ -306,6 +339,7 @@ register_layout_showcase <- function(input, output, session) {
       "      Status = c(\"Active\", \"Active\", \"Invited\")\n",
       "    )\n",
       "  )\n\n",
+      "  output$orders <- renderText(\"Nested nav item selected.\")\n\n",
       "  # Jump to a page from the server when you need to:\n",
       "  # update_block_nav(session, \"page\", \"users\")\n",
       "}"
@@ -320,19 +354,45 @@ register_layout_showcase <- function(input, output, session) {
   # API Reference table
   output$showcase_layout_api_table <- shiny::renderUI({
     showcase_api_table(data.frame(
-      Argument = c("block_page", "block_sidebar", "block_header", "block_body"),
+      Argument = c(
+        "block_page",
+        "block_sidebar",
+        "block_header",
+        "block_body",
+        "block_nav",
+        "block_nav_item",
+        "block_nav_group",
+        "block_nav_label"
+      ),
       Type = c(
         "..., title, sidebar, header, theme_mode, theme, class",
         "..., title, collapsible, collapsed, id, class",
         "..., class",
-        "..., class"
+        "..., class",
+        "..., id, class",
+        "label, value, href, icon, selected, class",
+        "label, ..., icon, value, expanded, class",
+        "text, class"
       ),
-      Default = c("none", "none", "none", "none"),
+      Default = c(
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "expanded = TRUE",
+        "none"
+      ),
       Description = c(
         "Main modern layout page shell. Injects and handles responsive sheet-drawers.",
         "Dashboard left sidebar with collapsible mode support and built-in menu toggles.",
         "Top navigation/action header shell.",
-        "Central page landmark wrapper for nested sections/grids."
+        "Central page landmark wrapper for nested sections/grids.",
+        "Wraps nav items/groups/labels. With an id, the selected leaf value is reported as input[[id]].",
+        "Leaf navigation link. Reports its value as the nav input when clicked; only leaves set the input.",
+        "Collapsible parent row wrapping nested items. Toggles disclosure only; never reports an input value.",
+        "Non-interactive section caption placed above items or a group; reports no input value."
       )
     ))
   })

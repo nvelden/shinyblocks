@@ -278,7 +278,7 @@ server <- function(input, output, session) {
         style = paste0(
           "width: ", if (collapsed) "4.5rem" else "200px", ";",
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
-          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--muted);"
+          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--sidebar);"
         ),
         htmltools::div(
           class = "sb-sidebar-title",
@@ -300,21 +300,35 @@ server <- function(input, output, session) {
             )
           }
         ),
-        # A real navigation input: clicking an item reports its value as
-        # input$showcase_layout_preview_nav and the page below switches.
+        # A real navigation input: leaf clicks report their value as
+        # input$showcase_layout_preview_nav and the page below switches. Groups
+        # only toggle disclosure state.
         block_nav(
           id = "showcase_layout_preview_nav",
+          block_nav_label("Workspace"),
           block_nav_item(
             "Dashboard",
             value = "dashboard",
             icon = "layout-dashboard",
             selected = identical(active_page, "dashboard")
           ),
-          block_nav_item(
-            "Users",
-            value = "users",
-            icon = "users",
-            selected = identical(active_page, "users")
+          block_nav_group(
+            "Operations",
+            block_nav_item(
+              "Users",
+              value = "users",
+              icon = "users",
+              selected = identical(active_page, "users")
+            ),
+            block_nav_item(
+              "Orders",
+              value = "orders",
+              icon = "clipboard",
+              selected = identical(active_page, "orders")
+            ),
+            icon = "folder",
+            value = "operations",
+            expanded = TRUE
           )
         )
       ),
@@ -331,7 +345,6 @@ server <- function(input, output, session) {
           block_cluster(
             align = "center",
             gap = "sm",
-            block_icon("menu"),
             htmltools::tags$span(style = "font-weight: 600; font-size: 0.875rem;", title)
           ),
           if (show_profile) {
@@ -350,7 +363,7 @@ server <- function(input, output, session) {
         htmltools::div(
           style = "flex: 1; padding: 1rem; background: var(--background); overflow-y: auto;",
           conditionalPanel(
-            condition = "input.showcase_layout_preview_nav != 'users'",
+            condition = "input.showcase_layout_preview_nav != 'users' && input.showcase_layout_preview_nav != 'orders'",
             htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Overview Metrics"),
             htmltools::div(
               style = "display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;",
@@ -369,6 +382,14 @@ server <- function(input, output, session) {
           conditionalPanel(
             condition = "input.showcase_layout_preview_nav == 'users'",
             layout_preview_users_table()
+          ),
+          conditionalPanel(
+            condition = "input.showcase_layout_preview_nav == 'orders'",
+            htmltools::tags$h4(style = "margin: 0 0 0.5rem 0; font-size: 0.875rem; font-weight: 600;", "Orders"),
+            htmltools::div(
+              style = "padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 0.75rem; color: var(--muted-foreground);",
+              "Server-driven selections expand the Operations group before selecting this nested leaf."
+            )
           )
         )
       )
@@ -399,12 +420,19 @@ server <- function(input, output, session) {
       "    title = ", string_literal(sidebar_title), ",\n",
       "    collapsible = ", collapsible, ",\n",
       "    collapsed = ", collapsed, ",\n",
-      "    # block_nav(id = ...) makes the items a Shiny input.\n",
+      "    # block_nav(id = ...) makes leaf items a Shiny input.\n",
       "    block_nav(\n",
       "      id = \"page\",\n",
+      "      block_nav_label(\"Workspace\"),\n",
       "      block_nav_item(\"Dashboard\", value = \"dashboard\",\n",
       "                     icon = \"layout-dashboard\", selected = TRUE),\n",
-      "      block_nav_item(\"Users\", value = \"users\", icon = \"users\")\n",
+      "      block_nav_group(\n",
+      "        \"Operations\",\n",
+      "        block_nav_item(\"Users\", value = \"users\", icon = \"users\"),\n",
+      "        block_nav_item(\"Orders\", value = \"orders\", icon = \"clipboard\"),\n",
+      "        icon = \"folder\",\n",
+      "        value = \"operations\"\n",
+      "      )\n",
       "    )\n",
       "  ),\n",
       "  header = block_header(\n",
@@ -412,12 +440,16 @@ server <- function(input, output, session) {
       "  ),\n",
       "  block_body(\n",
       "    conditionalPanel(\n",
-      "      \"input.page == 'dashboard'\",\n",
+      "      \"input.page != 'users' && input.page != 'orders'\",\n",
       "      block_card(title = \"Overview Metrics\", textOutput(\"summary\"))\n",
       "    ),\n",
       "    conditionalPanel(\n",
       "      \"input.page == 'users'\",\n",
       "      block_card(title = \"Users\", tableOutput(\"users\"))\n",
+      "    ),\n",
+      "    conditionalPanel(\n",
+      "      \"input.page == 'orders'\",\n",
+      "      block_card(title = \"Orders\", textOutput(\"orders\"))\n",
       "    )\n",
       "  )\n",
       ")\n\n",
@@ -433,6 +465,7 @@ server <- function(input, output, session) {
       "      Status = c(\"Active\", \"Active\", \"Invited\")\n",
       "    )\n",
       "  )\n\n",
+      "  output$orders <- renderText(\"Nested nav item selected.\")\n\n",
       "  # Jump to a page from the server when you need to:\n",
       "  # update_block_nav(session, \"page\", \"users\")\n",
       "}"

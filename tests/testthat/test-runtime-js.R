@@ -71,6 +71,20 @@ test_that("app JS registers tab and nav selection input bindings", {
   expect_no_match(js, "data-sb-nav-wired", fixed = TRUE)
 })
 
+test_that("app JS toggles nav groups without forking the nav input binding", {
+  js <- app_js()
+
+  expect_match(js, "function setNavGroupExpanded", fixed = TRUE)
+  expect_match(js, 'group.querySelector(".sb-nav-group-trigger")', fixed = TRUE)
+  expect_match(js, 'items.setAttribute("hidden", "hidden")', fixed = TRUE)
+  expect_match(js, 'items.removeAttribute("hidden")', fixed = TRUE)
+  expect_match(js, 'target.closest(".sb-nav-group-trigger")', fixed = TRUE)
+  expect_match(js, "expandAncestorNavGroups(nav, item)", fixed = TRUE)
+  expect_match(js, 'item.closest(".sb-nav-group")', fixed = TRUE)
+  expect_match(js, 'selector: "[data-sb-nav-input-id]"', fixed = TRUE)
+  expect_match(js, "navInputItems(nav)", fixed = TRUE)
+})
+
 test_that("runtime bindings fall back to the payload's initial state.value", {
   js <- runtime_bindings_source()
 

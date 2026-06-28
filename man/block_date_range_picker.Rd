@@ -10,7 +10,7 @@ block_date_range_picker(
   end = NULL,
   min = NULL,
   max = NULL,
-  separator = " – ",
+  separator = " <U+2013> ",
   placeholder = "Pick a date range",
   format = "yyyy-mm-dd",
   weekstart = 0,

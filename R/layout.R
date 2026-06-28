@@ -193,7 +193,11 @@ block_grid <- function(
     is_style <- nzchar(dot_names) & dot_names == "style"
     if (any(is_style)) {
       caller_style <- paste(
-        vapply(dots[is_style], function(s) paste(as.character(s), collapse = ""), character(1)),
+        vapply(
+          dots[is_style],
+          function(s) paste(as.character(s), collapse = ""),
+          character(1)
+        ),
         collapse = "; "
       )
       dots <- dots[!is_style]
@@ -307,25 +311,29 @@ block_header <- function(..., class = NULL) {
 #' @export
 block_nav <- function(..., id = NULL, class = NULL) {
   children <- list(...)
-  validate_children(children, "nav-item", "block_nav")
+  validate_nav_children(children)
 
   # An input nav reports the clicked item's `value`, so every item must carry a
   # non-empty one. Without this an item with a tag label and no explicit
   # `value` would look clickable but never update `input[[id]]`.
   if (!is.null(id)) {
-    missing_value <- vapply(
-      children,
-      function(child) {
-        value <- child$attribs[["data-value"]]
-        is.null(value) || !nzchar(as.character(value))
-      },
-      logical(1)
-    )
+    values <- nav_leaf_values(children)
+    missing_value <- !nzchar(values)
     if (any(missing_value)) {
       stop(
         "Every `block_nav_item()` in an input `block_nav(id = ...)` needs a ",
         "non-empty `value` (it is reported as `input[[id]]`). Items with a ",
         "tag label must pass `value` explicitly.",
+        call. = FALSE
+      )
+    }
+    duplicate_value <- values[duplicated(values)]
+    if (length(duplicate_value)) {
+      stop(
+        "Every `block_nav_item()` in an input `block_nav(id = ...)` needs a ",
+        "unique `value`; duplicate value: `",
+        duplicate_value[[1]],
+        "`.",
         call. = FALSE
       )
     }
@@ -340,6 +348,127 @@ block_nav <- function(..., id = NULL, class = NULL) {
       class = merge_classes("sb-nav", class),
       `data-sb-nav-input-id` = id,
       children
+    )
+  )
+}
+
+#' Create a collapsible sidebar navigation group
+#'
+#' Groups wrap leaf [block_nav_item()] children in a disclosure region. The
+#' group trigger toggles expansion only; it never reports a Shiny input value.
+#'
+#' @param label Group label.
+#' @param ... Child [block_nav_item()] tags. Named arguments are applied to the
+#'   group container as HTML attributes.
+#' @param icon Optional icon tag or vendored icon name.
+#' @param value Optional group identity for expansion state hooks. Stored as
+#'   `data-sb-nav-group-value`; it is not reported as a nav input value.
+#' @param expanded Whether the group starts expanded.
+#' @param class Additional classes for the group container.
+#'
+#' @return An `htmltools` tag.
+#' @family navigation
+#' @export
+block_nav_group <- function(
+  label,
+  ...,
+  icon = NULL,
+  value = NULL,
+  expanded = TRUE,
+  class = NULL
+) {
+  check_flag(expanded, "expanded")
+
+  dots <- list(...)
+  dot_names <- names(dots)
+  has_name <- if (is.null(dot_names)) {
+    rep(FALSE, length(dots))
+  } else {
+    nzchar(dot_names)
+  }
+  children <- dots[!has_name]
+  attrs <- dots[has_name]
+  attr_class <- attrs[["class"]]
+  attrs[["class"]] <- NULL
+  attrs[["data-sb-child"]] <- NULL
+  attrs[["data-expanded"]] <- NULL
+  attrs[["data-sb-nav-group-value"]] <- NULL
+  validate_children(children, "nav-item", "block_nav_group")
+
+  expanded_attr <- tolower(as.character(isTRUE(expanded)))
+  group_id <- paste0(
+    "sb-nav-group-",
+    tab_id_suffix(c(
+      as.character(value %||% nav_label_text(label) %||% "group"),
+      nav_leaf_values(children)
+    ))
+  )
+
+  trigger <- htmltools::tags$button(
+    type = "button",
+    class = "sb-nav-group-trigger",
+    # When the sidebar collapses to the icon rail the visible `.sb-nav-label`
+    # is hidden, so a text label doubles as the native hover tooltip (matching
+    # `block_nav_item()`).
+    title = nav_label_text(label),
+    `aria-expanded` = expanded_attr,
+    `aria-controls` = group_id,
+    `data-expanded` = expanded_attr,
+    `data-state` = if (isTRUE(expanded)) "open" else "closed",
+    set_icon_position(icon, "inline-start"),
+    htmltools::tags$span(class = "sb-nav-label", label),
+    # Collapsed shows a right-pointing chevron; CSS rotates it to point down
+    # when the group is expanded (matching the shadcn admin sidebar).
+    set_icon_position("chevron-right", "inline-end")
+  )
+
+  items <- do.call(
+    htmltools::tags$div,
+    c(
+      list(
+        id = group_id,
+        class = "sb-nav-group-items",
+        role = "group",
+        `aria-label` = nav_label_text(label),
+        `data-expanded` = expanded_attr,
+        hidden = if (isTRUE(expanded)) NULL else "hidden"
+      ),
+      children
+    )
+  )
+
+  group_args <- c(
+    attrs,
+    list(
+      class = merge_classes("sb-nav-group", attr_class, class),
+      `data-sb-child` = "nav-group",
+      `data-expanded` = expanded_attr,
+      `data-sb-nav-group-value` = value,
+      trigger,
+      items
+    )
+  )
+
+  attach_shinyblocks_deps(do.call(htmltools::tags$div, group_args))
+}
+
+#' Create a sidebar navigation section label
+#'
+#' Section labels are non-interactive captions inside [block_nav()]. They do not
+#' report a Shiny input value.
+#'
+#' @param text Label text.
+#' @param class Additional classes.
+#'
+#' @return An `htmltools` tag.
+#' @family navigation
+#' @export
+block_nav_label <- function(text, class = NULL) {
+  attach_shinyblocks_deps(
+    htmltools::tags$div(
+      class = merge_classes("sb-nav-section-label", class),
+      `data-sb-child` = "nav-label",
+      text
     )
   )
 }
@@ -467,10 +596,69 @@ sidebar_content <- function(children) {
 
 is_nav_item_tag <- function(x) {
   inherits(x, "shiny.tag") &&
-    identical(x$attribs[["data-sb-child"]], "nav-item")
+    isTRUE(
+      x$attribs[["data-sb-child"]] %in% c("nav-item", "nav-group", "nav-label")
+    )
 }
 
 is_nav_container_tag <- function(x) {
   inherits(x, "shiny.tag") &&
     identical(x$name, "nav")
+}
+
+validate_nav_children <- function(children) {
+  validate_children(
+    children,
+    c("nav-item", "nav-group", "nav-label"),
+    "block_nav"
+  )
+
+  groups <- vapply(
+    children,
+    function(child) identical(child$attribs[["data-sb-child"]], "nav-group"),
+    logical(1)
+  )
+  lapply(children[groups], function(group) {
+    items <- nav_group_items(group)
+    validate_children(items, "nav-item", "block_nav_group")
+  })
+
+  invisible(children)
+}
+
+nav_leaf_values <- function(children) {
+  unlist(
+    lapply(children, function(child) {
+      type <- child$attribs[["data-sb-child"]]
+      if (identical(type, "nav-item")) {
+        return(as.character(child$attribs[["data-value"]] %||% ""))
+      }
+      if (identical(type, "nav-group")) {
+        return(nav_leaf_values(nav_group_items(child)))
+      }
+      character()
+    }),
+    use.names = FALSE
+  )
+}
+
+nav_group_items <- function(group) {
+  containers <- Filter(
+    function(child) {
+      inherits(child, "shiny.tag") &&
+        identical(child$attribs[["class"]], "sb-nav-group-items")
+    },
+    group$children
+  )
+  if (!length(containers)) {
+    return(list())
+  }
+  containers[[1]]$children
+}
+
+nav_label_text <- function(label) {
+  if (is.character(label) && length(label) == 1L) {
+    return(label)
+  }
+  NULL
 }

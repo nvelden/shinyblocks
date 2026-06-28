@@ -1,11 +1,6 @@
 /*
  * shinyblocks shell runtime — HAND-AUTHORED SOURCE, not a build output.
- *
- * Unlike inst/www/shinyblocks-runtime.{js,css} (built from frontend/src) and
- * inst/www/shinyblocks.css (built from inst/www/src), no bundler produces this
- * file. Edit it here. It wires theme, sidebar collapse/drawer, and the tab and
- * sidebar-nav Shiny inputs (block_tabs(id = ...) / block_nav(id = ...)) as real
- * Shiny InputBindings driven by delegated DOM events. `make budget` guards size.
+ * Edit here; `make budget` guards size.
  */
 (function () {
   function currentThemeMode() {
@@ -128,8 +123,7 @@
     });
   }
 
-  // Returns whether an item matched and was selected, so callers can avoid
-  // reporting an input event for an unknown value.
+  // Returns whether a value matched, so unknown server updates stay silent.
   function activateTabByValue(tabset, value) {
     var selected = String(value == null ? "" : value);
     var trigger = tabTriggers(tabset).find(function (item) {
@@ -140,11 +134,7 @@
     return true;
   }
 
-  // Sidebar/page navigation. A `block_nav(id = ...)` carries
-  // `data-sb-nav-input-id` (plus a matching DOM id) and becomes a Shiny input;
-  // clicking one of its `.sb-nav-item` links selects it (the binding reports the
-  // item's `data-value`, the same contract `block_tabs()` uses). Plain navs (no
-  // id) stay ordinary links.
+  // Sidebar/page navigation mirrors the tabs `data-value` binding contract.
   function navInputItems(nav) {
     return Array.prototype.slice.call(nav.querySelectorAll(".sb-nav-item"));
   }
@@ -158,8 +148,37 @@
     );
   }
 
+  function setNavGroupExpanded(group, expanded) {
+    if (!group) return;
+    var v = expanded ? "true" : "false";
+    var trigger = group.querySelector(".sb-nav-group-trigger");
+    var items = group.querySelector(".sb-nav-group-items");
+
+    group.setAttribute("data-expanded", v);
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", v);
+      trigger.setAttribute("data-expanded", v);
+      trigger.setAttribute("data-state", expanded ? "open" : "closed");
+    }
+    if (items) {
+      items.setAttribute("data-expanded", v);
+      expanded
+        ? items.removeAttribute("hidden")
+        : items.setAttribute("hidden", "hidden");
+    }
+  }
+
+  function expandAncestorNavGroups(nav, item) {
+    var group = item && item.closest ? item.closest(".sb-nav-group") : null;
+    while (group && nav.contains(group)) {
+      setNavGroupExpanded(group, true);
+      group = group.parentElement && group.parentElement.closest(".sb-nav-group");
+    }
+  }
+
   function activateNavItem(nav, item) {
     if (!item) return;
+    expandAncestorNavGroups(nav, item);
     navInputItems(nav).forEach(function (other) {
       var active = other === item;
       other.classList.toggle("is-selected", active);
@@ -192,11 +211,7 @@
     el.dispatchEvent(evt);
   }
 
-  // Local interactivity for tabs and sidebar-nav inputs is delegated at the
-  // document, so dynamically inserted markup needs no per-element wiring. A user
-  // selection mutates the DOM and dispatches `sb:tabs-change`/`sb:nav-change`;
-  // the Shiny InputBinding listens for that event to report the value. Plain
-  // navs (no `data-sb-nav-input-id`) are left as ordinary links.
+  // Delegated tabs/nav interactivity works for dynamically inserted markup.
   function wireSelectionDelegation() {
     if (window.shinyblocksSelectionWired) return;
     window.shinyblocksSelectionWired = true;
@@ -205,12 +220,23 @@
       var target = event.target;
       if (!target || !target.closest) return;
 
+      var groupTrigger = target.closest(".sb-nav-group-trigger");
+      if (groupTrigger) {
+        var group = groupTrigger.closest(".sb-nav-group");
+        if (!group) return;
+        event.preventDefault();
+        setNavGroupExpanded(
+          group,
+          groupTrigger.getAttribute("aria-expanded") !== "true"
+        );
+        return;
+      }
+
       var navItem = target.closest(".sb-nav-item");
       if (navItem) {
         var inputNav = navItem.closest("[data-sb-nav-input-id]");
         if (inputNav) {
-          // A navigation control, not a hyperlink: select it instead of
-          // following its href.
+          // Input navs select instead of following links.
           event.preventDefault();
           activateNavItem(inputNav, navItem);
           dispatchSelectionChange(inputNav, "sb:nav-change");
@@ -272,11 +298,7 @@
     });
   }
 
-  // Real Shiny InputBindings for the tab and sidebar-nav selection inputs. The
-  // binding reports the selected `data-value` (`getValue`), reflects server
-  // updates from `update_block_tabs()`/`update_block_nav()` (`receiveMessage`,
-  // routed by the element's DOM id), and re-binds on inserted UI via
-  // `Shiny.bindAll`. A user selection arrives through the delegated change event.
+  // Real Shiny InputBindings for tab/nav selections.
   function registerSelectionBinding(name, config) {
     function Binding() {}
     Binding.prototype = Object.create(window.Shiny.InputBinding.prototype);

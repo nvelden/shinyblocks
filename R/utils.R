@@ -19,13 +19,22 @@ merge_classes <- function(...) {
 # Scalar argument validators. Each centralizes the predicate so call sites stop
 # re-spelling `!is.numeric(x) || length(x) != 1 || ...`. Pass `msg` to preserve a
 # component-specific error string; otherwise a generic one is built from `name`.
-check_number <- function(x, name, min = NULL, positive = FALSE,
-                         null_ok = FALSE, msg = NULL) {
+check_number <- function(
+  x,
+  name,
+  min = NULL,
+  positive = FALSE,
+  null_ok = FALSE,
+  msg = NULL
+) {
   if (null_ok && is.null(x)) {
     return(invisible(x))
   }
-  ok <- is.numeric(x) && length(x) == 1 && !is.na(x) &&
-    (is.null(min) || x >= min) && (!positive || x > 0)
+  ok <- is.numeric(x) &&
+    length(x) == 1 &&
+    !is.na(x) &&
+    (is.null(min) || x >= min) &&
+    (!positive || x > 0)
   if (!ok) {
     stop(msg %||% sprintf("`%s` must be a single number.", name), call. = FALSE)
   }
@@ -57,7 +66,10 @@ check_character <- function(x, name, null_ok = FALSE, msg = NULL) {
     return(invisible(x))
   }
   if (!is.character(x) || anyNA(x)) {
-    stop(msg %||% sprintf("`%s` must be a character vector.", name), call. = FALSE)
+    stop(
+      msg %||% sprintf("`%s` must be a character vector.", name),
+      call. = FALSE
+    )
   }
   invisible(x)
 }
@@ -82,18 +94,28 @@ match_arg <- function(arg, choices, arg_name = deparse(substitute(arg))) {
 }
 
 validate_children <- function(children, type, parent) {
+  type_label <- if (length(type) == 1L) {
+    type
+  } else {
+    paste(type, collapse = "`, `")
+  }
+
   invalid <- vapply(
     children,
     function(child) {
+      marker <- if (inherits(child, "shiny.tag")) {
+        child$attribs[["data-sb-child"]]
+      }
       !inherits(child, "shiny.tag") ||
-        !identical(child$attribs[["data-sb-child"]], type)
+        is.null(marker) ||
+        !(marker %in% type)
     },
     logical(1)
   )
 
   if (any(invalid)) {
     stop(
-      sprintf("All children of `%s()` must be `%s` items.", parent, type),
+      sprintf("All children of `%s()` must be `%s` items.", parent, type_label),
       call. = FALSE
     )
   }

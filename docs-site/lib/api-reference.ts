@@ -73,6 +73,37 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "nav-group": [
+    {
+      name: "block_nav",
+      description: "Wraps leaf nav items, collapsible groups, and section labels. With an id it becomes a Shiny input whose value comes only from clicked block_nav_item() leaves.",
+      arguments: [
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "block_nav_item(), block_nav_group(), and block_nav_label() children." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional Shiny input id. Nested leaf values must be unique and non-empty when set." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "CSS class applied to the navigation wrapper." }
+      ]
+    },
+    {
+      name: "block_nav_group",
+      description: "Creates a collapsible parent row that toggles nested leaf items without reporting a Shiny input value.",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "required", description: "Group trigger label." },
+        { argument: "...", type: "block_nav_item()", defaultVal: "required", description: "Nested leaf navigation items." },
+        { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Leading icon shown in the trigger." },
+        { argument: "value", type: "character", defaultVal: "NULL", description: "Optional group identity stored as data-sb-nav-group-value; not reported as the nav input." },
+        { argument: "expanded", type: "logical", defaultVal: "TRUE", description: "Initial disclosure state." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the group wrapper." }
+      ]
+    },
+    {
+      name: "block_nav_label",
+      description: "Creates a non-interactive section caption inside a nav.",
+      arguments: [
+        { argument: "text", type: "character", defaultVal: "required", description: "Caption text." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the label element." }
+      ]
+    }
+  ],
   "layout-primitives": [
     {
       name: "block_stack",
