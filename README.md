@@ -99,6 +99,6 @@ Relative paths can be resolved inside Shinylive's generated app
 directory and may fail with missing `library.js.metadata` errors.
 
 The current prerelease assets are attached to
-<https://github.com/nvelden/shinyblocks/releases/tag/v0.0.0.9002>.
+<https://github.com/nvelden/shinyblocks/releases/tag/v0.0.0.9003>.
 The first Shinylive load can take a little longer while webR downloads
 and caches the package image.
