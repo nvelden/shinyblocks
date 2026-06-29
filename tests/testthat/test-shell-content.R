@@ -7,7 +7,11 @@ test_that("badge variants map to runtime props", {
   info <- runtime_payload_from(block_badge("Active", variant = "info"))
   outline <- runtime_payload_from(block_badge("Draft", variant = "outline"))
   ghost <- runtime_payload_from(block_badge("Quiet", variant = "ghost"))
-  link <- runtime_payload_from(block_badge("Docs", variant = "link", size = "lg"))
+  link <- runtime_payload_from(block_badge(
+    "Docs",
+    variant = "link",
+    size = "lg"
+  ))
 
   expect_identical(destructive$props$variant, "destructive")
   expect_identical(success$props$variant, "success")
@@ -59,7 +63,11 @@ test_that("card composition helpers render expected child markers", {
   expect_identical(tag_attr(content, "data-sb-child"), "card-content")
   expect_identical(tag_attr(footer, "data-sb-child"), "card-footer")
 
-  styled_card <- block_card("Body", class = "custom", style = "max-width: 20rem;")
+  styled_card <- block_card(
+    "Body",
+    class = "custom",
+    style = "max-width: 20rem;"
+  )
   card_html <- render_html(card)
   expect_match(card_html, 'class="sb-card custom"', fixed = TRUE)
   # Cards are plain markup now, not a runtime React mount: the card's own tag
@@ -121,7 +129,11 @@ test_that("alerts render role, variants, and icon markup", {
 test_that("alerts accept composed title and description tags", {
   title <- block_alert_title("Maintenance")
   description <- block_alert_description("Scheduled tonight.")
-  action <- block_alert_action(block_button("Review", variant = "outline", size = "sm"))
+  action <- block_alert_action(block_button(
+    "Review",
+    variant = "outline",
+    size = "sm"
+  ))
   payload <- runtime_payload_from(
     block_alert(title, description = description, action = action, icon = NULL)
   )
@@ -173,7 +185,11 @@ test_that("value boxes render expected regions", {
 
   expect_match(box$props$titleHtml, "Revenue", fixed = TRUE)
   expect_match(box$props$valueHtml, "$42k", fixed = TRUE)
-  expect_match(box$props$descriptionHtml, "Up 12% month over month.", fixed = TRUE)
+  expect_match(
+    box$props$descriptionHtml,
+    "Up 12% month over month.",
+    fixed = TRUE
+  )
   expect_match(box$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
   expect_identical(box$props$variant, "accent")
   expect_match(box$props$contentHtml, 'data-sb-component="badge"', fixed = TRUE)
@@ -181,7 +197,11 @@ test_that("value boxes render expected regions", {
 })
 
 test_that("value boxes merge user classes", {
-  payload <- runtime_payload_from(block_value_box("Revenue", "$42k", class = "custom"))
+  payload <- runtime_payload_from(block_value_box(
+    "Revenue",
+    "$42k",
+    class = "custom"
+  ))
   expect_identical(payload$className, "custom")
 })
 
@@ -223,8 +243,22 @@ test_that("skeletons and spinners expose expected attributes", {
       style = "width: 4rem; height: 1rem;"
     )
   )
-  spinner <- runtime_payload_from(block_spinner(label = "Loading table", size = "lg", color = "muted", class = "custom", style = "margin: 1rem;"))
-  spinner_html <- render_html(block_spinner(label = "Loading table", size = "lg", color = "muted", class = "custom", style = "margin: 1rem;"))
+  spinner <- runtime_payload_from(block_spinner(
+    label = "Loading table",
+    size = "lg",
+    color = "muted",
+    icon = "loader-pinwheel",
+    class = "custom",
+    style = "margin: 1rem;"
+  ))
+  spinner_html <- render_html(block_spinner(
+    label = "Loading table",
+    size = "lg",
+    color = "muted",
+    icon = "loader-pinwheel",
+    class = "custom",
+    style = "margin: 1rem;"
+  ))
 
   expect_identical(skeleton$className, "custom")
   expect_identical(skeleton$props$attrs$id, "loading-skeleton")
@@ -235,9 +269,26 @@ test_that("skeletons and spinners expose expected attributes", {
   expect_identical(spinner$props$label, "Loading table")
   expect_identical(spinner$props$size, "lg")
   expect_identical(spinner$props$color, "muted")
+  expect_identical(spinner$props$iconName, "loader-pinwheel")
+  expect_match(
+    spinner$props$spriteHref,
+    "icons/sprite.svg",
+    fixed = TRUE
+  )
   expect_identical(spinner$className, "custom")
   expect_identical(spinner$style$margin, "1rem")
   expect_match(spinner_html, 'data-sb-component="spinner"', fixed = TRUE)
+})
+
+test_that("spinner validates icon choices", {
+  for (icon in shinyblocks:::spinner_icon_choices()) {
+    expect_identical(
+      runtime_payload_from(block_spinner(icon = icon))$props$iconName,
+      icon
+    )
+  }
+
+  expect_error(block_spinner(icon = "home"))
 })
 
 test_that("spinner and icon accept the same semantic colors", {
@@ -282,7 +333,11 @@ test_that("empty states render icon, description, and action", {
   )
   expect_match(empty$props$contentHtml, "Extra detail", fixed = TRUE)
   expect_match(empty$props$iconHtml, 'data-icon="inline-start"', fixed = TRUE)
-  expect_match(empty$props$actionHtml, 'data-sb-component="button"', fixed = TRUE)
+  expect_match(
+    empty$props$actionHtml,
+    'data-sb-component="button"',
+    fixed = TRUE
+  )
   expect_match(empty_html, 'data-sb-component="empty"', fixed = TRUE)
 })
 
@@ -360,15 +415,27 @@ test_that("block_code handles defaults correctly", {
 test_that("block_icon size and color map to real classes", {
   default_icon <- block_icon("home")
   expect_match(tag_attr(default_icon, "class"), "sb-icon", fixed = TRUE)
-  expect_false(grepl("sb-icon-size-", tag_attr(default_icon, "class"), fixed = TRUE))
-  expect_false(grepl("sb-icon-color-", tag_attr(default_icon, "class"), fixed = TRUE))
+  expect_false(grepl(
+    "sb-icon-size-",
+    tag_attr(default_icon, "class"),
+    fixed = TRUE
+  ))
+  expect_false(grepl(
+    "sb-icon-color-",
+    tag_attr(default_icon, "class"),
+    fixed = TRUE
+  ))
 
   lg_icon <- block_icon("home", size = "lg")
   expect_match(tag_attr(lg_icon, "class"), "sb-icon-size-lg", fixed = TRUE)
 
   sm_icon <- block_icon("home", size = "sm", color = "success", class = "extra")
   expect_match(tag_attr(sm_icon, "class"), "sb-icon-size-sm", fixed = TRUE)
-  expect_match(tag_attr(sm_icon, "class"), "sb-icon-color-success", fixed = TRUE)
+  expect_match(
+    tag_attr(sm_icon, "class"),
+    "sb-icon-color-success",
+    fixed = TRUE
+  )
   expect_match(tag_attr(sm_icon, "class"), "extra", fixed = TRUE)
 })
 
@@ -383,6 +450,14 @@ test_that("block_icon rejects an unknown color", {
 test_that("block_icon ignores size for tag passthrough and applies color", {
   custom <- htmltools::tags$svg(class = "my-icon")
   passthrough <- block_icon(custom, size = "lg", color = "warning")
-  expect_false(grepl("sb-icon-size-", tag_attr(passthrough, "class") %||% "", fixed = TRUE))
-  expect_match(tag_attr(passthrough, "class"), "sb-icon-color-warning", fixed = TRUE)
+  expect_false(grepl(
+    "sb-icon-size-",
+    tag_attr(passthrough, "class") %||% "",
+    fixed = TRUE
+  ))
+  expect_match(
+    tag_attr(passthrough, "class"),
+    "sb-icon-color-warning",
+    fixed = TRUE
+  )
 })

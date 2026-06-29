@@ -127,12 +127,17 @@ test_that("layout helpers merge user classes", {
   )
 })
 
-test_that("text nav items carry the label as a title for tooltip and a11y name", {
-  # In the collapsed icon rail the visible label is visually hidden and the icon
-  # is aria-hidden, so `title` is the link's accessible-name fallback.
-  expect_identical(tag_attr(block_nav_item("Reports"), "title"), "Reports")
+test_that("nav items expose the accessible name via the label span, not title", {
+  # The accessible name comes from the `.sb-nav-label` span (kept in the a11y
+  # tree even when visually hidden on the collapsed rail). A native `title`
+  # would surface a second tooltip alongside the styled rail pill, so it is
+  # omitted for both text and tag labels.
+  item <- block_nav_item("Reports")
+  expect_null(tag_attr(item, "title"))
+  label <- item$children[[length(item$children)]]
+  expect_identical(tag_attr(label, "class"), "sb-nav-label")
+  expect_identical(label$children[[1]], "Reports")
 
-  # Non-character labels (e.g. a tag) must not be coerced into a title.
   tagged <- block_nav_item(htmltools::tags$span("Reports"))
   expect_null(tag_attr(tagged, "title"))
 })
@@ -228,8 +233,9 @@ test_that("nav groups render disclosure markup without input values", {
   expect_identical(tag_attr(group, "class"), "sb-nav-group custom")
   expect_identical(tag_attr(trigger, "aria-expanded"), "false")
   expect_identical(tag_attr(trigger, "aria-controls"), tag_attr(items, "id"))
-  # The text label doubles as the icon-rail hover tooltip, mirroring nav items.
-  expect_identical(tag_attr(trigger, "title"), "Admin")
+  # No native `title`: the accessible name comes from the label span and the
+  # collapsed-rail hover affordance is the styled tooltip pill (matching items).
+  expect_null(tag_attr(trigger, "title"))
   expect_identical(tag_attr(items, "role"), "group")
   expect_identical(tag_attr(items, "aria-label"), "Admin")
   expect_identical(tag_attr(items, "data-expanded"), "false")

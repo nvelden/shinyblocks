@@ -125,7 +125,12 @@ register_layout_showcase <- function(input, output, session) {
         style = paste0(
           "width: ", if (collapsed) "4.5rem" else "200px", ";",
           "transition: width 0.3s ease; display: flex; flex-direction: column; padding: 1rem;",
-          "position: relative; overflow: hidden; border-right: 1px solid var(--border); background: var(--sidebar);"
+          # Collapsed: let the icon-rail hover tooltip overflow the rail and sit
+          # above the main panel. Expanded: clip long labels during the width
+          # transition as before.
+          "position: relative; z-index: 2;",
+          if (collapsed) "overflow: visible;" else "overflow: hidden;",
+          "border-right: 1px solid var(--border); background: var(--sidebar);"
         ),
         
         htmltools::div(

@@ -30,6 +30,14 @@ if (!requireNamespace("shinylive", quietly = TRUE)) {
 playgrounds_src <- "playgrounds"
 playgrounds_out <- "public/playgrounds"
 manifest_path <- "lib/preview-manifest.json"
+# WASM package image (library.data.gz + library.js.metadata) mounted by each
+# playground at runtime. Populated by CI from the *latest release*, so it can
+# LAG `HEAD`: a playground that uses a newly added component/function (e.g. a
+# brand-new block_*()) will boot blank with "could not find function" in the
+# nested Shinylive console until this image is rebuilt from the *current local*
+# package. When that happens, rebuild + repack the image into this dir, re-run
+# this script, and restart `npm run preview`. See docs-site/README.md
+# ("Troubleshooting a blank playground iframe").
 wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
 
 # Per-slug iframe height. Default 720; override here when a component

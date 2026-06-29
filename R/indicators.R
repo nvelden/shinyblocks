@@ -30,7 +30,11 @@ block_value_box <- function(
     props = list(
       titleHtml = html_fragment(title),
       valueHtml = html_fragment(value),
-      descriptionHtml = if (!is.null(description)) html_fragment(description) else NULL,
+      descriptionHtml = if (!is.null(description)) {
+        html_fragment(description)
+      } else {
+        NULL
+      },
       contentHtml = html_fragment(...),
       iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
       variant = variant
@@ -105,6 +109,9 @@ block_skeleton <- function(class = NULL, ...) {
 #' @param label Accessible `aria-label` announced by assistive technology.
 #' @param size Visual size.
 #' @param color Semantic color.
+#' @param icon Spinner icon name. One of `"loader-2"`, `"loader"`,
+#'   `"loader-circle"`, `"loader-pinwheel"`, `"refresh-cw"`, `"rotate-cw"`,
+#'   or `"circle-dashed"`.
 #' @param class Additional classes.
 #' @param style Optional inline custom styles.
 #'
@@ -114,22 +121,46 @@ block_skeleton <- function(class = NULL, ...) {
 block_spinner <- function(
   label = "Loading",
   size = c("default", "sm", "lg"),
-  color = c("default", "muted", "primary", "destructive", "success", "warning", "info"),
+  color = c(
+    "default",
+    "muted",
+    "primary",
+    "destructive",
+    "success",
+    "warning",
+    "info"
+  ),
+  icon = spinner_icon_choices(),
   class = NULL,
   style = NULL
 ) {
   size <- match_arg(size, c("default", "sm", "lg"))
   color <- match_arg(color, semantic_color_choices())
+  icon <- match_arg(icon, spinner_icon_choices())
 
   runtime_component(
     component = "spinner",
     props = list(
       label = label,
       size = size,
-      color = color
+      color = color,
+      iconName = icon,
+      spriteHref = sprite_href()
     ),
     class = class,
     style = style
+  )
+}
+
+spinner_icon_choices <- function() {
+  c(
+    "loader-2",
+    "loader",
+    "loader-circle",
+    "loader-pinwheel",
+    "refresh-cw",
+    "rotate-cw",
+    "circle-dashed"
   )
 }
 
@@ -302,9 +333,15 @@ update_block_progress <- function(
     stop("`min` must be less than `max`.", call. = FALSE)
   }
 
-  if (!missing(message)) check_string(message, "message", null_ok = TRUE)
-  if (!missing(detail)) check_string(detail, "detail", null_ok = TRUE)
-  if (!missing(label)) check_string(label, "label", null_ok = TRUE)
+  if (!missing(message)) {
+    check_string(message, "message", null_ok = TRUE)
+  }
+  if (!missing(detail)) {
+    check_string(detail, "detail", null_ok = TRUE)
+  }
+  if (!missing(label)) {
+    check_string(label, "label", null_ok = TRUE)
+  }
   if (!missing(show_value)) {
     check_flag(show_value, "show_value")
     payload$showValue <- isTRUE(show_value)
@@ -317,13 +354,16 @@ update_block_progress <- function(
     payload$variant <- match_arg(variant, PROGRESS_VARIANTS)
   }
 
-  payload <- apply_update_fields(payload, list(
-    field_clearable("message"),
-    field_clearable("detail"),
-    field_clearable("label"),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    payload,
+    list(
+      field_clearable("message"),
+      field_clearable("detail"),
+      field_clearable("label"),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   runtime_input_update(session, id, "progress", payload, notify_key = NULL)
 }
@@ -336,7 +376,10 @@ progress_numeric_field <- function(payload, name, value, is_missing) {
   }
   if (is.null(value)) {
     stop(
-      sprintf("`%s` cannot be NULL; omit it to preserve the current value.", name),
+      sprintf(
+        "`%s` cannot be NULL; omit it to preserve the current value.",
+        name
+      ),
       call. = FALSE
     )
   }
@@ -369,14 +412,21 @@ inc_block_progress <- function(
   detail
 ) {
   check_finite_number(amount, "amount")
-  if (!missing(message)) check_string(message, "message", null_ok = TRUE)
-  if (!missing(detail)) check_string(detail, "detail", null_ok = TRUE)
+  if (!missing(message)) {
+    check_string(message, "message", null_ok = TRUE)
+  }
+  if (!missing(detail)) {
+    check_string(detail, "detail", null_ok = TRUE)
+  }
 
   payload <- list(action = "increment", amount = amount)
-  payload <- apply_update_fields(payload, list(
-    field_clearable("message"),
-    field_clearable("detail")
-  ))
+  payload <- apply_update_fields(
+    payload,
+    list(
+      field_clearable("message"),
+      field_clearable("detail")
+    )
+  )
 
   runtime_input_update(session, id, "progress", payload, notify_key = NULL)
 }
@@ -409,7 +459,11 @@ block_empty <- function(
     component = "empty",
     props = list(
       titleHtml = html_fragment(title),
-      descriptionHtml = if (!is.null(description)) html_fragment(description) else NULL,
+      descriptionHtml = if (!is.null(description)) {
+        html_fragment(description)
+      } else {
+        NULL
+      },
       contentHtml = html_fragment(...),
       iconHtml = if (!is.null(icon_tag)) html_fragment(icon_tag) else NULL,
       actionHtml = if (!is.null(action)) html_fragment(action) else NULL
