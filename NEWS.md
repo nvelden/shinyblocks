@@ -1,5 +1,7 @@
 # shinyblocks (development version)
 
+## 0.0.0.9003
+
 ### Components
 
 * `block_nav()` now accepts `block_nav_group()` collapsible groups and `block_nav_label()` section captions, letting sidebars express nested navigation while preserving the existing leaf-only Shiny input contract. Nested `block_nav_item()` values are validated for non-empty unique values in input navs (#80).
