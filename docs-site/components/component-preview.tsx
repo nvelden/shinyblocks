@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { PreviewSurface } from "@/components/preview-surface";
 
 interface ComponentPreviewProps {
   slug: string;
@@ -35,14 +36,14 @@ export function ComponentPreview({
         {/* Render R HTML fragment inside inert wrapper. Fixed height + clip so
             every card in a row matches, regardless of preview content length
             (e.g. the long Code sample no longer stretches its whole row). */}
-        <div
-          data-component-preview={slug}
+        <PreviewSurface
+          slug={slug}
+          ariaHidden
+          html={html}
           className={cn(
             "pointer-events-none select-none w-full h-64 overflow-hidden flex items-center justify-center rounded-lg bg-muted/50 p-4 border border-dashed border-border/60 transition-colors duration-200 group-hover:bg-muted/70",
             className
           )}
-          dangerouslySetInnerHTML={{ __html: html }}
-          aria-hidden="true"
         />
       </div>
     </Link>

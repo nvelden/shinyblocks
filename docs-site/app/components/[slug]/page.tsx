@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import manifestData from "@/lib/preview-manifest.json";
 import { API_REFERENCE_DATABASE } from "@/lib/api-reference";
 import { PlaygroundFrame } from "@/components/playground-frame";
+import { PreviewSurface } from "@/components/preview-surface";
 
 interface ManifestEntry {
   name: string;
@@ -102,9 +103,9 @@ export default async function ComponentDetailPage({ params }: PageProps) {
                 </div>
               ) : (
                 <div className="rounded-xl border border-border bg-card p-10 shadow-sm relative overflow-hidden transition-colors duration-200">
-                  <div
+                  <PreviewSurface
+                    html={component.html}
                     className="pointer-events-none select-none w-full flex items-center justify-center min-h-[220px] rounded-lg bg-muted/40 p-8 border border-dashed border-border/80"
-                    dangerouslySetInnerHTML={{ __html: component.html }}
                   />
                 </div>
               )}
