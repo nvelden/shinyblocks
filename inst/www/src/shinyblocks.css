@@ -678,6 +678,15 @@
       grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
     }
 
+    /* The icon-rail hover tooltip overflows the narrow sidebar into the main
+       column, so the collapsed sidebar must be its own stacking layer above the
+       page content — otherwise the main panel paints over the tooltip. */
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar {
+      position: relative;
+      z-index: 40;
+      overflow: visible;
+    }
+
     /* The non-interactive sidebar title can drop out entirely when collapsed. */
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title-text {
       display: none;
@@ -709,6 +718,39 @@
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item,
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger {
       @apply justify-center px-2;
+      /* Anchor for the icon-rail hover/focus tooltip below. */
+      position: relative;
+    }
+
+    /* On the icon rail the visible label is sr-only; reveal it as a floating
+       tooltip pill to the right on hover/focus so the icon keeps a name. */
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item:hover .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item:focus-visible .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger:hover .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger:focus-visible .sb-nav-label {
+      position: absolute;
+      left: calc(100% + 0.5rem);
+      top: 50%;
+      transform: translateY(-50%);
+      width: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      clip: auto;
+      white-space: nowrap;
+      /* Mirror the `.sb-tooltip-content` runtime tooltip styling so the icon-rail
+         hover label reads identically to a `block_tooltip()`. */
+      padding: 0.375rem 0.625rem;
+      border-radius: var(--sb-tooltip-radius, calc(var(--radius) * 0.8));
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      font-size: 0.75rem;
+      line-height: 1rem;
+      box-shadow:
+        0 4px 6px -1px rgb(0 0 0 / 0.1),
+        0 2px 4px -2px rgb(0 0 0 / 0.1);
+      z-index: 90;
+      pointer-events: none;
     }
 
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-items {
