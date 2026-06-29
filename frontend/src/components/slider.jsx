@@ -251,7 +251,6 @@ export function Slider({ payload, root }) {
   const rangeStyle = isVertical
     ? { bottom: `${left}%`, height: `${Math.max(0, right - left)}%`, width: "100%" }
     : { left: `${left}%`, width: `${Math.max(0, right - left)}%` };
-  const valueLabel = values.length > 1 ? `${values[0]} - ${values[1]}` : String(values[0]);
   const hasBounds = minLabel != null || maxLabel != null;
   const shellStyle = {
     display: "inline-flex",
@@ -265,7 +264,11 @@ export function Slider({ payload, root }) {
     flexDirection: isVertical ? "row" : "column",
     alignItems: isVertical ? "stretch" : "center",
     gap: "0.5rem",
-    width: isVertical ? "auto" : "100%"
+    width: isVertical ? "auto" : "100%",
+    // Reserve room for the floating value label so it never overlaps content
+    // above (horizontal) or beside (vertical) the slider.
+    paddingTop: showValue && !isVertical ? "1.25rem" : undefined,
+    paddingRight: showValue && isVertical ? "2rem" : undefined
   };
   const labelStyle = {
     fontSize: "0.75rem",
@@ -273,6 +276,29 @@ export function Slider({ payload, root }) {
     lineHeight: 1,
     color: "var(--muted-foreground)"
   };
+  function valueLabelStyle(item) {
+    return isVertical
+      ? {
+          ...labelStyle,
+          position: "absolute",
+          bottom: `${percentFor(item)}%`,
+          left: "100%",
+          transform: "translateY(50%)",
+          marginLeft: "0.5rem",
+          whiteSpace: "nowrap",
+          pointerEvents: "none"
+        }
+      : {
+          ...labelStyle,
+          position: "absolute",
+          left: `${percentFor(item)}%`,
+          bottom: "100%",
+          transform: "translateX(-50%)",
+          marginBottom: "0.4rem",
+          whiteSpace: "nowrap",
+          pointerEvents: "none"
+        };
+  }
   const boundsStyle = {
     ...labelStyle,
     display: "flex",
@@ -285,7 +311,6 @@ export function Slider({ payload, root }) {
 
   return (
     <div className="sb-slider-shell" data-orientation={orientation} style={shellStyle}>
-      {showValue ? <div className="sb-slider-value" style={labelStyle}>{valueLabel}</div> : null}
       <div className="sb-slider-body" style={bodyStyle}>
         <div
           className={classNames("sb-slider", className)}
@@ -337,6 +362,17 @@ export function Slider({ payload, root }) {
               onKeyDown={(event) => handleKeyDown(event, index)}
             />
           ))}
+          {showValue
+            ? values.map((item, index) => (
+                <div
+                  key={`value-${index}`}
+                  className="sb-slider-value"
+                  style={valueLabelStyle(item)}
+                >
+                  {item}
+                </div>
+              ))
+            : null}
         </div>
         {hasBounds ? (
           <div className="sb-slider-bounds" style={boundsStyle}>
