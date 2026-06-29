@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import manifest from "@/lib/preview-manifest.json";
 import { PlaygroundFrame } from "@/components/playground-frame";
+import { PreviewSurface } from "@/components/preview-surface";
 
 export default function HomePage() {
   const gallery = manifest.find((c) => c.slug === "gallery");
@@ -58,10 +59,7 @@ export default function HomePage() {
               />
             </div>
           ) : (
-            <div
-              className="w-full"
-              dangerouslySetInnerHTML={{ __html: gallery.html }}
-            />
+            <PreviewSurface className="w-full" html={gallery.html} />
           )
         )}
       </section>
