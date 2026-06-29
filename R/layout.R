@@ -407,10 +407,9 @@ block_nav_group <- function(
   trigger <- htmltools::tags$button(
     type = "button",
     class = "sb-nav-group-trigger",
-    # When the sidebar collapses to the icon rail the visible `.sb-nav-label`
-    # is hidden, so a text label doubles as the native hover tooltip (matching
-    # `block_nav_item()`).
-    title = nav_label_text(label),
+    # No `title`: like `block_nav_item()`, the accessible name comes from the
+    # `.sb-nav-label` span and the collapsed-rail hover affordance is the styled
+    # tooltip pill, so a native `title` would only duplicate it.
     `aria-expanded` = expanded_attr,
     `aria-controls` = group_id,
     `data-expanded` = expanded_attr,
@@ -497,22 +496,19 @@ block_nav_item <- function(
 ) {
   icon <- set_icon_position(icon, "inline-start")
 
-  # A plain-text label doubles as the native hover tooltip and, when the
-  # sidebar collapses to the icon rail, as the link's accessible-name fallback
-  # (the visible `.sb-nav-label` is visually hidden there, and the icon is
-  # `aria-hidden`). Non-character labels (e.g. a tag) are left untitled.
-  tooltip <- if (is.character(label) && length(label) == 1L) label
-
   # The reported input value defaults to the text label; an explicit `value`
   # is required when the label is a tag.
   value <- value %||%
     (if (is.character(label) && length(label) == 1L) label else NULL)
 
+  # No `title`: the accessible name comes from the `.sb-nav-label` span (kept in
+  # the a11y tree even when visually hidden on the collapsed icon rail), and the
+  # rail's hover affordance is the styled `.sb-nav-label` tooltip pill. A native
+  # `title` would surface a second, redundant tooltip on hover.
   attach_shinyblocks_deps(
     htmltools::tags$a(
       class = merge_classes("sb-nav-item", if (selected) "is-selected", class),
       href = href,
-      title = tooltip,
       `aria-current` = if (selected) "page" else NULL,
       `data-sb-child` = "nav-item",
       `data-value` = value,

@@ -732,12 +732,18 @@
       left: calc(100% + 0.5rem);
       top: 50%;
       transform: translateY(-50%);
-      width: auto;
       height: auto;
       margin: 0;
       overflow: visible;
       clip: auto;
-      white-space: nowrap;
+      /* Size to the label, but cap width and wrap long labels so they never run
+         off the viewport (matching the runtime tooltip's max-width). */
+      width: max-content;
+      max-width: 16rem;
+      white-space: normal;
+      /* Break a single unbreakable word longer than the cap so it never
+         overflows the pill. */
+      overflow-wrap: anywhere;
       /* Mirror the `.sb-tooltip-content` runtime tooltip styling so the icon-rail
          hover label reads identically to a `block_tooltip()`. */
       padding: 0.375rem 0.625rem;
