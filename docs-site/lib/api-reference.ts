@@ -920,6 +920,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "label", type: "character", defaultVal: "'Loading'", description: "Screenreader loading announcement label." },
         { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Spinner dimensions mapped to package size classes." },
         { argument: "color", type: "'default' | 'muted' | 'primary' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Semantic foreground color token." },
+        { argument: "icon", type: "'loader-2' | 'loader' | 'loader-circle' | 'loader-pinwheel' | 'refresh-cw' | 'rotate-cw' | 'circle-dashed'", defaultVal: "'loader-2'", description: "Animated Lucide glyph used for the spinner." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Styling animation/color custom classes." },
         { argument: "style", type: "character | list", defaultVal: "NULL", description: "Optional inline styles." }
       ]

@@ -6,11 +6,13 @@ register_spinner_showcase <- function(input, output, session) {
     }
     size <- input$showcase_spinner_doc_size %||% "default"
     color <- input$showcase_spinner_doc_color %||% "default"
+    icon <- input$showcase_spinner_doc_spinner_icon %||% "loader-2"
 
     block_spinner(
       label = label,
       size = size,
-      color = color
+      color = color,
+      icon = icon
     )
   })
   shiny::outputOptions(
@@ -26,6 +28,7 @@ register_spinner_showcase <- function(input, output, session) {
     }
     size_val <- input$showcase_spinner_doc_size %||% "default"
     color_val <- input$showcase_spinner_doc_color %||% "default"
+    icon_val <- input$showcase_spinner_doc_spinner_icon %||% "loader-2"
 
     args <- c()
     if (label_val != "Loading") {
@@ -36,6 +39,9 @@ register_spinner_showcase <- function(input, output, session) {
     }
     if (color_val != "default") {
       args <- c(args, paste0('color = "', color_val, '"'))
+    }
+    if (icon_val != "loader-2") {
+      args <- c(args, paste0('icon = "', icon_val, '"'))
     }
 
     if (length(args) == 0) {
@@ -52,13 +58,28 @@ register_spinner_showcase <- function(input, output, session) {
 
   output$showcase_spinner_api_table <- shiny::renderUI({
     showcase_api_table(data.frame(
-      Argument = c("label", "size", "color", "class", "style"),
-      Type = c("character", "character", "character", "character", "character | named list"),
-      Default = c("\"Loading\"", "\"default\"", "\"default\"", "NULL", "NULL"),
+      Argument = c("label", "size", "color", "icon", "class", "style"),
+      Type = c(
+        "character",
+        "character",
+        "character",
+        "character",
+        "character",
+        "character | named list"
+      ),
+      Default = c(
+        "\"Loading\"",
+        "\"default\"",
+        "\"default\"",
+        "\"loader-2\"",
+        "NULL",
+        "NULL"
+      ),
       Description = c(
         "Accessible screen-reader label for the spinner.",
         "Visual size. One of sm, default, or lg.",
         "Semantic color. One of default, muted, primary, destructive, success, warning, or info.",
+        "Spinner icon. One of loader-2, loader, loader-circle, loader-pinwheel, refresh-cw, rotate-cw, or circle-dashed.",
         "Additional CSS class merged onto the spinner element.",
         "Optional inline styles applied to the spinner element."
       )

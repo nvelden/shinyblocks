@@ -1,42 +1,58 @@
 htmltools::tagList(
   showcase_playground_layout(
-      controls = htmltools::tagList(
-        showcase_controls_group(
-          "Accessibility", first = TRUE,
-          block_field(
-            block_field_label("aria-label", `for` = "showcase_spinner_doc_label"),
-            block_input("showcase_spinner_doc_label", value = "Loading")
-          ),
-          block_field_description(
-            "Screen-reader label only; it does not render visible text."
-          )
+    controls = htmltools::tagList(
+      showcase_controls_group(
+        "Accessibility",
+        first = TRUE,
+        block_field(
+          block_field_label("aria-label", `for` = "showcase_spinner_doc_label"),
+          block_input("showcase_spinner_doc_label", value = "Loading")
         ),
-        showcase_controls_group(
-          "Styling",
-          block_field(
-            block_field_label("size", `for` = "showcase_spinner_doc_size"),
-            block_select(
-              "showcase_spinner_doc_size",
-              choices = c("sm", "default", "lg"),
-              selected = "default",
-              size = "sm"
-            )
-          ),
-          block_field(
-            block_field_label("color", `for` = "showcase_spinner_doc_color"),
-            block_select(
-              "showcase_spinner_doc_color",
-              choices = shinyblocks:::semantic_color_choices(),
-              selected = "default",
-              size = "sm"
-            )
-          )
+        block_field_description(
+          "Screen-reader label only; it does not render visible text."
         )
       ),
-      preview_output_id = "showcase_spinner_preview_ui",
-      code_output_id = "showcase_spinner_preview_code"
+      showcase_controls_group(
+        "Styling",
+        block_field(
+          block_field_label(
+            "icon",
+            `for` = "showcase_spinner_doc_spinner_icon"
+          ),
+          block_select(
+            "showcase_spinner_doc_spinner_icon",
+            choices = shinyblocks:::spinner_icon_choices(),
+            selected = "loader-2",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("size", `for` = "showcase_spinner_doc_size"),
+          block_select(
+            "showcase_spinner_doc_size",
+            choices = c("sm", "default", "lg"),
+            selected = "default",
+            size = "sm"
+          )
+        ),
+        block_field(
+          block_field_label("color", `for` = "showcase_spinner_doc_color"),
+          block_select(
+            "showcase_spinner_doc_color",
+            choices = shinyblocks:::semantic_color_choices(),
+            selected = "default",
+            size = "sm"
+          )
+        )
+      )
+    ),
+    preview_output_id = "showcase_spinner_preview_ui",
+    code_output_id = "showcase_spinner_preview_code"
   ),
-  htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "API Reference"
+  ),
   shiny::uiOutput("showcase_spinner_api_table"),
   htmltools::tags$h3(
     style = "margin-top: 2rem; font-size: 1.125rem;",
@@ -47,8 +63,12 @@ htmltools::tagList(
     "Stable instances used by tools/parity/. Do not remove."
   ),
   block_cluster(
-      gap = "md",
-      align = "center",
-    block_spinner(class = "sb-parity-spinner-default")
+    gap = "md",
+    align = "center",
+    block_spinner(class = "sb-parity-spinner-default"),
+    block_spinner(
+      icon = "loader-pinwheel",
+      class = "sb-parity-spinner-pinwheel"
+    )
   )
 )

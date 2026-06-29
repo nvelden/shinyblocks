@@ -47,10 +47,13 @@ export function Spinner({ payload }) {
   const props = payload.props || {};
   const size = props.size || "default";
   const color = props.color || "default";
+  const iconName = props.iconName || "loader-2";
+  const spriteHref = props.spriteHref || "";
 
   return (
     <svg
       data-slot="spinner"
+      data-icon={iconName}
       data-size={size}
       data-color={color}
       viewBox="0 0 24 24"
@@ -68,7 +71,11 @@ export function Spinner({ payload }) {
       role="status"
       aria-label={props.label || "Loading"}
     >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      {spriteHref ? (
+        <use href={`${spriteHref}#sb-icon-${iconName}`} />
+      ) : (
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      )}
     </svg>
   );
 }

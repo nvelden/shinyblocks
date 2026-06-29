@@ -8,6 +8,7 @@ block_spinner(
   label = "Loading",
   size = c("default", "sm", "lg"),
   color = c("default", "muted", "primary", "destructive", "success", "warning", "info"),
+  icon = spinner_icon_choices(),
   class = NULL,
   style = NULL
 )
@@ -18,6 +19,10 @@ block_spinner(
 \item{size}{Visual size.}
 
 \item{color}{Semantic color.}
+
+\item{icon}{Spinner icon name. One of \code{"loader-2"}, \code{"loader"},
+\code{"loader-circle"}, \code{"loader-pinwheel"}, \code{"refresh-cw"}, \code{"rotate-cw"},
+or \code{"circle-dashed"}.}
 
 \item{class}{Additional classes.}
 
