@@ -70,6 +70,10 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 - Run targeted Playwright/browser checks and docs-site commands that invoke
   `tsx` outside the command sandbox / with escalation. In sandboxed Codex
   sessions, `tsx` can fail with IPC permission errors before the real test runs.
+- Blank docs-site Shinylive playground iframe? The error is in the nested
+  Shinylive frame's console, and the usual cause is a stale/missing WASM package
+  image (lacks newly added exports). Full checklist in the `shinyblocks-component`
+  skill (§ "Troubleshooting a blank playground iframe") and `docs-site/README.md`.
 - Run GitHub-mutating `gh` commands that require network access, such as
   `gh issue create`, outside the command sandbox / with escalation on the first
   attempt. Use `--body-file` for longer issue bodies so shell quoting does not
