@@ -2,7 +2,7 @@
 % Please edit documentation in R/overlays.R
 \name{block_dialog}
 \alias{block_dialog}
-\title{Create a dialog (Phase 4.4 — Shiny-bound modal with size + footer)}
+\title{Create a dialog}
 \usage{
 block_dialog(
   id,
@@ -24,8 +24,8 @@ block_dialog(
 
 \item{title}{Required dialog title. Used as the accessible name.}
 
-\item{...}{Body content. Serialized to HTML in 4.1/4.2; arbitrary
-Shiny children become Shiny-bound in a later sub-phase.}
+\item{...}{Body content, serialized to HTML. Children are not
+Shiny-bound.}
 
 \item{description}{Optional description below the title.}
 
@@ -56,8 +56,11 @@ An \code{htmltools} tag.
 \description{
 A modal dialog rendered into the runtime portal root. Reports its
 open/closed state to \verb{input$<id>} and accepts server-driven
-updates through \code{update_block_dialog()}. A11y behaviors (escape,
-outside-click, focus trap, focus return, scroll lock) land in 4.3.
+updates through \code{update_block_dialog()}. The runtime implements the
+modal accessibility contract: \code{Escape} and overlay (outside) click
+dismiss, focus moves into the dialog on open and returns to the
+previously focused element on close, \code{Tab}/\code{Shift+Tab} cycle within
+the dialog, and body scroll is locked while open.
 }
 \seealso{
 Other content: 

@@ -139,6 +139,26 @@ const progressPayload = JSON.stringify({
   className: null
 });
 
+const dialogPayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "dialog",
+  id: "runtime_dialog",
+  props: {
+    titleHtml: "Runtime dialog",
+    descriptionHtml: "Dialog description",
+    bodyHtml: "<input id='dialog-first' type='text' /><button id='dialog-middle' type='button'>Middle</button>",
+    footerHtml: "<button id='dialog-last' type='button'>Save</button>",
+    triggerLabel: "Open dialog",
+    size: "default",
+    hideTitle: false
+  },
+  slots: {},
+  children: [],
+  state: { value: false, open: false },
+  binding: { input: true },
+  className: null
+});
+
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
 
@@ -196,6 +216,11 @@ try {
         </div>
         <div id="runtime-progress" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="progress" data-sb-input-id="runtime_progress">
           <script type="application/json" data-shinyblocks-payload>${progressPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
+        </div>
+        <div id="runtime-dialog" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="dialog" data-sb-input-id="runtime_dialog">
+          <script type="application/json" data-shinyblocks-payload>${dialogPayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children></div>
         </div>
@@ -608,6 +633,136 @@ try {
     await page.locator(`${progressTrack}`).getAttribute("data-indeterminate"),
     "true",
     "indeterminate progress should flag the track"
+  );
+
+  // Dialog: modal a11y contract (issue #95). Each behavior the roxygen/spec
+  // promises is asserted here: ARIA wiring, focus-into on open, Tab/Shift+Tab
+  // trap, Escape + overlay-click dismiss, focus return to the trigger, and
+  // body scroll lock/restore.
+  const dialogTrigger = "#runtime-dialog [data-slot='dialog-trigger']";
+  const dialogContent = "[data-slot='dialog-content']";
+  const activeElementId = () =>
+    page.evaluate(() => document.activeElement && document.activeElement.id);
+  const bodyOverflow = () => page.evaluate(() => document.body.style.overflow);
+  const waitForDialogTriggerFocus = () =>
+    page.waitForFunction(() =>
+      Boolean(
+        document.activeElement &&
+          document.activeElement.getAttribute("data-slot") === "dialog-trigger"
+      )
+    );
+
+  assert.equal(
+    await page.locator(dialogTrigger).getAttribute("aria-haspopup"),
+    "dialog",
+    "dialog trigger should advertise aria-haspopup=dialog"
+  );
+  assert.equal(
+    await page.locator(dialogTrigger).getAttribute("aria-expanded"),
+    "false",
+    "closed dialog trigger should report aria-expanded=false"
+  );
+
+  await page.locator(dialogTrigger).click();
+  await page.waitForSelector(dialogContent);
+  assert.deepEqual(
+    await page.locator(dialogContent).evaluate((node) => ({
+      role: node.getAttribute("role"),
+      modal: node.getAttribute("aria-modal"),
+      labelledBy: node.getAttribute("aria-labelledby"),
+      describedBy: node.getAttribute("aria-describedby")
+    })),
+    {
+      role: "dialog",
+      modal: "true",
+      labelledBy: "runtime_dialog-title",
+      describedBy: "runtime_dialog-description"
+    },
+    "open dialog should carry the full modal ARIA wiring"
+  );
+  assert.equal(
+    await page.locator(dialogTrigger).getAttribute("aria-expanded"),
+    "true",
+    "open dialog trigger should report aria-expanded=true"
+  );
+  assert.equal(
+    await page.locator("#runtime-dialog").evaluate((node) => node.dataset.sbDialogOpen),
+    "true",
+    "opening should set the open expando/dataset for the Shiny binding"
+  );
+  assert.equal(
+    await bodyOverflow(),
+    "hidden",
+    "opening the dialog should lock body scroll"
+  );
+  assert.equal(
+    await activeElementId(),
+    "dialog-first",
+    "opening should move focus to the first focusable element in the dialog"
+  );
+
+  // Tab from the last focusable (the built-in close button) wraps to the first;
+  // Shift+Tab from the first wraps back to the last.
+  await page.locator("[data-slot='dialog-close']").focus();
+  await page.keyboard.press("Tab");
+  assert.equal(
+    await activeElementId(),
+    "dialog-first",
+    "Tab on the last focusable should wrap to the first (focus trap)"
+  );
+  await page.keyboard.press("Shift+Tab");
+  const wrappedBack = await page.evaluate(
+    () => document.activeElement && document.activeElement.getAttribute("data-slot")
+  );
+  assert.equal(
+    wrappedBack,
+    "dialog-close",
+    "Shift+Tab on the first focusable should wrap to the last (focus trap)"
+  );
+
+  // Escape dismisses, returns focus to the trigger, and restores scroll.
+  await page.keyboard.press("Escape");
+  await page.waitForSelector(dialogContent, { state: "detached" });
+  await waitForDialogTriggerFocus();
+  assert.equal(
+    await bodyOverflow(),
+    "",
+    "closing the dialog should restore body scroll"
+  );
+  assert.equal(
+    await page.locator("#runtime-dialog").evaluate((node) => node.dataset.sbDialogOpen),
+    "false",
+    "Escape should flip the open expando/dataset to false"
+  );
+
+  // Overlay (outside) click dismisses as well.
+  await page.locator(dialogTrigger).click();
+  await page.waitForSelector(dialogContent);
+  await page
+    .locator("[data-slot='dialog-overlay']")
+    .click({ position: { x: 5, y: 5 } });
+  await page.waitForSelector(dialogContent, { state: "detached" });
+  await waitForDialogTriggerFocus();
+
+  // Server-driven open/close through the receive channel keeps the same
+  // contract (scroll lock on, focus into the dialog; both restored on close).
+  await page
+    .locator("#runtime-dialog")
+    .evaluate((node) => node.__sbDialogReceive({ open: true }));
+  await page.waitForSelector(dialogContent);
+  assert.equal(
+    await bodyOverflow(),
+    "hidden",
+    "server-driven open should lock body scroll"
+  );
+  await page
+    .locator("#runtime-dialog")
+    .evaluate((node) => node.__sbDialogReceive({ open: false }));
+  await page.waitForSelector(dialogContent, { state: "detached" });
+  assert.equal(
+    await bodyOverflow(),
+    "",
+    "server-driven close should restore body scroll"
   );
 
   await page.evaluate((payloadText) => {
