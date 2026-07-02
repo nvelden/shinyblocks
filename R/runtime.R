@@ -103,11 +103,29 @@ runtime_mount_id <- function(component, input_id = NULL) {
   slug <- runtime_id_slug(source)
 
   if (!is.null(input_id)) {
+    # Slugging is lossy ("a.b" and "a-b" both slug to "a-b"), and the mount id
+    # is both a DOM id and the `sendInputMessage()` routing target, so distinct
+    # input ids must never collide. When the slug changed the id, disambiguate
+    # with a short hash of the raw id; untouched ids keep their bare slug.
+    if (!identical(slug, input_id)) {
+      slug <- paste0(slug, "-", runtime_id_hash(input_id))
+    }
     return(paste0("sb-runtime-", component_slug, "-", slug))
   }
 
   runtime_mount_state$next_id <- runtime_mount_state$next_id + 1L
   paste0("sb-runtime-", component_slug, "-", slug, "-", runtime_mount_state$next_id)
+}
+
+# Short deterministic hash (7 hex chars) of an arbitrary string, dependency-free.
+# Polynomial rolling hash over code points; the modulus keeps the accumulator
+# exact in doubles and within integer range for `sprintf("%x")`.
+runtime_id_hash <- function(value) {
+  h <- 0
+  for (b in utf8ToInt(enc2utf8(value))) {
+    h <- (h * 131 + b) %% 268435399
+  }
+  sprintf("%07x", as.integer(h))
 }
 
 validate_input_id <- function(input_id) {

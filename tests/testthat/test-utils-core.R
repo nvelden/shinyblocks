@@ -171,3 +171,72 @@ test_that("validate_select_choice_values rejects invalid values", {
   )
   expect_invisible(validate_select_choice_values(c("free", "pro")))
 })
+
+test_that("match_arg rejects partial vectors of otherwise-valid choices", {
+  ns <- local_internal()
+
+  expect_error(
+    ns$match_arg(c("lg", "sm"), c("default", "sm", "lg"), "size"),
+    "must be one of"
+  )
+
+  # The default-signature idiom (the full choice set) still resolves to its
+  # first element, including when the signature reorders the choices.
+  expect_identical(
+    ns$match_arg(c("default", "sm", "lg"), c("default", "sm", "lg"), "size"),
+    "default"
+  )
+  expect_identical(
+    ns$match_arg(c("lg", "default", "sm"), c("default", "sm", "lg"), "size"),
+    "lg"
+  )
+})
+
+test_that("normalize_choices rejects grouped (nested) choices", {
+  ns <- local_internal()
+
+  expect_error(
+    ns$normalize_choices(list(Group = list(A = "a", B = "b"))),
+    "Grouped"
+  )
+  expect_error(
+    ns$normalize_choices(list(Group = c(A = "a", B = "b"))),
+    "Grouped"
+  )
+  # A named scalar under an outer name would mangle to "A.x" via unlist().
+  expect_error(
+    ns$normalize_choices(list(A = c(x = "1"))),
+    "Grouped"
+  )
+
+  flat_vec <- ns$normalize_choices(c(A = "a", B = "b"))
+  expect_identical(flat_vec$label, c("A", "B"))
+  flat_list <- ns$normalize_choices(list(A = "a", B = "b"))
+  expect_identical(flat_list$value, c("a", "b"))
+  expect_identical(flat_list$label, c("A", "B"))
+})
+
+test_that("block_field_invalid ids are unique and leave the RNG alone", {
+  make_invalid <- function(input_id) {
+    as.character(
+      block_field_invalid(block_field(block_input(input_id)), "Required")
+    )
+  }
+  extract_id <- function(html) {
+    regmatches(html, regexpr("sb-field-error-[0-9]+", html))
+  }
+
+  # Seeding the RNG must not make two fields share an error-message id.
+  set.seed(42)
+  first <- extract_id(make_invalid("first"))
+  set.seed(42)
+  second <- extract_id(make_invalid("second"))
+  expect_false(identical(first, second))
+
+  # Building UI must not consume from the user's RNG stream.
+  set.seed(7)
+  expected <- stats::runif(1)
+  set.seed(7)
+  invisible(make_invalid("third"))
+  expect_identical(stats::runif(1), expected)
+})

@@ -48,7 +48,11 @@ is updated. Cosmetic-only updates never notify.}
 Invisibly returns \code{NULL}.
 }
 \description{
-Update a runtime select input
+Not every \code{\link[=block_select]{block_select()}} argument can be changed after creation:
+\code{multiple}, \code{max_items}, and \code{style} are create-only. Also note that when
+\code{selected} is supplied without \code{choices}, it is validated for shape only —
+the server cannot see the client's current choice list, so membership is
+resolved client-side.
 }
 \seealso{
 Other forms: 

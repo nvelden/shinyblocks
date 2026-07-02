@@ -92,10 +92,14 @@ field_style <- function(key, arg = key) {
 # parent frame lists them exactly as `missing()` would, so defaulted arguments
 # are skipped.
 apply_update_fields <- function(payload, fields, env = parent.frame()) {
+  # If the updater was invoked through a `...`-forwarding wrapper
+  # (`function(...) update_block_x(...)`), its call contains a literal `...`
+  # that only exists in the *wrapper's* frame — `parent.frame(2L)` from here —
+  # so dots must be expanded there, not in the updater's own frame.
   supplied <- names(match.call(
     definition = sys.function(-1L),
     call = sys.call(-1L),
-    envir = env
+    envir = parent.frame(2L)
   ))[-1L]
   for (f in fields) {
     if (!f$arg %in% supplied) next

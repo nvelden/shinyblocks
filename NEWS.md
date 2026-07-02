@@ -1,5 +1,16 @@
 # shinyblocks (development version)
 
+### Bug fixes
+
+* `block_date_picker()` and `block_date_range_picker()` now format `POSIXct`/`POSIXlt` values in the value's own timezone. Previously they routed through `as.Date()`, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).
+* `block_field_invalid()` now generates its error-message ids from an internal counter instead of `runif()`. Ids stay unique when the app seeds the RNG (previously two fields built after the same `set.seed()` shared an id, breaking `aria-describedby` wiring), and building UI no longer consumes from the user's RNG stream.
+* `update_block_*()` helpers no longer fail when called through a `...`-forwarding wrapper (`function(...) update_block_input(...)`), a common pattern in module helper code.
+* Runtime mount ids are now collision-free across input ids that sanitize to the same slug (e.g. `"a.b"` vs `"a-b"`); a short hash disambiguates them, so server updates always reach the right element. Ids without special characters are unchanged.
+* `block_select()` and `update_block_select()` now reject grouped (nested) `choices` with a clear error instead of silently flattening them into mangled `"Group.label"` labels. Grouped choices were never supported; previously they produced wrong output without warning.
+* Choice-style arguments are matched exactly everywhere: passing a partial vector of otherwise-valid values (e.g. `size = c("lg", "sm")`) or a partial string (e.g. `type = "pass"`) is now an error instead of silently resolving to one of them. Function-signature defaults are unaffected.
+* Server updates for `update_block_dialog(class = )` and `update_block_file_input(class = )` now use the same payload key as every other component.
+* The dependency asset-version stamp is computed once per R process instead of stat-ing every bundled asset file on each `block_*()` call. Set `options(shinyblocks.asset_version_cache = FALSE)` to recompute per call during asset development.
+
 ## 0.0.0.9003
 
 ### Components

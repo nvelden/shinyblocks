@@ -110,6 +110,17 @@ block_field_legend <- function(..., class = NULL) {
   )
 }
 
+# Monotonic counter for field error-message ids. A counter (not `runif()`)
+# keeps ids unique within a page even when the app seeds the RNG, and leaves
+# the user's RNG stream untouched.
+field_error_id_state <- new.env(parent = emptyenv())
+field_error_id_state$next_id <- 0L
+
+next_field_error_id <- function() {
+  field_error_id_state$next_id <- field_error_id_state$next_id + 1L
+  paste0("sb-field-error-", field_error_id_state$next_id)
+}
+
 #' Mark a field invalid
 #'
 #' @param field A `block_field()` tag.
@@ -126,7 +137,7 @@ block_field_invalid <- function(field, message) {
     stop("`field` must be created by `block_field()`.", call. = FALSE)
   }
 
-  message_id <- sprintf("sb-field-error-%s", as.integer(stats::runif(1) * 1e9))
+  message_id <- next_field_error_id()
   tag_query <- htmltools::tagQuery(field)
 
   tag_query$

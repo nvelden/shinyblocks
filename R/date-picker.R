@@ -19,7 +19,9 @@ normalize_iso_date <- function(x, name) {
     if (is.na(x)) {
       stop(sprintf("`%s` must not be `NA`.", name), call. = FALSE)
     }
-    return(format(as.Date(x), "%Y-%m-%d"))
+    # Format in the value's own timezone. `as.Date.POSIXct` defaults to UTC,
+    # which shifts the calendar date for sessions east of UTC.
+    return(format(x, "%Y-%m-%d"))
   }
   if (is.character(x)) {
     if (is.na(x)) {

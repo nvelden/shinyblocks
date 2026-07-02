@@ -255,7 +255,7 @@ test_that("update_block_file_input targets the file-input mount and never notifi
   expect_identical(message$payload$disabled, TRUE)
   expect_identical(message$payload$invalid, TRUE)
   expect_identical(message$payload$style$maxWidth, "20rem")
-  expect_identical(message$payload$className, "custom-file")
+  expect_identical(message$payload$class, "custom-file")
   expect_identical(message$payload$reset, TRUE)
   # File inputs carry no runtime value, so they never emit a notify flag.
   expect_null(message$payload$notify)
@@ -304,4 +304,21 @@ test_that("update_block_file_input clears dropzone icon and content", {
   expect_null(payload$dropzoneIconName)
   expect_true("dropzoneContentHtml" %in% names(payload))
   expect_null(payload$dropzoneContentHtml)
+})
+
+test_that("updaters work when called through a dots-forwarding wrapper", {
+  capture <- local_input_message_session()
+
+  wrapper <- function(...) update_block_input(capture$session, "txt", ...)
+  expect_invisible(wrapper(value = "forwarded", disabled = TRUE))
+
+  message <- capture$last_message()
+  expect_identical(message$payload$value, "forwarded")
+  expect_identical(message$payload$disabled, TRUE)
+  expect_identical(message$payload$notify, TRUE)
+
+  # Two levels of forwarding resolve the dots in the right frame too.
+  outer <- function(...) wrapper(...)
+  expect_invisible(outer(placeholder = "deep"))
+  expect_identical(capture$last_message()$payload$placeholder, "deep")
 })

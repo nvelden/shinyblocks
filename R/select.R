@@ -113,6 +113,12 @@ block_select <- function(
 
 #' Update a runtime select input
 #'
+#' Not every [block_select()] argument can be changed after creation:
+#' `multiple`, `max_items`, and `style` are create-only. Also note that when
+#' `selected` is supplied without `choices`, it is validated for shape only —
+#' the server cannot see the client's current choice list, so membership is
+#' resolved client-side.
+#'
 #' @param session Shiny session. Defaults to the current reactive domain.
 #' @param input_id Input id passed to `block_select()`.
 #' @param choices Optional replacement choices.

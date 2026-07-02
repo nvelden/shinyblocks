@@ -77,8 +77,8 @@ export function Dialog({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
         setSize(nextData.size || "default");
       }
-      if (Object.prototype.hasOwnProperty.call(nextData, "className")) {
-        setContentClassName(nextData.className || "");
+      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
+        setContentClassName(nextData.class || "");
       }
       if (Object.prototype.hasOwnProperty.call(nextData, "style")) {
         setContentStyle(nextData.style || {});
