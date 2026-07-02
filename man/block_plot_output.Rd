@@ -61,7 +61,7 @@ already renders to the media box size, so \code{object-fit} would have no visibl
 effect.
 }
 \seealso{
-Other outputs: 
-\code{\link{block_image_output}()}
+Other outputs:
+\code{\link[=block_image_output]{block_image_output()}}
 }
 \concept{outputs}

@@ -47,9 +47,9 @@ Any argument left unspecified is preserved on the client. Pass \code{NULL} for
 \code{icon} or \code{style} to clear them.
 }
 \seealso{
-Other action: 
-\code{\link{block_button}()},
-\code{\link{block_task_button}()},
-\code{\link{update_block_task_button}()}
+Other action:
+\code{\link[=block_button]{block_button()}},
+\code{\link[=block_task_button]{block_task_button()}},
+\code{\link[=update_block_task_button]{update_block_task_button()}}
 }
 \concept{action}
