@@ -168,7 +168,23 @@ try {
       echo?.textContent.includes('"dashboard"');
   });
   // Toggling a group updates disclosure state only; it must not report a nav
-  // input value or leave collapsed leaves focusable.
+  // input value or leave collapsed leaves focusable. The group starts
+  // collapsed, so the first click expands it and a second click collapses it.
+  await page
+    .locator("#showcase_layout_preview_nav .sb-nav-group-trigger")
+    .filter({ hasText: "Operations" })
+    .click();
+  await page.waitForFunction(() => {
+    const group = document.querySelector(
+      "#showcase_layout_preview_nav .sb-nav-group[data-sb-nav-group-value='operations']"
+    );
+    const trigger = group?.querySelector(".sb-nav-group-trigger");
+    const items = group?.querySelector(".sb-nav-group-items");
+    const echo = document.querySelector("#showcase_layout_preview_value");
+    return trigger?.getAttribute("aria-expanded") === "true" &&
+      !items?.hasAttribute("hidden") &&
+      echo?.textContent.includes('"dashboard"');
+  });
   await page
     .locator("#showcase_layout_preview_nav .sb-nav-group-trigger")
     .filter({ hasText: "Operations" })

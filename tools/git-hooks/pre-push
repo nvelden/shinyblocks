@@ -1,0 +1,32 @@
+#!/bin/sh
+# Pre-push safety gate: catch CI failures before they reach GitHub.
+#
+# Runs the checks that have historically broken CI (full test suite, built
+# asset freshness, runtime + showcase browser tests, stale man/NAMESPACE).
+# CI still runs the complete `make gate` (adds lint, spell, budget, parity,
+# R CMD check) — run that manually before opening a PR.
+#
+# Skip once with:   git push --no-verify
+# or:               SKIP_PREPUSH=1 git push
+# Full gate instead: PREPUSH_GATE=1 git push
+
+set -e
+
+if [ -n "$SKIP_PREPUSH" ]; then
+  echo "pre-push: skipped (SKIP_PREPUSH set)"
+  exit 0
+fi
+
+cd "$(git rev-parse --show-toplevel)"
+
+if [ -n "$PREPUSH_GATE" ]; then
+  echo "pre-push: running full 'make gate' (PREPUSH_GATE set)..."
+  make gate
+  exit 0
+fi
+
+echo "pre-push: running check-slice + runtime/showcase tests + docs-verify..."
+echo "pre-push: (skip once with 'git push --no-verify'; full CI gate: 'PREPUSH_GATE=1 git push')"
+make check-slice runtime-test runtime-shiny-test showcase-test docs-verify
+
+echo "pre-push: OK"
