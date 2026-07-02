@@ -36,13 +36,13 @@ Groups wrap leaf \code{\link[=block_nav_item]{block_nav_item()}} children in a d
 group trigger toggles expansion only; it never reports a Shiny input value.
 }
 \seealso{
-Other navigation: 
-\code{\link{block_nav}()},
-\code{\link{block_nav_item}()},
-\code{\link{block_nav_label}()},
-\code{\link{block_tab}()},
-\code{\link{block_tabs}()},
-\code{\link{update_block_nav}()},
-\code{\link{update_block_tabs}()}
+Other navigation:
+\code{\link[=block_nav]{block_nav()}},
+\code{\link[=block_nav_item]{block_nav_item()}},
+\code{\link[=block_nav_label]{block_nav_label()}},
+\code{\link[=block_tab]{block_tab()}},
+\code{\link[=block_tabs]{block_tabs()}},
+\code{\link[=update_block_nav]{update_block_nav()}},
+\code{\link[=update_block_tabs]{update_block_tabs()}}
 }
 \concept{navigation}

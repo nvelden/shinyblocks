@@ -19,13 +19,13 @@ Section labels are non-interactive captions inside \code{\link[=block_nav]{block
 report a Shiny input value.
 }
 \seealso{
-Other navigation: 
-\code{\link{block_nav}()},
-\code{\link{block_nav_group}()},
-\code{\link{block_nav_item}()},
-\code{\link{block_tab}()},
-\code{\link{block_tabs}()},
-\code{\link{update_block_nav}()},
-\code{\link{update_block_tabs}()}
+Other navigation:
+\code{\link[=block_nav]{block_nav()}},
+\code{\link[=block_nav_group]{block_nav_group()}},
+\code{\link[=block_nav_item]{block_nav_item()}},
+\code{\link[=block_tab]{block_tab()}},
+\code{\link[=block_tabs]{block_tabs()}},
+\code{\link[=update_block_nav]{update_block_nav()}},
+\code{\link[=update_block_tabs]{update_block_tabs()}}
 }
 \concept{navigation}

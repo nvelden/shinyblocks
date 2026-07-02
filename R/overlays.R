@@ -1,15 +1,18 @@
-#' Create a dialog (Phase 4.4 — Shiny-bound modal with size + footer)
+#' Create a dialog
 #'
 #' A modal dialog rendered into the runtime portal root. Reports its
 #' open/closed state to `input$<id>` and accepts server-driven
-#' updates through `update_block_dialog()`. A11y behaviors (escape,
-#' outside-click, focus trap, focus return, scroll lock) land in 4.3.
+#' updates through `update_block_dialog()`. The runtime implements the
+#' modal accessibility contract: `Escape` and overlay (outside) click
+#' dismiss, focus moves into the dialog on open and returns to the
+#' previously focused element on close, `Tab`/`Shift+Tab` cycle within
+#' the dialog, and body scroll is locked while open.
 #'
 #' @param id Required input id. `input$<id>` is `TRUE` when open,
 #'   `FALSE` when closed.
 #' @param title Required dialog title. Used as the accessible name.
-#' @param ... Body content. Serialized to HTML in 4.1/4.2; arbitrary
-#'   Shiny children become Shiny-bound in a later sub-phase.
+#' @param ... Body content, serialized to HTML. Children are not
+#'   Shiny-bound.
 #' @param description Optional description below the title.
 #' @param footer Optional footer content (typically action buttons).
 #'   Renders below the body in a right-aligned flex row.

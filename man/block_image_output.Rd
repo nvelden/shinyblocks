@@ -24,7 +24,7 @@ block_image_output(
 )
 }
 \arguments{
-\item{id}{Shiny output id, passed verbatim to \code{\link[shiny:plotOutput]{shiny::imageOutput()}}.}
+\item{id}{Shiny output id, passed verbatim to \code{\link[shiny:imageOutput]{shiny::imageOutput()}}.}
 
 \item{width, height}{CSS lengths forwarded to the Shiny output. \code{height = NULL} resolves to \code{"100\%"} when \code{aspect} is set, otherwise Shiny's default.}
 
@@ -43,7 +43,7 @@ block_image_output(
 \item{click, dblclick, hover, brush}{Forwarded to the Shiny output unchanged.}
 
 \item{inline, fill}{Forwarded to the Shiny output. \code{fill} defaults to \code{FALSE}
-to match \code{\link[shiny:plotOutput]{shiny::imageOutput()}}.}
+to match \code{\link[shiny:imageOutput]{shiny::imageOutput()}}.}
 
 \item{class}{Additional classes for the \verb{<figure>} wrapper.}
 
@@ -53,19 +53,19 @@ to match \code{\link[shiny:plotOutput]{shiny::imageOutput()}}.}
 An \code{htmltools} \verb{<figure>} tag.
 }
 \description{
-Wraps \code{\link[shiny:plotOutput]{shiny::imageOutput()}} in a shadcn-styled frame (aspect box,
+Wraps \code{\link[shiny:imageOutput]{shiny::imageOutput()}} in a shadcn-styled frame (aspect box,
 object-fit, border, radius, optional caption). App-author server code stays
 vanilla Shiny: \code{output$id <- shiny::renderImage(...)} is unchanged. The
 image's accessible name (\code{alt}) is server-controlled via
 \code{\link[shiny:renderImage]{shiny::renderImage()}}'s returned \code{alt}; the frame cannot set it.
 }
 \details{
-For \emph{static} images use \code{\link[htmltools:builder]{htmltools::img()}} — no component needed. Interactive
+For \emph{static} images use \code{\link[htmltools:img]{htmltools::img()}} — no component needed. Interactive
 htmlwidgets (plotly, leaflet, DT, ...) are a different mechanism and out of
 scope.
 }
 \seealso{
-Other outputs: 
-\code{\link{block_plot_output}()}
+Other outputs:
+\code{\link[=block_plot_output]{block_plot_output()}}
 }
 \concept{outputs}

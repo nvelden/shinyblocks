@@ -42,11 +42,11 @@ present only in \code{dark} keeps the package default in light mode and the
 dark value in dark mode.
 }
 \seealso{
-Other theme: 
-\code{\link{block_dark_mode_toggle}()},
-\code{\link{block_style}()},
-\code{\link{block_style_profiles}()},
-\code{\link{block_theme_presets}()},
-\code{\link{update_block_theme}()}
+Other theme:
+\code{\link[=block_dark_mode_toggle]{block_dark_mode_toggle()}},
+\code{\link[=block_style]{block_style()}},
+\code{\link[=block_style_profiles]{block_style_profiles()}},
+\code{\link[=block_theme_presets]{block_theme_presets()}},
+\code{\link[=update_block_theme]{update_block_theme()}}
 }
 \concept{theme}
