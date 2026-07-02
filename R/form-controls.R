@@ -141,7 +141,7 @@ block_input <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
-  type <- match.arg(type)
+  type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
 
   hidden_native <- hidden_native_input(
     input_id,
@@ -363,7 +363,7 @@ update_block_file_input <- function(
     field("disabled", transform = isTRUE),
     field("invalid", transform = isTRUE),
     field_style("style"),
-    field_clearable("className", "class")
+    field_clearable("class")
   ))
 
   if (!missing(variant)) {
@@ -442,7 +442,7 @@ update_block_input <- function(
   ))
 
   if (!missing(type)) {
-    payload$type <- match.arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+    payload$type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
   }
 
   runtime_input_update(session, input_id, "input", payload, notify = notify)

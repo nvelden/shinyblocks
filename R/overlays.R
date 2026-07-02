@@ -52,7 +52,7 @@ block_dialog <- function(
     trigger, "trigger", null_ok = TRUE,
     msg = "`trigger` must be a single string label or NULL."
   )
-  size <- match.arg(size)
+  size <- match_arg(size, c("default", "sm", "lg", "xl"))
 
   runtime_component(
     component = "dialog",
@@ -120,22 +120,12 @@ update_block_dialog <- function(
     field("titleHtml", "title", html_or_null),
     field("descriptionHtml", "description", html_or_null),
     field_clearable("footerHtml", "footer", html_fragment),
-    field_clearable("className", "class"),
+    field_clearable("class"),
     field_style("style")
   ))
 
   if (!missing(size)) {
-    allowed <- c("default", "sm", "lg", "xl")
-    if (!is.character(size) || length(size) != 1 || !(size %in% allowed)) {
-      stop(
-        sprintf(
-          "`size` must be one of %s.",
-          paste(shQuote(allowed), collapse = ", ")
-        ),
-        call. = FALSE
-      )
-    }
-    payload$size <- size
+    payload$size <- match_arg(size, c("default", "sm", "lg", "xl"))
   }
 
   runtime_input_update(
@@ -183,8 +173,8 @@ block_popover <- function(
   if (!is.null(id)) {
     validate_input_id(id)
   }
-  side <- match.arg(side)
-  align <- match.arg(align)
+  side <- match_arg(side, c("bottom", "top", "left", "right"))
+  align <- match_arg(align, c("center", "start", "end"))
 
   content_style <- if (!is.null(style)) normalize_runtime_style(style) else NULL
 
@@ -255,10 +245,10 @@ update_block_popover <- function(
     payload$triggerLabel <- trigger
   }
   if (!missing(side)) {
-    payload$side <- match.arg(side, c("bottom", "top", "left", "right"))
+    payload$side <- match_arg(side, c("bottom", "top", "left", "right"))
   }
   if (!missing(align)) {
-    payload$align <- match.arg(align, c("center", "start", "end"))
+    payload$align <- match_arg(align, c("center", "start", "end"))
   }
 
   runtime_input_update(
@@ -302,8 +292,8 @@ block_tooltip <- function(
 ) {
   if (missing(trigger)) trigger <- NULL
   check_string(trigger, "trigger", msg = "`trigger` must be a single string label.")
-  side <- match.arg(side)
-  align <- match.arg(align)
+  side <- match_arg(side, c("top", "bottom", "left", "right"))
+  align <- match_arg(align, c("center", "start", "end"))
   check_number(
     delay_duration, "delay_duration", min = 0,
     msg = "`delay_duration` must be a non-negative numeric scalar."

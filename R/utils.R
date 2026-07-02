@@ -75,7 +75,15 @@ check_character <- function(x, name, null_ok = FALSE, msg = NULL) {
 }
 
 match_arg <- function(arg, choices, arg_name = deparse(substitute(arg))) {
-  if (length(arg) > 1 && all(arg %in% choices)) {
+  # Only the default-signature idiom may pass a vector: the *entire* choice set
+  # (order-insensitive, so a signature may list its default first). A partial
+  # vector like c("lg", "sm") is a caller mistake and must error, not silently
+  # resolve to its first element.
+  if (
+    length(arg) > 1 &&
+      length(arg) == length(choices) &&
+      setequal(arg, choices)
+  ) {
     arg <- arg[[1]]
   }
 
@@ -274,6 +282,32 @@ normalize_runtime_style <- function(style) {
 }
 
 normalize_choices <- function(choices) {
+  # Grouped (optgroup-style) choices — `list(Group = c(a = "1", ...))` as
+  # accepted by `shiny::selectInput()` — are not supported. Flattening them
+  # would silently mangle labels into "Group.a", so reject nesting outright.
+  if (is.list(choices)) {
+    outer_names <- names(choices) %||% rep("", length(choices))
+    nested <- vapply(
+      seq_along(choices),
+      function(i) {
+        x <- choices[[i]]
+        # A list element or a multi-value element is a group; so is a named
+        # element under an outer name (`unlist()` would join them as "A.x").
+        is.list(x) ||
+          length(x) > 1L ||
+          (nzchar(outer_names[[i]]) && !is.null(names(x)))
+      },
+      logical(1)
+    )
+    if (any(nested)) {
+      stop(
+        "`choices` must be a flat vector or list of single values. ",
+        "Grouped (nested) choices are not supported.",
+        call. = FALSE
+      )
+    }
+  }
+
   values <- unlist(choices, recursive = TRUE, use.names = TRUE)
 
   if (length(values) == 0) {

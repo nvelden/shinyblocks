@@ -98,8 +98,8 @@ test_that("block_popover requires a string trigger", {
 })
 
 test_that("block_popover rejects invalid side and align", {
-  expect_error(block_popover(trigger = "x", side = "diagonal"), "should be one of")
-  expect_error(block_popover(trigger = "x", align = "weird"), "should be one of")
+  expect_error(block_popover(trigger = "x", side = "diagonal"), "must be one of")
+  expect_error(block_popover(trigger = "x", align = "weird"), "must be one of")
 })
 
 test_that("block_tooltip emits a runtime payload with trigger and body", {
@@ -125,8 +125,8 @@ test_that("block_tooltip emits a runtime payload with trigger and body", {
 test_that("block_tooltip rejects bad trigger, side, align, and delay", {
   expect_error(block_tooltip(trigger = NULL), "`trigger`", fixed = TRUE)
   expect_error(block_tooltip(trigger = c("a", "b")), "single string", fixed = TRUE)
-  expect_error(block_tooltip(trigger = "x", side = "diagonal"), "should be one of")
-  expect_error(block_tooltip(trigger = "x", align = "weird"), "should be one of")
+  expect_error(block_tooltip(trigger = "x", side = "diagonal"), "must be one of")
+  expect_error(block_tooltip(trigger = "x", align = "weird"), "must be one of")
   expect_error(
     block_tooltip(trigger = "x", delay_duration = -1),
     "non-negative",
@@ -237,7 +237,7 @@ test_that("block_dialog defaults to size = 'default' and forwards size + footer"
 test_that("block_dialog rejects unknown size values", {
   expect_error(
     block_dialog(id = "x", title = "T", size = "huge"),
-    "should be one of"
+    "must be one of"
   )
 })
 
@@ -268,7 +268,7 @@ test_that("update_block_dialog forwards class and style", {
   )
 
   message <- capture$last_payload()
-  expect_identical(message$className, "custom-dialog")
+  expect_identical(message$class, "custom-dialog")
   expect_identical(message$style$border, "2px dashed red")
   expect_identical(message$notify, FALSE)
 })

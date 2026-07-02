@@ -29,7 +29,7 @@ block_radio_group <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
-  orientation <- match.arg(orientation)
+  orientation <- match_arg(orientation, c("vertical", "horizontal"))
   choices_df <- normalize_choices(choices)
   validate_select_choice_values(choices_df$value)
   choice_values <- choices_df$value
@@ -113,7 +113,7 @@ update_block_radio_group <- function(
   ))
 
   if (!missing(orientation)) {
-    payload$orientation <- match.arg(orientation, c("vertical", "horizontal"))
+    payload$orientation <- match_arg(orientation, c("vertical", "horizontal"))
   }
 
   runtime_input_update(

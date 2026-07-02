@@ -164,3 +164,15 @@ test_that("update_block_date_picker rejects invalid replacement dates", {
     "valid `yyyy-mm-dd`"
   )
 })
+
+test_that("POSIX values keep their own timezone's calendar date", {
+  # 10:00 in Auckland is 22:00 *the previous day* in UTC; `as.Date.POSIXct`
+  # defaults to UTC and would report 2026-07-01.
+  eastern <- as.POSIXct("2026-07-02 10:00:00", tz = "Pacific/Auckland")
+  payload <- runtime_payload_from(block_date_picker("d", value = eastern))
+  expect_identical(payload$state$value, "2026-07-02")
+
+  western <- as.POSIXct("2026-07-02 22:00:00", tz = "America/Los_Angeles")
+  payload <- runtime_payload_from(block_date_picker("d", value = western))
+  expect_identical(payload$state$value, "2026-07-02")
+})

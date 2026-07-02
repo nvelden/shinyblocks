@@ -122,3 +122,30 @@ test_that("runtime_payload_json() reports a friendly error for unserialisable pa
     "Runtime payload is not JSON serializable:"
   )
 })
+
+test_that("runtime_mount_id is injective across slug-colliding input ids", {
+  ns <- local_internal()
+
+  # "a.b" and "a-b" share the slug "a-b"; the mount id doubles as a DOM id and
+  # the sendInputMessage routing target, so they must not collide.
+  expect_false(identical(
+    ns$runtime_mount_id("input", "a.b"),
+    ns$runtime_mount_id("input", "a-b")
+  ))
+  expect_false(identical(
+    ns$runtime_mount_id("input", "a.b"),
+    ns$runtime_mount_id("input", "a:b")
+  ))
+
+  # Deterministic: the UI constructor and the updater must compute the same id.
+  expect_identical(
+    ns$runtime_mount_id("input", "a.b"),
+    ns$runtime_mount_id("input", "a.b")
+  )
+
+  # Ids untouched by slugging keep their bare, stable form.
+  expect_identical(
+    ns$runtime_mount_id("input", "my-input_1"),
+    "sb-runtime-input-my-input_1"
+  )
+})

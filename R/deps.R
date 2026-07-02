@@ -49,7 +49,28 @@ shinyblocks_version <- function() {
   version
 }
 
+# Memoized: every block_*() call attaches the dependency, and the mtime stamp
+# cannot change within a running process under normal use. Recomputing it would
+# stat every asset file once per tag (hundreds of syscalls per page render).
+# Set `options(shinyblocks.asset_version_cache = FALSE)` during asset
+# development to recompute on each call (e.g. after rebuilding the runtime
+# without restarting R).
+asset_version_state <- new.env(parent = emptyenv())
+
 shinyblocks_asset_version <- function() {
+  use_cache <- !isFALSE(getOption("shinyblocks.asset_version_cache"))
+  if (use_cache && !is.null(asset_version_state$version)) {
+    return(asset_version_state$version)
+  }
+
+  version <- compute_shinyblocks_asset_version()
+  if (use_cache) {
+    asset_version_state$version <- version
+  }
+  version
+}
+
+compute_shinyblocks_asset_version <- function() {
   version <- shinyblocks_version()
   www <- shinyblocks_www_dir()
   if (is.null(www)) {

@@ -128,7 +128,7 @@ export function FileInput({ payload, root }) {
         if ("disabled" in data) next.disabled = Boolean(data.disabled);
         if ("invalid" in data) next.invalid = Boolean(data.invalid);
         if ("style" in data) next.style = data.style || {};
-        if ("className" in data) next.className = data.className || "";
+        if ("class" in data) next.className = data.class || "";
         return next;
       });
       if (native) {
