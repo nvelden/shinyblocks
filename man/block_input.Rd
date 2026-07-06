@@ -9,6 +9,9 @@ block_input(
   value = "",
   placeholder = NULL,
   type = c("text", "password", "email", "url", "tel", "search", "number"),
+  min = NULL,
+  max = NULL,
+  step = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -26,6 +29,16 @@ block_input(
 \item{type}{Input type. One of \code{"text"}, \code{"password"}, \code{"email"},
 \code{"url"}, \code{"tel"}, \code{"search"}, or \code{"number"}. Defaults to \code{"text"}.}
 
+\item{min}{Optional numeric lower bound. Only valid when
+\code{type = "number"}.}
+
+\item{max}{Optional numeric upper bound. Only valid when
+\code{type = "number"}.}
+
+\item{step}{Optional positive step size for the stepper buttons and
+arrow keys. Only valid when \code{type = "number"}; defaults to 1 in the
+browser when unset.}
+
 \item{width}{Optional CSS width value (applied to the wrapper).}
 
 \item{disabled}{Whether the control is disabled.}
@@ -42,6 +55,14 @@ An \code{htmltools} tag.
 }
 \description{
 Create a styled single-line text input
+}
+\details{
+When \code{type = "number"}, the control renders increment/decrement stepper
+buttons and \verb{input$<input_id>} reports a numeric value (like
+\code{\link[shiny:numericInput]{shiny::numericInput()}}): \code{NA} while the field is empty or unparseable,
+a numeric scalar otherwise. All other types report a character string.
+The reported type is fixed when the control first binds; switching to or
+from \code{"number"} with \code{update_block_input()} does not change it.
 }
 \seealso{
 Other forms:

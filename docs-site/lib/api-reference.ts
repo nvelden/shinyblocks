@@ -579,8 +579,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Builds a standard single-line interactive form input element.",
       arguments: [
         { argument: "input_id", type: "character", defaultVal: "required", description: "Input identifier." },
-        { argument: "type", type: "'text' | 'password' | 'email' | 'url' | 'tel' | 'search' | 'number'", defaultVal: "'text'", description: "HTML text field variant category type." },
+        { argument: "type", type: "'text' | 'password' | 'email' | 'url' | 'tel' | 'search' | 'number'", defaultVal: "'text'", description: "HTML text field variant category type. The number type renders stepper buttons and reports a numeric value (NA while empty)." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Preview text before typing." },
+        { argument: "min", type: "numeric", defaultVal: "NULL", description: "Lower bound for the stepper and arrow keys (number type only)." },
+        { argument: "max", type: "numeric", defaultVal: "NULL", description: "Upper bound for the stepper and arrow keys (number type only)." },
+        { argument: "step", type: "numeric", defaultVal: "NULL", description: "Positive step size (number type only; browser default 1)." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user inputs." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Highlight validation error borders." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Custom layout wrapper styling." },
@@ -595,6 +598,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input control ID." },
         { argument: "value", type: "character", defaultVal: "NULL", description: "Update text input value." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Set new placeholder copy." },
+        { argument: "min", type: "numeric", defaultVal: "NULL", description: "Replace the lower bound (number type only); NULL clears it." },
+        { argument: "max", type: "numeric", defaultVal: "NULL", description: "Replace the upper bound (number type only); NULL clears it." },
+        { argument: "step", type: "numeric", defaultVal: "NULL", description: "Replace the step size (number type only); NULL resets to 1." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Freeze/unfreeze input." },
         { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle validation visual highlights." }
       ]

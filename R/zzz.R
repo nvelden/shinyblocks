@@ -46,6 +46,16 @@
     count_num
   }, force = TRUE)
 
+  # Number inputs (`block_input(type = "number")`) report their raw text; the
+  # typed handler converts it so `input$<id>` behaves like `numericInput()`:
+  # empty or unparseable text is NA, everything else a numeric scalar.
+  shiny::registerInputHandler("shinyblocks.number", function(val, transport, name) {
+    if (is.null(val)) return(NULL)
+    val <- as.character(val)
+    if (length(val) != 1 || !nzchar(trimws(val))) return(NA_real_)
+    suppressWarnings(as.numeric(val))
+  }, force = TRUE)
+
   # Progress is display-only: its binding declares `type = "shinyblocks.progress"`
   # (so getType()/the payload agree) but reports no value. Register a handler so
   # Shiny accepts the typed message instead of erroring on an unknown type; it

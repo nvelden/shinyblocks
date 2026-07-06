@@ -195,6 +195,15 @@ ui <- shiny::fluidPage(
     step = 5,
     class = "runtime-slider-fixture"
   ),
+  block_input(
+    "runtime_number",
+    value = 5,
+    type = "number",
+    min = 0,
+    max = 10,
+    step = 5,
+    class = "runtime-number-fixture"
+  ),
   block_button(
     "Runtime button",
     id = "runtime_button",
@@ -319,6 +328,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_checkbox_value"),
   shiny::verbatimTextOutput("runtime_switch_value"),
   shiny::verbatimTextOutput("runtime_slider_value"),
+  shiny::verbatimTextOutput("runtime_number_value"),
+  shiny::verbatimTextOutput("runtime_number_class"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_task_button_value"),
@@ -358,6 +369,7 @@ ui <- shiny::fluidPage(
   shiny::actionButton("disable_switch", "Disable switch"),
   shiny::actionButton("enable_switch", "Enable switch"),
   shiny::actionButton("set_slider_75", "Set slider 75"),
+  shiny::actionButton("set_number_7", "Set number 7"),
   shiny::actionButton("disable_slider", "Disable slider"),
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
@@ -480,6 +492,16 @@ server <- function(input, output, session) {
       return("<NULL>")
     }
     paste(value, collapse = ",")
+  })
+  output$runtime_number_value <- shiny::renderText({
+    value <- input$runtime_number
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    format(value)
+  })
+  output$runtime_number_class <- shiny::renderText({
+    class(input$runtime_number)[1]
   })
   output$runtime_button_value <- shiny::renderText({
     value <- input$runtime_button
@@ -792,6 +814,15 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_slider",
       value = 75,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$set_number_7, {
+    update_block_input(
+      session = session,
+      input_id = "runtime_number",
+      value = 7,
       notify = TRUE
     )
   })

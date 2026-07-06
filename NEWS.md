@@ -1,5 +1,9 @@
 # shinyblocks (development version)
 
+### Components
+
+* `block_input(type = "number")` now has a first-class numeric contract (issue #96). New `min`, `max`, and `step` arguments (number type only) drive increment/decrement stepper buttons rendered inside the control's right edge, the native arrow-key stepping, and stepper bound clamping; `update_block_input()` accepts the same arguments (`NULL` clears a bound). `input$<id>` for number inputs now reports a numeric value like `shiny::numericInput()` — `NA` while the field is empty or unparseable — instead of a character string; other types are unchanged.
+
 ### Bug fixes
 
 * `block_date_picker()` and `block_date_range_picker()` now format `POSIXct`/`POSIXlt` values in the value's own timezone. Previously they routed through `as.Date()`, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).
