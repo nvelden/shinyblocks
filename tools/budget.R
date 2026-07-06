@@ -47,10 +47,12 @@ targets <- list(
     # day grid, selected/today/disabled/focus states) adds ~4 KB raw. Raised
     # 65 -> 70 KB for the #61 date-range-picker runtime CSS (trigger + portaled
     # range calendar: in-range band, range-start/end endpoints, hover-preview
-    # reduced-emphasis states) adds ~3.5 KB raw.
+    # reduced-emphasis states) adds ~3.5 KB raw. Raised 70 -> 72 KB for the
+    # #96 number-input stepper CSS (wrapper, stacked stepper buttons, native
+    # spinner suppression) adds ~0.9 KB raw (lands at ~70.8 KB).
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 70,
+    limit_kb = 72,
     metric = "raw",
     group = "runtime"
   ),
@@ -85,9 +87,12 @@ targets <- list(
     # state machine, decorative spinner, persistent live-status region, and the
     # author/controlled aria-label arbitration) adds ~2.6 KB raw (lands at
     # ~294.6 KB). Gzipped (86 KB) stays the meaningful transfer budget and is
-    # within limit; raw remains the headroom guard.
+    # within limit; raw remains the headroom guard. Raised 296 -> 300 KB for
+    # the #96 number-input stepper (min/max/step state + receive fields,
+    # stepper buttons, typed-number getType) adds ~1.5 KB raw (lands at
+    # ~297.5 KB); gzipped (87 KB) unchanged and within limit.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 296,
+    limit_kb = 300,
     metric = "raw",
     group = "runtime"
   ),
@@ -106,9 +111,11 @@ targets <- list(
     # zlib tips over on CI, so 86 KB restores margin. Raised 86 -> 87 KB for
     # the #69 task-button state machine and binding: Linux zlib reports 86.1 KB
     # while macOS remains at 86.0 KB, so the prior limit had no cross-platform
-    # margin.
+    # margin. Raised 87 -> 88 KB for the #96 number-input stepper: macOS lands
+    # at exactly 87.0 KB, which leaves no margin for the platform-variant zlib
+    # on CI.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 87,
+    limit_kb = 88,
     metric = "gzipped",
     group = "runtime"
   ),
