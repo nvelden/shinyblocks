@@ -247,6 +247,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-input-group-fixtures", property: "color", token: "--foreground" }
     ]
   },
+  breadcrumb: {
+    section: "breadcrumb",
+    bindings: [
+      { selector: ".sb-parity-breadcrumb-default .sb-breadcrumb-list", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-breadcrumb-default .sb-breadcrumb-page", property: "color", token: "--foreground" }
+    ]
+  },
   "image-output": {
     section: "image-output",
     bindings: [

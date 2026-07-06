@@ -897,6 +897,36 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  breadcrumb: [
+    {
+      name: "block_breadcrumb",
+      description: "Static page-shell breadcrumb trail rendered as a nav[aria-label='breadcrumb'] landmark.",
+      arguments: [
+        { argument: "...", type: "tags", defaultVal: "required", description: "block_breadcrumb_item() and block_breadcrumb_ellipsis() entries; separators are inserted automatically." },
+        { argument: "separator", type: "character | tag", defaultVal: "NULL", description: "Separator between entries (string or tag); defaults to a chevron icon, hidden from assistive technology." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline CSS styles for the nav container." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the nav container." }
+      ]
+    },
+    {
+      name: "block_breadcrumb_item",
+      description: "One breadcrumb entry: a link, plain text, or the aria-current page marker.",
+      arguments: [
+        { argument: "label", type: "character | tag", defaultVal: "required", description: "Entry label." },
+        { argument: "href", type: "character", defaultVal: "NULL", description: "Destination URL; renders an anchor. Ignored when current = TRUE." },
+        { argument: "current", type: "logical", defaultVal: "FALSE", description: "Marks the current page: non-interactive span with aria-current='page'." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the list entry." }
+      ]
+    },
+    {
+      name: "block_breadcrumb_ellipsis",
+      description: "Collapsed-middle marker for long trails: decorative glyph plus visually hidden label.",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "'More'", description: "Visually hidden text announced to assistive technology." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the list entry." }
+      ]
+    }
+  ],
   separator: [
     {
       name: "block_separator",
