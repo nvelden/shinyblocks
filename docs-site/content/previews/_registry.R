@@ -84,6 +84,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Combobox",
+    slug = "combobox",
+    file = "combobox.R",
+    description = "Searchable select with type-to-filter, keyboard navigation, and single or multiple modes.",
+    featured = TRUE
+  ),
+  list(
     name = "Date Picker",
     slug = "date-picker",
     file = "date-picker.R",

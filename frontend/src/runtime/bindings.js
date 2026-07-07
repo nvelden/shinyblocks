@@ -22,6 +22,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "button",
   "task-button",
   "select",
+  "combobox",
   "dialog",
   "popover",
   "checkbox",
@@ -329,6 +330,78 @@ const BINDING_CONFIGS = [
     }
   },
   {
+    // Searchable select. Shares the select value bridge (hidden native
+    // `<select>` read in single/multiple mode); the React view is the single
+    // writer that keeps the native options synchronized. `__sbComboboxReceive`
+    // is a distinct expando so combobox and select can coexist on a page.
+    component: "combobox",
+    requireInputId: false,
+    receiveProp: "__sbComboboxReceive",
+    getValue(el) {
+      const native = nativeSelect(el);
+      if (!native) return null;
+      return native.multiple ? getNativeMultiValue(el) : native.value;
+    },
+    setValue(el, value) {
+      const native = nativeSelect(el);
+      if (native && native.multiple) {
+        const selected = toMultiSelectedArray(value);
+        setNativeMultiValue(el, selected, false);
+        if (typeof el.__sbComboboxReceive === "function") {
+          el.__sbComboboxReceive({ selected, notify: false });
+        }
+        return;
+      }
+      const single = toSingleSelected(value);
+      setNativeValue(el, single, false);
+      if (typeof el.__sbComboboxReceive === "function") {
+        el.__sbComboboxReceive({ selected: single, notify: false });
+      }
+    },
+    subscribe(el, callback) {
+      const native = nativeSelect(el);
+      if (!native) return;
+      const handler = () => callback(false);
+      native.addEventListener("change", handler);
+      el.__sbComboboxChangeHandler = handler;
+    },
+    unsubscribe(el) {
+      const native = nativeSelect(el);
+      if (!native || !el.__sbComboboxChangeHandler) return;
+      native.removeEventListener("change", el.__sbComboboxChangeHandler);
+      delete el.__sbComboboxChangeHandler;
+    },
+    receiveMessage(el, data) {
+      if (typeof el.__sbComboboxReceive === "function") {
+        el.__sbComboboxReceive(data);
+        return;
+      }
+      // Pre-mount fallback: write directly to native.
+      const native = nativeSelect(el);
+      const multiple = Boolean(native && native.multiple);
+      if (Object.prototype.hasOwnProperty.call(data, "choices")) {
+        if (multiple) {
+          setNativeMultiChoices(
+            el,
+            data.choices,
+            Object.prototype.hasOwnProperty.call(data, "selected")
+              ? toMultiSelectedArray(data.selected)
+              : getNativeMultiValue(el)
+          );
+        } else {
+          setNativeChoices(el, data.choices, data.placeholder, data.selected);
+        }
+      }
+      if (Object.prototype.hasOwnProperty.call(data, "selected")) {
+        if (multiple) {
+          setNativeMultiValue(el, toMultiSelectedArray(data.selected), Boolean(data.notify));
+        } else {
+          setNativeValue(el, data.selected, Boolean(data.notify));
+        }
+      }
+    }
+  },
+  {
     component: "dialog",
     requireInputId: false,
     receiveProp: "__sbDialogReceive",
@@ -601,6 +674,7 @@ const BINDING_NAMES = [
   "shinyblocks.button",
   "shinyblocks.task_button",
   "shinyblocks.select",
+  "shinyblocks.combobox",
   "shinyblocks.dialog",
   "shinyblocks.popover",
   "shinyblocks.checkbox",

@@ -143,7 +143,7 @@ test_that("showcase owns its theme in the page head and renders one body landmar
   head <- fixture$head
   html <- fixture$html
 
-  expect_match(head, 'href="showcase.css?v=20260616_01"', fixed = TRUE)
+  expect_match(head, 'href="showcase.css?v=20260707_01"', fixed = TRUE)
   body_matches <- regmatches(
     html,
     gregexpr('<main class="sb-body">', html, fixed = TRUE)

@@ -2,6 +2,7 @@
 
 ### Components
 
+* New `block_combobox()` / `update_block_combobox()`: a searchable select (shadcn Command + Popover) with type-to-filter over choices, keyboard navigation, and a no-results empty state. Supports single and multiple modes (chips with an optional `max_items` cap), `search_placeholder`/`empty_message` text, and the same hidden-native value bridge and updater contract as `block_select()`. Closes the biggest catalog gap for `selectizeInput()` migration (#85).
 * New `block_toggle_group()` / `update_block_toggle_group()`: a segmented single/multiple toggle input (view switchers, formatting toolbars) reporting a string (single) or character vector (multiple) to `input$<id>`. Supports `default`/`outline` variants, three sizes, per-choice icons (vendored names or tags) with optional icon-only items, and group-wide or per-item disabling (#93).
 
 ### Bug fixes

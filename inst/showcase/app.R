@@ -6,6 +6,7 @@ source(file.path("R", "section.R"), local = TRUE)
 source(file.path("R", "server_button.R"), local = TRUE)
 source(file.path("R", "server_task_button.R"), local = TRUE)
 source(file.path("R", "server_select.R"), local = TRUE)
+source(file.path("R", "server_combobox.R"), local = TRUE)
 source(file.path("R", "server_date_picker.R"), local = TRUE)
 source(file.path("R", "server_date_range_picker.R"), local = TRUE)
 source(file.path("R", "server_checkbox.R"), local = TRUE)
@@ -171,6 +172,18 @@ sections <- list(
     title = "Select",
     lead = NULL,
     file = "select.R"
+  ),
+  list(
+    id = "combobox",
+    label = "Combobox",
+    icon = "search",
+    title = "Combobox",
+    lead = paste(
+      "A searchable select: type-to-filter over choices with keyboard",
+      "navigation, single and multiple modes, and the same hidden-native value",
+      "bridge as block_select()."
+    ),
+    file = "combobox.R"
   ),
   list(
     id = "date-picker",
@@ -560,6 +573,7 @@ server <- function(input, output, session) {
   register_task_button_showcase(input, output, session)
   register_code_showcase(input, output, session)
   register_select_showcase(input, output, session)
+  register_combobox_showcase(input, output, session)
   register_date_picker_showcase(input, output, session)
   register_date_range_picker_showcase(input, output, session)
   register_checkbox_showcase(input, output, session)

@@ -65,6 +65,7 @@ for \code{type = "single"}, a character vector for \code{type = "multiple"}.
 \seealso{
 Other forms:
 \code{\link[=block_checkbox]{block_checkbox()}},
+\code{\link[=block_combobox]{block_combobox()}},
 \code{\link[=block_date_picker]{block_date_picker()}},
 \code{\link[=block_date_range_picker]{block_date_range_picker()}},
 \code{\link[=block_field]{block_field()}},
@@ -84,6 +85,7 @@ Other forms:
 \code{\link[=block_switch]{block_switch()}},
 \code{\link[=block_textarea]{block_textarea()}},
 \code{\link[=update_block_checkbox]{update_block_checkbox()}},
+\code{\link[=update_block_combobox]{update_block_combobox()}},
 \code{\link[=update_block_date_picker]{update_block_date_picker()}},
 \code{\link[=update_block_date_range_picker]{update_block_date_range_picker()}},
 \code{\link[=update_block_file_input]{update_block_file_input()}},

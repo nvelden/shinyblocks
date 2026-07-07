@@ -400,6 +400,42 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  combobox: [
+    {
+      name: "block_combobox",
+      description: "A searchable select (shadcn Command + Popover): type-to-filter over choices with keyboard navigation, single and multiple modes, and the same hidden-native value bridge as block_select().",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Shiny input binding identifier." },
+        { argument: "choices", type: "list | character", defaultVal: "required", description: "List of selectable values/keys." },
+        { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Initial selected value; use a vector for multiple mode." },
+        { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Prompt text shown on the trigger when selection is empty." },
+        { argument: "search_placeholder", type: "character", defaultVal: "'Search...'", description: "Placeholder shown in the type-to-filter box." },
+        { argument: "empty_message", type: "character", defaultVal: "'No results found.'", description: "Message shown when the filter matches no choices." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user inputs." },
+        { argument: "width", type: "character", defaultVal: "'100%'", description: "Dimensions layout width." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styling string." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Sizing dimensions." },
+        { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply invalid visual highlights." },
+        { argument: "multiple", type: "logical", defaultVal: "FALSE", description: "Allow selecting multiple values." },
+        { argument: "max_items", type: "integer", defaultVal: "NULL", description: "Optional maximum selected values in multiple mode." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional styling classes." }
+      ]
+    },
+    {
+      name: "update_block_combobox",
+      description: "Overwrites values, choices, filter/empty text, or input locks from R servers.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session object." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
+        { argument: "choices", type: "list | character", defaultVal: "NULL", description: "New selection choices list." },
+        { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Value selector key or vector to choose." },
+        { argument: "search_placeholder", type: "character", defaultVal: "NULL", description: "Replacement filter-box placeholder." },
+        { argument: "empty_message", type: "character", defaultVal: "NULL", description: "Replacement empty-state message." },
+        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle input disabled state." },
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." }
+      ]
+    }
+  ],
   "date-picker": [
     {
       name: "block_date_picker",

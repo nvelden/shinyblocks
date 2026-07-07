@@ -175,6 +175,13 @@ ui <- shiny::fluidPage(
     max_items = 2,
     class = "runtime-multi-select-fixture"
   ),
+  block_combobox(
+    "runtime_combobox",
+    choices = c(Apple = "apple", Apricot = "apricot", Banana = "banana", Cherry = "cherry"),
+    selected = "apple",
+    placeholder = "Choose fruit",
+    class = "runtime-combobox-fixture"
+  ),
   block_checkbox(
     "runtime_checkbox",
     "Runtime checkbox",
@@ -329,6 +336,7 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("choice_value"),
   shiny::verbatimTextOutput("nested_value"),
   shiny::verbatimTextOutput("runtime_select_value"),
+  shiny::verbatimTextOutput("runtime_combobox_value"),
   shiny::verbatimTextOutput("runtime_multi_select_value"),
   shiny::verbatimTextOutput("runtime_multi_select_length"),
   shiny::verbatimTextOutput("runtime_checkbox_value"),
@@ -364,6 +372,9 @@ ui <- shiny::fluidPage(
   shiny::actionButton("clear_select", "Clear select"),
   shiny::actionButton("disable_select", "Disable select"),
   shiny::actionButton("enable_select", "Enable select"),
+  shiny::actionButton("set_combobox_cherry", "Set combobox Cherry"),
+  shiny::actionButton("disable_combobox", "Disable combobox"),
+  shiny::actionButton("enable_combobox", "Enable combobox"),
   shiny::actionButton("set_multi_select", "Set multi select"),
   shiny::actionButton("clear_multi_select", "Clear multi select"),
   shiny::actionButton("disable_multi_select", "Disable multi select"),
@@ -456,6 +467,16 @@ server <- function(input, output, session) {
   output$nested_value <- shiny::renderText(input$nested %||% "<NULL>")
   output$runtime_select_value <- shiny::renderText({
     value <- input$runtime_select
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    if (identical(value, "")) {
+      return("<EMPTY>")
+    }
+    value
+  })
+  output$runtime_combobox_value <- shiny::renderText({
+    value <- input$runtime_combobox
     if (is.null(value)) {
       return("<NULL>")
     }
@@ -717,6 +738,31 @@ server <- function(input, output, session) {
     update_block_select(
       session = session,
       input_id = "runtime_select",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_combobox_cherry, {
+    update_block_combobox(
+      session = session,
+      input_id = "runtime_combobox",
+      selected = "cherry",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_combobox, {
+    update_block_combobox(
+      session = session,
+      input_id = "runtime_combobox",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_combobox, {
+    update_block_combobox(
+      session = session,
+      input_id = "runtime_combobox",
       disabled = FALSE
     )
   })
