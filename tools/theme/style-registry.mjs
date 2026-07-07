@@ -242,6 +242,11 @@ export const STYLE_REGISTRY = {
   },
 
   // --- Runtime components: profile-neutral -------------------------------
+  "dropdown-menu": {
+    section: "dropdown_menu",
+    mode: "profile-neutral",
+    reason: "The dropdown menu content reuses the popover surface tokens (--sb-popover-radius/-border/-surface/-shadow), so profile geometry reaches it through the popover overlay entry; its own item rows draw radius straight from the base --radius token and expose no dropdown-specific geometry token for a profile to override."
+  },
   separator: {
     section: "separator",
     mode: "profile-neutral",

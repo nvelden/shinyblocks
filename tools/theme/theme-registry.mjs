@@ -95,6 +95,11 @@ export const THEME_REGISTRY = {
     mode: "static-only",
     reason: "Dialog content (bg --background, border --border) only renders when the overlay is open; CSS is token-driven and covered by the static check."
   },
+  "dropdown-menu": {
+    section: "dropdown_menu",
+    mode: "static-only",
+    reason: "Menu content (bg --popover, items --accent/--destructive) only renders when open; CSS is token-driven and covered by the static check."
+  },
   empty: {
     section: "empty",
     bindings: [

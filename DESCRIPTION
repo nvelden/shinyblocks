@@ -29,6 +29,7 @@ Collate:
     'image.R'
     'alert.R'
     'overlays.R'
+    'dropdown-menu.R'
     'indicators.R'
     'components.R'
     'field.R'

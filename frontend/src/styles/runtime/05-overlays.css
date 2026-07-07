@@ -130,6 +130,99 @@
   box-shadow: var(--sb-popover-shadow, var(--sb-overlay-shadow));
 }
 
+/* Dropdown menu — portal-rendered action menu. Reuses the popover surface
+ * tokens; rows follow the select-item accent/destructive language. */
+[data-shinyblocks-portal-root] .sb-dropdown-menu-content {
+  z-index: 60;
+  min-width: 8rem;
+  max-width: 20rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  border: 1px solid var(--sb-popover-border, var(--border));
+  border-radius: var(--sb-popover-radius, calc(var(--radius) * 0.8));
+  background-color: var(--sb-popover-surface, var(--popover));
+  backdrop-filter: var(--sb-surface-backdrop, none);
+  color: var(--popover-foreground);
+  padding: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow: var(--sb-popover-shadow, var(--sb-overlay-shadow));
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-label {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-separator {
+  height: 1px;
+  margin: 0.25rem -0.25rem;
+  background-color: var(--border);
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: calc(var(--radius) * 0.6);
+  color: var(--popover-foreground);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item[data-highlighted="true"],
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item:focus-visible {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item[data-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: default;
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item[data-variant="destructive"] {
+  color: var(--destructive);
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item[data-variant="destructive"][data-highlighted="true"],
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item[data-variant="destructive"]:focus-visible {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground, var(--primary-foreground));
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-item-label {
+  flex: 1 1 auto;
+}
+
+[data-shinyblocks-portal-root] .sb-dropdown-menu-shortcut {
+  margin-left: auto;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
 [data-shinyblocks-portal-root] .sb-tooltip-content {
   z-index: 70;
   max-width: 18rem;

@@ -328,6 +328,18 @@ ui <- shiny::fluidPage(
       "Inner action"
     )
   ),
+  block_dropdown_menu(
+    "Open dropdown",
+    id = "runtime_dropdown_menu",
+    dropdown_menu_label("Account"),
+    dropdown_menu_item("profile", "Profile"),
+    dropdown_menu_item("billing", "Billing", disabled = TRUE),
+    dropdown_menu_separator(),
+    dropdown_menu_item("logout", "Log out", variant = "destructive")
+  ),
+  shiny::verbatimTextOutput("runtime_dropdown_menu_value"),
+  shiny::actionButton("open_dropdown_menu", "Open dropdown (server)"),
+  shiny::actionButton("replace_dropdown_menu", "Replace dropdown items"),
   block_toaster("runtime_toaster", position = "bottom-right"),
   shiny::verbatimTextOutput("runtime_toaster_value"),
   shiny::actionButton("fire_toast", "Fire toast"),
@@ -644,6 +656,23 @@ server <- function(input, output, session) {
       return("TRUE")
     }
     "FALSE"
+  })
+  output$runtime_dropdown_menu_value <- shiny::renderText({
+    value <- input$runtime_dropdown_menu
+    if (is.null(value)) "<NULL>" else as.character(value)
+  })
+  shiny::observeEvent(input$open_dropdown_menu, {
+    update_block_dropdown_menu(session, "runtime_dropdown_menu", open = TRUE)
+  })
+  shiny::observeEvent(input$replace_dropdown_menu, {
+    update_block_dropdown_menu(
+      session,
+      "runtime_dropdown_menu",
+      items = list(
+        dropdown_menu_item("invite", "Invite members"),
+        dropdown_menu_item("new_team", "New team")
+      )
+    )
   })
   output$runtime_table_sel_value <- shiny::renderText({
     rows <- input$runtime_table_sel_rows_selected

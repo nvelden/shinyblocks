@@ -1102,6 +1102,46 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "dropdown-menu": [
+    {
+      name: "block_dropdown_menu",
+      description: "Portal-rendered action menu built from item/label/separator parts; choosing an item reports its value to input$id as an event.",
+      arguments: [
+        { argument: "trigger", type: "character | shiny.tag", defaultVal: "required", description: "Trigger label string or an arbitrary tag (icon button, avatar)." },
+        { argument: "...", type: "menu parts", defaultVal: "required", description: "dropdown_menu_item(), dropdown_menu_label(), dropdown_menu_separator()." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional input id; input$id reports the chosen item value as an event." },
+        { argument: "label", type: "character", defaultVal: "NULL", description: "Accessible name for the trigger; recommended for icon-only triggers." },
+        { argument: "side", type: "'bottom' | 'top' | 'left' | 'right'", defaultVal: "'bottom'", description: "Side of the trigger to anchor on." },
+        { argument: "align", type: "'start' | 'center' | 'end'", defaultVal: "'start'", description: "Alignment along the anchored side." },
+        { argument: "trigger_variant", type: "character", defaultVal: "'outline'", description: "Button variant for a string trigger." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Whether the trigger is disabled." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles on the menu content container." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the menu content container." }
+      ]
+    },
+    {
+      name: "dropdown_menu_item",
+      description: "A selectable action row. Choosing it reports its value to the parent menu's input$id.",
+      arguments: [
+        { argument: "value", type: "character", defaultVal: "required", description: "Value reported to the parent menu's input$id." },
+        { argument: "label", type: "character", defaultVal: "value", description: "Item label." },
+        { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional leading icon." },
+        { argument: "shortcut", type: "character", defaultVal: "NULL", description: "Right-aligned keyboard-shortcut hint (display only)." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Whether the item is non-interactive." },
+        { argument: "variant", type: "'default' | 'destructive'", defaultVal: "'default'", description: "Item visual variant." }
+      ]
+    },
+    {
+      name: "update_block_dropdown_menu",
+      description: "Server-driven update: replace items, open/close, reposition, disable, or restyle the menu.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active R/Shiny session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Dropdown-menu input id." },
+        { argument: "items", type: "menu parts", defaultVal: "-", description: "Replacement menu parts." },
+        { argument: "open", type: "logical", defaultVal: "-", description: "Programmatically open/close the menu." }
+      ]
+    }
+  ],
   tooltip: [
     {
       name: "block_tooltip",

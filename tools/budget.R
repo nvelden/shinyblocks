@@ -51,9 +51,12 @@ targets <- list(
     # #93 toggle-group CSS (joined segmented control, outline/collapsed inner
     # borders, three sizes, icon slot) adds ~2.2 KB raw (lands at ~72.2 KB),
     # leaving margin for the in-flight #96 stepper CSS (~0.9 KB) to merge.
+    # Raised 74 -> 77 KB for the #86 dropdown-menu CSS (portaled action menu:
+    # content surface, label/separator, item hover/focus + destructive/disabled
+    # variants, icon slot, shortcut) adds ~1.3 KB raw (lands at ~75.2 KB).
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 74,
+    limit_kb = 77,
     metric = "raw",
     group = "runtime"
   ),
@@ -96,9 +99,12 @@ targets <- list(
     # component (single + multiple views with a portaled filter box, empty
     # state, and filtered keyboard navigation) + its binding adds ~11 KB raw
     # (lands at ~315.5 KB) on top of the shared select-popover hook and
-    # native-input helpers (reused, not duplicated).
+    # native-input helpers (reused, not duplicated). Raised 318 -> 323 KB for
+    # the #86 dropdown-menu runtime: the action-menu component (portal, floating
+    # position, roving focus, keyboard nav + typeahead) + its event-value
+    # binding adds ~4 KB raw (lands at ~321.9 KB) reusing the overlays helpers.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 318,
+    limit_kb = 323,
     metric = "raw",
     group = "runtime"
   ),
