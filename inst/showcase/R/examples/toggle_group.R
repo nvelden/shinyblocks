@@ -8,7 +8,7 @@ htmltools::tagList(
           block_input("showcase_toggle_group_doc_label", value = "View")
         ),
         block_field(
-          block_field_label("choices (one per line, label|value)", `for` = "showcase_toggle_group_doc_choices"),
+          block_field_label("choices", `for` = "showcase_toggle_group_doc_choices"),
           block_textarea(
             "showcase_toggle_group_doc_choices",
             value = "List|list\nGrid|grid\nBoard|board",
@@ -17,7 +17,7 @@ htmltools::tagList(
           )
         ),
         block_field(
-          block_field_label("initial selected (comma-separated)", `for` = "showcase_toggle_group_doc_selected"),
+          block_field_label("initial selected", `for` = "showcase_toggle_group_doc_selected"),
           block_input("showcase_toggle_group_doc_selected", value = "list")
         ),
         block_field(
@@ -26,7 +26,7 @@ htmltools::tagList(
         ),
         block_field(
           block_field_label("icon_only", `for` = "showcase_toggle_group_doc_icon_only"),
-          block_checkbox("showcase_toggle_group_doc_icon_only", "Icon-only items (requires icons)", value = FALSE)
+          block_checkbox("showcase_toggle_group_doc_icon_only", "Icon-only items", value = FALSE)
         )
       ),
       showcase_controls_group(

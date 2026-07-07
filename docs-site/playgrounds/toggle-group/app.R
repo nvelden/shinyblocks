@@ -141,7 +141,7 @@ ui <- block_page(
               )
             ),
             block_field(
-              block_field_label("initial selected (comma-separated)", `for` = "showcase_toggle_group_doc_selected"),
+              block_field_label("initial selected", `for` = "showcase_toggle_group_doc_selected"),
               block_input("showcase_toggle_group_doc_selected", value = "list")
             )
           ),
