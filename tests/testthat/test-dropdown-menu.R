@@ -6,7 +6,7 @@ test_that("block_dropdown_menu emits a runtime payload with items and binding", 
       dropdown_menu_label("Account"),
       dropdown_menu_item("profile", "Profile", icon = "user"),
       dropdown_menu_separator(),
-      dropdown_menu_item("logout", "Log out", variant = "destructive", shortcut = "⌘Q"),
+      dropdown_menu_item("logout", "Log out", variant = "destructive", shortcut = "\u2318Q"),
       side = "top",
       align = "end"
     )
@@ -28,7 +28,7 @@ test_that("block_dropdown_menu emits a runtime payload with items and binding", 
   expect_identical(items[[2]]$iconName, "user")
   expect_identical(items[[3]]$type, "separator")
   expect_identical(items[[4]]$variant, "destructive")
-  expect_identical(items[[4]]$shortcut, "⌘Q")
+  expect_identical(items[[4]]$shortcut, "\u2318Q")
 })
 
 test_that("block_dropdown_menu without id is client-only", {

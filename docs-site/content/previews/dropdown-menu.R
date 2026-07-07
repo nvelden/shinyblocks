@@ -28,7 +28,7 @@ shinyblocks::block_stack(
       `data-slot` = "dropdown-menu-item",
       `data-highlighted` = "true",
       htmltools::tags$span(class = "sb-dropdown-menu-item-label", "Profile"),
-      htmltools::tags$span(class = "sb-dropdown-menu-shortcut", "⌘P")
+      htmltools::tags$span(class = "sb-dropdown-menu-shortcut", "\u2318P")
     ),
     htmltools::tags$div(
       class = "sb-dropdown-menu-item",

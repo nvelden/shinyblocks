@@ -12,7 +12,7 @@ register_dropdown_menu_showcase <- function(input, output, session) {
       dropdown_menu_item(
         "profile", "Profile",
         icon = if (icons) "user" else NULL,
-        shortcut = if (shortcuts) "⌘P" else NULL
+        shortcut = if (shortcuts) "\u2318P" else NULL
       ),
       dropdown_menu_item(
         "billing", "Billing",
@@ -22,7 +22,7 @@ register_dropdown_menu_showcase <- function(input, output, session) {
       dropdown_menu_item(
         "settings", "Settings",
         icon = if (icons) "settings" else NULL,
-        shortcut = if (shortcuts) "⌘," else NULL
+        shortcut = if (shortcuts) "\u2318," else NULL
       ),
       dropdown_menu_separator()
     )
@@ -41,28 +41,30 @@ register_dropdown_menu_showcase <- function(input, output, session) {
     parts
   }
 
-  output$showcase_dropdown_menu_preview_ui <- shiny::renderUI({
-    if (isTRUE(replaced())) {
-      return(block_dropdown_menu(
-        input$showcase_dropdown_menu_doc_trigger %||% "Open menu",
-        id = "showcase_dropdown_menu_preview",
-        dropdown_menu_label("Workspace"),
-        dropdown_menu_item("invite", "Invite members", icon = "user"),
-        dropdown_menu_item("new_team", "New team", icon = "menu"),
-        side = input$showcase_dropdown_menu_doc_side %||% "bottom",
-        align = input$showcase_dropdown_menu_doc_align %||% "start"
-      ))
-    }
+  # When the "Replace items" action has fired, swap only the item list; every
+  # styling/state control (trigger_variant, side, align, disabled, style) stays
+  # live so the preview keeps responding to the panel.
+  replaced_items <- function() {
+    icons <- isTRUE(input$showcase_dropdown_menu_doc_icons)
+    list(
+      dropdown_menu_label("Workspace"),
+      dropdown_menu_item("invite", "Invite members", icon = if (icons) "user" else NULL),
+      dropdown_menu_item("new_team", "New team", icon = if (icons) "menu" else NULL)
+    )
+  }
 
+  output$showcase_dropdown_menu_preview_ui <- shiny::renderUI({
     trigger <- input$showcase_dropdown_menu_doc_trigger %||% "Open menu"
     if (!nzchar(trigger)) trigger <- "Open menu"
 
     style_val <- input$showcase_dropdown_menu_doc_style %||% ""
     if (!nzchar(style_val)) style_val <- NULL
 
+    items <- if (isTRUE(replaced())) replaced_items() else build_items()
+
     args <- c(
       list(trigger, id = "showcase_dropdown_menu_preview"),
-      build_items(),
+      items,
       list(
         side = input$showcase_dropdown_menu_doc_side %||% "bottom",
         align = input$showcase_dropdown_menu_doc_align %||% "start",
@@ -104,9 +106,9 @@ register_dropdown_menu_showcase <- function(input, output, session) {
 
     lines <- c(
       '  dropdown_menu_label("My Account")',
-      item_line("profile", "Profile", icon = if (icons) "user", shortcut = if (shortcuts) "⌘P"),
+      item_line("profile", "Profile", icon = if (icons) "user", shortcut = if (shortcuts) "\u2318P"),
       item_line("billing", "Billing", icon = if (icons) "dollar-sign", disabled = disable_billing),
-      item_line("settings", "Settings", icon = if (icons) "settings", shortcut = if (shortcuts) "⌘,"),
+      item_line("settings", "Settings", icon = if (icons) "settings", shortcut = if (shortcuts) "\u2318,"),
       "  dropdown_menu_separator()"
     )
     if (destructive) {
