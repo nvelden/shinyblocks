@@ -44,6 +44,7 @@ import { Switch } from "./components/switch.jsx";
 import { Table } from "./components/table.jsx";
 import { Textarea } from "./components/textarea.jsx";
 import { Toaster } from "./components/toaster.jsx";
+import { ToggleGroup } from "./components/toggle-group.jsx";
 import { Tooltip } from "./components/tooltip.jsx";
 
 const mounted = new Map();
@@ -74,7 +75,8 @@ const COMPONENTS = {
   slider: Slider,
   select: Select,
   table: Table,
-  toaster: Toaster
+  toaster: Toaster,
+  "toggle-group": ToggleGroup
 };
 
 function RuntimeMount({ payload, root }) {

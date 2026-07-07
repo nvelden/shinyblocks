@@ -66,6 +66,7 @@ Other forms:
 \code{\link[=block_select]{block_select()}},
 \code{\link[=block_slider]{block_slider()}},
 \code{\link[=block_switch]{block_switch()}},
+\code{\link[=block_toggle_group]{block_toggle_group()}},
 \code{\link[=update_block_checkbox]{update_block_checkbox()}},
 \code{\link[=update_block_date_picker]{update_block_date_picker()}},
 \code{\link[=update_block_date_range_picker]{update_block_date_range_picker()}},
@@ -75,6 +76,7 @@ Other forms:
 \code{\link[=update_block_select]{update_block_select()}},
 \code{\link[=update_block_slider]{update_block_slider()}},
 \code{\link[=update_block_switch]{update_block_switch()}},
-\code{\link[=update_block_textarea]{update_block_textarea()}}
+\code{\link[=update_block_textarea]{update_block_textarea()}},
+\code{\link[=update_block_toggle_group]{update_block_toggle_group()}}
 }
 \concept{forms}

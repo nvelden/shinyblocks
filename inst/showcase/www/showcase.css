@@ -474,3 +474,9 @@ pre.shiny-text-output {
 #showcase_progress_preview_ui > * {
   width: 100%;
 }
+
+.sb-toggle-group-control.showcase-toggle-group-preview-custom {
+  border: 2px dashed var(--ring) !important;
+  padding: 0.5rem !important;
+  border-radius: 0.5rem !important;
+}

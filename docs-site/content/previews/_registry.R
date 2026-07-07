@@ -133,6 +133,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Toggle Group",
+    slug = "toggle-group",
+    file = "toggle_group.R",
+    description = "Segmented single or multiple toggle input for view switchers and toolbars.",
+    featured = TRUE
+  ),
+  list(
     name = "Switch",
     slug = "switch",
     file = "switch.R",

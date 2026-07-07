@@ -57,6 +57,134 @@ test_that("block_radio_group rejects an unknown selected value", {
   )
 })
 
+test_that("block_toggle_group emits a runtime payload with choice records", {
+  tg <- block_toggle_group(
+    "view",
+    choices = c(List = "list", Grid = "grid", Board = "board"),
+    selected = "grid",
+    variant = "outline",
+    size = "sm",
+    disabled = "board",
+    class = "custom"
+  )
+  html <- render_html(tg)
+  payload <- runtime_payload_from(tg)
+
+  expect_identical(
+    tag_attr(tg, "class"),
+    "sb-runtime-mount sb-toggle-group"
+  )
+  expect_identical(payload$className, "custom")
+  expect_match(html, 'data-sb-component="toggle-group"', fixed = TRUE)
+  expect_match(
+    html,
+    '<input id="view" type="hidden" class="sb-toggle-group-native"',
+    fixed = TRUE
+  )
+  expect_identical(payload$id, "view")
+  expect_identical(payload$state$value, "grid")
+  expect_identical(payload$props$type, "single")
+  expect_identical(payload$props$variant, "outline")
+  expect_identical(payload$props$size, "sm")
+  expect_identical(payload$props$disabled, FALSE)
+  expect_identical(as.character(payload$props$disabledValues), "board")
+  expect_identical(length(payload$props$choices), 3L)
+  expect_identical(payload$props$choices[[1]]$value, "list")
+  expect_identical(payload$props$choices[[1]]$label, "List")
+  expect_identical(payload$binding$type, "shinyblocks.toggle-group")
+})
+
+test_that("block_toggle_group multiple mode keeps an array state value", {
+  tg <- block_toggle_group(
+    "marks",
+    choices = c(Bold = "bold", Italic = "italic"),
+    selected = c("bold", "italic"),
+    type = "multiple"
+  )
+  payload <- runtime_payload_from(tg)
+
+  expect_identical(payload$props$type, "multiple")
+  expect_identical(
+    as.character(unlist(payload$state$value)),
+    c("bold", "italic")
+  )
+  expect_match(render_html(tg), '"value":["bold","italic"]', fixed = TRUE)
+
+  # A length-1 multiple selection must stay a JSON array (auto_unbox would
+  # otherwise collapse it to a scalar and flip the reported value shape).
+  one <- block_toggle_group(
+    "marks1",
+    choices = c(Bold = "bold", Italic = "italic"),
+    selected = "bold",
+    type = "multiple"
+  )
+  expect_match(render_html(one), '"value":["bold"]', fixed = TRUE)
+
+  empty <- block_toggle_group(
+    "marks2",
+    choices = c(Bold = "bold"),
+    type = "multiple"
+  )
+  expect_match(render_html(empty), '"value":[]', fixed = TRUE)
+})
+
+test_that("block_toggle_group single mode allows an empty selection", {
+  tg <- block_toggle_group("view", choices = c(List = "list"))
+  payload <- runtime_payload_from(tg)
+  expect_null(payload$state$value)
+})
+
+test_that("block_toggle_group maps icons onto choice records", {
+  tg <- block_toggle_group(
+    "view",
+    choices = c(List = "list", Grid = "grid"),
+    icons = list(list = "layout-list", grid = htmltools::tags$svg()),
+    icon_only = TRUE
+  )
+  payload <- runtime_payload_from(tg)
+
+  expect_identical(payload$props$iconOnly, TRUE)
+  expect_identical(payload$props$choices[[1]]$icon, "layout-list")
+  expect_match(payload$props$choices[[2]]$iconHtml, "<svg", fixed = TRUE)
+})
+
+test_that("block_toggle_group validates selected, disabled, and icons", {
+  choices <- c(A = "a", B = "b")
+
+  expect_error(
+    block_toggle_group("t", choices, selected = "z"),
+    "must match one of"
+  )
+  expect_error(
+    block_toggle_group("t", choices, selected = c("a", "b")),
+    "single value"
+  )
+  expect_error(
+    block_toggle_group("t", choices, selected = c("a", "a"), type = "multiple"),
+    "duplicate"
+  )
+  expect_error(
+    block_toggle_group("t", choices, disabled = "z"),
+    "`disabled` values must match"
+  )
+  expect_error(
+    block_toggle_group("t", choices, disabled = NA),
+    "`disabled` must be"
+  )
+  expect_error(
+    block_toggle_group("t", choices, icons = list(z = "list")),
+    "`icons` names must match"
+  )
+  expect_error(
+    block_toggle_group("t", choices, icons = list(a = "not-a-real-icon")),
+    "icon"
+  )
+  expect_error(
+    block_toggle_group("t", choices, icons = list(a = "list"), icon_only = TRUE),
+    "cover every choice"
+  )
+})
+
 test_that("block_input emits a runtime payload and hidden native input", {
   input <- block_input(
     "email",

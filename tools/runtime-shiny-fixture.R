@@ -195,6 +195,21 @@ ui <- shiny::fluidPage(
     step = 5,
     class = "runtime-slider-fixture"
   ),
+  block_toggle_group(
+    "runtime_toggle",
+    choices = c(List = "list", Grid = "grid", Board = "board"),
+    selected = "list",
+    class = "runtime-toggle-fixture"
+  ),
+  block_toggle_group(
+    "runtime_toggle_multi",
+    choices = c(Bold = "bold", Italic = "italic", Underline = "underline"),
+    selected = "bold",
+    type = "multiple",
+    variant = "outline",
+    disabled = "underline",
+    class = "runtime-toggle-multi-fixture"
+  ),
   block_button(
     "Runtime button",
     id = "runtime_button",
@@ -319,6 +334,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_checkbox_value"),
   shiny::verbatimTextOutput("runtime_switch_value"),
   shiny::verbatimTextOutput("runtime_slider_value"),
+  shiny::verbatimTextOutput("runtime_toggle_value"),
+  shiny::verbatimTextOutput("runtime_toggle_multi_value"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_task_button_value"),
@@ -358,6 +375,12 @@ ui <- shiny::fluidPage(
   shiny::actionButton("disable_switch", "Disable switch"),
   shiny::actionButton("enable_switch", "Enable switch"),
   shiny::actionButton("set_slider_75", "Set slider 75"),
+  shiny::actionButton("set_toggle_grid", "Set toggle grid"),
+  shiny::actionButton("clear_toggle", "Clear toggle"),
+  shiny::actionButton("disable_toggle", "Disable toggle"),
+  shiny::actionButton("enable_toggle", "Enable toggle"),
+  shiny::actionButton("set_toggle_multi", "Set toggle multi"),
+  shiny::actionButton("swap_toggle_choices", "Swap toggle choices"),
   shiny::actionButton("disable_slider", "Disable slider"),
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
@@ -476,6 +499,20 @@ server <- function(input, output, session) {
   })
   output$runtime_slider_value <- shiny::renderText({
     value <- input$runtime_slider
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(value, collapse = ",")
+  })
+  output$runtime_toggle_value <- shiny::renderText({
+    value <- input$runtime_toggle
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(value, collapse = ",")
+  })
+  output$runtime_toggle_multi_value <- shiny::renderText({
+    value <- input$runtime_toggle_multi
     if (is.null(value)) {
       return("<NULL>")
     }
@@ -792,6 +829,59 @@ server <- function(input, output, session) {
       session = session,
       input_id = "runtime_slider",
       value = 75,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$set_toggle_grid, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle",
+      selected = "grid",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$clear_toggle, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle",
+      selected = NULL,
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$disable_toggle, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle",
+      disabled = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$enable_toggle, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle",
+      disabled = FALSE
+    )
+  })
+
+  shiny::observeEvent(input$set_toggle_multi, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle_multi",
+      selected = c("bold", "italic"),
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$swap_toggle_choices, {
+    update_block_toggle_group(
+      session = session,
+      input_id = "runtime_toggle",
+      choices = c(Day = "day", Week = "week"),
+      selected = "week",
       notify = TRUE
     )
   })

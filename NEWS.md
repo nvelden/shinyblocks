@@ -1,5 +1,9 @@
 # shinyblocks (development version)
 
+### Components
+
+* New `block_toggle_group()` / `update_block_toggle_group()`: a segmented single/multiple toggle input (view switchers, formatting toolbars) reporting a string (single) or character vector (multiple) to `input$<id>`. Supports `default`/`outline` variants, three sizes, per-choice icons (vendored names or tags) with optional icon-only items, and group-wide or per-item disabling (#93).
+
 ### Bug fixes
 
 * `block_date_picker()` and `block_date_range_picker()` now format `POSIXct`/`POSIXlt` values in the value's own timezone. Previously they routed through `as.Date()`, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).

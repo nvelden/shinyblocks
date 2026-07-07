@@ -38,6 +38,7 @@ Collate:
     'date-range-picker.R'
     'form-controls.R'
     'radio-group.R'
+    'toggle-group.R'
     'tabs.R'
     'toast.R'
     'style-profiles.R'

@@ -160,6 +160,13 @@ export const STYLE_REGISTRY = {
     },
     bindings: [{ selector: ".sb-parity-radio-group-checked", property: "gap" }]
   },
+  "toggle-group": {
+    section: "toggle-group",
+    neutralProfiles: {
+      nova: "Nova's default button radius equals the toggle group's shared button-radius default, so the outer radius does not change."
+    },
+    bindings: [{ selector: ".sb-parity-toggle-group-on", property: "borderRadius" }]
+  },
   alert: {
     section: "alert",
     bindings: [{ selector: ".sb-parity-alert-destructive", property: "borderRadius" }]

@@ -13,7 +13,7 @@ RUNTIME_COMPONENT_NAMES <- c(
   "empty", "file-input", "input", "popover", "progress", "radio-group", "select",
   "separator",
   "skeleton", "slider", "spinner", "switch", "table", "task-button", "textarea",
-  "toaster",
+  "toaster", "toggle-group",
   "tooltip", "value-box"
 )
 

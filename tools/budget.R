@@ -47,10 +47,13 @@ targets <- list(
     # day grid, selected/today/disabled/focus states) adds ~4 KB raw. Raised
     # 65 -> 70 KB for the #61 date-range-picker runtime CSS (trigger + portaled
     # range calendar: in-range band, range-start/end endpoints, hover-preview
-    # reduced-emphasis states) adds ~3.5 KB raw.
+    # reduced-emphasis states) adds ~3.5 KB raw. Raised 70 -> 74 KB for the
+    # #93 toggle-group CSS (joined segmented control, outline/collapsed inner
+    # borders, three sizes, icon slot) adds ~2.2 KB raw (lands at ~72.2 KB),
+    # leaving margin for the in-flight #96 stepper CSS (~0.9 KB) to merge.
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 70,
+    limit_kb = 74,
     metric = "raw",
     group = "runtime"
   ),
@@ -85,9 +88,12 @@ targets <- list(
     # state machine, decorative spinner, persistent live-status region, and the
     # author/controlled aria-label arbitration) adds ~2.6 KB raw (lands at
     # ~294.6 KB). Gzipped (86 KB) stays the meaningful transfer budget and is
-    # within limit; raw remains the headroom guard.
+    # within limit; raw remains the headroom guard. Raised 296 -> 304 KB for
+    # the #93 toggle-group runtime (component with roving tabindex + single/
+    # multiple value shapes, binding, native mirror) adds ~3.7 KB raw (lands
+    # at ~299.7 KB), leaving margin for the in-flight #96 stepper (~1.5 KB).
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 296,
+    limit_kb = 304,
     metric = "raw",
     group = "runtime"
   ),
@@ -106,9 +112,11 @@ targets <- list(
     # zlib tips over on CI, so 86 KB restores margin. Raised 86 -> 87 KB for
     # the #69 task-button state machine and binding: Linux zlib reports 86.1 KB
     # while macOS remains at 86.0 KB, so the prior limit had no cross-platform
-    # margin.
+    # margin. Raised 87 -> 89 KB for the #93 toggle-group runtime: macOS lands
+    # at 87.4 KB, and the in-flight #96 stepper adds a few hundred bytes more,
+    # so 89 KB keeps a cross-platform zlib margin.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 87,
+    limit_kb = 89,
     metric = "gzipped",
     group = "runtime"
   ),
