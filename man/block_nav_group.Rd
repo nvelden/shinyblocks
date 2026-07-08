@@ -37,6 +37,9 @@ group trigger toggles expansion only; it never reports a Shiny input value.
 }
 \seealso{
 Other navigation:
+\code{\link[=block_breadcrumb]{block_breadcrumb()}},
+\code{\link[=block_breadcrumb_ellipsis]{block_breadcrumb_ellipsis()}},
+\code{\link[=block_breadcrumb_item]{block_breadcrumb_item()}},
 \code{\link[=block_nav]{block_nav()}},
 \code{\link[=block_nav_item]{block_nav_item()}},
 \code{\link[=block_nav_label]{block_nav_label()}},

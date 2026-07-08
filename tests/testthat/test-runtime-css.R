@@ -172,7 +172,16 @@ test_that("package source CSS only owns shell and composition hooks", {
       "^\\.sb-field-description\\b|",
       "^\\.sb-field-set\\b|",
       "^\\.sb-input-group\\b|",
-      "^\\.sb-input-group-addon\\b"
+      "^\\.sb-input-group-addon\\b|",
+      "^\\.sb-breadcrumb\\b|",
+      "^\\.sb-breadcrumb-list\\b|",
+      "^\\.sb-breadcrumb-item\\b|",
+      "^\\.sb-breadcrumb-link\\b|",
+      "^\\.sb-breadcrumb-page\\b|",
+      "^\\.sb-breadcrumb-text\\b|",
+      "^\\.sb-breadcrumb-separator\\b|",
+      "^\\.sb-breadcrumb-ellipsis\\b|",
+      "^\\.sb-breadcrumb-sr-only\\b"
     ),
     selectors
   )

@@ -29,6 +29,9 @@ Selects a tab rendered by \code{\link[=block_tabs]{block_tabs()}} from the serve
 }
 \seealso{
 Other navigation:
+\code{\link[=block_breadcrumb]{block_breadcrumb()}},
+\code{\link[=block_breadcrumb_ellipsis]{block_breadcrumb_ellipsis()}},
+\code{\link[=block_breadcrumb_item]{block_breadcrumb_item()}},
 \code{\link[=block_nav]{block_nav()}},
 \code{\link[=block_nav_group]{block_nav_group()}},
 \code{\link[=block_nav_item]{block_nav_item()}},
