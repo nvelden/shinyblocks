@@ -217,6 +217,15 @@ ui <- shiny::fluidPage(
     disabled = "underline",
     class = "runtime-toggle-multi-fixture"
   ),
+  block_input(
+    "runtime_number",
+    value = 5,
+    type = "number",
+    min = 0,
+    max = 10,
+    step = 5,
+    class = "runtime-number-fixture"
+  ),
   block_button(
     "Runtime button",
     id = "runtime_button",
@@ -356,6 +365,8 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_slider_value"),
   shiny::verbatimTextOutput("runtime_toggle_value"),
   shiny::verbatimTextOutput("runtime_toggle_multi_value"),
+  shiny::verbatimTextOutput("runtime_number_value"),
+  shiny::verbatimTextOutput("runtime_number_class"),
   shiny::verbatimTextOutput("runtime_button_value"),
   shiny::verbatimTextOutput("runtime_button_class"),
   shiny::verbatimTextOutput("runtime_task_button_value"),
@@ -404,6 +415,7 @@ ui <- shiny::fluidPage(
   shiny::actionButton("enable_toggle", "Enable toggle"),
   shiny::actionButton("set_toggle_multi", "Set toggle multi"),
   shiny::actionButton("swap_toggle_choices", "Swap toggle choices"),
+  shiny::actionButton("set_number_7", "Set number 7"),
   shiny::actionButton("disable_slider", "Disable slider"),
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
@@ -550,6 +562,16 @@ server <- function(input, output, session) {
       return("<NULL>")
     }
     paste(value, collapse = ",")
+  })
+  output$runtime_number_value <- shiny::renderText({
+    value <- input$runtime_number
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    format(value)
+  })
+  output$runtime_number_class <- shiny::renderText({
+    class(input$runtime_number)[1]
   })
   output$runtime_button_value <- shiny::renderText({
     value <- input$runtime_button
@@ -957,6 +979,15 @@ server <- function(input, output, session) {
       input_id = "runtime_toggle",
       choices = c(Day = "day", Week = "week"),
       selected = "week",
+      notify = TRUE
+    )
+  })
+
+  shiny::observeEvent(input$set_number_7, {
+    update_block_input(
+      session = session,
+      input_id = "runtime_number",
+      value = 7,
       notify = TRUE
     )
   })

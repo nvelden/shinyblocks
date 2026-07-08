@@ -449,6 +449,35 @@ try {
   await assertText(page, "#runtime_toggle_multi_value", "italic");
   await page.click("#set_toggle_multi");
   await assertText(page, "#runtime_toggle_multi_value", "bold,italic");
+  // Number input: typed numeric reporting + stepper buttons (issue #96).
+  const numberRoot = "[data-sb-component='input'][data-sb-input-id='runtime_number']";
+  await assertText(page, "#runtime_number_value", "5");
+  await assertText(page, "#runtime_number_class", "numeric");
+  await page.click(`${numberRoot} [data-slot='input-stepper-up']`);
+  await assertText(page, "#runtime_number_value", "10");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_number")?.value),
+    "10",
+    "runtime number input should keep the hidden native value"
+  );
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} [data-slot='input-stepper-up']`)?.disabled === true;
+  }, numberRoot);
+  await page.click(`${numberRoot} [data-slot='input-stepper-down']`);
+  await page.click(`${numberRoot} [data-slot='input-stepper-down']`);
+  await assertText(page, "#runtime_number_value", "0");
+  await page.waitForFunction((root) => {
+    return document.querySelector(`${root} [data-slot='input-stepper-down']`)?.disabled === true;
+  }, numberRoot);
+  await page.fill(`${numberRoot} .sb-input-control`, "");
+  await assertText(page, "#runtime_number_value", "NA");
+  await assertText(page, "#runtime_number_class", "numeric");
+  await page.click("#set_number_7");
+  await assertText(page, "#runtime_number_value", "7");
+  // Arrow keys step natively on the visible input (snapping to the step grid).
+  await page.focus(`${numberRoot} .sb-input-control`);
+  await page.keyboard.press("ArrowUp");
+  await assertText(page, "#runtime_number_value", "10");
 
   await assertText(page, "#runtime_button_value", "0");
   await assertText(page, "#runtime_button_class", "shinyActionButtonValue,shiny.actionButton,integer");

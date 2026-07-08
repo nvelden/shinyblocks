@@ -1,0 +1,7 @@
+# Note: robots.txt is only authoritative at the domain root, which we don't
+# control on nvelden.github.io. Kept here as a best-effort hint; the sitemap
+# should also be submitted directly in Google Search Console.
+User-agent: *
+Allow: /
+
+Sitemap: https://nvelden.github.io/shinyblocks/sitemap.xml

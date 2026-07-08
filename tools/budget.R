@@ -103,8 +103,10 @@ targets <- list(
     # the #86 dropdown-menu runtime: the action-menu component (portal, floating
     # position, roving focus, keyboard nav + typeahead) + its event-value
     # binding adds ~4 KB raw (lands at ~321.9 KB) reusing the overlays helpers.
+    # Raised 323 -> 326 KB once the #96 number-input stepper landed alongside
+    # (combined tree lands at ~323.9 KB raw); gzip (92.6 KB) stays within limit.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 323,
+    limit_kb = 326,
     metric = "raw",
     group = "runtime"
   ),
@@ -129,8 +131,11 @@ targets <- list(
     # Raised 89 -> 93 KB for the #85 combobox runtime: macOS lands at ~90.5 KB
     # (the searchable-select filter/empty-state views on top of the shared
     # select core), so 93 KB restores a cross-platform zlib margin.
+    # Raised 93 -> 94 KB with the #86 dropdown-menu runtime alongside the
+    # combobox + stepper set: macOS lands at ~92.6 KB, leaving no cross-platform
+    # zlib margin at 93, so 94 KB restores it.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 93,
+    limit_kb = 94,
     metric = "gzipped",
     group = "runtime"
   ),

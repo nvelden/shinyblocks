@@ -367,6 +367,38 @@ test_that("update_block_file_input clears dropzone icon and content", {
   expect_null(payload$dropzoneContentHtml)
 })
 
+test_that("update_block_input sends and clears number bounds", {
+  capture <- local_input_message_session()
+
+  update_block_input(
+    capture$session, "qty",
+    min = 0, max = 10, step = 2
+  )
+  payload <- capture$last_message()$payload
+  expect_identical(payload$min, 0)
+  expect_identical(payload$max, 10)
+  expect_identical(payload$step, 2)
+
+  # NULL clears each bound: the key must be present with a NULL value.
+  update_block_input(capture$session, "qty", min = NULL, max = NULL, step = NULL)
+  payload <- capture$last_message()$payload
+  expect_true(all(c("min", "max", "step") %in% names(payload)))
+  expect_null(payload$min)
+  expect_null(payload$max)
+  expect_null(payload$step)
+
+  expect_error(
+    update_block_input(capture$session, "qty", min = 5, max = 5),
+    "`min` must be strictly less than `max`.",
+    fixed = TRUE
+  )
+  expect_error(
+    update_block_input(capture$session, "qty", step = -1),
+    "`step` must be a single positive numeric value.",
+    fixed = TRUE
+  )
+})
+
 test_that("updaters work when called through a dots-forwarding wrapper", {
   capture <- local_input_message_session()
 
