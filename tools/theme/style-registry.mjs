@@ -110,6 +110,15 @@ export const STYLE_REGISTRY = {
       { selector: ".sb-parity-select-default [data-slot='select-trigger']", property: "borderRadius" }
     ]
   },
+  combobox: {
+    section: "combobox",
+    neutralProfiles: {
+      nova: "Nova's combobox trigger radius maps to rounded-lg, matching the current shinyblocks default combobox radius (shared select trigger surface)."
+    },
+    bindings: [
+      { selector: ".sb-parity-combobox-default [data-slot='select-trigger']", property: "borderRadius" }
+    ]
+  },
   checkbox: {
     section: "checkbox",
     neutralProfiles: {

@@ -7,7 +7,7 @@ runtime_mount_state$next_id <- 0L
 # frontend/src/runtime/bindings.js — keep them in sync when adding a new
 # component.
 RUNTIME_COMPONENT_NAMES <- c(
-  "alert", "badge", "button", "checkbox", "code", "date-picker",
+  "alert", "badge", "button", "checkbox", "code", "combobox", "date-picker",
   "date-range-picker",
   "dialog",
   "empty", "file-input", "input", "popover", "progress", "radio-group", "select",

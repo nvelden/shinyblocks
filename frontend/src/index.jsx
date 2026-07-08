@@ -29,6 +29,7 @@ import {
 import { Button } from "./components/button.jsx";
 import { TaskButton } from "./components/task-button.jsx";
 import { Code } from "./components/code.jsx";
+import { Combobox } from "./components/combobox.jsx";
 import { Dialog } from "./components/dialog.jsx";
 import { Popover } from "./components/popover.jsx";
 import { Checkbox } from "./components/checkbox.jsx";
@@ -58,6 +59,7 @@ const COMPONENTS = {
   skeleton: Skeleton,
   empty: Empty,
   code: Code,
+  combobox: Combobox,
   "value-box": ValueBox,
   alert: Alert,
   dialog: Dialog,

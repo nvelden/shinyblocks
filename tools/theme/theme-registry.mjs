@@ -165,6 +165,20 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-multi-select .sb-select-chip", property: "borderColor", token: "--border" }
     ]
   },
+  combobox: {
+    section: "combobox",
+    bindings: [
+      // The combobox trigger reuses the select trigger surface; its portaled
+      // search box / empty state only render on interaction, so the static
+      // fixture only exercises the trigger foreground (single) plus the multi
+      // chip palette (rendered from the pre-selected fixture).
+      { selector: ".sb-parity-combobox-default [data-slot='select-trigger']", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-multi-combobox [data-slot='select-trigger']", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-multi-combobox .sb-select-chip", property: "backgroundColor", token: "--secondary" },
+      { selector: ".sb-parity-multi-combobox .sb-select-chip", property: "color", token: "--secondary-foreground" },
+      { selector: ".sb-parity-multi-combobox .sb-select-chip", property: "borderColor", token: "--border" }
+    ]
+  },
   separator: {
     section: "separator",
     bindings: [

@@ -1184,3 +1184,47 @@
   width: 0.75rem;
   height: 0.75rem;
 }
+
+/* Combobox: a searchable select. It reuses the select trigger/content/item
+   surfaces; the only additions are the popup's sticky filter header and the
+   no-results empty state. */
+[data-shinyblocks-portal-root] .sb-combobox-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  padding: 0.125rem 0.25rem 0.375rem 0.25rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--sb-select-content-border, var(--border));
+}
+
+[data-shinyblocks-portal-root] .sb-combobox-search-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+[data-shinyblocks-portal-root] .sb-combobox-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--popover-foreground);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding: 0.25rem 0;
+}
+
+[data-shinyblocks-portal-root] .sb-combobox-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+[data-shinyblocks-portal-root] .sb-combobox-empty {
+  padding: 1.25rem 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}

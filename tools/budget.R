@@ -51,9 +51,11 @@ targets <- list(
     # #93 toggle-group CSS (joined segmented control, outline/collapsed inner
     # borders, three sizes, icon slot) adds ~2.2 KB raw (lands at ~72.2 KB),
     # leaving margin for the in-flight #96 stepper CSS (~0.9 KB) to merge.
+    # Raised 74 -> 76 KB for the #85 combobox CSS (searchable-select filter box,
+    # empty state, chip list) adds ~2 KB raw (lands at ~74.4 KB).
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 74,
+    limit_kb = 76,
     metric = "raw",
     group = "runtime"
   ),
@@ -92,8 +94,13 @@ targets <- list(
     # the #93 toggle-group runtime (component with roving tabindex + single/
     # multiple value shapes, binding, native mirror) adds ~3.7 KB raw (lands
     # at ~299.7 KB), leaving margin for the in-flight #96 stepper (~1.5 KB).
+    # Raised 304 -> 318 KB for the #85 combobox runtime: the searchable-select
+    # component (single + multiple views with a portaled filter box, empty
+    # state, and filtered keyboard navigation) + its binding adds ~11 KB raw
+    # (lands at ~315.5 KB) on top of the shared select-popover hook and
+    # native-input helpers (reused, not duplicated).
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 304,
+    limit_kb = 318,
     metric = "raw",
     group = "runtime"
   ),
@@ -115,8 +122,11 @@ targets <- list(
     # margin. Raised 87 -> 89 KB for the #93 toggle-group runtime: macOS lands
     # at 87.4 KB, and the in-flight #96 stepper adds a few hundred bytes more,
     # so 89 KB keeps a cross-platform zlib margin.
+    # Raised 89 -> 93 KB for the #85 combobox runtime: macOS lands at ~90.5 KB
+    # (the searchable-select filter/empty-state views on top of the shared
+    # select core), so 93 KB restores a cross-platform zlib margin.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 89,
+    limit_kb = 93,
     metric = "gzipped",
     group = "runtime"
   ),

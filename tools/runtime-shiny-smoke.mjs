@@ -140,6 +140,45 @@ try {
       document.querySelector("#runtime_select-trigger")?.disabled === false;
   });
 
+  // Combobox: type-to-filter over choices, keyboard-driven commit, the shared
+  // hidden-native value bridge, server update, and disabled state.
+  await assertText(page, "#runtime_combobox_value", "apple");
+  await page.click("#runtime_combobox-trigger");
+  // The filter box is focused on open; typing narrows the list. "ap" keeps
+  // Apple + Apricot; "apr" leaves only Apricot.
+  await page.locator("#runtime_combobox .sb-combobox-input, [data-shinyblocks-portal-root] .sb-combobox-input").first().fill("apr");
+  await page.waitForFunction(() => {
+    const items = document.querySelectorAll(
+      "[data-shinyblocks-portal-root] [data-slot='select-item']"
+    );
+    return items.length === 1 && /Apricot/.test(items[0].textContent || "");
+  });
+  // Enter commits the single highlighted match.
+  await page.keyboard.press("Enter");
+  assert.equal(
+    await page.locator("#runtime_combobox").inputValue(),
+    "apricot",
+    "combobox should commit the filtered match to the hidden native value"
+  );
+  await assertText(page, "#runtime_combobox_value", "apricot");
+  // A query with no matches shows the empty state.
+  await page.click("#runtime_combobox-trigger");
+  await page.locator("[data-shinyblocks-portal-root] .sb-combobox-input").fill("zzz");
+  await page.waitForSelector("[data-shinyblocks-portal-root] [data-slot='combobox-empty']");
+  await page.keyboard.press("Escape");
+  await page.click("#set_combobox_cherry");
+  await assertText(page, "#runtime_combobox_value", "cherry");
+  await page.click("#disable_combobox");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_combobox")?.disabled === true &&
+      document.querySelector("#runtime_combobox-trigger")?.disabled === true;
+  });
+  await page.click("#enable_combobox");
+  await page.waitForFunction(() => {
+    return document.querySelector("#runtime_combobox")?.disabled === false &&
+      document.querySelector("#runtime_combobox-trigger")?.disabled === false;
+  });
+
   // Multiple-mode select: chips, a multiselectable listbox that stays open on
   // toggle, chip removal (pointer + keyboard), the `max_items` cap, server
   // update/clear, stale-choice reconciliation, and disabled state.

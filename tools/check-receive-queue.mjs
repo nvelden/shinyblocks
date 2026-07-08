@@ -32,7 +32,11 @@ const BINDINGS_PATH = "frontend/src/runtime/bindings.js";
 const CUSTOM_RECEIVE_ALLOWLIST = {
   select:
     "Custom receiveMessage writes pending `choices`/`selected` straight to the " +
-    "native <select> before React mounts, so the pre-mount window is covered."
+    "native <select> before React mounts, so the pre-mount window is covered.",
+  combobox:
+    "Custom receiveMessage writes pending `choices`/`selected` straight to the " +
+    "native <select> before React mounts (same value bridge as select), so the " +
+    "pre-mount window is covered."
 };
 
 function fail(messages) {
