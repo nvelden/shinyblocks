@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ComponentPreview } from "@/components/component-preview";
+import { ComponentsGrid } from "@/components/components-grid";
 import manifest from "@/lib/preview-manifest.json";
+
+export const metadata: Metadata = {
+  title: "Components",
+  description:
+    "Browse every shinyblocks component: layout primitives, form inputs, data display, feedback, and overlays — all rendered from pure R.",
+};
 
 export default function ComponentsIndexPage() {
   return (
@@ -36,19 +43,16 @@ export default function ComponentsIndexPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {manifest
+          <ComponentsGrid
+            items={manifest
               .filter((c) => c.slug !== "gallery")
-              .map((component) => (
-                <ComponentPreview
-                  key={component.slug}
-                  slug={component.slug}
-                  name={component.name}
-                  href={`/components/${component.slug}/`}
-                  html={component.html}
-                />
-              ))}
-          </div>
+              .map(({ slug, name, description, html }) => ({
+                slug,
+                name,
+                description,
+                html,
+              }))}
+          />
         </main>
       </div>
     </div>
