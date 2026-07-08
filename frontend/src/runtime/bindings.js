@@ -24,6 +24,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "select",
   "combobox",
   "dialog",
+  "dropdown-menu",
   "popover",
   "checkbox",
   "switch",
@@ -429,6 +430,37 @@ const BINDING_CONFIGS = [
     ...popoverEvents
   },
   {
+    // Action menu. The reported value is the chosen item's `value`, delivered as
+    // an event so choosing the same item twice fires again (`getValue` only
+    // seeds the pre-event `input$<id>`). The subscribe handler pushes the value
+    // with `priority: "event"` directly, keyed by the mount's namespaced id, so
+    // it never dedupes like a regular reactive value.
+    component: "dropdown-menu",
+    receiveProp: "__sbDropdownMenuReceive",
+    getValue(el) {
+      return Object.prototype.hasOwnProperty.call(el, "__sbDropdownMenuValue")
+        ? el.__sbDropdownMenuValue
+        : null;
+    },
+    subscribe(el, callback) {
+      const handler = () => {
+        const id = el.dataset.sbInputId;
+        if (!id || !window.Shiny || !window.Shiny.setInputValue) {
+          callback(false);
+          return;
+        }
+        window.Shiny.setInputValue(id, el.__sbDropdownMenuValue, { priority: "event" });
+      };
+      el.addEventListener("sb:dropdown-menu-change", handler);
+      el.__sbDropdownMenuChangeHandler = handler;
+    },
+    unsubscribe(el) {
+      if (!el.__sbDropdownMenuChangeHandler) return;
+      el.removeEventListener("sb:dropdown-menu-change", el.__sbDropdownMenuChangeHandler);
+      delete el.__sbDropdownMenuChangeHandler;
+    }
+  },
+  {
     component: "checkbox",
     receiveProp: "__sbCheckboxReceive",
     getValue(el) {
@@ -684,6 +716,7 @@ const BINDING_NAMES = [
   "shinyblocks.select",
   "shinyblocks.combobox",
   "shinyblocks.dialog",
+  "shinyblocks.dropdown-menu",
   "shinyblocks.popover",
   "shinyblocks.checkbox",
   "shinyblocks.switch",

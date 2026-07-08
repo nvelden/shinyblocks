@@ -31,6 +31,7 @@ import { TaskButton } from "./components/task-button.jsx";
 import { Code } from "./components/code.jsx";
 import { Combobox } from "./components/combobox.jsx";
 import { Dialog } from "./components/dialog.jsx";
+import { DropdownMenu } from "./components/dropdown-menu.jsx";
 import { Popover } from "./components/popover.jsx";
 import { Checkbox } from "./components/checkbox.jsx";
 import { DatePicker } from "./components/date-picker.jsx";
@@ -63,6 +64,7 @@ const COMPONENTS = {
   "value-box": ValueBox,
   alert: Alert,
   dialog: Dialog,
+  "dropdown-menu": DropdownMenu,
   popover: Popover,
   tooltip: Tooltip,
   checkbox: Checkbox,

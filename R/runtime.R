@@ -9,7 +9,7 @@ runtime_mount_state$next_id <- 0L
 RUNTIME_COMPONENT_NAMES <- c(
   "alert", "badge", "button", "checkbox", "code", "combobox", "date-picker",
   "date-range-picker",
-  "dialog",
+  "dialog", "dropdown-menu",
   "empty", "file-input", "input", "popover", "progress", "radio-group", "select",
   "separator",
   "skeleton", "slider", "spinner", "switch", "table", "task-button", "textarea",

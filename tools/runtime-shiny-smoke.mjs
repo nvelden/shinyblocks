@@ -1205,6 +1205,77 @@ try {
   });
   await assertText(page, "#runtime_popover_value", "FALSE");
 
+  // Dropdown menu: open on click, choose an item -> event value; a disabled
+  // item is inert; keyboard nav + Enter activates; the same choice fires again
+  // (event priority); Escape returns focus to the trigger; a server updater
+  // opens the menu and replaces its items.
+  const ddTrigger = "[data-sb-component='dropdown-menu'] [data-slot='dropdown-menu-trigger']";
+  await assertText(page, "#runtime_dropdown_menu_value", "<NULL>");
+  await page.click(ddTrigger);
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']").waitFor({
+    state: "visible"
+  });
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-item']").first().click();
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']");
+  });
+  await assertText(page, "#runtime_dropdown_menu_value", "profile");
+
+  // Choosing the same item again must still fire (event-style value).
+  await page.click(ddTrigger);
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']").waitFor({
+    state: "visible"
+  });
+  // A disabled item ("Billing") should not activate on click.
+  await page.click(
+    "[data-shinyblocks-portal-root] [data-slot='dropdown-menu-item'][data-disabled='true']",
+    { force: true }
+  );
+  assert.ok(
+    await page.evaluate(
+      () => !!document.querySelector("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']")
+    ),
+    "disabled dropdown item should not close the menu"
+  );
+  // Keyboard: ArrowDown skips the disabled Billing item to Log out, Enter fires.
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']");
+  });
+  await assertText(page, "#runtime_dropdown_menu_value", "logout");
+  assert.equal(
+    await page.evaluate(() => document.activeElement?.getAttribute("data-slot")),
+    "dropdown-menu-trigger",
+    "closing the dropdown menu should return focus to the trigger"
+  );
+
+  // Escape closes without choosing.
+  await page.click(ddTrigger);
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']").waitFor({
+    state: "visible"
+  });
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => {
+    return !document.querySelector("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']");
+  });
+
+  // Server update: open programmatically, then replace items.
+  await page.click("#open_dropdown_menu");
+  await page.locator("[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']").waitFor({
+    state: "visible"
+  });
+  await page.keyboard.press("Escape");
+  await page.click("#replace_dropdown_menu");
+  await page.click(ddTrigger);
+  await page.waitForFunction(() => {
+    const content = document.querySelector(
+      "[data-shinyblocks-portal-root] [data-slot='dropdown-menu-content']"
+    );
+    return content && content.textContent && content.textContent.includes("Invite members");
+  });
+  await page.keyboard.press("Escape");
+
   // Toaster: server fires a toast, it renders in the portal and reports a
   // `{action, id, seq}` event (formatted "action:id:seq"); a second fire stacks;
   // the close button reports a dismiss event; dismiss-all clears the stack and

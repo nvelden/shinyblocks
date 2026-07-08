@@ -12,6 +12,7 @@ source(file.path("R", "server_date_range_picker.R"), local = TRUE)
 source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
 source(file.path("R", "server_popover.R"), local = TRUE)
+source(file.path("R", "server_dropdown_menu.R"), local = TRUE)
 source(file.path("R", "server_textarea.R"), local = TRUE)
 source(file.path("R", "server_file_input.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
@@ -459,6 +460,18 @@ sections <- list(
     file = "popover.R"
   ),
   list(
+    id = "dropdown_menu",
+    label = "Dropdown Menu",
+    icon = "menu",
+    title = "Dropdown Menu",
+    lead = paste(
+      "Portal-rendered action menu with item/label/separator parts,",
+      "destructive and disabled item states, keyboard navigation,",
+      "typeahead, and event-style value reporting to input$<id>."
+    ),
+    file = "dropdown_menu.R"
+  ),
+  list(
     id = "tooltip",
     label = "Tooltip",
     icon = "info",
@@ -601,6 +614,7 @@ server <- function(input, output, session) {
   register_toast_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
+  register_dropdown_menu_showcase(input, output, session)
   register_badge_showcase(input, output, session)
   register_alert_showcase(input, output, session)
   register_table_showcase(input, output, session)

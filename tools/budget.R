@@ -51,11 +51,12 @@ targets <- list(
     # #93 toggle-group CSS (joined segmented control, outline/collapsed inner
     # borders, three sizes, icon slot) adds ~2.2 KB raw (lands at ~72.2 KB),
     # leaving margin for the in-flight #96 stepper CSS (~0.9 KB) to merge.
-    # Raised 74 -> 76 KB for the #85 combobox CSS (searchable-select filter box,
-    # empty state, chip list) adds ~2 KB raw (lands at ~74.4 KB).
+    # Raised 74 -> 77 KB for the #86 dropdown-menu CSS (portaled action menu:
+    # content surface, label/separator, item hover/focus + destructive/disabled
+    # variants, icon slot, shortcut) adds ~1.3 KB raw (lands at ~75.2 KB).
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 76,
+    limit_kb = 77,
     metric = "raw",
     group = "runtime"
   ),
@@ -98,9 +99,14 @@ targets <- list(
     # component (single + multiple views with a portaled filter box, empty
     # state, and filtered keyboard navigation) + its binding adds ~11 KB raw
     # (lands at ~315.5 KB) on top of the shared select-popover hook and
-    # native-input helpers (reused, not duplicated).
+    # native-input helpers (reused, not duplicated). Raised 318 -> 323 KB for
+    # the #86 dropdown-menu runtime: the action-menu component (portal, floating
+    # position, roving focus, keyboard nav + typeahead) + its event-value
+    # binding adds ~4 KB raw (lands at ~321.9 KB) reusing the overlays helpers.
+    # Raised 323 -> 326 KB once the #96 number-input stepper landed alongside
+    # (combined tree lands at ~323.9 KB raw); gzip (92.6 KB) stays within limit.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 318,
+    limit_kb = 326,
     metric = "raw",
     group = "runtime"
   ),
@@ -125,8 +131,11 @@ targets <- list(
     # Raised 89 -> 93 KB for the #85 combobox runtime: macOS lands at ~90.5 KB
     # (the searchable-select filter/empty-state views on top of the shared
     # select core), so 93 KB restores a cross-platform zlib margin.
+    # Raised 93 -> 94 KB with the #86 dropdown-menu runtime alongside the
+    # combobox + stepper set: macOS lands at ~92.6 KB, leaving no cross-platform
+    # zlib margin at 93, so 94 KB restores it.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 93,
+    limit_kb = 94,
     metric = "gzipped",
     group = "runtime"
   ),

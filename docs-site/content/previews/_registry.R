@@ -273,6 +273,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Dropdown Menu",
+    slug = "dropdown-menu",
+    file = "dropdown-menu.R",
+    description = "Portal-rendered action menu with items, labels, separators, and event-style value reporting.",
+    featured = TRUE
+  ),
+  list(
     name = "Tooltip",
     slug = "tooltip",
     file = "tooltip.R",
