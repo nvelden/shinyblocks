@@ -280,6 +280,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Accordion",
+    slug = "accordion",
+    file = "accordion.R",
+    description = "Collapsible content sections with single or multiple open modes and animated panel height.",
+    featured = TRUE
+  ),
+  list(
     name = "Tooltip",
     slug = "tooltip",
     file = "tooltip.R",

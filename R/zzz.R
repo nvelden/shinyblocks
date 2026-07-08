@@ -63,4 +63,12 @@
   shiny::registerInputHandler("shinyblocks.progress", function(val, transport, name) {
     NULL
   }, force = TRUE)
+
+  # Multiple-open accordions report an array of open item values. Coerce it to a
+  # plain character vector so `input$<id>` is `character(0)` when nothing is open
+  # instead of an empty list. Single-open accordions use no type (scalar/NULL).
+  shiny::registerInputHandler("shinyblocks.accordion", function(val, transport, name) {
+    if (is.null(val)) return(character(0))
+    as.character(unlist(val))
+  }, force = TRUE)
 }

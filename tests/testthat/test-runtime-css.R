@@ -165,6 +165,7 @@ test_that("package source CSS only owns shell and composition hooks", {
       "^\\.sb-tabs-trigger\\b|",
       "^\\.sb-tabs-content\\b|",
       "^\\.sb-tabs-panel\\b|",
+      "^\\.sb-accordion\\b|",
       "^\\.sb-field\\b|",
       "^\\.sb-field-group\\b|",
       "^\\.sb-field-label\\b|",
@@ -200,6 +201,36 @@ test_that("mobile sidebar establishes an explicit shell overlay stack", {
   expect_match(
     css,
     '\\.sb-page\\[data-sidebar-enhanced="true"\\] \\.sb-sidebar-backdrop \\{[\\s\\S]*z-index: 79;',
+    perl = TRUE
+  )
+})
+
+test_that("accordion collapse uses a grid-rows track with padding off the grid item", {
+  css <- package_source_css()
+
+  expect_match(
+    css,
+    "\\.sb-accordion-content \\{[^}]*grid-template-rows: 0fr;",
+    perl = TRUE
+  )
+  expect_match(
+    css,
+    "\\.sb-accordion-content\\[data-state=\"open\"\\] \\{[^}]*grid-template-rows: 1fr;",
+    perl = TRUE
+  )
+  expect_match(
+    css,
+    "\\.sb-accordion-content-inner \\{[^}]*overflow: hidden;",
+    perl = TRUE
+  )
+  inner_block <- regmatches(
+    css,
+    regexpr("\\.sb-accordion-content-inner \\{[^}]*\\}", css, perl = TRUE)
+  )
+  expect_false(grepl("padding", inner_block))
+  expect_match(
+    css,
+    "\\.sb-accordion-content-body \\{[^}]*padding-bottom: 1rem;",
     perl = TRUE
   )
 })

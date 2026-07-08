@@ -220,6 +220,19 @@
       var target = event.target;
       if (!target || !target.closest) return;
 
+      var accTrigger = target.closest(".sb-accordion-trigger");
+      if (accTrigger) {
+        var acc = accTrigger.closest(".sb-accordion");
+        var accItem = accTrigger.closest(".sb-accordion-item");
+        if (!acc || !accItem || accItem.hasAttribute("data-disabled")) return;
+        event.preventDefault();
+        toggleAccordionItem(acc, accItem);
+        if (acc.hasAttribute("data-sb-accordion-input-id")) {
+          dispatchSelectionChange(acc, "sb:accordion-change");
+        }
+        return;
+      }
+
       var groupTrigger = target.closest(".sb-nav-group-trigger");
       if (groupTrigger) {
         var group = groupTrigger.closest(".sb-nav-group");
@@ -259,6 +272,23 @@
       var target = event.target;
       if (!target || !target.closest) return;
 
+      var accTrigger = target.closest(".sb-accordion-trigger");
+      if (accTrigger) {
+        var acc = accTrigger.closest(".sb-accordion");
+        if (!acc) return;
+        var accTriggers = accordionTriggers(acc);
+        var ai = accTriggers.indexOf(accTrigger);
+        var nextTrigger = null;
+        if (event.key === "ArrowDown") nextTrigger = accTriggers[ai + 1] || accTriggers[0];
+        if (event.key === "ArrowUp") nextTrigger = accTriggers[ai - 1] || accTriggers[accTriggers.length - 1];
+        if (event.key === "Home") nextTrigger = accTriggers[0];
+        if (event.key === "End") nextTrigger = accTriggers[accTriggers.length - 1];
+        if (!nextTrigger) return;
+        event.preventDefault();
+        nextTrigger.focus();
+        return;
+      }
+
       var trigger = target.closest(".sb-tabs-list [role='tab']");
       if (trigger) {
         var tabset = trigger.closest(".sb-tabs");
@@ -296,6 +326,92 @@
       event.preventDefault();
       nextItem.focus();
     });
+  }
+
+  // R-side accordion primitive (block_accordion): collapsible content sections.
+  function accordionItems(acc) {
+    return Array.prototype.slice.call(
+      acc.querySelectorAll(".sb-accordion-item")
+    );
+  }
+
+  function accordionTriggers(acc) {
+    return accordionItems(acc)
+      .map(function (item) {
+        return item.querySelector(".sb-accordion-trigger");
+      })
+      .filter(Boolean);
+  }
+
+  function setAccordionItemState(item, open) {
+    if (!item) return;
+    var v = open ? "open" : "closed";
+    var trigger = item.querySelector(".sb-accordion-trigger");
+    var content = item.querySelector(".sb-accordion-content");
+    item.setAttribute("data-state", v);
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      trigger.setAttribute("data-state", v);
+    }
+    if (content) {
+      content.setAttribute("data-state", v);
+      // `inert` keeps collapsed content out of the tab order and a11y tree while
+      // the CSS grid-rows transition animates the height.
+      if (open) {
+        content.removeAttribute("inert");
+      } else {
+        content.setAttribute("inert", "");
+      }
+    }
+  }
+
+  function toggleAccordionItem(acc, item) {
+    var wasOpen = item.getAttribute("data-state") === "open";
+    var single = acc.getAttribute("data-type") !== "multiple";
+    var collapsible = acc.getAttribute("data-collapsible") === "true";
+    if (single) {
+      if (wasOpen) {
+        if (collapsible) setAccordionItemState(item, false);
+      } else {
+        accordionItems(acc).forEach(function (other) {
+          setAccordionItemState(other, other === item);
+        });
+      }
+    } else {
+      setAccordionItemState(item, !wasOpen);
+    }
+  }
+
+  function accordionValue(acc) {
+    var open = accordionItems(acc)
+      .filter(function (item) {
+        return item.getAttribute("data-state") === "open";
+      })
+      .map(function (item) {
+        return item.getAttribute("data-value");
+      });
+    if (acc.getAttribute("data-type") !== "multiple") {
+      return open.length ? open[0] : null;
+    }
+    return open;
+  }
+
+  function applyAccordionOpen(acc, values) {
+    var wanted = {};
+    (values || []).forEach(function (v) {
+      wanted[String(v)] = true;
+    });
+    var single = acc.getAttribute("data-type") !== "multiple";
+    var applied = false;
+    var opened = 0;
+    accordionItems(acc).forEach(function (item) {
+      var value = item.getAttribute("data-value");
+      var open = !!wanted[value] && !(single && opened > 0);
+      if (open) opened += 1;
+      if ((item.getAttribute("data-state") === "open") !== open) applied = true;
+      setAccordionItemState(item, open);
+    });
+    return applied;
   }
 
   // Real Shiny InputBindings for tab/nav selections.
@@ -343,12 +459,54 @@
     window.Shiny.inputBindings.register(new Binding(), name);
   }
 
+  function registerAccordionBinding() {
+    function Binding() {}
+    Binding.prototype = Object.create(window.Shiny.InputBinding.prototype);
+    Binding.prototype.find = function (scope) {
+      var root = scope || document;
+      var sel = ".sb-accordion[data-sb-accordion-input-id]";
+      var els = Array.prototype.slice.call(root.querySelectorAll(sel));
+      if (root.matches && root.matches(sel)) els.unshift(root);
+      return els;
+    };
+    Binding.prototype.getId = function (el) {
+      return el.getAttribute("data-sb-accordion-input-id");
+    };
+    Binding.prototype.getValue = accordionValue;
+    Binding.prototype.getType = function (el) {
+      return el.getAttribute("data-type") === "multiple"
+        ? "shinyblocks.accordion"
+        : null;
+    };
+    Binding.prototype.subscribe = function (el, callback) {
+      el.__sbAccordionHandler = function () {
+        callback(false);
+      };
+      el.addEventListener("sb:accordion-change", el.__sbAccordionHandler);
+    };
+    Binding.prototype.unsubscribe = function (el) {
+      if (!el.__sbAccordionHandler) return;
+      el.removeEventListener("sb:accordion-change", el.__sbAccordionHandler);
+      delete el.__sbAccordionHandler;
+    };
+    Binding.prototype.receiveMessage = function (el, data) {
+      data = data || {};
+      var applied = applyAccordionOpen(el, data.open);
+      if (applied && data.notify !== false) {
+        dispatchSelectionChange(el, "sb:accordion-change");
+      }
+    };
+    window.Shiny.inputBindings.register(new Binding(), "shinyblocks.accordion");
+  }
+
   function registerSelectionBindings() {
     if (window.shinyblocksSelectionBound) return;
     if (!window.Shiny || !window.Shiny.InputBinding || !window.Shiny.inputBindings) {
       return;
     }
     window.shinyblocksSelectionBound = true;
+
+    registerAccordionBinding();
 
     registerSelectionBinding("shinyblocks.tabs", {
       selector: ".sb-tabs[data-sb-tabs-input-id]",

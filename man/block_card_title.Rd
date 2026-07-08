@@ -19,6 +19,8 @@ Create a card title
 }
 \seealso{
 Other content:
+\code{\link[=block_accordion]{block_accordion()}},
+\code{\link[=block_accordion_item]{block_accordion_item()}},
 \code{\link[=block_alert]{block_alert()}},
 \code{\link[=block_alert_action]{block_alert_action()}},
 \code{\link[=block_alert_description]{block_alert_description()}},
@@ -49,6 +51,7 @@ Other content:
 \code{\link[=inc_block_progress]{inc_block_progress()}},
 \code{\link[=show_toast]{show_toast()}},
 \code{\link[=table_column]{table_column()}},
+\code{\link[=update_block_accordion]{update_block_accordion()}},
 \code{\link[=update_block_dialog]{update_block_dialog()}},
 \code{\link[=update_block_dropdown_menu]{update_block_dropdown_menu()}},
 \code{\link[=update_block_popover]{update_block_popover()}},

@@ -18,6 +18,7 @@ source(file.path("R", "server_file_input.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
 source(file.path("R", "server_toggle_group.R"), local = TRUE)
+source(file.path("R", "server_accordion.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
 source(file.path("R", "server_slider.R"), local = TRUE)
@@ -472,6 +473,18 @@ sections <- list(
     file = "dropdown_menu.R"
   ),
   list(
+    id = "accordion",
+    label = "Accordion",
+    icon = "chevron-down",
+    title = "Accordion",
+    lead = paste(
+      "Collapsible content sections with single or multiple open modes,",
+      "collapsible single mode, animated panel height, keyboard navigation,",
+      "and update_block_accordion() server updates."
+    ),
+    file = "accordion.R"
+  ),
+  list(
     id = "tooltip",
     label = "Tooltip",
     icon = "info",
@@ -500,7 +513,7 @@ sections <- list(
 ui <- block_page(
   title = "shinyblocks — component gallery",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260707_01")
+    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260708_accordion")
   ),
   sidebar = block_sidebar(
     title = "shinyblocks",
@@ -615,6 +628,7 @@ server <- function(input, output, session) {
   register_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
   register_dropdown_menu_showcase(input, output, session)
+  register_accordion_showcase(input, output, session)
   register_badge_showcase(input, output, session)
   register_alert_showcase(input, output, session)
   register_table_showcase(input, output, session)

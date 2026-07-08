@@ -262,6 +262,13 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-tabs-default", property: "color", token: "--foreground" }
     ]
   },
+  accordion: {
+    section: "accordion",
+    bindings: [
+      { selector: ".sb-parity-accordion .sb-accordion-trigger", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-accordion .sb-accordion-item", property: "borderBottomColor", token: "--border" }
+    ]
+  },
   field: {
     section: "field",
     bindings: [
@@ -318,6 +325,7 @@ export const RSIDE_PRIMITIVES = [
   "nav",
   "sidebar",
   "tabs",
+  "accordion",
   "field",
   "input-group",
   "image-output",

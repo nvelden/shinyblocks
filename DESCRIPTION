@@ -30,6 +30,7 @@ Collate:
     'alert.R'
     'overlays.R'
     'dropdown-menu.R'
+    'accordion.R'
     'indicators.R'
     'components.R'
     'field.R'
@@ -57,6 +58,7 @@ Collate:
 Imports:
     htmltools,
     jsonlite,
+    rlang,
     shiny
 Suggests:
     testthat (>= 3.0.0),

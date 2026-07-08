@@ -1178,6 +1178,43 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  accordion: [
+    {
+      name: "block_accordion",
+      description: "Vertically stacked collapsible sections built from block_accordion_item(); reports open value(s) to input$id when id is set.",
+      arguments: [
+        { argument: "...", type: "block_accordion_item()", defaultVal: "required", description: "One or more block_accordion_item() sections." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional input id; input$id reports the open value(s)." },
+        { argument: "type", type: "'single' | 'multiple'", defaultVal: "'single'", description: "One open at a time, or any number open independently. Create-only." },
+        { argument: "collapsible", type: "logical", defaultVal: "FALSE", description: "Single mode: whether the open item can collapse to none. Create-only." },
+        { argument: "open", type: "character", defaultVal: "NULL", description: "Item value(s) open initially. Must match item values." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styles on the accordion wrapper." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the accordion wrapper." }
+      ]
+    },
+    {
+      name: "block_accordion_item",
+      description: "A single collapsible section: a trigger title that expands or collapses arbitrary body content.",
+      arguments: [
+        { argument: "value", type: "character", defaultVal: "required", description: "Unique item id; reported to input$id and targeted by updates." },
+        { argument: "title", type: "character | shiny.tag", defaultVal: "required", description: "Trigger label." },
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Panel body content." },
+        { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional leading icon before the title." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Whether the item cannot be toggled." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the item wrapper." }
+      ]
+    },
+    {
+      name: "update_block_accordion",
+      description: "Server-driven update: open or close items by value.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active R/Shiny session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Accordion input id." },
+        { argument: "open", type: "character", defaultVal: "-", description: "Item value(s) that should be open after the update; NULL/character(0) closes all." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether Shiny receives an input event after the update." }
+      ]
+    }
+  ],
   tooltip: [
     {
       name: "block_tooltip",

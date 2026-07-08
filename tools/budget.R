@@ -24,9 +24,13 @@ targets <- list(
     # `shinyblocks.nav`) driven by delegated DOM events: this retired the
     # per-element wiring guards, the `sb:tabs`/`sb:nav` custom-message handlers,
     # and the `shiny:connected` re-sync in favour of one shared binding factory,
-    # landing at ~20.4 KB. Raw is a headroom guard, not a transfer budget.
+    # landing at ~20.4 KB. Raised for the #91 accordion primitive
+    # (block_accordion): delegated click/keyboard toggle honouring single/
+    # multiple + collapsible, `inert`-based collapse, and a real
+    # `shinyblocks.accordion` InputBinding reporting open item value(s). Raw is
+    # a headroom guard, not a transfer budget.
     path = "inst/www/shinyblocks.js",
-    limit_kb = 21,
+    limit_kb = 27,
     metric = "raw",
     group = "compatibility"
   ),

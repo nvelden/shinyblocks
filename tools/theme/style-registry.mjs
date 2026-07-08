@@ -272,6 +272,11 @@ export const STYLE_REGISTRY = {
     mode: "profile-neutral",
     reason: "The range trigger reuses the same base control radius (calc(var(--radius) * 0.8)) as the single-date picker; no range-specific geometry token is ported into the profile system, so no shipped profile overrides it. Trigger colour conformance is covered by theme-registry.mjs."
   },
+  accordion: {
+    section: "accordion",
+    mode: "profile-neutral",
+    reason: "The accordion is a flat token-driven list: item dividers use --border and the only rounded geometry is the transient focus ring (--radius-sm). It exposes no accordion-specific geometry token for a profile to override, so no shipped profile changes it. Divider/trigger colour conformance is covered by theme-registry.mjs."
+  },
 
   // --- R-side shell families: Luma ported (compiled into inst/www/shinyblocks.css) ---
   nav: {
