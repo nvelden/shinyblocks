@@ -119,12 +119,27 @@ update_block_textarea <- function(
 #' @param placeholder Optional placeholder text.
 #' @param type Input type. One of `"text"`, `"password"`, `"email"`,
 #'   `"url"`, `"tel"`, `"search"`, or `"number"`. Defaults to `"text"`.
+#' @param min Optional numeric lower bound. Only valid when
+#'   `type = "number"`.
+#' @param max Optional numeric upper bound. Only valid when
+#'   `type = "number"`.
+#' @param step Optional positive step size for the stepper buttons and
+#'   arrow keys. Only valid when `type = "number"`; defaults to 1 in the
+#'   browser when unset.
 #' @param width Optional CSS width value (applied to the wrapper).
 #' @param disabled Whether the control is disabled.
 #' @param invalid Whether the control should show invalid styling
 #'   (sets `aria-invalid="true"`).
 #' @param style Inline CSS styles for the input element.
 #' @param class Additional classes for the wrapper.
+#'
+#' @details
+#' When `type = "number"`, the control renders increment/decrement stepper
+#' buttons and `input$<input_id>` reports a numeric value (like
+#' [shiny::numericInput()]): `NA` while the field is empty or unparseable,
+#' a numeric scalar otherwise. All other types report a character string.
+#' The reported type is fixed when the control first binds; switching to or
+#' from `"number"` with `update_block_input()` does not change it.
 #'
 #' @return An `htmltools` tag.
 #' @family forms
@@ -134,6 +149,9 @@ block_input <- function(
   value = "",
   placeholder = NULL,
   type = c("text", "password", "email", "url", "tel", "search", "number"),
+  min = NULL,
+  max = NULL,
+  step = NULL,
   width = NULL,
   disabled = FALSE,
   invalid = FALSE,
@@ -142,6 +160,27 @@ block_input <- function(
 ) {
   validate_input_id(input_id)
   type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+  if ((!is.null(min) || !is.null(max) || !is.null(step)) && type != "number") {
+    stop(
+      "`min`, `max`, and `step` are only supported when `type = \"number\"`.",
+      call. = FALSE
+    )
+  }
+  check_number(
+    min, "min", null_ok = TRUE,
+    msg = "`min` must be a single numeric value."
+  )
+  check_number(
+    max, "max", null_ok = TRUE,
+    msg = "`max` must be a single numeric value."
+  )
+  if (!is.null(min) && !is.null(max) && min >= max) {
+    stop("`min` must be strictly less than `max`.", call. = FALSE)
+  }
+  check_number(
+    step, "step", positive = TRUE, null_ok = TRUE,
+    msg = "`step` must be a single positive numeric value."
+  )
 
   hidden_native <- hidden_native_input(
     input_id,
@@ -157,6 +196,9 @@ block_input <- function(
     props = list(
       placeholder = placeholder,
       type = type,
+      min = if (is.null(min)) NULL else as.numeric(min),
+      max = if (is.null(max)) NULL else as.numeric(max),
+      step = if (is.null(step)) NULL else as.numeric(step),
       disabled = isTRUE(disabled),
       invalid = isTRUE(invalid),
       style = normalize_runtime_style(style)
@@ -410,6 +452,12 @@ update_block_file_input <- function(
 #' @param value Optional replacement value.
 #' @param placeholder Optional replacement placeholder text.
 #' @param type Optional input type.
+#' @param min Optional replacement lower bound (number type only). Use
+#'   `NULL` to clear.
+#' @param max Optional replacement upper bound (number type only). Use
+#'   `NULL` to clear.
+#' @param step Optional replacement step size (number type only). Use
+#'   `NULL` to reset to the browser default of 1.
 #' @param disabled Optional disabled state.
 #' @param invalid Optional invalid flag.
 #' @param style Optional replacement inline CSS styles for the input.
@@ -426,6 +474,9 @@ update_block_input <- function(
   value,
   placeholder,
   type,
+  min,
+  max,
+  step,
   disabled,
   invalid,
   style,
@@ -443,6 +494,37 @@ update_block_input <- function(
 
   if (!missing(type)) {
     payload$type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+  }
+  if (!missing(min)) {
+    if (is.null(min)) {
+      payload["min"] <- list(NULL)
+    } else {
+      check_number(min, "min", msg = "`min` must be a single numeric value.")
+      payload$min <- as.numeric(min)
+    }
+  }
+  if (!missing(max)) {
+    if (is.null(max)) {
+      payload["max"] <- list(NULL)
+    } else {
+      check_number(max, "max", msg = "`max` must be a single numeric value.")
+      payload$max <- as.numeric(max)
+    }
+  }
+  if (!missing(min) && !missing(max) &&
+        !is.null(min) && !is.null(max) && min >= max) {
+    stop("`min` must be strictly less than `max`.", call. = FALSE)
+  }
+  if (!missing(step)) {
+    if (is.null(step)) {
+      payload["step"] <- list(NULL)
+    } else {
+      check_number(
+        step, "step", positive = TRUE,
+        msg = "`step` must be a single positive numeric value."
+      )
+      payload$step <- as.numeric(step)
+    }
   }
 
   runtime_input_update(session, input_id, "input", payload, notify = notify)

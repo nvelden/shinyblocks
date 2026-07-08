@@ -3,6 +3,8 @@
 ### Components
 
 * New `block_toggle_group()` / `update_block_toggle_group()`: a segmented single/multiple toggle input (view switchers, formatting toolbars) reporting a string (single) or character vector (multiple) to `input$<id>`. Supports `default`/`outline` variants, three sizes, per-choice icons (vendored names or tags) with optional icon-only items, and group-wide or per-item disabling (#93).
+* `block_breadcrumb()`, `block_breadcrumb_item()`, and `block_breadcrumb_ellipsis()` are new (issue #92): a static page-shell breadcrumb trail following the shadcn breadcrumb pattern. The trail renders a `nav[aria-label="breadcrumb"]` landmark; separators (default chevron, customizable per trail via `separator =` as a string or tag) are auto-inserted between entries and hidden from assistive technology; `current = TRUE` marks the current page with a non-interactive `aria-current="page"` span; and `block_breadcrumb_ellipsis()` collapses long middles behind a decorative glyph with a visually hidden label. Pure `htmltools` markup — no runtime payload or Shiny binding (static links are v1 per the issue; nav-input integration was deliberately deferred).
+* `block_input(type = "number")` now has a first-class numeric contract (issue #96). New `min`, `max`, and `step` arguments (number type only) drive increment/decrement stepper buttons rendered inside the control's right edge, the native arrow-key stepping, and stepper bound clamping; `update_block_input()` accepts the same arguments (`NULL` clears a bound). `input$<id>` for number inputs now reports a numeric value like `shiny::numericInput()` — `NA` while the field is empty or unparseable — instead of a character string; other types are unchanged.
 
 ### Bug fixes
 

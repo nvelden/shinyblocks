@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import manifestData from "@/lib/preview-manifest.json";
 import { API_REFERENCE_DATABASE } from "@/lib/api-reference";
+import { SITE_URL } from "@/lib/site";
 import { PlaygroundFrame } from "@/components/playground-frame";
 import { PreviewSurface } from "@/components/preview-surface";
 
@@ -25,6 +26,21 @@ interface PageProps {
 
 export async function generateStaticParams() {
   return manifest.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const component = manifest.find((c) => c.slug === slug);
+  if (!component) return {};
+  return {
+    title: component.name,
+    description: component.description,
+    openGraph: {
+      title: `${component.name} — shinyblocks`,
+      description: component.description,
+      url: `${SITE_URL}/components/${slug}/`,
+    },
+  };
 }
 
 export default async function ComponentDetailPage({ params }: PageProps) {

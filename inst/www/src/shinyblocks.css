@@ -574,6 +574,53 @@
     box-shadow: none;
   }
 
+  /* R-side breadcrumb primitive (shadcn breadcrumb port). Separators and the
+   * ellipsis glyph are decorative; a11y comes from the nav landmark and
+   * aria-current on the page entry. */
+
+  .sb-breadcrumb-list {
+    @apply flex flex-wrap items-center gap-1.5 text-sm break-words text-muted-foreground sm:gap-2.5;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sb-breadcrumb-item {
+    @apply inline-flex items-center gap-1.5;
+  }
+
+  .sb-breadcrumb-link {
+    @apply text-muted-foreground no-underline transition-colors;
+  }
+
+  .sb-breadcrumb-link:hover {
+    @apply text-foreground;
+  }
+
+  .sb-breadcrumb-page {
+    @apply font-normal text-foreground;
+  }
+
+  .sb-breadcrumb-text {
+    @apply text-muted-foreground;
+  }
+
+  .sb-breadcrumb-separator {
+    @apply inline-flex items-center;
+  }
+
+  .sb-breadcrumb-separator .sb-icon {
+    @apply size-3.5;
+  }
+
+  .sb-breadcrumb-ellipsis {
+    @apply flex size-5 items-center justify-center;
+  }
+
+  .sb-breadcrumb-sr-only {
+    @apply sr-only;
+  }
+
   .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):disabled {
     cursor: not-allowed;
     opacity: 0.5;

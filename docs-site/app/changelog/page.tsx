@@ -1,7 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Changelog",
+  description: "Release notes and recent changes in shinyblocks.",
+};
 
 export default function ChangelogPage() {
   const changelogHtmlPath = path.join(process.cwd(), "content/changelog.html");

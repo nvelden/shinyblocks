@@ -27,6 +27,9 @@ Shiny tabset does. Without \code{id} the items stay plain links.
 }
 \seealso{
 Other navigation:
+\code{\link[=block_breadcrumb]{block_breadcrumb()}},
+\code{\link[=block_breadcrumb_ellipsis]{block_breadcrumb_ellipsis()}},
+\code{\link[=block_breadcrumb_item]{block_breadcrumb_item()}},
 \code{\link[=block_nav_group]{block_nav_group()}},
 \code{\link[=block_nav_item]{block_nav_item()}},
 \code{\link[=block_nav_label]{block_nav_label()}},

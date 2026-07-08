@@ -210,6 +210,13 @@ registry <- list(
     featured = FALSE
   ),
   list(
+    name = "Breadcrumb",
+    slug = "breadcrumb",
+    file = "breadcrumb.R",
+    description = "Page-shell breadcrumb trail with aria-current page entry and collapsible middle.",
+    featured = FALSE
+  ),
+  list(
     name = "Separator",
     slug = "separator",
     file = "separator.R",

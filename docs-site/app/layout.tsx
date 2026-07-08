@@ -6,12 +6,41 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import Script from "next/script";
 import { getRuntimeAssets } from "@/lib/runtime-assets";
+import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 import "./globals.css";
 
+// Absolute URLs throughout: basePath + metadataBase resolution is easy to
+// get subtly wrong on a GitHub Pages project site, and scrapers need exact
+// URLs. og.png is a committed static asset (see scripts/generate-og-image.mjs).
+const OG_IMAGE = {
+  url: `${SITE_URL}/og.png`,
+  width: 1200,
+  height: 630,
+  alt: "shinyblocks — shadcn-inspired Shiny components",
+};
+
 export const metadata: Metadata = {
-  title: "shinyblocks — shadcn-inspired Shiny components",
-  description:
-    "A set of beautifully designed shadcn-inspired components for Shiny. Pure R. Open source.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "shinyblocks — shadcn-inspired Shiny components",
+    template: "%s — shinyblocks",
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: "shinyblocks — shadcn-inspired Shiny components",
+    description: SITE_DESCRIPTION,
+    url: `${SITE_URL}/`,
+    siteName: "shinyblocks",
+    locale: "en_US",
+    type: "website",
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "shinyblocks — shadcn-inspired Shiny components",
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
 };
 
 export default function RootLayout({

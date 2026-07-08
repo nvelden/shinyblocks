@@ -41,6 +41,7 @@ source(file.path("R", "server_layout_primitives.R"), local = TRUE)
 source(file.path("R", "server_field.R"), local = TRUE)
 source(file.path("R", "server_image_output.R"), local = TRUE)
 source(file.path("R", "server_plot_output.R"), local = TRUE)
+source(file.path("R", "server_breadcrumb.R"), local = TRUE)
 
 # Sections drive both the sidebar nav and the body. Each entry maps to
 # inst/showcase/R/examples/<file>.R; add a new component by adding a
@@ -318,6 +319,17 @@ sections <- list(
     file = "slider.R"
   ),
   list(
+    id = "breadcrumb",
+    label = "Breadcrumb",
+    icon = "chevron-right",
+    title = "Breadcrumb",
+    lead = paste(
+      "Static page-shell breadcrumb trail: nav landmark, aria-current page",
+      "entry, decorative separators, and an optional collapsed middle."
+    ),
+    file = "breadcrumb.R"
+  ),
+  list(
     id = "tabs",
     label = "Tabs",
     icon = "layout-list",
@@ -587,6 +599,7 @@ server <- function(input, output, session) {
   register_card_showcase(input, output, session)
   register_value_box_showcase(input, output, session)
   register_tabs_showcase(input, output, session)
+  register_breadcrumb_showcase(input, output, session)
   register_theme_showcase(input, output, session)
   register_style_showcase(input, output, session)
   register_layout_showcase(input, output, session)
