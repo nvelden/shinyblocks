@@ -15,6 +15,7 @@ source(file.path("R", "server_textarea.R"), local = TRUE)
 source(file.path("R", "server_file_input.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
+source(file.path("R", "server_toggle_group.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
 source(file.path("R", "server_slider.R"), local = TRUE)
@@ -251,6 +252,18 @@ sections <- list(
     file = "radio_group.R"
   ),
   list(
+    id = "toggle-group",
+    label = "Toggle group",
+    icon = "layout-list",
+    title = "Toggle group",
+    lead = paste(
+      "Runtime-rendered segmented toggle group for single or multiple choice with",
+      "outline variant, sizes, icons, per-item disabled state, and",
+      "update_block_toggle_group() server updates."
+    ),
+    file = "toggle_group.R"
+  ),
+  list(
     id = "switch",
     label = "Switch",
     icon = "circle-half-stroke",
@@ -461,7 +474,7 @@ sections <- list(
 ui <- block_page(
   title = "shinyblocks — component gallery",
   theme = htmltools::tagList(
-    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260616_01")
+    htmltools::tags$link(rel = "stylesheet", type = "text/css", href = "showcase.css?v=20260707_01")
   ),
   sidebar = block_sidebar(
     title = "shinyblocks",
@@ -566,6 +579,7 @@ server <- function(input, output, session) {
   register_file_input_showcase(input, output, session)
   register_input_showcase(input, output, session)
   register_radio_group_showcase(input, output, session)
+  register_toggle_group_showcase(input, output, session)
   register_switch_showcase(input, output, session)
   register_input_group_showcase(input, output, session)
   register_slider_showcase(input, output, session)

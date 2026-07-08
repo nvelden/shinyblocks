@@ -52,6 +52,12 @@ export function setNativeRadioGroupValue(root, value) {
   native.value = value == null ? "" : String(value);
 }
 
+export function setNativeToggleGroupValue(root, value) {
+  const native = root.querySelector("input.sb-toggle-group-native");
+  if (!native) return;
+  native.value = value == null ? "" : String(value);
+}
+
 export function nativeSlider(root) {
   return root ? root.querySelector("input.sb-slider-native") : null;
 }

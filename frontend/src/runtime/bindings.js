@@ -33,6 +33,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "slider",
   "table",
   "toaster",
+  "toggle-group",
   "date-picker",
   "date-range-picker",
   "progress"
@@ -151,6 +152,7 @@ const switchEvents = rootEventListener("sb:switch-change", "__sbSwitchChangeHand
 const textareaEvents = rootEventListener("sb:textarea-change", "__sbTextareaChangeHandler", true);
 const inputEvents = rootEventListener("sb:input-change", "__sbInputChangeHandler", true);
 const radioGroupEvents = rootEventListener("sb:radio-group-change", "__sbRadioGroupChangeHandler");
+const toggleGroupEvents = rootEventListener("sb:toggle-group-change", "__sbToggleGroupChangeHandler");
 const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHandler", true);
 const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHandler");
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
@@ -435,6 +437,25 @@ const BINDING_CONFIGS = [
     ...radioGroupEvents
   },
   {
+    // Single mode reports a string (or null when nothing is pressed);
+    // multiple mode reports a JS array (Shiny → character vector). The value
+    // shape follows the mount payload's `type`, which is create-only.
+    component: "toggle-group",
+    receiveProp: "__sbToggleGroupReceive",
+    getValue(el) {
+      if (Object.prototype.hasOwnProperty.call(el, "__sbToggleGroupValue")) {
+        return el.__sbToggleGroupValue;
+      }
+      return initialValue(el);
+    },
+    setValue(el, value) {
+      if (typeof el.__sbToggleGroupReceive === "function") {
+        el.__sbToggleGroupReceive({ selected: value, notify: false });
+      }
+    },
+    ...toggleGroupEvents
+  },
+  {
     component: "slider",
     receiveProp: "__sbSliderReceive",
     getValue(el) {
@@ -595,6 +616,7 @@ const BINDING_NAMES = [
   "shinyblocks.textarea",
   "shinyblocks.input",
   "shinyblocks.radio-group",
+  "shinyblocks.toggle-group",
   "shinyblocks.slider",
   "shinyblocks.table",
   "shinyblocks.file-input",

@@ -143,6 +143,14 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-radio-group-checked .sb-radio-group-button[data-state='checked'] .sb-radio-group-indicator", property: "backgroundColor", token: "--primary" }
     ]
   },
+  "toggle-group": {
+    section: "toggle-group",
+    bindings: [
+      { selector: ".sb-parity-toggle-group-on .sb-toggle-group-item[data-state='on']", property: "backgroundColor", token: "--accent" },
+      { selector: ".sb-parity-toggle-group-on .sb-toggle-group-item[data-state='on']", property: "color", token: "--accent-foreground" },
+      { selector: ".sb-parity-toggle-group-on .sb-toggle-group-item[data-state='off']", property: "borderColor", token: "--input" }
+    ]
+  },
   select: {
     section: "select",
     bindings: [

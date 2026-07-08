@@ -335,6 +335,81 @@ try {
     "runtime slider thumb drag should keep updating after the pointer leaves the track"
   );
 
+  // Toggle group: single mode (radio semantics, press-again releases).
+  const toggleRoot = "[data-sb-component='toggle-group'][data-sb-input-id='runtime_toggle']";
+  await assertText(page, "#runtime_toggle_value", "list");
+  assert.equal(
+    await page.evaluate((root) => {
+      return document.querySelector(`${root} .sb-toggle-group-item[data-state='on']`)?.getAttribute("aria-checked");
+    }, toggleRoot),
+    "true",
+    "single-mode toggle items should carry radio semantics"
+  );
+  await page.locator(`${toggleRoot} .sb-toggle-group-item`).filter({ hasText: "Grid" }).click();
+  await assertText(page, "#runtime_toggle_value", "grid");
+  assert.equal(
+    await page.evaluate(() => document.querySelector("#runtime_toggle")?.value),
+    "grid",
+    "runtime toggle group should keep the hidden native value"
+  );
+  // Pressing the active item releases it.
+  await page.locator(`${toggleRoot} .sb-toggle-group-item`).filter({ hasText: "Grid" }).click();
+  await assertText(page, "#runtime_toggle_value", "<NULL>");
+  // Roving tabindex: arrows move focus without selecting; Space presses.
+  await page.locator(`${toggleRoot} .sb-toggle-group-item`).first().focus();
+  await page.keyboard.press("ArrowRight");
+  await assertText(page, "#runtime_toggle_value", "<NULL>");
+  assert.equal(
+    await page.evaluate(() => document.activeElement?.textContent),
+    "Grid",
+    "arrow keys should move focus across toggle items"
+  );
+  await page.keyboard.press("Space");
+  await assertText(page, "#runtime_toggle_value", "grid");
+  // Server updates: selected, clear, choices swap, disabled.
+  await page.click("#clear_toggle");
+  await assertText(page, "#runtime_toggle_value", "<NULL>");
+  await page.click("#set_toggle_grid");
+  await assertText(page, "#runtime_toggle_value", "grid");
+  await page.click("#disable_toggle");
+  await page.waitForFunction((root) => {
+    const items = Array.from(document.querySelectorAll(`${root} .sb-toggle-group-item`));
+    return items.length > 0 && items.every((item) => item.disabled);
+  }, toggleRoot);
+  await page.click("#enable_toggle");
+  await page.waitForFunction((root) => {
+    const items = Array.from(document.querySelectorAll(`${root} .sb-toggle-group-item`));
+    return items.length > 0 && items.every((item) => !item.disabled);
+  }, toggleRoot);
+  await page.click("#swap_toggle_choices");
+  await assertText(page, "#runtime_toggle_value", "week");
+  await page.locator(`${toggleRoot} .sb-toggle-group-item`).filter({ hasText: "Day" }).click();
+  await assertText(page, "#runtime_toggle_value", "day");
+
+  // Toggle group: multiple mode (aria-pressed, per-item disabled).
+  const toggleMultiRoot = "[data-sb-component='toggle-group'][data-sb-input-id='runtime_toggle_multi']";
+  await assertText(page, "#runtime_toggle_multi_value", "bold");
+  assert.equal(
+    await page.evaluate((root) => {
+      return document.querySelector(`${root} .sb-toggle-group-item[data-state='on']`)?.getAttribute("aria-pressed");
+    }, toggleMultiRoot),
+    "true",
+    "multiple-mode toggle items should report aria-pressed"
+  );
+  assert.equal(
+    await page.evaluate((root) => {
+      const items = Array.from(document.querySelectorAll(`${root} .sb-toggle-group-item`));
+      return items.find((item) => item.textContent === "Underline")?.disabled;
+    }, toggleMultiRoot),
+    true,
+    "per-item disabled values should disable only that item"
+  );
+  await page.locator(`${toggleMultiRoot} .sb-toggle-group-item`).filter({ hasText: "Italic" }).click();
+  await assertText(page, "#runtime_toggle_multi_value", "bold,italic");
+  await page.locator(`${toggleMultiRoot} .sb-toggle-group-item`).filter({ hasText: "Bold" }).click();
+  await assertText(page, "#runtime_toggle_multi_value", "italic");
+  await page.click("#set_toggle_multi");
+  await assertText(page, "#runtime_toggle_multi_value", "bold,italic");
   // Number input: typed numeric reporting + stepper buttons (issue #96).
   const numberRoot = "[data-sb-component='input'][data-sb-input-id='runtime_number']";
   await assertText(page, "#runtime_number_value", "5");

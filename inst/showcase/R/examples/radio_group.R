@@ -8,7 +8,7 @@ htmltools::tagList(
           block_input("showcase_radio_group_doc_label", value = "Notification preference")
         ),
         block_field(
-          block_field_label("choices (one per line, label|value)", `for` = "showcase_radio_group_doc_choices"),
+          block_field_label("choices", `for` = "showcase_radio_group_doc_choices"),
           block_textarea(
             "showcase_radio_group_doc_choices",
             value = "All|all\nMentions|mentions\nNone|none",

@@ -172,6 +172,67 @@ test_that("cosmetic update_block_switch messages do not notify", {
   expect_null(message$checked)
 })
 
+test_that("update_block_toggle_group sends input binding messages", {
+  capture <- local_input_message_session()
+
+  expect_invisible(
+    update_block_toggle_group(
+      capture$session,
+      "view",
+      selected = "grid",
+      choices = c(List = "list", Grid = "grid"),
+      icons = list(grid = "layout-grid"),
+      disabled = "list",
+      variant = "outline",
+      size = "lg",
+      class = "custom-toggle",
+      notify = TRUE
+    )
+  )
+
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-toggle-group-view")
+  expect_identical(as.character(message$payload$selected), "grid")
+  expect_identical(message$payload$choices[[2]]$label, "Grid")
+  expect_identical(message$payload$choices[[2]]$icon, "layout-grid")
+  expect_identical(message$payload$disabled, FALSE)
+  expect_identical(as.character(message$payload$disabledValues), "list")
+  expect_identical(message$payload$variant, "outline")
+  expect_identical(message$payload$size, "lg")
+  expect_identical(message$payload$class, "custom-toggle")
+  expect_identical(message$payload$notify, TRUE)
+})
+
+test_that("update_block_toggle_group clears the selection via NULL", {
+  capture <- local_input_message_session()
+
+  update_block_toggle_group(capture$session, "view", selected = NULL)
+  payload <- capture$last_payload()
+  expect_true("selected" %in% names(payload))
+  expect_null(payload$selected)
+  expect_identical(payload$notify, TRUE)
+})
+
+test_that("update_block_toggle_group rejects icons without choices", {
+  capture <- local_input_message_session()
+
+  expect_error(
+    update_block_toggle_group(
+      capture$session, "view", icons = list(a = "list")
+    ),
+    "`icons` requires `choices`"
+  )
+})
+
+test_that("cosmetic update_block_toggle_group messages do not notify", {
+  capture <- local_input_message_session()
+
+  update_block_toggle_group(capture$session, "view", class = "renamed")
+  message <- capture$last_payload()
+  expect_identical(message$notify, FALSE)
+  expect_null(message$selected)
+})
+
 test_that("update_block_slider sends input binding messages", {
   capture <- local_input_message_session()
 

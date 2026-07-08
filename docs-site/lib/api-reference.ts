@@ -634,6 +634,39 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "toggle-group": [
+    {
+      name: "block_toggle_group",
+      description: "Segmented toggle group for single or multiple pressed choices (view switchers, toolbars).",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Input id; reports a string (single) or character vector (multiple)." },
+        { argument: "choices", type: "list | character", defaultVal: "required", description: "Choice labels and values." },
+        { argument: "selected", type: "character", defaultVal: "NULL", description: "Initial pressed value(s); NULL starts released." },
+        { argument: "type", type: "'single' | 'multiple'", defaultVal: "'single'", description: "Selection mode; create-only." },
+        { argument: "variant", type: "'default' | 'outline'", defaultVal: "'default'", description: "Borderless or outlined segments." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Item height and padding." },
+        { argument: "icons", type: "named list", defaultVal: "NULL", description: "Choice value to vendored icon name or shiny.tag mapping." },
+        { argument: "icon_only", type: "logical", defaultVal: "FALSE", description: "Hide labels visually; labels become aria-label. Requires icons." },
+        { argument: "disabled", type: "logical | character", defaultVal: "FALSE", description: "Disable the group, or listed choice values per item." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline CSS styles applied to the group wrapper." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class merged onto the group wrapper." }
+      ]
+    },
+    {
+      name: "update_block_toggle_group",
+      description: "Replaces pressed values, choices, icons, disabled state, variant, or size from the server.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Standard active R/Shiny session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target toggle group input ID." },
+        { argument: "selected", type: "character", defaultVal: "NULL", description: "New pressed value(s); NULL releases everything." },
+        { argument: "choices", type: "list | character", defaultVal: "NULL", description: "Replacement choices." },
+        { argument: "icons", type: "named list", defaultVal: "NULL", description: "Icons for the replacement choices; requires choices." },
+        { argument: "disabled", type: "logical | character", defaultVal: "NULL", description: "Group flag or per-item choice values." },
+        { argument: "variant", type: "'default' | 'outline'", defaultVal: "NULL", description: "New visual variant." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "NULL", description: "New item size." }
+      ]
+    }
+  ],
   switch: [
     {
       name: "block_switch",
