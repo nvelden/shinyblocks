@@ -3,6 +3,23 @@ import { labelIdForInput } from "../runtime/dom.js";
 import { nativeInput, setNativeInputValue } from "../runtime/native-inputs.js";
 import { classNames } from "./shared.jsx";
 
+function finiteOrNull(raw) {
+  if (raw == null || raw === "") return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function positiveOrNull(raw) {
+  const parsed = finiteOrNull(raw);
+  return parsed != null && parsed > 0 ? parsed : null;
+}
+
+function decimalsOf(number) {
+  const text = String(number);
+  const fraction = text.split(".")[1];
+  return fraction ? fraction.length : 0;
+}
+
 export function Input({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
@@ -11,6 +28,9 @@ export function Input({ payload, root }) {
   const [value, setValueState] = useState(initialValue);
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
   const [type, setType] = useState(props.type || "text");
+  const [min, setMin] = useState(finiteOrNull(props.min));
+  const [max, setMax] = useState(finiteOrNull(props.max));
+  const [step, setStep] = useState(positiveOrNull(props.step));
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
   const [style, setStyle] = useState(props.style || {});
@@ -46,6 +66,15 @@ export function Input({ payload, root }) {
       if (Object.prototype.hasOwnProperty.call(nextData, "type")) {
         setType(nextData.type || "text");
       }
+      if (Object.prototype.hasOwnProperty.call(nextData, "min")) {
+        setMin(finiteOrNull(nextData.min));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "max")) {
+        setMax(finiteOrNull(nextData.max));
+      }
+      if (Object.prototype.hasOwnProperty.call(nextData, "step")) {
+        setStep(positiveOrNull(nextData.step));
+      }
       if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
         const nextDisabled = Boolean(nextData.disabled);
         setDisabled(nextDisabled);
@@ -69,8 +98,7 @@ export function Input({ payload, root }) {
     };
   }, [inputId, root]);
 
-  function handleChange(event) {
-    const next = event.target.value;
+  function commitValue(next) {
     setValueState(next);
     if (root) {
       root.__sbInputValue = next;
@@ -80,13 +108,46 @@ export function Input({ payload, root }) {
     }
   }
 
-  return (
+  function handleChange(event) {
+    commitValue(event.target.value);
+  }
+
+  const isNumber = type === "number";
+  const currentNumber = finiteOrNull(value);
+
+  function stepBy(direction) {
+    if (disabled) return;
+    const usableStep = step == null ? 1 : step;
+    let next;
+    if (currentNumber == null) {
+      // Empty field: step lands on a bound when one exists, else on 0,
+      // matching native <input type="number"> stepUp/stepDown behavior.
+      next = direction > 0 ? (min != null ? min : 0) : (max != null ? max : 0);
+    } else {
+      next = currentNumber + direction * usableStep;
+    }
+    if (min != null) next = Math.max(min, next);
+    if (max != null) next = Math.min(max, next);
+    const precision = Math.max(
+      decimalsOf(usableStep),
+      currentNumber == null ? 0 : decimalsOf(currentNumber)
+    );
+    commitValue(String(Number(next.toFixed(precision))));
+  }
+
+  const atMin = currentNumber != null && min != null && currentNumber <= min;
+  const atMax = currentNumber != null && max != null && currentNumber >= max;
+
+  const control = (
     <input
       className={classNames("sb-input-control", className)}
       data-slot="input-control"
       type={type}
       value={value}
       placeholder={placeholder || undefined}
+      min={isNumber && min != null ? min : undefined}
+      max={isNumber && max != null ? max : undefined}
+      step={isNumber && step != null ? step : undefined}
       disabled={disabled}
       aria-invalid={isInvalid || undefined}
       aria-labelledby={labelledBy || undefined}
@@ -94,5 +155,43 @@ export function Input({ payload, root }) {
       style={style}
       onChange={handleChange}
     />
+  );
+
+  if (!isNumber) return control;
+
+  // Stepper buttons stay outside the tab order: the input itself is the
+  // spinbutton (arrow keys step natively); the buttons are a pointer affordance.
+  return (
+    <div className="sb-input-number" data-slot="input-number">
+      {control}
+      <div className="sb-input-stepper" data-slot="input-stepper">
+        <button
+          type="button"
+          className="sb-input-stepper-btn"
+          data-slot="input-stepper-up"
+          aria-label="Increase value"
+          tabIndex={-1}
+          disabled={disabled || atMax}
+          onClick={() => stepBy(1)}
+        >
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m18 15-6-6-6 6" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="sb-input-stepper-btn"
+          data-slot="input-stepper-down"
+          aria-label="Decrease value"
+          tabIndex={-1}
+          disabled={disabled || atMin}
+          onClick={() => stepBy(-1)}
+        >
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
 }

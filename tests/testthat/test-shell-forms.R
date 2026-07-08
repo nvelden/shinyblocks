@@ -91,6 +91,66 @@ test_that("block_input emits a runtime payload and hidden native input", {
   expect_identical(payload$binding$type, "shinyblocks.input")
 })
 
+test_that("block_input number type carries min/max/step props", {
+  input <- block_input(
+    "qty",
+    value = 5,
+    type = "number",
+    min = 0,
+    max = 10,
+    step = 0.5
+  )
+  payload <- runtime_payload_from(input)
+
+  expect_identical(payload$props$type, "number")
+  # The payload JSON round-trip reads whole numbers back as integers.
+  expect_equal(payload$props$min, 0)
+  expect_equal(payload$props$max, 10)
+  expect_equal(payload$props$step, 0.5)
+  expect_identical(payload$state$value, "5")
+
+  # Bounds are optional; omitted bounds stay out of the payload.
+  bare <- runtime_payload_from(block_input("qty2", type = "number"))
+  expect_null(bare$props$min)
+  expect_null(bare$props$max)
+  expect_null(bare$props$step)
+})
+
+test_that("block_input validates number-only bound arguments", {
+  expect_error(
+    block_input("qty", min = 0),
+    "only supported when `type = \"number\"`",
+    fixed = TRUE
+  )
+  expect_error(
+    block_input("qty", type = "number", min = "0"),
+    "`min` must be a single numeric value.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_input("qty", type = "number", min = 10, max = 10),
+    "`min` must be strictly less than `max`.",
+    fixed = TRUE
+  )
+  expect_error(
+    block_input("qty", type = "number", step = 0),
+    "`step` must be a single positive numeric value.",
+    fixed = TRUE
+  )
+})
+
+test_that("shinyblocks.number input handler decodes like numericInput", {
+  handler <- shiny:::inputHandlers$get("shinyblocks.number")
+  skip_if(is.null(handler), "input handler registry not accessible")
+
+  expect_null(handler(NULL, NULL, "qty"))
+  expect_identical(handler("", NULL, "qty"), NA_real_)
+  expect_identical(handler("  ", NULL, "qty"), NA_real_)
+  expect_identical(handler("abc", NULL, "qty"), NA_real_)
+  expect_identical(handler("2.5", NULL, "qty"), 2.5)
+  expect_identical(handler("-3", NULL, "qty"), -3)
+})
+
 test_that("block_file_input emits bindable native file input markup", {
   file_input <- block_file_input(
     "upload",

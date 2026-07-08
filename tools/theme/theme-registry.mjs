@@ -114,7 +114,9 @@ export const THEME_REGISTRY = {
   input: {
     section: "input",
     bindings: [
-      { selector: ".sb-parity-input-default", property: "backgroundColor", token: "--background" }
+      { selector: ".sb-parity-input-default", property: "backgroundColor", token: "--background" },
+      { selector: ".sb-parity-input-number-wrap .sb-input-stepper-btn", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-input-number-wrap .sb-input-stepper", property: "borderLeftColor", token: "--input" }
     ]
   },
   popover: {
