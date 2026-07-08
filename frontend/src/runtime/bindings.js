@@ -73,7 +73,7 @@ function makeRuntimeBinding(config) {
         : matches;
     }
     getId(el) { return getId ? getId(el) : el.dataset.sbInputId; }
-    getType() { return type; }
+    getType(el) { return typeof type === "function" ? type(el) : type; }
     getValue(el) { return getValue ? getValue(el) : null; }
     setValue(el, value) { if (setValue) setValue(el, value); }
     subscribe(el, callback) { if (subscribe) subscribe(el, callback); }
@@ -472,6 +472,14 @@ const BINDING_CONFIGS = [
   },
   {
     component: "input",
+    // Number inputs report through the typed "shinyblocks.number" handler so
+    // `input$<id>` is numeric like numericInput(). The type is read from the
+    // mount payload because Shiny resolves getType once at bind time — a later
+    // `update_block_input(type = ...)` cannot change how the value is decoded.
+    type(el) {
+      const payload = readPayload(el);
+      return payload?.props?.type === "number" ? "shinyblocks.number" : null;
+    },
     receiveProp: "__sbInputReceive",
     getValue(el) {
       if (typeof el.__sbInputValue === "string") return el.__sbInputValue;

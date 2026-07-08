@@ -615,8 +615,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Builds a standard single-line interactive form input element.",
       arguments: [
         { argument: "input_id", type: "character", defaultVal: "required", description: "Input identifier." },
-        { argument: "type", type: "'text' | 'password' | 'email' | 'url' | 'tel' | 'search' | 'number'", defaultVal: "'text'", description: "HTML text field variant category type." },
+        { argument: "type", type: "'text' | 'password' | 'email' | 'url' | 'tel' | 'search' | 'number'", defaultVal: "'text'", description: "HTML text field variant category type. The number type renders stepper buttons and reports a numeric value (NA while empty)." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Preview text before typing." },
+        { argument: "min", type: "numeric", defaultVal: "NULL", description: "Lower bound for the stepper and arrow keys (number type only)." },
+        { argument: "max", type: "numeric", defaultVal: "NULL", description: "Upper bound for the stepper and arrow keys (number type only)." },
+        { argument: "step", type: "numeric", defaultVal: "NULL", description: "Positive step size (number type only; browser default 1)." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user inputs." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Highlight validation error borders." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Custom layout wrapper styling." },
@@ -631,6 +634,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input control ID." },
         { argument: "value", type: "character", defaultVal: "NULL", description: "Update text input value." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Set new placeholder copy." },
+        { argument: "min", type: "numeric", defaultVal: "NULL", description: "Replace the lower bound (number type only); NULL clears it." },
+        { argument: "max", type: "numeric", defaultVal: "NULL", description: "Replace the upper bound (number type only); NULL clears it." },
+        { argument: "step", type: "numeric", defaultVal: "NULL", description: "Replace the step size (number type only); NULL resets to 1." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Freeze/unfreeze input." },
         { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle validation visual highlights." }
       ]
@@ -957,6 +963,36 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "class", type: "character", defaultVal: "NULL", description: "Styling classes to apply." },
         { argument: "color", type: "'default' | 'muted' | 'primary' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Semantic foreground color token." },
         { argument: "...", type: "character", defaultVal: "NULL", description: "Additional attribute parameters." }
+      ]
+    }
+  ],
+  breadcrumb: [
+    {
+      name: "block_breadcrumb",
+      description: "Static page-shell breadcrumb trail rendered as a nav[aria-label='breadcrumb'] landmark.",
+      arguments: [
+        { argument: "...", type: "tags", defaultVal: "required", description: "block_breadcrumb_item() and block_breadcrumb_ellipsis() entries; separators are inserted automatically." },
+        { argument: "separator", type: "character | tag", defaultVal: "NULL", description: "Separator between entries (string or tag); defaults to a chevron icon, hidden from assistive technology." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline CSS styles for the nav container." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the nav container." }
+      ]
+    },
+    {
+      name: "block_breadcrumb_item",
+      description: "One breadcrumb entry: a link, plain text, or the aria-current page marker.",
+      arguments: [
+        { argument: "label", type: "character | tag", defaultVal: "required", description: "Entry label." },
+        { argument: "href", type: "character", defaultVal: "NULL", description: "Destination URL; renders an anchor. Ignored when current = TRUE." },
+        { argument: "current", type: "logical", defaultVal: "FALSE", description: "Marks the current page: non-interactive span with aria-current='page'." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the list entry." }
+      ]
+    },
+    {
+      name: "block_breadcrumb_ellipsis",
+      description: "Collapsed-middle marker for long trails: decorative glyph plus visually hidden label.",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "'More'", description: "Visually hidden text announced to assistive technology." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the list entry." }
       ]
     }
   ],

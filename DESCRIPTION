@@ -41,6 +41,7 @@ Collate:
     'radio-group.R'
     'toggle-group.R'
     'tabs.R'
+    'breadcrumb.R'
     'toast.R'
     'style-profiles.R'
     'style.R'

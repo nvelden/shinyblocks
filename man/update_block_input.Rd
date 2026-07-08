@@ -10,6 +10,9 @@ update_block_input(
   value,
   placeholder,
   type,
+  min,
+  max,
+  step,
   disabled,
   invalid,
   style,
@@ -27,6 +30,15 @@ update_block_input(
 \item{placeholder}{Optional replacement placeholder text.}
 
 \item{type}{Optional input type.}
+
+\item{min}{Optional replacement lower bound (number type only). Use
+\code{NULL} to clear.}
+
+\item{max}{Optional replacement upper bound (number type only). Use
+\code{NULL} to clear.}
+
+\item{step}{Optional replacement step size (number type only). Use
+\code{NULL} to reset to the browser default of 1.}
 
 \item{disabled}{Optional disabled state.}
 

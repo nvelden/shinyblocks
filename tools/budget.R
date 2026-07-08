@@ -51,9 +51,11 @@ targets <- list(
     # #93 toggle-group CSS (joined segmented control, outline/collapsed inner
     # borders, three sizes, icon slot) adds ~2.2 KB raw (lands at ~72.2 KB),
     # leaving margin for the in-flight #96 stepper CSS (~0.9 KB) to merge.
+    # Raised 74 -> 76 KB for the #85 combobox CSS (searchable-select filter box,
+    # empty state, chip list) adds ~2 KB raw (lands at ~74.4 KB).
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 74,
+    limit_kb = 76,
     metric = "raw",
     group = "runtime"
   ),

@@ -27,6 +27,18 @@ htmltools::tagList(
           )
         ),
         block_field(
+          block_field_label("min (number type)", `for` = "showcase_input_doc_min"),
+          block_input("showcase_input_doc_min", value = "", type = "number", placeholder = "e.g. 0")
+        ),
+        block_field(
+          block_field_label("max (number type)", `for` = "showcase_input_doc_max"),
+          block_input("showcase_input_doc_max", value = "", type = "number", placeholder = "e.g. 10")
+        ),
+        block_field(
+          block_field_label("step (number type)", `for` = "showcase_input_doc_step"),
+          block_input("showcase_input_doc_step", value = "", type = "number", placeholder = "default 1")
+        ),
+        block_field(
           block_field_label("disabled", `for` = "showcase_input_doc_disabled"),
           block_checkbox("showcase_input_doc_disabled", "Disabled", value = FALSE)
         ),
@@ -43,7 +55,8 @@ htmltools::tagList(
           showcase_action_button("showcase_input_clear", "Clear"),
           showcase_action_button("showcase_input_disable", "Disable"),
           showcase_action_button("showcase_input_enable", "Enable"),
-          showcase_action_button("showcase_input_to_password", "Type → password")
+          showcase_action_button("showcase_input_to_password", "Type → password"),
+          showcase_action_button("showcase_input_number_bounds", "Bounds 0–10, step 2")
         )
       ),
       showcase_controls_group(
@@ -87,6 +100,18 @@ htmltools::tagList(
       "sb_parity_input_default",
       value = "Parity",
       class = "sb-parity-input-default"
+    )
+  ),
+  htmltools::div(
+    class = "sb-parity-input-number-wrap",
+    style = "max-width: 320px; margin-top: 0.75rem;",
+    block_input(
+      "sb_parity_input_number",
+      value = 5,
+      type = "number",
+      min = 0,
+      max = 10,
+      class = "sb-parity-input-number"
     )
   )
 )

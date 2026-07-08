@@ -114,7 +114,9 @@ export const THEME_REGISTRY = {
   input: {
     section: "input",
     bindings: [
-      { selector: ".sb-parity-input-default", property: "backgroundColor", token: "--background" }
+      { selector: ".sb-parity-input-default", property: "backgroundColor", token: "--background" },
+      { selector: ".sb-parity-input-number-wrap .sb-input-stepper-btn", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-input-number-wrap .sb-input-stepper", property: "borderLeftColor", token: "--input" }
     ]
   },
   popover: {
@@ -265,6 +267,13 @@ export const THEME_REGISTRY = {
     section: "input-group",
     bindings: [
       { selector: ".sb-parity-input-group-fixtures", property: "color", token: "--foreground" }
+    ]
+  },
+  breadcrumb: {
+    section: "breadcrumb",
+    bindings: [
+      { selector: ".sb-parity-breadcrumb-default .sb-breadcrumb-list", property: "color", token: "--muted-foreground" },
+      { selector: ".sb-parity-breadcrumb-default .sb-breadcrumb-page", property: "color", token: "--foreground" }
     ]
   },
   "image-output": {
