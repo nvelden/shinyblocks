@@ -2,11 +2,12 @@
 #
 # For each subdir under docs-site/playgrounds/, run shinylive::export() to
 # produce a self-contained Shinylive site under public/playgrounds/<slug>/.
-# `shinyblocks` is loaded from the bundled WASM filesystem image, not
-# Shinylive's public webR package repo. Playground app.R files should
-# mount `library.data.gz` before loading shinyblocks, and
-# shinylive::export() must run with `wasm_packages = FALSE` so its
-# dependency scanner does not try `webr::install("shinyblocks")`.
+# `shinyblocks` is installed at runtime from r-universe
+# (https://nvelden.r-universe.dev), which rebuilds the WebAssembly binary
+# from main on every push. Each playground app.R carries the same
+# install.packages() bootstrap; shinylive::export() runs with
+# `wasm_packages = FALSE` so its dependency scanner does not try to
+# bundle shinyblocks at export time.
 #
 # Then merge the playground metadata (hasPlayground, playgroundHeight)
 # into lib/preview-manifest.json so the detail page knows which slugs
@@ -27,18 +28,28 @@ if (!requireNamespace("shinylive", quietly = TRUE)) {
   )
 }
 
+# shinylive >= 0.5.0 bundles webR 0.6 (R 4.6). r-universe only serves wasm
+# binaries for the R version it currently builds against (R 4.6), so older
+# shinylive assets (webR 0.5 = R 4.5) request bin/emscripten/contrib/4.5/
+# and find nothing -- every playground then fails to install shinyblocks.
+if (packageVersion("shinylive") < "0.5.0") {
+  stop(
+    "shinylive >= 0.5.0 is required (bundles webR 0.6 / R 4.6 to match the ",
+    "r-universe wasm binaries). Installed: ", packageVersion("shinylive"),
+    ". Update with install.packages('shinylive').",
+    call. = FALSE
+  )
+}
+
 playgrounds_src <- "playgrounds"
 playgrounds_out <- "public/playgrounds"
 manifest_path <- "lib/preview-manifest.json"
-# WASM package image (library.data.gz + library.js.metadata) mounted by each
-# playground at runtime. Populated by CI from the *latest release*, so it can
-# LAG `HEAD`: a playground that uses a newly added component/function (e.g. a
-# brand-new block_*()) will boot blank with "could not find function" in the
-# nested Shinylive console until this image is rebuilt from the *current local*
-# package. When that happens, rebuild + repack the image into this dir, re-run
-# this script, and restart `npm run preview`. See docs-site/README.md
-# ("Troubleshooting a blank playground iframe").
-wasm_src_dir <- "playgrounds/_wasm"  # populated by CI from latest release
+# NOTE: playgrounds install shinyblocks from r-universe at runtime, so the
+# wasm binary can LAG `HEAD` by ~15-45 min after a push while r-universe
+# rebuilds: a playground that uses a brand-new component/argument will boot
+# blank with "could not find function" in the nested Shinylive console until
+# https://nvelden.r-universe.dev/shinyblocks has caught up. No redeploy is
+# needed once it has — live pages self-heal on the next load.
 
 # Per-slug iframe height. Default 720; override here when a component
 # needs more vertical room (icons gallery, layouts, etc).
@@ -111,29 +122,8 @@ for (slug in slugs) {
     unlink(out_dir, recursive = TRUE, force = TRUE)
   }
 
-  # Stage the wasm filesystem image inside the app source directory so
-  # app.json remains self-contained for local Shinylive app inspection.
-  # The exported site also copies these files to public/playgrounds/,
-  # which is the path the app.R bootstrap mounts at runtime.
-  staged <- c()
-  for (asset in c("library.data.gz", "library.js.metadata")) {
-    src <- file.path(wasm_src_dir, asset)
-    if (!file.exists(src)) {
-      warning(sprintf(
-        "Wasm asset %s not found at %s — playground will fail to load shinyblocks.",
-        asset, src
-      ), call. = FALSE)
-      next
-    }
-    dest <- file.path(app_dir, asset)
-    file.copy(src, dest, overwrite = TRUE)
-    staged <- c(staged, dest)
-  }
-
   cat(sprintf("Exporting %s → %s\n", app_dir, out_dir))
-  on.exit(unlink(staged), add = TRUE)
   shinylive::export(app_dir, out_dir, wasm_packages = FALSE)
-  unlink(staged)
 
   local_shinylive_dir <- file.path(out_dir, "shinylive")
   local_sw_path <- file.path(out_dir, "shinylive-sw.js")
@@ -165,17 +155,6 @@ for (slug in slugs) {
     
     writeLines(html_content, html_path)
     cat("  Rewrote index.html to use shared Shinylive assets\n")
-  }
-}
-
-# Copy the WASM assets directly into the parent shared directory so they are
-# served as static files on the web server at a single location.
-for (asset in c("library.data.gz", "library.js.metadata")) {
-  src <- file.path(wasm_src_dir, asset)
-  if (file.exists(src)) {
-    dest <- file.path(playgrounds_out, asset)
-    file.copy(src, dest, overwrite = TRUE)
-    cat(sprintf("Static WASM asset copied to parent: %s → %s\n", src, dest))
   }
 }
 

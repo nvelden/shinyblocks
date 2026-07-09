@@ -1,43 +1,16 @@
-if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
-  dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-
-  # Try mounting from relative paths. In some environments (e.g. standard workers),
-  # paths resolve relative to the worker script context. In others (e.g. blob workers/proxied environments),
-  # they resolve relative to the main document base URL. We try both to be fully resilient.
-  mounted <- FALSE
-  for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch(
-      {
-        webr::mount("/packages", path)
-        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-          mounted <- TRUE
-          break
-        }
-      },
-      error = function(e) {
-        # Ignore and try the next path
-      }
-    )
-  }
-
-  if (!mounted) {
-    # If both relative paths fail, try absolute path as a last resort fallback
-    # (works on the default nvelden.github.io/shinyblocks deployment)
-    tryCatch(
-      {
-        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-      },
-      error = function(e) {
-        stop("Failed to mount shinyblocks WASM package library: ", e$message)
-      }
-    )
-  }
-
-  .libPaths(c("/packages", .libPaths()))
+# Install shinyblocks (pre-built WebAssembly binary) from r-universe.
+# NOTE: must be installed.packages(), not requireNamespace() - webR shims
+# requireNamespace() and it returns NULL (not FALSE) for packages missing
+# from the default webR repo, so negating its result errors.
+if (!"shinyblocks" %in% rownames(installed.packages())) {
+  install.packages(
+    "shinyblocks",
+    repos = c("https://nvelden.r-universe.dev", "https://repo.r-wasm.org")
+  )
 }
 
 library(shiny)
-do.call(library, list("shinyblocks", character.only = TRUE))
+library(shinyblocks)
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 

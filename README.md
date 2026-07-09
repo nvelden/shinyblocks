@@ -75,30 +75,23 @@ The hosted documentation and gallery are available at
 ## Use With Shinylive
 
 `shinyblocks` can be used in Shinylive/webR apps before the package is
-available through CRAN or the default webR package repositories by
-mounting the package filesystem image published with a GitHub release.
-
-Download `library.data.gz` and `library.js.metadata` from a
-`shinyblocks` release, place both files in a public folder in your
-Shinylive export, for example `wasm_binaries/`, then mount the image
-before calling `library(shinyblocks)`:
+available through CRAN or the default webR package repositories.
+Pre-built WebAssembly binaries are published on
+[r-universe](https://nvelden.r-universe.dev/shinyblocks) and rebuilt
+automatically from `main` on every push. Install at the top of your
+Shinylive `app.R`:
 
 ```r
-if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
-  dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-  webr::mount("/packages", "/wasm_binaries/library.data.gz")
-  .libPaths(c("/packages", .libPaths()))
+if (!"shinyblocks" %in% rownames(installed.packages())) {
+  install.packages(
+    "shinyblocks",
+    repos = c("https://nvelden.r-universe.dev", "https://repo.r-wasm.org")
+  )
 }
 
 library(shiny)
 library(shinyblocks)
 ```
 
-Use a root-relative mount path such as `/wasm_binaries/library.data.gz`.
-Relative paths can be resolved inside Shinylive's generated app
-directory and may fail with missing `library.js.metadata` errors.
-
-The current prerelease assets are attached to
-<https://github.com/nvelden/shinyblocks/releases/tag/v0.0.0.9003>.
 The first Shinylive load can take a little longer while webR downloads
-and caches the package image.
+and caches the package binaries.

@@ -71,9 +71,12 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
   `tsx` outside the command sandbox / with escalation. In sandboxed Codex
   sessions, `tsx` can fail with IPC permission errors before the real test runs.
 - Blank docs-site Shinylive playground iframe? The error is in the nested
-  Shinylive frame's console, and the usual cause is a stale/missing WASM package
-  image (lacks newly added exports). Full checklist in the `shinyblocks-component`
-  skill (§ "Troubleshooting a blank playground iframe") and `docs-site/README.md`.
+  Shinylive frame's console. Playgrounds install shinyblocks from
+  https://nvelden.r-universe.dev at runtime; the usual cause is that the
+  r-universe wasm binary has not yet caught up with a freshly pushed component
+  (~15-45 min lag) — it self-heals once that build finishes. Full checklist in
+  the `shinyblocks-component` skill (§ "Troubleshooting a blank playground
+  iframe") and `docs-site/README.md`.
 - Run GitHub-mutating `gh` commands that require network access, such as
   `gh issue create`, outside the command sandbox / with escalation on the first
   attempt. Use `--body-file` for longer issue bodies so shell quoting does not

@@ -62,21 +62,9 @@ for (file in roots) {
   }
 }
 
-if (file.exists("README.md") && file.exists("DESCRIPTION")) {
-  package_version <- read.dcf("DESCRIPTION", fields = "Version")[[1]]
-  expected_release_url <- sprintf(
-    "https://github.com/nvelden/shinyblocks/releases/tag/v%s",
-    package_version
-  )
-  readme <- paste(readLines("README.md", warn = FALSE), collapse = "\n")
-  checked <- checked + 1L
-  if (!grepl(expected_release_url, readme, fixed = TRUE)) {
-    broken <- c(broken, sprintf(
-      "  README.md  -> prerelease URL must match DESCRIPTION Version (%s)",
-      expected_release_url
-    ))
-  }
-}
+# NOTE: the README prerelease-URL/DESCRIPTION-Version lockstep check was
+# removed with the r-universe wasm migration: releases no longer ship wasm
+# filesystem-image assets, so README no longer links a versioned release tag.
 
 cat(sprintf(
   "\ndoc-links: checked %d link(s) across %d file(s)\n",

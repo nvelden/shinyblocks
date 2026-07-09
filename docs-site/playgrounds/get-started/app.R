@@ -6,37 +6,15 @@
 # This is the exact canonical app from the Get Started guide, wrapped with the
 # Shinylive WASM bootstrap so it runs as the guide's embedded live preview.
 
-if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
-  dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-
-  mounted <- FALSE
-  for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch(
-      {
-        webr::mount("/packages", path)
-        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-          mounted <- TRUE
-          break
-        }
-      },
-      error = function(e) {
-        # Try the next path; Shinylive resolves mount URLs differently by host.
-      }
-    )
-  }
-
-  if (!mounted) {
-    tryCatch(
-      {
-        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-      },
-      error = function(e) {
-        stop("Failed to mount shinyblocks WASM package library: ", e$message)
-      }
-    )
-  }
-
-  .libPaths(c("/packages", .libPaths()))
+# Install shinyblocks (pre-built WebAssembly binary) from r-universe.
+# NOTE: must be installed.packages(), not requireNamespace() - webR shims
+# requireNamespace() and it returns NULL (not FALSE) for packages missing
+# from the default webR repo, so negating its result errors.
+if (!"shinyblocks" %in% rownames(installed.packages())) {
+  install.packages(
+    "shinyblocks",
+    repos = c("https://nvelden.r-universe.dev", "https://repo.r-wasm.org")
+  )
 }
 
 library(shiny)
