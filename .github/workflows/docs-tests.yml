@@ -38,7 +38,7 @@ jobs:
       # The prebuild (`npm run build` → generate-previews.R /
       # generate-playgrounds.R) needs devtools, shinylive, shiny and jsonlite.
       # `local::.` installs shinyblocks + its Suggests (devtools/shiny/jsonlite);
-      # shinylive + webr mirror docs-deploy.yml so this job is deterministic
+      # shinylive mirrors docs-deploy.yml so this job is deterministic
       # rather than riding a warm package cache.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -47,14 +47,6 @@ jobs:
             any::shinylive
             local::.
           working-directory: .
-
-      # `webr` is the R interface resolved by shinylive::export()'s static
-      # analysis of each app.R. Published via r-wasm's r-universe.
-      - name: Install webr (build-time dep for shinylive::export)
-        working-directory: docs-site
-        run: |
-          Rscript -e 'install.packages("webr",
-            repos = c("https://r-wasm.r-universe.dev", getOption("repos")))'
 
       - uses: actions/setup-node@v6
         with:

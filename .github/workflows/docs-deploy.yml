@@ -58,16 +58,6 @@ jobs:
           working-directory: "."
           install-quarto: false
 
-      # `webr` is the R interface used inside the webR runtime. Installed
-      # locally only so `shinylive::export()`'s static analysis of each
-      # app.R can resolve `webr::mount(...)`. It is published via
-      # r-wasm's r-universe.
-      - name: Install webr (build-time dep for shinylive::export)
-        working-directory: docs-site
-        run: |
-          Rscript -e 'install.packages("webr",
-            repos = c("https://r-wasm.r-universe.dev", getOption("repos")))'
-
       - uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -77,40 +67,13 @@ jobs:
       - run: npm ci
         working-directory: docs-site
 
-      # Build the wasm filesystem image (library.data.gz +
-      # library.js.metadata) from the checked-out package commit. The
-      # playground R source and the browser-loaded shinyblocks package must
-      # stay in lockstep; otherwise new component arguments can be exported
-      # before webR has a package image that supports them.
-      - name: Checkout r-wasm/actions
-        uses: actions/checkout@v6
-        with:
-          ref: v3
-          repository: r-wasm/actions
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: .r-wasm-actions
-
-      - name: Find Config/Needs/wasm in DESCRIPTION
-        id: wasm-needs
-        shell: Rscript {0}
-        run: |
-          has_wasm_need <-
-            file.exists("DESCRIPTION") &&
-            "Config/Needs/wasm" %in% names(as.list(read.dcf("DESCRIPTION")[1,]))
-          pkg <- if (has_wasm_need) as.list(read.dcf("DESCRIPTION")[1,])$`Config/Needs/wasm` else ""
-          pkg <- paste0(strsplit(pkg, "[[:space:],]+")[[1]], collapse = ",")
-          cat("pkg=", pkg, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
-
-      - name: Build wasm filesystem image from this commit
-        uses: ./.r-wasm-actions/build-rwasm
-        with:
-          packages: |
-            .
-            ${{ steps.wasm-needs.outputs.pkg }}
-          strip: "demo, doc, examples, help, html, include, tests, vignette"
-          image-path: docs-site/playgrounds/_wasm
-          compress: true
-
+      # NOTE: playgrounds install shinyblocks from r-universe at runtime
+      # (https://nvelden.r-universe.dev, rebuilt from main on every push),
+      # so no wasm filesystem image is built here. Freshly pushed component
+      # changes appear in live playgrounds once r-universe finishes its
+      # build (~15-45 min) — already-deployed pages pick it up on the next
+      # load, no redeploy needed.
+      #
       # 1. Static previews + initial manifest.
       # 2. Shinylive exports + merge hasPlayground into the manifest.
       # 3. Next build consumes the merged manifest + exported assets.

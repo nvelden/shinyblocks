@@ -17,41 +17,19 @@ import { CODE_COMPLETE } from "../content/guides/get-started";
 const here = dirname(fileURLToPath(import.meta.url));
 const outPath = join(here, "..", "playgrounds", "get-started", "app.R");
 
-// Mount the bundled shinyblocks WASM filesystem image before loading the
-// package — identical bootstrap to the component playgrounds, so the live
-// preview uses the package built from this same commit. See
-// scripts/generate-playgrounds.R for how the image is staged.
-const BOOTSTRAP = `if (!"shinyblocks" %in% installed.packages()[, "Package"]) {
-  dir.create("/packages", recursive = TRUE, showWarnings = FALSE)
-
-  mounted <- FALSE
-  for (path in c("../../library.data.gz", "../library.data.gz")) {
-    tryCatch(
-      {
-        webr::mount("/packages", path)
-        if ("shinyblocks" %in% installed.packages(lib.loc = "/packages")[, "Package"]) {
-          mounted <- TRUE
-          break
-        }
-      },
-      error = function(e) {
-        # Try the next path; Shinylive resolves mount URLs differently by host.
-      }
-    )
-  }
-
-  if (!mounted) {
-    tryCatch(
-      {
-        webr::mount("/packages", "/shinyblocks/playgrounds/library.data.gz")
-      },
-      error = function(e) {
-        stop("Failed to mount shinyblocks WASM package library: ", e$message)
-      }
-    )
-  }
-
-  .libPaths(c("/packages", .libPaths()))
+// Install the shinyblocks WebAssembly binary from r-universe before loading
+// the package — identical bootstrap to the component playgrounds. r-universe
+// rebuilds the binary from main on every push, so live previews track the
+// latest package without bundling a filesystem image.
+const BOOTSTRAP = `# Install shinyblocks (pre-built WebAssembly binary) from r-universe.
+# NOTE: must be installed.packages(), not requireNamespace() - webR shims
+# requireNamespace() and it returns NULL (not FALSE) for packages missing
+# from the default webR repo, so negating its result errors.
+if (!"shinyblocks" %in% rownames(installed.packages())) {
+  install.packages(
+    "shinyblocks",
+    repos = c("https://nvelden.r-universe.dev", "https://repo.r-wasm.org")
+  )
 }`;
 
 const HEADER = `# AUTO-GENERATED — do not edit.

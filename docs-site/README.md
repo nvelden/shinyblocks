@@ -29,10 +29,23 @@ npm run test:e2e:install # one-time browser install
 
 Each `playgrounds/<slug>/app.R` is a Shiny app exported to a self-contained
 Shinylive (webR/WASM) site under `public/playgrounds/<slug>/` and embedded in an
-`<iframe>`. The apps do **not** install `shinyblocks` from a webR repo — they
-mount a prebuilt package image (`library.data.gz` + `library.js.metadata`) from
-`public/playgrounds/` at runtime. That image is normally produced by CI from the
-**latest release** (`playgrounds/_wasm/`), so locally it can be stale or absent.
+`<iframe>`. At runtime each app installs `shinyblocks` as a pre-built
+WebAssembly binary from <https://nvelden.r-universe.dev> (dependencies come
+from the default webR repo). r-universe rebuilds that binary from `main` on
+every push, so it can lag `HEAD` by ~15-45 min after a push — and playgrounds
+pick up the new build on the next page load without a redeploy.
+
+Exports require **shinylive >= 0.5.0** (enforced by
+`scripts/generate-playgrounds.R`): its assets bundle webR 0.6 / R 4.6,
+matching the R version r-universe builds wasm binaries for. Older shinylive
+(webR 0.5 / R 4.5) requests `bin/emscripten/contrib/4.5/`, which r-universe
+no longer populates, so every playground fails to install shinyblocks.
+
+Playground `app.R` bootstraps must test installedness with
+`"shinyblocks" %in% rownames(installed.packages())` — **not**
+`requireNamespace()`, which webR shims to return `NULL` (not `FALSE`) for
+packages missing from the default webR repo, so negating it errors before
+`install.packages()` ever runs.
 
 ## Troubleshooting a blank playground iframe
 
@@ -43,19 +56,18 @@ always inside the **nested Shinylive frame**, not the top page:
    *Inspect*, or load the app directly, e.g.
    `…/shinyblocks/playgrounds/gallery/`). The top-page console usually shows
    nothing useful.
-2. **Common cause — wrong/old WASM package image.** Symptoms in that console:
-   `shinyblocks` not found, or `could not find function "block_…"` for a function
-   that exists on `HEAD` but not in the mounted image (the release image lags
-   `HEAD`). Fix: build the **current local** `shinyblocks`, pack it into
-   `library.data.gz` / `library.js.metadata`, and place them in
-   `public/playgrounds/` (and `playgrounds/_wasm/` so `generate-playgrounds.R`
-   restages them). Any playground using newly added components/functions needs a
-   freshly built image, not the released one.
-3. **Don't embed the image in `app.json`.** Keep `app.json` to `app.R` only
-   (~tens of KB, like the other slugs). Bundling the ~14 MB image inflates it to
-   ~19 MB and the Shinylive loader chokes → blank frame. The image is mounted
-   from the separately served `../library.data.gz`, not from `app.json`.
-4. **After changing any playground or the image:** re-run
+2. **Common cause — r-universe binary lagging `main`.** Symptoms in that
+   console: `shinyblocks` not found, or `could not find function "block_…"`
+   for a function that exists on `HEAD` but is not yet in the wasm binary at
+   <https://nvelden.r-universe.dev/shinyblocks> (builds take ~15-45 min after
+   a push; unpushed local-only changes never appear in playgrounds). Check the
+   built commit on that page; once the build lands the playground self-heals
+   on reload.
+3. **Keep `app.json` small.** Keep it to `app.R` only (~tens of KB, like the
+   other slugs) — bundling large binary assets inflates it and the Shinylive
+   loader chokes → blank frame. Packages install from r-universe at runtime;
+   nothing is embedded.
+4. **After changing any playground:** re-run
    `Rscript scripts/generate-playgrounds.R` (regenerates `public/playgrounds/`),
    then **restart `npm run preview`**. `preview` serves a *copied snapshot* at
    `.preview/shinyblocks/` (taken from `out/` at startup), so edits under
