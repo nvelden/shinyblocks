@@ -38,6 +38,7 @@ import { DatePicker } from "./components/date-picker.jsx";
 import { DateRangePicker } from "./components/date-range-picker.jsx";
 import { FileInput } from "./components/file-input.jsx";
 import { Input } from "./components/input.jsx";
+import { Pagination } from "./components/pagination.jsx";
 import { Progress } from "./components/progress.jsx";
 import { RadioGroup } from "./components/radio-group.jsx";
 import { Select } from "./components/select.jsx";
@@ -74,6 +75,7 @@ const COMPONENTS = {
   switch: Switch,
   textarea: Textarea,
   input: Input,
+  pagination: Pagination,
   progress: Progress,
   "radio-group": RadioGroup,
   slider: Slider,

@@ -56,6 +56,11 @@
     suppressWarnings(as.numeric(val))
   }, force = TRUE)
 
+  shiny::registerInputHandler("shinyblocks.pagination", function(val, transport, name) {
+    if (is.null(val)) return(NULL)
+    as.integer(val)
+  }, force = TRUE)
+
   # Progress is display-only: its binding declares `type = "shinyblocks.progress"`
   # (so getType()/the payload agree) but reports no value. Register a handler so
   # Shiny accepts the typed message instead of erroring on an unknown type; it

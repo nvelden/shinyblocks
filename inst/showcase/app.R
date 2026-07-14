@@ -18,6 +18,7 @@ source(file.path("R", "server_file_input.R"), local = TRUE)
 source(file.path("R", "server_input.R"), local = TRUE)
 source(file.path("R", "server_radio_group.R"), local = TRUE)
 source(file.path("R", "server_toggle_group.R"), local = TRUE)
+source(file.path("R", "server_pagination.R"), local = TRUE)
 source(file.path("R", "server_accordion.R"), local = TRUE)
 source(file.path("R", "server_switch.R"), local = TRUE)
 source(file.path("R", "server_input_group.R"), local = TRUE)
@@ -277,6 +278,11 @@ sections <- list(
       "update_block_toggle_group() server updates."
     ),
     file = "toggle_group.R"
+  ),
+  list(
+    id = "pagination", label = "Pagination", icon = "more-horizontal",
+    title = "Pagination", lead = "Page navigation input with bounds, ellipsis truncation, and server updates.",
+    file = "pagination.R"
   ),
   list(
     id = "switch",
@@ -620,6 +626,7 @@ server <- function(input, output, session) {
   register_input_showcase(input, output, session)
   register_radio_group_showcase(input, output, session)
   register_toggle_group_showcase(input, output, session)
+  register_pagination_showcase(input, output, session)
   register_switch_showcase(input, output, session)
   register_input_group_showcase(input, output, session)
   register_slider_showcase(input, output, session)

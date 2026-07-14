@@ -74,6 +74,7 @@ playground_heights <- list(
   `input-group` = 720L,
   `radio-group` = 720L,
   `toggle-group` = 720L,
+  pagination = 720L,
   select = 720L,
   separator = 720L,
   skeleton = 720L,

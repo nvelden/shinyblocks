@@ -58,6 +58,12 @@ export function setNativeToggleGroupValue(root, value) {
   native.value = value == null ? "" : String(value);
 }
 
+export function setNativePaginationValue(root, value) {
+  const native = root.querySelector("input.sb-pagination-native");
+  if (!native) return;
+  native.value = value == null ? "" : String(value);
+}
+
 export function nativeSlider(root) {
   return root ? root.querySelector("input.sb-slider-native") : null;
 }
