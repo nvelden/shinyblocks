@@ -44,13 +44,11 @@ register_pagination_showcase <- function(input, output, session) {
       toupper(s$disabled)
     )
   })
-  output$showcase_pagination_value <- shiny::renderUI({
-    htmltools::tags$code(
-      if (is.null(input$showcase_pagination_preview)) {
-        "NULL"
-      } else {
-        as.character(input$showcase_pagination_preview)
-      }
+  output$showcase_pagination_value <- showcase_render_code({
+    value <- input$showcase_pagination_preview
+    paste0(
+      "input$page = ",
+      if (is.null(value)) "NULL" else as.character(value)
     )
   })
   action_code <- shiny::reactiveVal(

@@ -65,10 +65,7 @@ htmltools::tagList(
     preview_output_id = "showcase_pagination_preview_ui",
     code_output_id = "showcase_pagination_preview_code",
     extra_outputs = htmltools::tagList(
-      htmltools::tags$div(
-        htmltools::tags$strong("input$page"),
-        shiny::uiOutput("showcase_pagination_value")
-      ),
+      shiny::uiOutput("showcase_pagination_value"),
       shiny::uiOutput("showcase_pagination_action_code")
     )
   ),
