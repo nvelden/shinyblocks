@@ -73,6 +73,7 @@ setup:
 	$(R) -e 'install.packages(c("devtools", "lintr", "urlchecker", "pkgdown", "shinytest2", "withr", "spelling"), repos = "https://cloud.r-project.org")'
 	$(R) -e 'devtools::install_dev_deps(".")'
 	git config core.hooksPath tools/git-hooks
+	@echo "Installed pre-commit component parity and pre-push verification hooks."
 
 watch-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --watch

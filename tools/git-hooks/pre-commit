@@ -1,0 +1,25 @@
+#!/bin/sh
+# Component parity guard: feature slices that change runtime visuals or their
+# showcase/registry fixtures must pass the browser parity suite before commit.
+#
+# Skip once only when the suite was already run manually:
+#   SKIP_PRECOMMIT_PARITY=1 git commit ...
+
+set -e
+
+if [ -n "$SKIP_PRECOMMIT_PARITY" ]; then
+  echo "pre-commit: component parity skipped (SKIP_PRECOMMIT_PARITY set)"
+  exit 0
+fi
+
+cd "$(git rev-parse --show-toplevel)"
+
+changed=$(git diff --cached --name-only --diff-filter=ACMR)
+if ! printf '%s\n' "$changed" | grep -Eq '^(R/runtime\.R|frontend/src/|inst/showcase/|tools/theme/(theme|style)-registry\.mjs)'; then
+  exit 0
+fi
+
+echo "pre-commit: component/runtime changes detected; running make parity-ci..."
+echo "pre-commit: skip once with SKIP_PRECOMMIT_PARITY=1 git commit"
+make parity-ci
+echo "pre-commit: component parity OK"
