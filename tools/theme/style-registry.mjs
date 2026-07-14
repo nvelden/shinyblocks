@@ -179,6 +179,9 @@ export const STYLE_REGISTRY = {
   pagination: {
     section: "pagination",
     mode: "runtime",
+    neutralProfiles: {
+      nova: "Nova's default button radius equals pagination's shared button-radius default, so the page-link radius does not change."
+    },
     bindings: [{ selector: ".sb-parity-pagination-active .sb-pagination-link", property: "borderRadius" }]
   },
   alert: {

@@ -70,6 +70,10 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
 - Run targeted Playwright/browser checks and docs-site commands that invoke
   `tsx` outside the command sandbox / with escalation. In sandboxed Codex
   sessions, `tsx` can fail with IPC permission errors before the real test runs.
+- `make setup` installs a conditional pre-commit parity hook. Commits touching
+  runtime components, showcase fixtures, or theme/style registries run
+  `make parity-ci`; use `SKIP_PRECOMMIT_PARITY=1 git commit ...` only when the
+  same parity suite has already passed manually.
 - Blank docs-site Shinylive playground iframe? The error is in the nested
   Shinylive frame's console. Playgrounds install shinyblocks from
   https://nvelden.r-universe.dev at runtime; the usual cause is that the
