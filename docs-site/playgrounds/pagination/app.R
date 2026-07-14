@@ -27,10 +27,7 @@ ui <- block_page(
           style = "padding: 2rem 0; border: 1px dashed var(--border);",
           block_pagination("page", 20, 8)
         ),
-        htmltools::tags$p(
-          "Selected page: ",
-          shiny::textOutput("value", inline = TRUE)
-        ),
+        shiny::uiOutput("value"),
         block_code(
           'block_pagination("page", pages = 20, selected = 8)',
           language = "r",
@@ -68,7 +65,14 @@ ui <- block_page(
 
 server <- function(input, output, session) {
   disabled <- reactiveVal(FALSE)
-  output$value <- renderText(if (is.null(input$page)) 8L else input$page)
+  output$value <- renderUI({
+    value <- if (is.null(input$page)) 8L else input$page
+    block_code(
+      paste0("input$page = ", value),
+      language = "r",
+      copyable = TRUE
+    )
+  })
   observeEvent(
     input$first,
     update_block_pagination(session, "page", selected = 1)
