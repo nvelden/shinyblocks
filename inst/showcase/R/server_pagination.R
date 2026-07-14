@@ -51,10 +51,23 @@ register_pagination_showcase <- function(input, output, session) {
       if (is.null(value)) "NULL" else as.character(value)
     )
   })
+  shiny::outputOptions(
+    output,
+    "showcase_pagination_value",
+    suspendWhenHidden = FALSE
+  )
   action_code <- shiny::reactiveVal(
-    "# Use update_block_pagination() to change pages or selection."
+    paste0(
+      "# Click an action button to see\n",
+      "# the update_block_pagination() code here."
+    )
   )
   output$showcase_pagination_action_code <- showcase_render_code(action_code())
+  shiny::outputOptions(
+    output,
+    "showcase_pagination_action_code",
+    suspendWhenHidden = FALSE
+  )
   shiny::observeEvent(input$showcase_pagination_first, {
     update_block_pagination(
       session,
