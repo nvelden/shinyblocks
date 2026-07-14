@@ -26,6 +26,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "dialog",
   "dropdown-menu",
   "popover",
+  "pagination",
   "checkbox",
   "switch",
   "textarea",
@@ -155,6 +156,7 @@ const textareaEvents = rootEventListener("sb:textarea-change", "__sbTextareaChan
 const inputEvents = rootEventListener("sb:input-change", "__sbInputChangeHandler", true);
 const radioGroupEvents = rootEventListener("sb:radio-group-change", "__sbRadioGroupChangeHandler");
 const toggleGroupEvents = rootEventListener("sb:toggle-group-change", "__sbToggleGroupChangeHandler");
+const paginationEvents = rootEventListener("sb:pagination-change", "__sbPaginationChangeHandler");
 const sliderEvents = rootEventListener("sb:slider-change", "__sbSliderChangeHandler", true);
 const dialogEvents = rootEventListener("sb:dialog-change", "__sbDialogChangeHandler");
 const popoverEvents = rootEventListener("sb:popover-change", "__sbPopoverChangeHandler");
@@ -561,6 +563,22 @@ const BINDING_CONFIGS = [
     ...toggleGroupEvents
   },
   {
+    component: "pagination",
+    type: "shinyblocks.pagination",
+    receiveProp: "__sbPaginationReceive",
+    getValue(el) {
+      return Object.prototype.hasOwnProperty.call(el, "__sbPaginationValue")
+        ? el.__sbPaginationValue
+        : initialValue(el);
+    },
+    setValue(el, value) {
+      if (typeof el.__sbPaginationReceive === "function") {
+        el.__sbPaginationReceive({ selected: value, notify: false });
+      }
+    },
+    ...paginationEvents
+  },
+  {
     component: "slider",
     receiveProp: "__sbSliderReceive",
     getValue(el) {
@@ -724,6 +742,7 @@ const BINDING_NAMES = [
   "shinyblocks.input",
   "shinyblocks.radio-group",
   "shinyblocks.toggle-group",
+  "shinyblocks.pagination",
   "shinyblocks.slider",
   "shinyblocks.table",
   "shinyblocks.file-input",

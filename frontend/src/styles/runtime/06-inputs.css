@@ -1228,3 +1228,24 @@
   font-size: 0.875rem;
   color: var(--muted-foreground);
 }
+
+/* Pagination uses buttons because it is a Shiny input, while preserving the
+   canonical shadcn nav/list/link structure and visual states. */
+[data-shinyblocks-root] .sb-pagination-native { display: none; }
+[data-shinyblocks-root] .sb-pagination-control { display: flex; width: 100%; justify-content: center; }
+[data-shinyblocks-root] .sb-pagination-content { display: flex; flex-flow: row wrap; align-items: center; justify-content: center; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+[data-shinyblocks-root] .sb-pagination-link,
+[data-shinyblocks-root] .sb-pagination-ellipsis { display: inline-flex; min-width: 2.25rem; height: 2.25rem; align-items: center; justify-content: center; gap: 0.25rem; padding: 0 0.75rem; border: 1px solid transparent; border-radius: var(--sb-button-radius, calc(var(--radius) - 2px)); background: transparent; color: var(--foreground); font: inherit; font-size: 0.875rem; line-height: 1; }
+[data-shinyblocks-root] .sb-pagination-link { cursor: pointer; transition: color var(--sb-transition-duration), background-color var(--sb-transition-duration), border-color var(--sb-transition-duration), box-shadow var(--sb-transition-duration); }
+[data-shinyblocks-root] .sb-pagination-link:hover:not(:disabled) { background-color: var(--accent); color: var(--accent-foreground); }
+[data-shinyblocks-root] .sb-pagination-link[data-active="true"] { border-color: var(--border); background-color: var(--background); }
+[data-shinyblocks-root] .sb-pagination-link:focus-visible { outline: none; box-shadow: 0 0 0 var(--sb-focus-ring-width) var(--ring); }
+[data-shinyblocks-root] .sb-pagination-link:disabled { cursor: not-allowed; opacity: var(--sb-disabled-opacity); }
+[data-shinyblocks-root] .sb-pagination-nav svg,
+[data-shinyblocks-root] .sb-pagination-ellipsis svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[data-shinyblocks-root] .sb-pagination-ellipsis svg circle { fill: currentColor; stroke: none; }
+[data-shinyblocks-root] .sb-pagination-ellipsis { padding: 0; color: var(--muted-foreground); }
+@media (max-width: 639px) {
+  [data-shinyblocks-root] .sb-pagination-nav span { display: none; }
+  [data-shinyblocks-root] .sb-pagination-nav { padding: 0; }
+}

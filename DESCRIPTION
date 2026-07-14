@@ -42,6 +42,7 @@ Collate:
     'form-controls.R'
     'radio-group.R'
     'toggle-group.R'
+    'pagination.R'
     'tabs.R'
     'breadcrumb.R'
     'toast.R'

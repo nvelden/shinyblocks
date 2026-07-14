@@ -147,6 +147,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Pagination",
+    slug = "pagination",
+    file = "pagination.R",
+    description = "Page navigation input with previous/next bounds and ellipsis truncation.",
+    featured = TRUE
+  ),
+  list(
     name = "Switch",
     slug = "switch",
     file = "switch.R",

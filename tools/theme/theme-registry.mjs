@@ -156,6 +156,14 @@ export const THEME_REGISTRY = {
       { selector: ".sb-parity-toggle-group-on .sb-toggle-group-item[data-state='off']", property: "borderColor", token: "--input" }
     ]
   },
+  pagination: {
+    section: "pagination",
+    bindings: [
+      { selector: ".sb-parity-pagination-active .sb-pagination-link[data-active='true']", property: "borderColor", token: "--border" },
+      { selector: ".sb-parity-pagination-active .sb-pagination-link", property: "color", token: "--foreground" },
+      { selector: ".sb-parity-pagination-active .sb-pagination-ellipsis", property: "color", token: "--muted-foreground" }
+    ]
+  },
   select: {
     section: "select",
     bindings: [

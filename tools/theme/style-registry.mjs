@@ -176,6 +176,11 @@ export const STYLE_REGISTRY = {
     },
     bindings: [{ selector: ".sb-parity-toggle-group-on", property: "borderRadius" }]
   },
+  pagination: {
+    section: "pagination",
+    mode: "runtime",
+    bindings: [{ selector: ".sb-parity-pagination-active .sb-pagination-link", property: "borderRadius" }]
+  },
   alert: {
     section: "alert",
     bindings: [{ selector: ".sb-parity-alert-destructive", property: "borderRadius" }]

@@ -480,6 +480,7 @@ pre.shiny-text-output {
   padding: 0.5rem !important;
   border-radius: 0.5rem !important;
 }
+.showcase-pagination-custom { padding: 0.5rem; border: 1px dashed var(--border); border-radius: var(--radius); }
 
 .sb-accordion.showcase-accordion-preview-custom {
   border: 2px dashed var(--ring) !important;

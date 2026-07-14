@@ -703,6 +703,34 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  pagination: [
+    {
+      name: "block_pagination",
+      description: "Page navigation input with bounded previous/next controls and ellipsis truncation.",
+      arguments: [
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Shiny input id reporting an integer page." },
+        { argument: "pages", type: "integer", defaultVal: "required", description: "Positive total page count." },
+        { argument: "selected", type: "integer", defaultVal: "1", description: "Initially active page." },
+        { argument: "sibling_count", type: "integer", defaultVal: "1", description: "Visible page links on each side of the active page." },
+        { argument: "show_edges", type: "logical", defaultVal: "TRUE", description: "Keep the first and last pages visible." },
+        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable all page controls." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline wrapper styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional wrapper class." }
+      ]
+    },
+    {
+      name: "update_block_pagination",
+      description: "Updates the page count, active page, disabled state, class, or style.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Target pagination input id." },
+        { argument: "pages", type: "integer", defaultVal: "NULL", description: "New total page count." },
+        { argument: "selected", type: "integer", defaultVal: "NULL", description: "New active page." },
+        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "New disabled state." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Notify Shiny when selection changes." }
+      ]
+    }
+  ],
   switch: [
     {
       name: "block_switch",

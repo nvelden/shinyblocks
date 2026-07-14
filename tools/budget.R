@@ -58,9 +58,11 @@ targets <- list(
     # Raised 74 -> 77 KB for the #86 dropdown-menu CSS (portaled action menu:
     # content surface, label/separator, item hover/focus + destructive/disabled
     # variants, icon slot, shortcut) adds ~1.3 KB raw (lands at ~75.2 KB).
+    # Raised 77 -> 81 KB for #94 pagination (page/nav/ellipsis states and
+    # responsive labels) adds ~1.6 KB raw and keeps useful build headroom.
     # Gzipped is the meaningful transfer budget; raw is a headroom guard.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 77,
+    limit_kb = 81,
     metric = "raw",
     group = "runtime"
   ),
@@ -74,9 +76,10 @@ targets <- list(
     # column): this sits right at the 9 KB boundary, and because the gzipped
     # metric is platform-variant (R's memCompress zlib differs by OS) it reads
     # ok locally but tips just over on CI. 10 KB restores margin.
+    # Raised 10 -> 11 KB for #94 pagination; the built asset is ~10.1 KB.
     # Gzipped is the binding transfer budget.
     path = "inst/www/shinyblocks-runtime.css",
-    limit_kb = 10,
+    limit_kb = 11,
     metric = "gzipped",
     group = "runtime"
   ),
@@ -109,8 +112,10 @@ targets <- list(
     # binding adds ~4 KB raw (lands at ~321.9 KB) reusing the overlays helpers.
     # Raised 323 -> 326 KB once the #96 number-input stepper landed alongside
     # (combined tree lands at ~323.9 KB raw); gzip (92.6 KB) stays within limit.
+    # Raised 326 -> 331 KB for #94 pagination (window/ellipsis calculation,
+    # bound controls, native value bridge, and updater) landing at ~327.5 KB.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 326,
+    limit_kb = 331,
     metric = "raw",
     group = "runtime"
   ),
