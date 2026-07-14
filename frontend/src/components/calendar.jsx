@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 // Shared calendar core for the date-picker family. Owns the pure ISO date
 // math and a presentational month grid (nav + weekday headers + day buttons)
 // with arrow-key navigation. The consuming component owns selection state,
@@ -116,10 +118,19 @@ export function Calendar({
   onCancel,
   getDayProps
 }) {
+  // Keep the most recently requested focus date synchronously. React state and
+  // the focus effect can briefly lag between rapid key presses; during that
+  // gap `document.activeElement` may be the grid/body rather than a day button.
+  // Falling back to the render-time `focused` prop can therefore repeat the
+  // previous move. The ref preserves the latest roving-tabindex destination.
+  const focusedRef = useRef(focused);
+  focusedRef.current = focused;
+
   function moveFocus(nextIso) {
     if (!nextIso) return;
     const parts = parseIso(nextIso);
     if (!parts) return;
+    focusedRef.current = nextIso;
     setFocused(nextIso);
     setView({ y: parts.y, m: parts.m - 1 });
   }
@@ -129,7 +140,7 @@ export function Calendar({
     // server messages are external inputs, so a malformed value must not crash
     // keyboard handling. Arrow keys lean on `addDays` (which no-ops on invalid
     // input); the month/week branches need the parsed parts, so bail if absent.
-    const activeIso = document.activeElement?.dataset?.sbCalendarDate || focused;
+    const activeIso = document.activeElement?.dataset?.sbCalendarDate || focusedRef.current;
     const cur = parseIso(activeIso);
     let next = null;
     if (event.key === "ArrowLeft") next = addDays(activeIso, -1);
@@ -255,7 +266,10 @@ export function Calendar({
                     disabled={dayDisabled}
                     {...extra}
                     onClick={() => onSelect(iso)}
-                    onFocus={() => setFocused(iso)}
+                    onFocus={() => {
+                      focusedRef.current = iso;
+                      setFocused(iso);
+                    }}
                   >
                     {day}
                   </button>
