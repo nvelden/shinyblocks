@@ -81,6 +81,11 @@ Local under `.agents/skills/<name>` and `.claude/skills/<name>`:
   (~15-45 min lag) — it self-heals once that build finishes. Full checklist in
   the `shinyblocks-component` skill (§ "Troubleshooting a blank playground
   iframe") and `docs-site/README.md`.
+- Do not report a public docs URL as updated after only a local build or preview.
+  Push the commit, wait for the `Deploy docs site` workflow to succeed, then
+  fetch the live `playgrounds/<slug>/app.json` (use a cache-busting query) and
+  verify a marker unique to the change. A local `out/` or `.preview/` check is
+  evidence for the build, not for production deployment.
 - Run GitHub-mutating `gh` commands that require network access, such as
   `gh issue create`, outside the command sandbox / with escalation on the first
   attempt. Use `--body-file` for longer issue bodies so shell quoting does not

@@ -78,6 +78,21 @@ always inside the **nested Shinylive frame**, not the top page:
 Note: `next dev` does not resolve directory-index URLs (`…/gallery/` → 404), so
 embedded playgrounds only render under the static `npm run preview` build.
 
+### Verifying a production playground change
+
+A successful local build does not update GitHub Pages. After pushing the
+change, wait for the `Deploy docs site` workflow to complete, then verify both
+the page and the exported playground payload. Use a cache-busting query because
+the Shinylive service worker may retain an older `app.json`:
+
+```bash
+curl -fsS "https://nvelden.github.io/shinyblocks/playgrounds/<slug>/app.json?rev=<commit>" \
+  | grep '<marker unique to the change>'
+```
+
+Do not describe the public playground as updated until this live-payload check
+passes. Local `out/` and `.preview/` checks only verify the local build.
+
 ## Deploy
 
 Push to `main` triggers `.github/workflows/docs-deploy.yml`, which builds and publishes to <https://nvelden.github.io/shinyblocks/>.

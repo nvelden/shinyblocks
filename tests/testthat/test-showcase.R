@@ -172,6 +172,48 @@ test_that("showcase styling controls have matching CSS hooks", {
   )
 })
 
+test_that("alert-dialog docs playground stays in sync with the showcase contract", {
+  docs_app <- testthat::test_path(
+    "..", "..", "docs-site", "playgrounds", "alert-dialog", "app.R"
+  )
+  if (!file.exists(docs_app)) {
+    testthat::skip("docs-site source is repo-only and not present in R CMD check")
+  }
+
+  source <- paste(readLines(docs_app, warn = FALSE), collapse = "\n")
+  required_markers <- c(
+    "showcase_alert_dialog_title",
+    "showcase_alert_dialog_description",
+    "showcase_alert_dialog_confirm_label",
+    "showcase_alert_dialog_cancel_label",
+    "showcase_alert_dialog_trigger",
+    "showcase_alert_dialog_variant",
+    "showcase_alert_dialog_open",
+    "showcase_alert_dialog_close",
+    "showcase_alert_dialog_size",
+    "showcase_alert_dialog_style",
+    "showcase_alert_dialog_class",
+    "showcase_alert_dialog_preview_ui",
+    "showcase_alert_dialog_value",
+    "showcase_alert_dialog_code",
+    "showcase_alert_dialog_server_code"
+  )
+
+  for (marker in required_markers) {
+    expect_match(source, marker, fixed = TRUE)
+  }
+  expect_match(
+    source,
+    'class = c("sb-parity-alert-dialog", custom_class)',
+    fixed = TRUE
+  )
+  expect_match(
+    source,
+    'class = "showcase-dialog-preview-custom"',
+    fixed = TRUE
+  )
+})
+
 test_that("layout showcase preview uses real collapsed sidebar hooks", {
   skip_if_no_showcase()
 
