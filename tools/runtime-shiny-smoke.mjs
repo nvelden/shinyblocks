@@ -1441,6 +1441,29 @@ try {
   await page.waitForSelector("[data-slot='alert-dialog-content']");
   assert.equal(await page.getAttribute("[data-slot='alert-dialog-content']", "role"), "alertdialog");
   assert.equal(await page.locator("[data-slot='alert-dialog-cancel']").evaluate((node) => node === document.activeElement), true);
+  const alertCancelStyles = await page.locator("[data-slot='alert-dialog-cancel']").evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        display: style.display,
+        height: style.height,
+        controlHeight: style.getPropertyValue("--sb-control-height").trim(),
+        portalAncestor: Boolean(node.closest("[data-shinyblocks-portal-root]")),
+        matchingButtonRules: Array.from(document.styleSheets).flatMap((sheet) => {
+          try {
+            return Array.from(sheet.cssRules)
+              .filter((rule) => rule.selectorText?.includes("sb-button") && node.matches(rule.selectorText))
+              .map((rule) => rule.cssText);
+          } catch {
+            return [];
+          }
+        })
+      };
+    });
+  assert.equal(
+    alertCancelStyles.matchingButtonRules.some((rule) => rule.includes("height: var(--sb-control-height)")),
+    true,
+    "portaled alert-dialog buttons should receive the shared button styles"
+  );
   await page.click("[data-slot='alert-dialog-overlay']", { position: { x: 5, y: 5 } });
   assert.equal(await page.locator("[data-slot='alert-dialog-content']").count(), 1, "scrim click must not dismiss");
   await page.keyboard.press("Escape");

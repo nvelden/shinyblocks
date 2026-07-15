@@ -25,8 +25,16 @@ register_alert_dialog_showcase <- function(input, output, session) {
   })
 
   output$showcase_alert_dialog_preview_ui <- shiny::renderUI({
+    custom_class <- if (isTRUE(input$showcase_alert_dialog_class)) {
+      "showcase-dialog-preview-custom"
+    } else {
+      NULL
+    }
+    custom_style <- input$showcase_alert_dialog_style %||% ""
     block_stack(
-      gap = "sm", class = "sb-parity-alert-dialog",
+      gap = "sm",
+      class = c("sb-parity-alert-dialog", custom_class),
+      style = if (nzchar(custom_style)) custom_style else NULL,
       htmltools::tags$strong(input$showcase_alert_dialog_title %||% "Delete account?"),
       htmltools::tags$p(style = "margin:0;color:var(--muted-foreground);", input$showcase_alert_dialog_description %||% ""),
       block_cluster(justify = "end", block_button(input$showcase_alert_dialog_cancel_label %||% "Cancel", variant = "outline"), block_button(input$showcase_alert_dialog_confirm_label %||% "Delete", variant = input$showcase_alert_dialog_variant %||% "destructive"))
@@ -37,7 +45,23 @@ register_alert_dialog_showcase <- function(input, output, session) {
     paste0("input$showcase_alert_dialog_preview = ", if (is.null(value)) "NULL" else dQuote(value))
   })
   output$showcase_alert_dialog_code <- showcase_render_code({
-    paste0('block_alert_dialog(\n  "showcase_alert_dialog_preview",\n  ', dQuote(input$showcase_alert_dialog_title %||% "Delete account?"), ',\n  description = ', dQuote(input$showcase_alert_dialog_description %||% ""), ',\n  confirm_label = ', dQuote(input$showcase_alert_dialog_confirm_label %||% "Delete"), ',\n  cancel_label = ', dQuote(input$showcase_alert_dialog_cancel_label %||% "Cancel"), ',\n  trigger = ', dQuote(input$showcase_alert_dialog_trigger %||% ""), ',\n  confirm_variant = ', dQuote(input$showcase_alert_dialog_variant %||% "destructive"), '\n)')
+    args <- c(
+      '"showcase_alert_dialog_preview"',
+      dQuote(input$showcase_alert_dialog_title %||% "Delete account?"),
+      paste0("description = ", dQuote(input$showcase_alert_dialog_description %||% "")),
+      paste0("confirm_label = ", dQuote(input$showcase_alert_dialog_confirm_label %||% "Delete")),
+      paste0("cancel_label = ", dQuote(input$showcase_alert_dialog_cancel_label %||% "Cancel")),
+      paste0("trigger = ", dQuote(input$showcase_alert_dialog_trigger %||% "")),
+      paste0("confirm_variant = ", dQuote(input$showcase_alert_dialog_variant %||% "destructive"))
+    )
+    size <- input$showcase_alert_dialog_size %||% "default"
+    if (!identical(size, "default")) args <- c(args, paste0("size = ", dQuote(size)))
+    style <- input$showcase_alert_dialog_style %||% ""
+    if (nzchar(style)) args <- c(args, paste0("style = ", dQuote(style)))
+    if (isTRUE(input$showcase_alert_dialog_class)) {
+      args <- c(args, 'class = "showcase-dialog-preview-custom"')
+    }
+    paste0("block_alert_dialog(\n  ", paste(args, collapse = ",\n  "), "\n)")
   })
   output$showcase_alert_dialog_server_code <- showcase_render_code({ server_code() })
   output$showcase_alert_dialog_api_table <- shiny::renderUI({

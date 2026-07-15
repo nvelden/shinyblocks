@@ -109,6 +109,7 @@ test_that("runtime CSS selectors are scoped to shinyblocks roots", {
     paste0(
       "^\\[data-shinyblocks-root\\]|",
       "^\\[data-shinyblocks-portal-root\\]|",
+      "^:is\\(\\[data-shinyblocks-root\\],\\[data-shinyblocks-portal-root\\]\\)|",
       "^\\[data-theme=\"dark\"\\] \\[data-shinyblocks-root\\]|",
       "^\\[data-theme=\"dark\"\\] \\[data-shinyblocks-portal-root\\]|",
       # Style-profile-scoped component CSS (e.g. data-sb-style="luma"). Still
