@@ -27,6 +27,8 @@
 //                        check asserts the profile actually affects it: it sets
 //                        at least one `<component>_*` token and/or has a
 //                        [data-sb-style] rule for it. Requires a `reason`.
+//                        Components that intentionally share another overlay's
+//                        profile tokens may set `overlayAlias` to that name.
 //   "profile-neutral" -> No shipped profile intentionally changes the component.
 //                        Requires a `reason`. The completeness gate still
 //                        requires the entry so a component is never silently
@@ -229,6 +231,13 @@ export const STYLE_REGISTRY = {
     mode: "overlay",
     reason:
       "Dialog content (radius/ring tokens + blurred scrim) only renders when open; asserted by the overlay presence check (profile sets dialog_* tokens and/or a [data-sb-style] dialog rule)."
+  },
+  "alert-dialog": {
+    section: "alert_dialog",
+    mode: "overlay",
+    overlayAlias: "dialog",
+    reason:
+      "Alert dialog reuses the profile-sensitive dialog surface and button variants and only renders while open."
   },
   popover: {
     section: "popover",

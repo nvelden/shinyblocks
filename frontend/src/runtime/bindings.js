@@ -23,6 +23,7 @@ const RUNTIME_INPUT_COMPONENTS = new Set([
   "task-button",
   "select",
   "combobox",
+  "alert-dialog",
   "dialog",
   "dropdown-menu",
   "popover",
@@ -405,6 +406,33 @@ const BINDING_CONFIGS = [
     }
   },
   {
+    component: "alert-dialog",
+    receiveProp: "__sbAlertDialogReceive",
+    getValue(el) {
+      return Object.prototype.hasOwnProperty.call(el, "__sbAlertDialogValue")
+        ? el.__sbAlertDialogValue
+        : null;
+    },
+    setValue() {},
+    subscribe(el, callback) {
+      const handler = () => {
+        const id = el.dataset.sbInputId;
+        if (!id || !window.Shiny?.setInputValue) {
+          callback(false);
+          return;
+        }
+        window.Shiny.setInputValue(id, el.__sbAlertDialogValue, { priority: "event" });
+      };
+      el.addEventListener("sb:alert-dialog-change", handler);
+      el.__sbAlertDialogChangeHandler = handler;
+    },
+    unsubscribe(el) {
+      if (!el.__sbAlertDialogChangeHandler) return;
+      el.removeEventListener("sb:alert-dialog-change", el.__sbAlertDialogChangeHandler);
+      delete el.__sbAlertDialogChangeHandler;
+    }
+  },
+  {
     component: "dialog",
     requireInputId: false,
     receiveProp: "__sbDialogReceive",
@@ -733,6 +761,7 @@ const BINDING_NAMES = [
   "shinyblocks.task_button",
   "shinyblocks.select",
   "shinyblocks.combobox",
+  "shinyblocks.alert-dialog",
   "shinyblocks.dialog",
   "shinyblocks.dropdown-menu",
   "shinyblocks.popover",

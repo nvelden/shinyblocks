@@ -30,6 +30,11 @@ const COMPONENTS_DIR = path.join(ROOT, "frontend", "src", "components");
 // root. Mirror RUNTIME_CONTENT_STYLE_COMPONENTS in R/runtime.R.
 const OWNERSHIP_ALLOWLIST = [
   {
+    file: "alert-dialog.jsx",
+    reason:
+      "Alert dialog content is portaled outside the mount subtree, so the content owns payload.style."
+  },
+  {
     file: "dialog.jsx",
     reason:
       "Dialog content is portaled to document.body, outside the mount subtree, so the mount div can never style it. runtime_component() leaves dialog's mount div plain and the content owns payload.style."

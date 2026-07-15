@@ -137,6 +137,123 @@ update_block_dialog <- function(
   )
 }
 
+#' Create an alert dialog
+#'
+#' A modal confirmation dialog that requires an explicit confirm or cancel
+#' choice. `input$<id>` is initially `NULL` and reports `"confirm"` or
+#' `"cancel"` for each outcome. Escape cancels; clicking the backdrop does
+#' nothing.
+#'
+#' @param id Required input id.
+#' @param title Required accessible title.
+#' @param description Optional supporting description.
+#' @param ... Optional body content, serialized to HTML.
+#' @param confirm_label Label for the confirmation action.
+#' @param cancel_label Label for the cancellation action.
+#' @param trigger Optional button label that opens the alert dialog.
+#' @param open Initial open state.
+#' @param confirm_variant Confirmation button variant: `"default"` or
+#'   `"destructive"`.
+#' @param size Content max-width preset. One of `"sm"`, `"default"`, `"lg"`,
+#'   or `"xl"`.
+#' @param class Additional classes for the dialog content container.
+#' @param style Optional inline CSS for the dialog content container.
+#'
+#' @return An `htmltools` tag.
+#' @family content
+#' @export
+block_alert_dialog <- function(
+  id,
+  title,
+  description = NULL,
+  ...,
+  confirm_label = "Continue",
+  cancel_label = "Cancel",
+  trigger = NULL,
+  open = FALSE,
+  confirm_variant = c("default", "destructive"),
+  size = c("default", "sm", "lg", "xl"),
+  class = NULL,
+  style = NULL
+) {
+  if (missing(id) || is.null(id)) stop("`id` is required.", call. = FALSE)
+  if (missing(title) || is.null(title)) stop("`title` is required.", call. = FALSE)
+  check_string(confirm_label, "confirm_label")
+  check_string(cancel_label, "cancel_label")
+  check_string(trigger, "trigger", null_ok = TRUE)
+  confirm_variant <- match_arg(confirm_variant, c("default", "destructive"))
+  size <- match_arg(size, c("default", "sm", "lg", "xl"))
+
+  runtime_component(
+    component = "alert-dialog",
+    input_id = id,
+    props = list(
+      titleHtml = html_fragment(title),
+      descriptionHtml = if (is.null(description)) NULL else html_fragment(description),
+      bodyHtml = html_fragment(...),
+      confirmLabel = confirm_label,
+      cancelLabel = cancel_label,
+      triggerLabel = trigger,
+      confirmVariant = confirm_variant,
+      size = size
+    ),
+    state = list(value = NULL, open = isTRUE(open)),
+    binding = list(input = TRUE),
+    class = class,
+    style = style
+  )
+}
+
+#' Update an alert dialog
+#'
+#' @param session Shiny session.
+#' @param input_id Alert dialog input id.
+#' @param open Optional boolean open state.
+#' @param title Optional replacement title.
+#' @param description Optional replacement description.
+#' @param confirm_label Optional replacement confirmation label.
+#' @param cancel_label Optional replacement cancellation label.
+#' @param confirm_variant Optional `"default"` or `"destructive"` variant.
+#' @param size Optional content size preset.
+#' @param class Optional replacement classes, or `NULL` to clear.
+#' @param style Optional replacement inline style, or `NULL` to clear.
+#'
+#' @return Invisibly returns `NULL`.
+#' @family content
+#' @export
+update_block_alert_dialog <- function(
+  session = shiny::getDefaultReactiveDomain(),
+  input_id,
+  open,
+  title,
+  description,
+  confirm_label,
+  cancel_label,
+  confirm_variant,
+  size,
+  class,
+  style
+) {
+  html_or_null <- function(value) if (is.null(value)) NULL else html_fragment(value)
+  payload <- apply_update_fields(list(), list(
+    field("open", transform = isTRUE),
+    field("titleHtml", "title", html_or_null),
+    field("descriptionHtml", "description", html_or_null),
+    field("confirmLabel", "confirm_label"),
+    field("cancelLabel", "cancel_label"),
+    field_clearable("class"),
+    field_style("style")
+  ))
+  if (!missing(confirm_variant)) {
+    payload$confirmVariant <- match_arg(confirm_variant, c("default", "destructive"))
+  }
+  if (!missing(size)) payload$size <- match_arg(size, c("default", "sm", "lg", "xl"))
+  runtime_input_update(
+    session, input_id, "alert-dialog", payload,
+    notify_key = NULL, notify = FALSE
+  )
+}
+
 #' Create a runtime popover
 #'
 #' A non-modal, portal-rendered popover anchored to a trigger button.

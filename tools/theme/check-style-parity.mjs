@@ -193,7 +193,8 @@ async function run() {
 
         const mode = config.mode || "profile";
         if (mode === "overlay") {
-          const a = overlayAffected(profile, name);
+          const overlayName = config.overlayAlias || name;
+          const a = overlayAffected(profile, overlayName);
           if (a.ok) {
             passes += 1;
             const via = [a.hasToken && "tokens", a.hasCss && "css"]
@@ -203,8 +204,8 @@ async function run() {
           } else {
             failures += 1;
             console.error(
-              `  FAIL ${profile} :: ${name} (overlay) — profile sets no ${name}_* ` +
-                `token and has no [data-sb-style="${profile}"] ${name} rule`
+              `  FAIL ${profile} :: ${name} (overlay) — profile sets no ${overlayName}_* ` +
+                `token and has no [data-sb-style="${profile}"] ${overlayName} rule`
             );
           }
           continue;

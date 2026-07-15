@@ -19,6 +19,7 @@
 * Runtime mount ids are now collision-free across input ids that sanitize to the same slug (e.g. `"a.b"` vs `"a-b"`); a short hash disambiguates them, so server updates always reach the right element. Ids without special characters are unchanged.
 * `block_select()` and `update_block_select()` now reject grouped (nested) `choices` with a clear error instead of silently flattening them into mangled `"Group.label"` labels. Grouped choices were never supported; previously they produced wrong output without warning.
 * Choice-style arguments are matched exactly everywhere: passing a partial vector of otherwise-valid values (e.g. `size = c("lg", "sm")`) or a partial string (e.g. `type = "pass"`) is now an error instead of silently resolving to one of them. Function-signature defaults are unaffected.
+* `block_alert_dialog()` adds an accessible confirm/cancel overlay with destructive confirmation styling, explicit `"confirm"` / `"cancel"` Shiny events, Escape-to-cancel, and no outside-click dismissal (#90).
 * Server updates for `update_block_dialog(class = )` and `update_block_file_input(class = )` now use the same payload key as every other component.
 * The dependency asset-version stamp is computed once per R process instead of stat-ing every bundled asset file on each `block_*()` call. Set `options(shinyblocks.asset_version_cache = FALSE)` to recompute per call during asset development.
 

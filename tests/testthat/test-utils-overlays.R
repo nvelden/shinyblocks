@@ -70,6 +70,58 @@ test_that("block_dialog requires id and title", {
   expect_error(block_dialog(id = "x"), "`title` is required", fixed = TRUE)
 })
 
+test_that("block_alert_dialog emits an outcome input payload", {
+  payload <- runtime_payload_from(block_alert_dialog(
+    id = "delete",
+    title = "Delete account?",
+    description = "This cannot be undone.",
+    "All stored data will be removed.",
+    confirm_label = "Delete",
+    cancel_label = "Keep account",
+    trigger = "Delete account",
+    confirm_variant = "destructive",
+    open = TRUE
+  ))
+
+  expect_identical(payload$component, "alert-dialog")
+  expect_identical(payload$id, "delete")
+  expect_null(payload$state$value)
+  expect_identical(payload$state$open, TRUE)
+  expect_identical(payload$props$confirmLabel, "Delete")
+  expect_identical(payload$props$cancelLabel, "Keep account")
+  expect_identical(payload$props$confirmVariant, "destructive")
+  expect_match(payload$props$bodyHtml, "stored data", fixed = TRUE)
+})
+
+test_that("block_alert_dialog validates its required contract", {
+  expect_error(block_alert_dialog(title = "X"), "`id` is required", fixed = TRUE)
+  expect_error(block_alert_dialog(id = "x"), "`title` is required", fixed = TRUE)
+  expect_error(
+    block_alert_dialog(id = "x", title = "X", confirm_variant = "danger"),
+    "`confirm_variant` must be one of \"default\", \"destructive\".",
+    fixed = TRUE
+  )
+})
+
+test_that("update_block_alert_dialog sends cosmetic and open updates", {
+  capture <- local_input_message_session()
+  expect_invisible(update_block_alert_dialog(
+    capture$session,
+    "delete",
+    open = TRUE,
+    title = "Really delete?",
+    confirm_label = "Delete",
+    confirm_variant = "destructive"
+  ))
+  message <- capture$last_message()
+  expect_identical(message$input_id, "sb-runtime-alert-dialog-delete")
+  expect_identical(message$payload$open, TRUE)
+  expect_match(message$payload$titleHtml, "Really delete?", fixed = TRUE)
+  expect_identical(message$payload$confirmLabel, "Delete")
+  expect_identical(message$payload$confirmVariant, "destructive")
+  expect_null(message$payload$notify)
+})
+
 test_that("block_popover emits a runtime payload with trigger and body", {
   payload <- runtime_payload_from(
     block_popover(

@@ -30,6 +30,7 @@ import { Button } from "./components/button.jsx";
 import { TaskButton } from "./components/task-button.jsx";
 import { Code } from "./components/code.jsx";
 import { Combobox } from "./components/combobox.jsx";
+import { AlertDialog } from "./components/alert-dialog.jsx";
 import { Dialog } from "./components/dialog.jsx";
 import { DropdownMenu } from "./components/dropdown-menu.jsx";
 import { Popover } from "./components/popover.jsx";
@@ -64,6 +65,7 @@ const COMPONENTS = {
   combobox: Combobox,
   "value-box": ValueBox,
   alert: Alert,
+  "alert-dialog": AlertDialog,
   dialog: Dialog,
   "dropdown-menu": DropdownMenu,
   popover: Popover,

@@ -67,6 +67,16 @@
   gap: 0.5rem;
 }
 
+[data-shinyblocks-portal-root] .sb-alert-dialog-content {
+  gap: 1rem;
+}
+
+@media (max-width: 639px) {
+  [data-shinyblocks-portal-root] .sb-alert-dialog-content .sb-dialog-footer {
+    flex-direction: column-reverse;
+  }
+}
+
 [data-shinyblocks-portal-root] .sb-dialog-header {
   display: flex;
   flex-direction: column;

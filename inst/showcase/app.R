@@ -11,6 +11,7 @@ source(file.path("R", "server_date_picker.R"), local = TRUE)
 source(file.path("R", "server_date_range_picker.R"), local = TRUE)
 source(file.path("R", "server_checkbox.R"), local = TRUE)
 source(file.path("R", "server_dialog.R"), local = TRUE)
+source(file.path("R", "server_alert_dialog.R"), local = TRUE)
 source(file.path("R", "server_popover.R"), local = TRUE)
 source(file.path("R", "server_dropdown_menu.R"), local = TRUE)
 source(file.path("R", "server_textarea.R"), local = TRUE)
@@ -444,6 +445,14 @@ sections <- list(
     file = "empty.R"
   ),
   list(
+    id = "alert_dialog",
+    label = "Alert Dialog",
+    icon = "message-circle",
+    title = "Alert dialogs",
+    lead = "Explicit confirm/cancel overlays for consequential actions.",
+    file = "alert_dialog.R"
+  ),
+  list(
     id = "dialog",
     label = "Dialog",
     icon = "message-circle",
@@ -633,6 +642,7 @@ server <- function(input, output, session) {
   register_tooltip_showcase(input, output, session)
   register_toast_showcase(input, output, session)
   register_dialog_showcase(input, output, session)
+  register_alert_dialog_showcase(input, output, session)
   register_popover_showcase(input, output, session)
   register_dropdown_menu_showcase(input, output, session)
   register_accordion_showcase(input, output, session)

@@ -114,8 +114,11 @@ targets <- list(
     # (combined tree lands at ~323.9 KB raw); gzip (92.6 KB) stays within limit.
     # Raised 326 -> 331 KB for #94 pagination (window/ellipsis calculation,
     # bound controls, native value bridge, and updater) landing at ~327.5 KB.
+    # Raised 331 -> 340 KB for #90 alert-dialog: the dedicated modal outcome
+    # component, focus/escape contract, event binding, and updater land the
+    # combined runtime at ~331.9 KB raw with useful headroom.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 331,
+    limit_kb = 340,
     metric = "raw",
     group = "runtime"
   ),
@@ -143,8 +146,10 @@ targets <- list(
     # Raised 93 -> 94 KB with the #86 dropdown-menu runtime alongside the
     # combobox + stepper set: macOS lands at ~92.6 KB, leaving no cross-platform
     # zlib margin at 93, so 94 KB restores it.
+    # Raised 94 -> 98 KB for #90 alert-dialog; macOS lands at ~94.3 KB and the
+    # higher guard preserves cross-platform zlib margin.
     path = "inst/www/shinyblocks-runtime.js",
-    limit_kb = 94,
+    limit_kb = 98,
     metric = "gzipped",
     group = "runtime"
   ),

@@ -1116,6 +1116,31 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  "alert-dialog": [
+    {
+      name: "block_alert_dialog",
+      description: "Accessible confirmation overlay that reports confirm or cancel outcomes.",
+      arguments: [
+        { argument: "id", type: "character", defaultVal: "required", description: "Outcome input id." },
+        { argument: "title", type: "character | tag", defaultVal: "required", description: "Accessible title." },
+        { argument: "description", type: "character | tag", defaultVal: "NULL", description: "Supporting description." },
+        { argument: "confirm_label", type: "character", defaultVal: '"Continue"', description: "Confirmation label." },
+        { argument: "cancel_label", type: "character", defaultVal: '"Cancel"', description: "Cancellation label." },
+        { argument: "trigger", type: "character", defaultVal: "NULL", description: "Optional opener label." },
+        { argument: "confirm_variant", type: '"default" | "destructive"', defaultVal: '"default"', description: "Confirmation styling." },
+        { argument: "size", type: "character", defaultVal: '"default"', description: "Width preset." }
+      ]
+    },
+    {
+      name: "update_block_alert_dialog",
+      description: "Updates and opens or closes an alert dialog from the server.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current", description: "Active session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Alert dialog id." },
+        { argument: "open", type: "logical", defaultVal: "missing", description: "Optional open state." }
+      ]
+    }
+  ],
   dialog: [
     {
       name: "block_dialog",

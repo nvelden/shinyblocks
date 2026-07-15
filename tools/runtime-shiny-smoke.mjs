@@ -1433,6 +1433,27 @@ try {
     "page should include one portal root"
   );
 
+  // Alert dialog: explicit outcomes, alertdialog semantics, no scrim dismiss,
+  // Escape-as-cancel, destructive action, and server-driven reopening.
+  const alertRoot = "[data-sb-component='alert-dialog'][data-sb-input-id='runtime_alert_dialog']";
+  await assertText(page, "#runtime_alert_dialog_value", "<NULL>");
+  await page.click(`${alertRoot} [data-slot='alert-dialog-trigger']`);
+  await page.waitForSelector("[data-slot='alert-dialog-content']");
+  assert.equal(await page.getAttribute("[data-slot='alert-dialog-content']", "role"), "alertdialog");
+  assert.equal(await page.locator("[data-slot='alert-dialog-cancel']").evaluate((node) => node === document.activeElement), true);
+  await page.click("[data-slot='alert-dialog-overlay']", { position: { x: 5, y: 5 } });
+  assert.equal(await page.locator("[data-slot='alert-dialog-content']").count(), 1, "scrim click must not dismiss");
+  await page.keyboard.press("Escape");
+  await assertText(page, "#runtime_alert_dialog_value", "cancel");
+  await page.click("#open_alert_dialog");
+  await page.waitForSelector("[data-slot='alert-dialog-action']");
+  assert.match(
+    await page.getAttribute("[data-slot='alert-dialog-action']", "class"),
+    new RegExp(["sb", "button", "destructive"].join("-"))
+  );
+  await page.click("[data-slot='alert-dialog-action']");
+  await assertText(page, "#runtime_alert_dialog_value", "confirm");
+
   // Progress: receive-only display block driven entirely by the server. The
   // bare input stays NULL while update/increment helpers move the bar; clearing
   // the message collapses its node; indeterminate drops the percent.

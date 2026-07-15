@@ -7,7 +7,7 @@ runtime_mount_state$next_id <- 0L
 # frontend/src/runtime/bindings.js — keep them in sync when adding a new
 # component.
 RUNTIME_COMPONENT_NAMES <- c(
-  "alert", "badge", "button", "checkbox", "code", "combobox", "date-picker",
+  "alert", "alert-dialog", "badge", "button", "checkbox", "code", "combobox", "date-picker",
   "date-range-picker",
   "dialog", "dropdown-menu",
   "empty", "file-input", "input", "pagination", "popover", "progress", "radio-group", "select",
@@ -26,7 +26,7 @@ RUNTIME_COMPONENT_NAMES <- c(
 # portaled root and the mount div stays plain. `dialog` and `toaster` are the
 # portaled components today (their content reads `payload.style`); keep this list
 # in sync with the gate's allowlist.
-RUNTIME_CONTENT_STYLE_COMPONENTS <- c("dialog", "toaster")
+RUNTIME_CONTENT_STYLE_COMPONENTS <- c("alert-dialog", "dialog", "toaster")
 
 runtime_component <- function(
   component,

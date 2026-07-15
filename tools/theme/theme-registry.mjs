@@ -95,6 +95,11 @@ export const THEME_REGISTRY = {
     mode: "static-only",
     reason: "Dialog content (bg --background, border --border) only renders when the overlay is open; CSS is token-driven and covered by the static check."
   },
+  "alert-dialog": {
+    section: "alert_dialog",
+    mode: "static-only",
+    reason: "Alert dialog content only renders while open; its shared dialog surface and action buttons use semantic tokens."
+  },
   "dropdown-menu": {
     section: "dropdown_menu",
     mode: "static-only",

@@ -349,6 +349,16 @@ ui <- shiny::fluidPage(
   shiny::verbatimTextOutput("runtime_dropdown_menu_value"),
   shiny::actionButton("open_dropdown_menu", "Open dropdown (server)"),
   shiny::actionButton("replace_dropdown_menu", "Replace dropdown items"),
+  block_alert_dialog(
+    "runtime_alert_dialog",
+    "Delete record?",
+    description = "This cannot be undone.",
+    confirm_label = "Delete",
+    trigger = "Open alert dialog",
+    confirm_variant = "destructive"
+  ),
+  shiny::verbatimTextOutput("runtime_alert_dialog_value"),
+  shiny::actionButton("open_alert_dialog", "Open alert dialog (server)"),
   block_toaster("runtime_toaster", position = "bottom-right"),
   shiny::verbatimTextOutput("runtime_toaster_value"),
   shiny::actionButton("fire_toast", "Fire toast"),
@@ -735,6 +745,10 @@ server <- function(input, output, session) {
   })
   shiny::observeEvent(input$move_toaster, {
     update_block_toaster(session, "runtime_toaster", position = "top-left")
+  })
+  output$runtime_alert_dialog_value <- shiny::renderText(input$runtime_alert_dialog %||% "<NULL>")
+  shiny::observeEvent(input$open_alert_dialog, {
+    update_block_alert_dialog(session, "runtime_alert_dialog", open = TRUE)
   })
 
   output$dynamic_value <- shiny::renderText(input$dynamic %||% "<NULL>")

@@ -266,6 +266,13 @@ registry <- list(
     featured = TRUE
   ),
   list(
+    name = "Alert Dialog",
+    slug = "alert-dialog",
+    file = "alert-dialog.R",
+    description = "Confirmation overlays that require an explicit outcome.",
+    featured = TRUE
+  ),
+  list(
     name = "Dialog",
     slug = "dialog",
     file = "dialog.R",
