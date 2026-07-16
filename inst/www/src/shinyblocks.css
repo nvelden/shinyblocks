@@ -747,24 +747,24 @@
    * Box chrome (aspect/border/radius/overflow) lives on the inner media box,
    * never on the <figure>, so the caption sibling is not clipped (D2). */
 
-  .sb-app .sb-output-frame {
+  .sb-output-frame {
     margin: 0;
   }
 
-  .sb-app .sb-output-media {
+  .sb-output-frame .sb-output-media {
     position: relative;
     display: block;
   }
 
-  .sb-app .sb-output-media[data-aspect] {
+  .sb-output-frame .sb-output-media[data-aspect] {
     aspect-ratio: var(--sb-output-aspect);
   }
 
-  .sb-app .sb-output-media[data-border] {
+  .sb-output-frame .sb-output-media[data-border] {
     border: 1px solid var(--border);
   }
 
-  .sb-app .sb-output-media[data-rounded] {
+  .sb-output-frame .sb-output-media[data-rounded] {
     border-radius: var(--radius);
     overflow: hidden;
   }
@@ -773,16 +773,16 @@
    * <img> later — sizing only the <img> leaves the container collapsed).
    * `display: block` forces the container to participate in layout even when
    * `inline = TRUE` emits a <span> (width/height are inert on an inline span). */
-  .sb-app .sb-output-media > .shiny-image-output,
-  .sb-app .sb-output-media > .shiny-plot-output {
+  .sb-output-frame .sb-output-media > .shiny-image-output,
+  .sb-output-frame .sb-output-media > .shiny-plot-output {
     display: block;
     width: 100%;
     height: 100%;
   }
 
   /* The eventual <img> fills the media box for both frame variants. */
-  .sb-app .sb-image-output .sb-output-media img,
-  .sb-app .sb-plot-output .sb-output-media img {
+  .sb-output-frame.sb-image-output .sb-output-media img,
+  .sb-output-frame.sb-plot-output .sb-output-media img {
     width: 100%;
     height: 100%;
   }
@@ -790,11 +790,11 @@
   /* object-fit only applies to image frames; renderPlot() already fits the box,
    * so plot frames never set `--sb-output-fit` and this rule never targets them.
    * The `cover` fallback keeps the declaration valid if the property is unset. */
-  .sb-app .sb-image-output .sb-output-media img {
+  .sb-output-frame.sb-image-output .sb-output-media img {
     object-fit: var(--sb-output-fit, cover);
   }
 
-  .sb-app .sb-output-caption {
+  .sb-output-frame .sb-output-caption {
     color: var(--muted-foreground);
     font-size: 0.875rem;
     margin-top: 0.5rem;

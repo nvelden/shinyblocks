@@ -183,7 +183,8 @@ test_that("package source CSS only owns shell and composition hooks", {
       "^\\.sb-breadcrumb-text\\b|",
       "^\\.sb-breadcrumb-separator\\b|",
       "^\\.sb-breadcrumb-ellipsis\\b|",
-      "^\\.sb-breadcrumb-sr-only\\b"
+      "^\\.sb-breadcrumb-sr-only\\b|",
+      "^\\.sb-output-frame\\b"
     ),
     selectors
   )

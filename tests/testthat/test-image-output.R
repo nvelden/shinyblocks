@@ -10,6 +10,7 @@ test_that("block_image_output builds the figure -> media -> output structure", {
 
   expect_identical(frame$name, "figure")
   expect_identical(tag_attr(frame, "class"), "sb-output-frame sb-image-output")
+  expect_identical(tag_attr(frame, "data-shinyblocks-scope"), "")
 
   media <- media_box(frame)
   expect_identical(media$name, "div")

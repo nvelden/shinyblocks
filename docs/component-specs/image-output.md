@@ -29,7 +29,7 @@ For `renderPlot()` / `plotOutput()`, use [`plot-output.md`](plot-output.md).
 ## Structure
 
 ```html
-<figure class="sb-output-frame sb-image-output">
+<figure class="sb-output-frame sb-image-output" data-shinyblocks-scope>
   <div class="sb-output-media" data-aspect data-border data-rounded
        style="--sb-output-aspect:16/9; --sb-output-fit:cover">
     <div class="shiny-image-output ..."></div>   <!-- Shiny fills with <img> -->
@@ -37,6 +37,10 @@ For `renderPlot()` / `plotOutput()`, use [`plot-output.md`](plot-output.md).
   <figcaption class="sb-output-caption">...</figcaption>
 </figure>
 ```
+
+The figure is a standalone token scope and every functional selector is rooted
+at `.sb-output-frame`, so the frame works unchanged in `fluidPage()`, bslib, or
+`block_page()` without targeting unrelated Shiny outputs.
 
 Box chrome (aspect/border/radius/`overflow:hidden`) lives on the inner
 `.sb-output-media`, never the `<figure>` — so the `<figcaption>` sibling is not

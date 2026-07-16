@@ -11,6 +11,9 @@ shadcn-styled frame as `block_image_output()`, sharing the private
 App-author server code stays vanilla Shiny — `output$id <- renderPlot(...)` is
 unchanged.
 
+The figure owns a standalone token scope and component-rooted selectors, so its
+layout and styling arguments work in host layouts without `block_page()`.
+
 See [`image-output.md`](image-output.md) for the full structure, library
 coverage matrix, token contract, and accessibility notes — they are identical.
 
