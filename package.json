@@ -33,6 +33,8 @@
     "shadcn:docs": "npx shadcn@latest docs"
   },
   "devDependencies": {
+    "@emnapi/core": "1.11.2",
+    "@emnapi/runtime": "1.11.2",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.2.4",
     "@vitejs/plugin-react": "^6.0.1",

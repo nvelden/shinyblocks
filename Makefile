@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health \
+.PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health npm-lock-check \
 	check-fast check-slice lint spell urls test docs docs-verify check check-local pkgdown budget \
 	doc-links legacy-audit layout-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
@@ -24,6 +24,7 @@ help:
 	@echo "                    does NOT run the full suite or R CMD check)"
 	@echo "  check-slice     - full tests + builds/static audits for a vertical slice;"
 	@echo "                    fails if built assets in inst/www are not committed"
+	@echo "  npm-lock-check  - verify package-lock.json with a clean, script-free npm install"
 	@echo ""
 	@echo "Phase exit:"
 	@echo "  build-css       - compile inst/www/src -> inst/www"
@@ -74,6 +75,9 @@ setup:
 	$(R) -e 'devtools::install_dev_deps(".")'
 	git config core.hooksPath tools/git-hooks
 	@echo "Installed pre-commit component parity and pre-push verification hooks."
+
+npm-lock-check:
+	npm ci --dry-run --ignore-scripts --no-audit --no-fund
 
 watch-css:
 	$(TAILWIND) --input $(CSS_INPUT) --output $(CSS_OUTPUT) --watch

@@ -1,20 +1,26 @@
 #!/bin/sh
-# Component parity guard: feature slices that change runtime visuals or their
-# showcase/registry fixtures must pass the browser parity suite before commit.
+# Dependency-integrity and component-parity guards.
 #
 # Skip once only when the suite was already run manually:
 #   SKIP_PRECOMMIT_PARITY=1 git commit ...
 
 set -e
 
+cd "$(git rev-parse --show-toplevel)"
+
+changed=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if printf '%s\n' "$changed" | grep -Eq '^(package(-lock)?\.json)$'; then
+  echo "pre-commit: npm manifest changed; verifying package-lock.json..."
+  make npm-lock-check
+  echo "pre-commit: npm lockfile OK"
+fi
+
 if [ -n "$SKIP_PRECOMMIT_PARITY" ]; then
   echo "pre-commit: component parity skipped (SKIP_PRECOMMIT_PARITY set)"
   exit 0
 fi
 
-cd "$(git rev-parse --show-toplevel)"
-
-changed=$(git diff --cached --name-only --diff-filter=ACMR)
 if ! printf '%s\n' "$changed" | grep -Eq '^(R/runtime\.R|frontend/src/|inst/showcase/|tools/theme/(theme|style)-registry\.mjs)'; then
   exit 0
 fi

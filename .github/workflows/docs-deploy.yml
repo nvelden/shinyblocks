@@ -64,6 +64,9 @@ jobs:
           cache: npm
           cache-dependency-path: docs-site/package-lock.json
 
+      - name: Use repository npm version
+        run: npm install --global npm@11.6.2
+
       - run: npm ci
         working-directory: docs-site
 
