@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
@@ -16,26 +16,18 @@ export function Toaster({ payload, root }) {
   const timersRef = useRef(new Map());
   const seqRef = useRef(0);
 
-  function clearTimer(id) {
+  const clearTimer = useCallback((id) => {
     const handle = timersRef.current.get(id);
     if (handle) {
       clearTimeout(handle);
       timersRef.current.delete(id);
     }
-  }
-
-  function startTimer(toast) {
-    clearTimer(toast.id);
-    if (!toast.duration || toast.duration <= 0) return;
-    // Auto-dismiss reports just like a manual dismiss so the server sees it.
-    const handle = setTimeout(() => dismiss(toast.id, true), toast.duration);
-    timersRef.current.set(toast.id, handle);
-  }
+  }, []);
 
   // `input$<id>` is event-shaped: `{ action, id, seq }`. The monotonic `seq`
   // guarantees the value changes on every show/dismiss — even when the same
   // toast id is dismissed twice — so the server reactive always fires.
-  function reportValue(action, id, notify) {
+  const reportValue = useCallback((action, id, notify) => {
     if (root) {
       seqRef.current += 1;
       root.__sbToasterValue = {
@@ -47,16 +39,25 @@ export function Toaster({ payload, root }) {
     if (notify !== false && root) {
       root.dispatchEvent(new CustomEvent("sb:toaster-change"));
     }
-  }
+  }, [root]);
 
-  function dismiss(id, notify) {
+  const dismiss = useCallback((id, notify) => {
     clearTimer(id);
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
     reportValue("dismiss", id, notify);
-  }
+  }, [clearTimer, reportValue]);
+
+  const startTimer = useCallback((toast) => {
+    clearTimer(toast.id);
+    if (!toast.duration || toast.duration <= 0) return;
+    // Auto-dismiss reports just like a manual dismiss so the server sees it.
+    const handle = setTimeout(() => dismiss(toast.id, true), toast.duration);
+    timersRef.current.set(toast.id, handle);
+  }, [clearTimer, dismiss]);
 
   useEffect(() => {
     if (!root) return undefined;
+    const timers = timersRef.current;
     if (typeof root.__sbToasterValue === "undefined") {
       root.__sbToasterValue = null;
     }
@@ -73,8 +74,8 @@ export function Toaster({ payload, root }) {
 
       if (next.action === "dismiss") {
         if (next.toastId == null) {
-          timersRef.current.forEach((handle) => clearTimeout(handle));
-          timersRef.current.clear();
+          timers.forEach((handle) => clearTimeout(handle));
+          timers.clear();
           setToasts([]);
           reportValue("dismiss", null, next.notify);
         } else {
@@ -110,10 +111,10 @@ export function Toaster({ payload, root }) {
 
     return () => {
       delete root.__sbToasterReceive;
-      timersRef.current.forEach((handle) => clearTimeout(handle));
-      timersRef.current.clear();
+      timers.forEach((handle) => clearTimeout(handle));
+      timers.clear();
     };
-  }, [root]);
+  }, [dismiss, reportValue, root, startTimer]);
 
   const portal = ensurePortalRoot(root);
   if (toasts.length === 0) return null;

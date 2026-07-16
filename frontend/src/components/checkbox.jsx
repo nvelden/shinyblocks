@@ -13,6 +13,7 @@ export function Checkbox({ payload, root }) {
   const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
   const controlRef = useRef(null);
+  const initialCheckedRef = useRef(checked);
   const invalid = root?.getAttribute("aria-invalid") === "true";
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
   const inlineLabelId = inputId ? `${inputId}__label` : undefined;
@@ -22,9 +23,10 @@ export function Checkbox({ payload, root }) {
 
     setLabelledBy(labelIdForInput(inputId));
 
-    root.__sbCheckboxValue = checked;
-    root.dataset.sbCheckboxChecked = checked ? "true" : "false";
-    setNativeCheckboxValue(root, checked, false);
+    const initialChecked = initialCheckedRef.current;
+    root.__sbCheckboxValue = initialChecked;
+    root.dataset.sbCheckboxChecked = initialChecked ? "true" : "false";
+    setNativeCheckboxValue(root, initialChecked, false);
 
     root.__sbCheckboxReceive = (data) => {
       const nextData = data || {};

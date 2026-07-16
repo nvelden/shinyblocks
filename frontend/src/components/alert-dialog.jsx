@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
 import { registerModal } from "../runtime/modal-manager.js";
@@ -20,21 +20,25 @@ export function AlertDialog({ payload, root }) {
   const contentRef = useRef(null);
   const cancelRef = useRef(null);
   const returnFocusRef = useRef(null);
+  const openRef = useRef(open);
   const titleId = `${inputId}-title`;
   const descriptionId = `${inputId}-description`;
 
-  function changeOpen(next) {
-    if (next && !open) returnFocusRef.current = document.activeElement;
-    setOpen(Boolean(next));
-  }
+  const changeOpen = useCallback((next) => {
+    const nextOpen = Boolean(next);
+    if (nextOpen && !openRef.current) returnFocusRef.current = document.activeElement;
+    openRef.current = nextOpen;
+    setOpen(nextOpen);
+  }, []);
 
-  function choose(outcome) {
+  const choose = useCallback((outcome) => {
     if (root) {
       root.__sbAlertDialogValue = outcome;
       root.dispatchEvent(new CustomEvent("sb:alert-dialog-change"));
     }
+    openRef.current = false;
     setOpen(false);
-  }
+  }, [root]);
 
   useEffect(() => {
     if (!root) return undefined;
@@ -52,7 +56,7 @@ export function AlertDialog({ payload, root }) {
       if (has("style")) setContentStyle(data.style || {});
     };
     return () => delete root.__sbAlertDialogReceive;
-  }, [root]);
+  }, [changeOpen, root]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -67,7 +71,7 @@ export function AlertDialog({ payload, root }) {
       unregister();
       returnFocusRef.current = null;
     };
-  }, [open]);
+  }, [choose, open]);
 
   return (
     <>

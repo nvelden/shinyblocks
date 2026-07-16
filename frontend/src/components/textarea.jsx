@@ -21,13 +21,15 @@ export function Textarea({ payload, root }) {
   const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
   const isInvalid = invalid || wrapperInvalid;
   const textareaRef = useRef(null);
+  const initialValueRef = useRef(value);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    root.__sbTextareaValue = value;
-    root.dataset.sbTextareaValue = value;
-    setNativeTextareaValue(root, value, false);
+    const mountValue = initialValueRef.current;
+    root.__sbTextareaValue = mountValue;
+    root.dataset.sbTextareaValue = mountValue;
+    setNativeTextareaValue(root, mountValue, false);
 
     root.__sbTextareaReceive = (data) => {
       const nextData = data || {};

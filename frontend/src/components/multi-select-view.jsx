@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import {
@@ -95,11 +95,11 @@ export function MultiSelectView({ payload, root }) {
     return clampSelected(ordered, cap);
   }
 
-  function applyValue(next, notify) {
+  const applyValue = useCallback((next, notify) => {
     valueRef.current = next;
     setValue(next);
     setNativeMultiValue(root, next, notify);
-  }
+  }, [root]);
 
   function toggleValue(choiceValue) {
     if (disabled) return;
@@ -233,7 +233,7 @@ export function MultiSelectView({ payload, root }) {
     return () => {
       delete root.__sbSelectReceive;
     };
-  }, [inputId, root]);
+  }, [applyValue, closePopover, inputId, root, setHighlighted, setOpen]);
 
   // Single-writer mount sync: mirror the initial membership and disabled state
   // into the hidden `<select multiple>` so the binding reads a correct value

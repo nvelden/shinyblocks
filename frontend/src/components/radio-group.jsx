@@ -19,13 +19,15 @@ export function RadioGroup({ payload, root }) {
   const isInvalid = invalid || wrapperInvalid;
   const labelledBy = inputId ? labelIdForInput(inputId) : null;
   const itemRefs = useRef(new Map());
+  const initialValueRef = useRef(value);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    root.__sbRadioGroupValue = value == null ? null : String(value);
-    root.dataset.sbRadioGroupValue = value == null ? "" : String(value);
-    setNativeRadioGroupValue(root, value);
+    const mountValue = initialValueRef.current;
+    root.__sbRadioGroupValue = mountValue == null ? null : String(mountValue);
+    root.dataset.sbRadioGroupValue = mountValue == null ? "" : String(mountValue);
+    setNativeRadioGroupValue(root, mountValue);
 
     root.__sbRadioGroupReceive = (data) => {
       const nextData = data || {};

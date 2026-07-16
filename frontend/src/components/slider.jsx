@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { labelIdForInput } from "../runtime/dom.js";
 import { nativeSlider, normalizeSliderValue, setNativeSliderValue, sliderValueToNative } from "../runtime/native-inputs.js";
 import { classNames } from "./shared.jsx";
@@ -41,13 +41,13 @@ export function Slider({ payload, root }) {
     return ((Number(item) - min) / (max - min)) * 100;
   }
 
-  function quantize(raw, nextMin = min, nextMax = max, nextStep = step) {
+  const quantize = useCallback((raw, nextMin = min, nextMax = max, nextStep = step) => {
     const usableStep = Number(nextStep) > 0 ? Number(nextStep) : 1;
     const clamped = Math.min(nextMax, Math.max(nextMin, Number(raw)));
     const snapped = Math.round((clamped - nextMin) / usableStep) * usableStep + nextMin;
     const precision = Math.max(0, String(usableStep).split(".")[1]?.length || 0);
     return Number(Math.min(nextMax, Math.max(nextMin, snapped)).toFixed(precision));
-  }
+  }, [max, min, step]);
 
   function normalized(nextValue, nextMin = min, nextMax = max, nextStep = step) {
     const next = normalizeSliderValue(nextValue, nextMin, nextMax);
@@ -220,7 +220,7 @@ export function Slider({ payload, root }) {
     return () => {
       delete root.__sbSliderReceive;
     };
-  }, [max, min, root, step, value]);
+  }, [max, min, quantize, root, step]);
 
   useEffect(() => {
     if (!root) return;

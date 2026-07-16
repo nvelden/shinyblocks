@@ -133,6 +133,7 @@ export function DropdownMenu({ payload, root }) {
   useEffect(() => {
     if (!open) return undefined;
 
+    const triggerNode = triggerRef.current;
     const focusFrame = requestAnimationFrame(() => {
       const first = actionable.length ? itemRefs.current[actionable[0]] : contentRef.current;
       if (first && typeof first.focus === "function") first.focus({ preventScroll: true });
@@ -152,7 +153,7 @@ export function DropdownMenu({ payload, root }) {
       document.removeEventListener("pointerdown", onDocumentPointerDown);
 
       const stored = returnFocusRef.current;
-      const target = stored && stored !== document.body ? stored : triggerRef.current;
+      const target = stored && stored !== document.body ? stored : triggerNode;
       returnFocusRef.current = null;
       if (target && typeof target.focus === "function") {
         target.focus({ preventScroll: true });

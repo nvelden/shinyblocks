@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import { installNativeFocusForwarding, nativeSelect, setNativeChoices, setNativeValue, toSingleSelected } from "../runtime/native-inputs.js";
@@ -71,9 +71,9 @@ function SingleSelectView({ payload, root }) {
     updatePosition();
   }
 
-  function closeSelect({ focus = false } = {}) {
+  const closeSelect = useCallback(({ focus = false } = {}) => {
     closePopover({ focus });
-  }
+  }, [closePopover]);
 
   function commit(nextValue) {
     if (disabled) return;
@@ -161,7 +161,7 @@ function SingleSelectView({ payload, root }) {
     return () => {
       delete root.__sbSelectReceive;
     };
-  }, [inputId, root]);
+  }, [closeSelect, inputId, root, setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!root) return;

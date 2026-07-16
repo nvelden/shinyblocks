@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { setNativePaginationValue } from "../runtime/native-inputs.js";
 import { classNames } from "./shared.jsx";
 
@@ -37,29 +37,33 @@ export function Pagination({ payload, root }) {
   const [selected, setSelected] = useState(clampPage(payload.state?.value, pages));
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
   const [className, setClassName] = useState(payload.className || "");
+  const pagesRef = useRef(pages);
+  const selectedRef = useRef(selected);
   const siblings = Math.max(0, Math.trunc(Number(props.siblingCount)) || 0);
   const edges = props.showEdges !== false;
 
-  function writeValue(value) {
+  const writeValue = useCallback((value) => {
     if (!root) return;
     root.__sbPaginationValue = value;
     root.dataset.sbPaginationValue = String(value);
     setNativePaginationValue(root, value);
-  }
+  }, [root]);
 
   useEffect(() => {
     if (!root) return undefined;
-    writeValue(selected);
+    writeValue(selectedRef.current);
     root.__sbPaginationReceive = (data = {}) => {
-      let nextPages = pages;
-      let next = selected;
+      let nextPages = pagesRef.current;
+      let next = selectedRef.current;
       if (Object.prototype.hasOwnProperty.call(data, "pages")) {
         nextPages = Math.max(1, Math.trunc(Number(data.pages)) || 1);
+        pagesRef.current = nextPages;
         setPages(nextPages);
         next = clampPage(next, nextPages);
       }
       if (Object.prototype.hasOwnProperty.call(data, "selected")) next = clampPage(data.selected, nextPages);
-      if (next !== selected || Object.prototype.hasOwnProperty.call(data, "selected")) {
+      if (next !== selectedRef.current || Object.prototype.hasOwnProperty.call(data, "selected")) {
+        selectedRef.current = next;
         setSelected(next); writeValue(next);
         if (data.notify) root.dispatchEvent(new CustomEvent("sb:pagination-change"));
       }
@@ -71,11 +75,12 @@ export function Pagination({ payload, root }) {
       }
     };
     return () => { delete root.__sbPaginationReceive; };
-  }, [root, pages, selected]);
+  }, [root, writeValue]);
 
   function choose(value) {
     if (disabled || value === selected) return;
     const next = clampPage(value, pages);
+    selectedRef.current = next;
     setSelected(next); writeValue(next);
     root?.dispatchEvent(new CustomEvent("sb:pagination-change"));
   }

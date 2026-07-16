@@ -132,7 +132,6 @@ export function DateRangePicker({ payload, root }) {
   // in-range band tracks arrow keys, not just the mouse.
   useEffect(() => {
     if (selecting) setHover(focused);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focused, selecting]);
 
   // Single-writer: keep the expando/dataset/native fresh for pre-bind reads and
@@ -144,7 +143,6 @@ export function DateRangePicker({ payload, root }) {
     root.dataset.sbDateRangePickerStart = start;
     root.dataset.sbDateRangePickerEnd = end;
     setNativeDateRangePickerValue(root, start, end, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start, end, root]);
 
   useEffect(() => {

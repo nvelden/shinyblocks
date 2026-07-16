@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { labelIdForInput } from "../runtime/dom.js";
 import { setNativeToggleGroupValue } from "../runtime/native-inputs.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
@@ -38,19 +38,20 @@ export function ToggleGroup({ payload, root }) {
   const iconOnly = Boolean(props.iconOnly);
   const labelledBy = inputId ? labelIdForInput(inputId) : null;
   const itemRefs = useRef(new Map());
+  const initialValueRef = useRef(value);
 
-  function writeValue(next) {
+  const writeValue = useCallback((next) => {
     if (!root) return;
     root.__sbToggleGroupValue = next;
     const joined = multiple ? next.join(",") : next == null ? "" : next;
     root.dataset.sbToggleGroupValue = joined;
     setNativeToggleGroupValue(root, joined);
-  }
+  }, [multiple, root]);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    writeValue(value);
+    writeValue(initialValueRef.current);
 
     root.__sbToggleGroupReceive = (data) => {
       const nextData = data || {};
@@ -98,7 +99,7 @@ export function ToggleGroup({ payload, root }) {
     return () => {
       delete root.__sbToggleGroupReceive;
     };
-  }, [root]);
+  }, [multiple, root, writeValue]);
 
   function isItemDisabled(choiceValue) {
     return disabled || disabledValues.indexOf(choiceValue) !== -1;

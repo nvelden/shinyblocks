@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import {
@@ -92,10 +92,10 @@ function ComboboxSingleView({ payload, root }) {
     updatePosition();
   }
 
-  function closeCombobox({ focus = false } = {}) {
+  const closeCombobox = useCallback(({ focus = false } = {}) => {
     closePopover({ focus });
     setQuery("");
-  }
+  }, [closePopover]);
 
   function commit(nextValue) {
     if (disabled) return;
@@ -186,7 +186,7 @@ function ComboboxSingleView({ payload, root }) {
     return () => {
       delete root.__sbComboboxReceive;
     };
-  }, [inputId, root]);
+  }, [closeCombobox, inputId, root, setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!root) return;
@@ -437,11 +437,11 @@ function ComboboxMultiView({ payload, root }) {
     return clampSelected(ordered, cap);
   }
 
-  function applyValue(next, notify) {
+  const applyValue = useCallback((next, notify) => {
     valueRef.current = next;
     setValue(next);
     setNativeMultiValue(root, next, notify);
-  }
+  }, [root]);
 
   function toggleValue(choiceValue) {
     if (disabled) return;
@@ -478,10 +478,10 @@ function ComboboxMultiView({ payload, root }) {
     updatePosition();
   }
 
-  function closeCombobox({ focus = false } = {}) {
+  const closeCombobox = useCallback(({ focus = false } = {}) => {
     closePopover({ focus });
     setQuery("");
-  }
+  }, [closePopover]);
 
   function isRowDisabled(choiceValue) {
     if (disabled) return true;
@@ -572,7 +572,7 @@ function ComboboxMultiView({ payload, root }) {
     return () => {
       delete root.__sbComboboxReceive;
     };
-  }, [inputId, root]);
+  }, [applyValue, closeCombobox, inputId, root, setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!root) return;

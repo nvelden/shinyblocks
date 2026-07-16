@@ -811,6 +811,9 @@ try {
 
   // Server-driven open/close through the receive channel keeps the same
   // contract (scroll lock on, focus into the dialog; both restored on close).
+  await page.locator("#runtime-dialog").evaluate((node) => {
+    node.__sbReceiveIdentityBeforeUpdate = node.__sbDialogReceive;
+  });
   await page
     .locator("#runtime-dialog")
     .evaluate((node) => node.__sbDialogReceive({ open: true }));
@@ -824,10 +827,18 @@ try {
     .locator("#runtime-dialog")
     .evaluate((node) => node.__sbDialogReceive({ open: false }));
   await page.waitForSelector(dialogContent, { state: "detached" });
+  await waitForDialogTriggerFocus();
   assert.equal(
     await bodyOverflow(),
     "",
     "server-driven close should restore body scroll"
+  );
+  assert.equal(
+    await page.locator("#runtime-dialog").evaluate(
+      (node) => node.__sbReceiveIdentityBeforeUpdate === node.__sbDialogReceive
+    ),
+    true,
+    "dialog state changes must not reinstall the receive handler"
   );
 
   // The shared modal manager coordinates mixed modal stacks. Only the top

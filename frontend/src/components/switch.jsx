@@ -14,6 +14,7 @@ export function Switch({ payload, root }) {
   const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
   const controlRef = useRef(null);
+  const initialCheckedRef = useRef(checked);
   const invalid = root?.getAttribute("aria-invalid") === "true";
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
   const inlineLabelId = inputId ? `${inputId}__label` : undefined;
@@ -23,9 +24,10 @@ export function Switch({ payload, root }) {
 
     setLabelledBy(labelIdForInput(inputId));
 
-    root.__sbSwitchValue = checked;
-    root.dataset.sbSwitchChecked = checked ? "true" : "false";
-    setNativeSwitchValue(root, checked, false);
+    const initialChecked = initialCheckedRef.current;
+    root.__sbSwitchValue = initialChecked;
+    root.dataset.sbSwitchChecked = initialChecked ? "true" : "false";
+    setNativeSwitchValue(root, initialChecked, false);
 
     root.__sbSwitchReceive = (data) => {
       const nextData = data || {};

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // Shared popover positioning/keyboard plumbing for the single- and multi-select
 // views. Extracted from `select.jsx` verbatim so single-select behavior stays
@@ -76,8 +76,8 @@ export function moveHighlightIndex(current, delta, count, fallbackIndex) {
 }
 
 export function useSelectPopover({ choicesCount, layoutDeps = [] }) {
-  const [open, setOpen] = useState(false);
-  const [highlighted, setHighlighted] = useState(-1);
+  const [open, setOpenState] = useState(false);
+  const [highlighted, setHighlightedState] = useState(-1);
   const [position, setPosition] = useState(null);
   const triggerRef = useRef(null);
   const contentRef = useRef(null);
@@ -87,19 +87,22 @@ export function useSelectPopover({ choicesCount, layoutDeps = [] }) {
     choicesCountRef.current = choicesCount;
   }, [choicesCount]);
 
-  function updatePosition(contentHeight) {
+  const setOpen = useCallback((next) => setOpenState(next), []);
+  const setHighlighted = useCallback((next) => setHighlightedState(next), []);
+
+  const updatePosition = useCallback((contentHeight) => {
     const next = computeSelectPosition(triggerRef.current, contentHeight, choicesCountRef.current);
     if (next) setPosition(next);
-  }
+  }, []);
 
-  function closePopover({ focus = false } = {}) {
+  const closePopover = useCallback(({ focus = false } = {}) => {
     setOpen(false);
     setHighlighted(-1);
     setPosition(null);
     if (focus) {
       requestAnimationFrame(() => triggerRef.current?.focus());
     }
-  }
+  }, [setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -127,8 +130,7 @@ export function useSelectPopover({ choicesCount, layoutDeps = [] }) {
       window.removeEventListener("resize", onWindowChange);
       window.removeEventListener("scroll", onWindowChange, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [closePopover, open, updatePosition]);
 
   // Once the popover is painted, reposition using its real height so the side
   // choice and clamp track the active style profile's item spacing instead of a
@@ -137,6 +139,8 @@ export function useSelectPopover({ choicesCount, layoutDeps = [] }) {
     if (!open) return;
     const height = measuredContentHeight(contentRef.current);
     if (height != null) updatePosition(height);
+    // `layoutDeps` is an explicit list of values that can change the measured
+    // content box; spreading it is the hook's public contract.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, ...layoutDeps]);
 

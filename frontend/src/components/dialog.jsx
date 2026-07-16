@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
 import { focusableElements } from "../runtime/focus.js";
@@ -26,12 +26,13 @@ export function Dialog({ payload, root }) {
 
   const contentRef = useRef(null);
   const returnFocusRef = useRef(null);
+  const initialOpenRef = useRef(open);
+  const openRef = useRef(open);
 
-  function setOpen(next, notify) {
+  const setOpen = useCallback((next, notify) => {
     const nextOpen = Boolean(next);
-    if (nextOpen && !open) {
-      returnFocusRef.current = document.activeElement;
-    }
+    if (nextOpen && !openRef.current) returnFocusRef.current = document.activeElement;
+    openRef.current = nextOpen;
     setOpenState(nextOpen);
     if (root) {
       root.__sbDialogValue = nextOpen;
@@ -40,13 +41,14 @@ export function Dialog({ payload, root }) {
     if (notify !== false && root) {
       root.dispatchEvent(new CustomEvent("sb:dialog-change"));
     }
-  }
+  }, [root]);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    root.__sbDialogValue = open;
-    root.dataset.sbDialogOpen = open ? "true" : "false";
+    const initialOpen = initialOpenRef.current;
+    root.__sbDialogValue = initialOpen;
+    root.dataset.sbDialogOpen = initialOpen ? "true" : "false";
 
     root.__sbDialogReceive = (data) => {
       const nextData = data || {};
@@ -77,7 +79,7 @@ export function Dialog({ payload, root }) {
     return () => {
       delete root.__sbDialogReceive;
     };
-  }, [root]);
+  }, [root, setOpen]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -95,7 +97,7 @@ export function Dialog({ payload, root }) {
       unregister();
       returnFocusRef.current = null;
     };
-  }, [open]);
+  }, [open, setOpen]);
 
   const portal = ensurePortalRoot(root);
 

@@ -1387,6 +1387,7 @@ try {
     if (typeof root?.__sbToasterReceive !== "function") {
       throw new Error("toaster receive handler is not installed");
     }
+    root.__sbReceiveIdentityBeforeUpdate = root.__sbToasterReceive;
     root.__sbToasterReceive({
       notify: false,
       toast: {
@@ -1418,6 +1419,13 @@ try {
       }
     });
   });
+  assert.equal(
+    await page.locator(
+      "[data-sb-component='toaster'][data-sb-input-id='runtime_toaster']"
+    ).evaluate((root) => root.__sbReceiveIdentityBeforeUpdate === root.__sbToasterReceive),
+    true,
+    "toast state changes must not reinstall the receive handler"
+  );
   await page.waitForFunction(() => {
     const texts = Array.from(
       document.querySelectorAll("[data-shinyblocks-portal-root] [data-slot='toast']")

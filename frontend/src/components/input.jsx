@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { labelIdForInput } from "../runtime/dom.js";
 import { nativeInput, setNativeInputValue } from "../runtime/native-inputs.js";
 import { classNames } from "./shared.jsx";
@@ -39,13 +39,15 @@ export function Input({ payload, root }) {
   const describedBy = root?.getAttribute("aria-describedby") || undefined;
   const wrapperInvalid = root?.getAttribute("aria-invalid") === "true";
   const isInvalid = invalid || wrapperInvalid;
+  const initialValueRef = useRef(value);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    root.__sbInputValue = value;
-    root.dataset.sbInputValue = value;
-    setNativeInputValue(root, value, false);
+    const mountValue = initialValueRef.current;
+    root.__sbInputValue = mountValue;
+    root.dataset.sbInputValue = mountValue;
+    setNativeInputValue(root, mountValue, false);
 
     root.__sbInputReceive = (data) => {
       const nextData = data || {};

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { classNames, HtmlSlot, Icon, passthroughAttrs } from "./shared.jsx";
 
 // Decorative busy spinner. `aria-hidden` and no status role — the persistent
@@ -65,12 +65,14 @@ export function TaskButton({ payload, root }) {
   const taskStateRef = useRef(taskState);
   const authorDisabledRef = useRef(authorDisabled);
   const labelBusyRef = useRef(labelBusy);
+  const initialClickCountRef = useRef(Number(initialState.value) || 0);
+  const initialAutoResetRef = useRef(Boolean(initialProps.autoReset));
 
   // Reflect the complete next state onto the real button in one pass, before
   // React reconciles. The click binding calls this (via the setter) for the
   // synchronous lock; the receive handler calls it after computing the merged
   // next state.
-  function syncButtonDom(nextState, nextAuthorDisabled, nextLabelBusy) {
+  const syncButtonDom = useCallback((nextState, nextAuthorDisabled, nextLabelBusy) => {
     const button = buttonRef.current;
     if (!button) return;
     const busy = nextState === "busy";
@@ -97,15 +99,15 @@ export function TaskButton({ payload, root }) {
         button.removeAttribute("aria-labelledby");
       }
     }
-  }
+  }, [authorAriaLabel, authorAriaLabelledBy]);
 
   useEffect(() => {
     if (!root) return undefined;
 
     if (typeof root.__sbTaskButtonClickCount === "undefined") {
-      root.__sbTaskButtonClickCount = Number(initialState.value) || 0;
+      root.__sbTaskButtonClickCount = initialClickCountRef.current;
     }
-    root.__sbTaskButtonAutoReset = Boolean(initialProps.autoReset);
+    root.__sbTaskButtonAutoReset = initialAutoResetRef.current;
 
     // The click binding installs the synchronous lock by calling this setter.
     root.__sbTaskButtonSetState = (nextState) => {
@@ -154,7 +156,7 @@ export function TaskButton({ payload, root }) {
       delete root.__sbTaskButtonSetState;
       delete root.__sbTaskButtonReceive;
     };
-  }, [root]);
+  }, [root, syncButtonDom]);
 
   const busy = taskState === "busy";
   const disabled = authorDisabled || busy;

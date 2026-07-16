@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
 import {
@@ -21,16 +21,19 @@ export function Popover({ payload, root }) {
   const triggerRef = useRef(null);
   const contentRef = useRef(null);
   const returnFocusRef = useRef(null);
+  const initialOpenRef = useRef(open);
+  const openRef = useRef(open);
   const contentId = `${payload.id || "popover"}-content`;
   const position = useFloatingPosition({ open, triggerRef, side, align });
 
-  function setOpen(next, notify) {
+  const setOpen = useCallback((next, notify) => {
     const nextOpen = Boolean(next);
-    if (nextOpen && !open) {
+    if (nextOpen && !openRef.current) {
       const active = document.activeElement;
       returnFocusRef.current =
         active && active !== document.body ? active : triggerRef.current;
     }
+    openRef.current = nextOpen;
     setOpenState(nextOpen);
     if (root) {
       root.__sbPopoverValue = nextOpen;
@@ -39,13 +42,14 @@ export function Popover({ payload, root }) {
     if (notify !== false && root) {
       root.dispatchEvent(new CustomEvent("sb:popover-change"));
     }
-  }
+  }, [root]);
 
   useEffect(() => {
     if (!root) return undefined;
 
-    root.__sbPopoverValue = open;
-    root.dataset.sbPopoverOpen = open ? "true" : "false";
+    const initialOpen = initialOpenRef.current;
+    root.__sbPopoverValue = initialOpen;
+    root.dataset.sbPopoverOpen = initialOpen ? "true" : "false";
 
     root.__sbPopoverReceive = (data) => {
       const nextData = data || {};
@@ -76,11 +80,12 @@ export function Popover({ payload, root }) {
     return () => {
       delete root.__sbPopoverReceive;
     };
-  }, [root]);
+  }, [root, setOpen]);
 
   useEffect(() => {
     if (!open) return undefined;
 
+    const triggerNode = triggerRef.current;
     const focusFrame = requestAnimationFrame(() => {
       const focusables = focusableChildren(contentRef.current);
       const initial = focusables[0] || contentRef.current;
@@ -112,14 +117,14 @@ export function Popover({ payload, root }) {
 
       const storedTarget = returnFocusRef.current;
       const target =
-        storedTarget && storedTarget !== document.body ? storedTarget : triggerRef.current;
+        storedTarget && storedTarget !== document.body ? storedTarget : triggerNode;
       returnFocusRef.current = null;
       if (target && typeof target.focus === "function") {
         target.focus({ preventScroll: true });
         requestAnimationFrame(() => target.focus({ preventScroll: true }));
       }
     };
-  }, [open]);
+  }, [open, setOpen]);
 
   const portal = ensurePortalRoot(root);
 
