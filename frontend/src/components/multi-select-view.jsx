@@ -8,6 +8,12 @@ import {
   setNativeMultiValue
 } from "../runtime/native-inputs.js";
 import { moveHighlightIndex, useSelectPopover } from "../runtime/select-popover.js";
+import {
+  clampSelected,
+  orderSelectedByChoices,
+  reconcileMultiSelection,
+  toMultiSelected
+} from "../runtime/multi-select-state.js";
 import { classNames } from "./shared.jsx";
 
 // Multiple-mode select. The trigger is a `div role="combobox"` (not a button)
@@ -19,12 +25,6 @@ import { classNames } from "./shared.jsx";
 // Coerce a received `selected` into a clean string array. Multiple mode has no
 // placeholder `""` row, so an empty string is never a real value — drop it so a
 // `NULL`/`""` clear and a `character(0)` clear behave identically.
-function toMultiSelected(selected) {
-  if (selected == null) return [];
-  const arr = Array.isArray(selected) ? selected : [selected];
-  return arr.map((value) => String(value)).filter((value) => value.length > 0);
-}
-
 export function MultiSelectView({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
@@ -35,14 +35,11 @@ export function MultiSelectView({ payload, root }) {
   // the rest of the lifecycle — `state.value` may arrive in any order or with
   // repeats.
   const [value, setValue] = useState(() => {
-    const wanted = new Set(toMultiSelected(state.value));
-    const ordered = (props.choices || [])
-      .map((choice) => choice.value)
-      .filter((choiceValue) => wanted.has(choiceValue));
+    const ordered = orderSelectedByChoices(props.choices || [], state.value);
     // R rejects an over-cap initial `selected`, but clamp defensively so the
     // mounted view can never start above the cap.
     const cap = props.maxItems == null ? null : Number(props.maxItems);
-    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
+    return clampSelected(ordered, cap);
   });
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
   const [disabled, setDisabled] = useState(Boolean(props.disabled));
@@ -87,9 +84,7 @@ export function MultiSelectView({ payload, root }) {
   // Keep the membership in choice order so chips, the listbox, and the native
   // `getValue` (which reads selected options in DOM order) all agree.
   function orderByChoices(set) {
-    return choicesRef.current
-      .map((choice) => choice.value)
-      .filter((choiceValue) => set.has(choiceValue));
+    return orderSelectedByChoices(choicesRef.current, set);
   }
 
   // Truncate to the active cap, keeping the leading (choice-order) values.
@@ -97,7 +92,7 @@ export function MultiSelectView({ payload, root }) {
   // arrive whole (initial mount, choices reconcile, server `selected`).
   function clampToCap(ordered) {
     const cap = maxItemsRef.current;
-    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
+    return clampSelected(ordered, cap);
   }
 
   function applyValue(next, notify) {
@@ -182,12 +177,7 @@ export function MultiSelectView({ payload, root }) {
         const carried = Object.prototype.hasOwnProperty.call(nextData, "selected")
           ? toMultiSelected(nextData.selected)
           : prior;
-        const allowed = new Set(nextChoices.map((choice) => String(choice.value)));
-        const next = clampToCap(
-          nextChoices
-            .map((choice) => choice.value)
-            .filter((choiceValue) => carried.includes(choiceValue) && allowed.has(choiceValue))
-        );
+        const next = reconcileMultiSelection(nextChoices, carried, maxItemsRef.current);
         valueRef.current = next;
         setValue(next);
         setNativeMultiChoices(root, nextChoices, next);

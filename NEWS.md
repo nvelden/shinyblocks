@@ -13,6 +13,8 @@
 
 ### Bug fixes
 
+* `block_select()` and `block_combobox()` now reject malformed logical flags instead of silently treating them as false; their shared native-select and multi-selection internals have also been consolidated.
+
 * `block_page()` no longer applies Tailwind Preflight or `!important` focus overrides to every descendant. The generated reset now targets only the app root and shinyblocks-owned `sb-*` elements, so native Shiny controls, bslib content, and htmlwidgets retain host typography, spacing, borders, media display, and focus treatment in content slots (issue #116).
 * Alert-dialog focus trapping now uses the same live focusable-element utility as dialog. Native and dynamically rendered inputs, selects, and textareas participate in both tab directions, while disabled, hidden, inert, `aria-hidden`, and negative-tabindex controls are skipped (issue #115).
 * `block_button()` now keeps constructor style in the same controlled channel as `update_block_button()`, so initial style can be replaced or cleared. Runtime-owned button attributes win over passthrough collisions while `title`, `name`, ARIA, and custom data attributes remain supported (issue #114).

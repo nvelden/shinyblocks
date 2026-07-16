@@ -11,6 +11,12 @@ import {
   toSingleSelected
 } from "../runtime/native-inputs.js";
 import { moveHighlightIndex, useSelectPopover } from "../runtime/select-popover.js";
+import {
+  clampSelected,
+  orderSelectedByChoices,
+  reconcileMultiSelection,
+  toMultiSelected
+} from "../runtime/multi-select-state.js";
 import { classNames } from "./shared.jsx";
 
 // One runtime identity (`component = "combobox"`), two implementations. The
@@ -39,12 +45,6 @@ function filterChoices(choices, query) {
   });
 }
 
-function toMultiSelected(selected) {
-  if (selected == null) return [];
-  const arr = Array.isArray(selected) ? selected : [selected];
-  return arr.map((value) => String(value)).filter((value) => value.length > 0);
-}
-
 function ComboboxSingleView({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
@@ -58,7 +58,7 @@ function ComboboxSingleView({ payload, root }) {
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
   const [size, setSize] = useState(props.size || "default");
   const [width, setWidth] = useState(props.width || "100%");
-  const [style, setStyle] = useState(props.style || {});
+  const [style] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
   const [query, setQuery] = useState("");
@@ -389,12 +389,9 @@ function ComboboxMultiView({ payload, root }) {
   const inputId = payload.id;
   const [choices, setChoices] = useState(props.choices || []);
   const [value, setValue] = useState(() => {
-    const wanted = new Set(toMultiSelected(state.value));
-    const ordered = (props.choices || [])
-      .map((choice) => choice.value)
-      .filter((choiceValue) => wanted.has(choiceValue));
+    const ordered = orderSelectedByChoices(props.choices || [], state.value);
     const cap = props.maxItems == null ? null : Number(props.maxItems);
-    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
+    return clampSelected(ordered, cap);
   });
   const [placeholder, setPlaceholder] = useState(props.placeholder || "");
   const [searchPlaceholder, setSearchPlaceholder] = useState(props.searchPlaceholder || "Search...");
@@ -432,14 +429,12 @@ function ComboboxMultiView({ payload, root }) {
   const filtered = useMemo(() => filterChoices(choices, query), [choices, query]);
 
   function orderByChoices(set) {
-    return choicesRef.current
-      .map((choice) => choice.value)
-      .filter((choiceValue) => set.has(choiceValue));
+    return orderSelectedByChoices(choicesRef.current, set);
   }
 
   function clampToCap(ordered) {
     const cap = maxItemsRef.current;
-    return cap != null && ordered.length > cap ? ordered.slice(0, cap) : ordered;
+    return clampSelected(ordered, cap);
   }
 
   function applyValue(next, notify) {
@@ -530,12 +525,7 @@ function ComboboxMultiView({ payload, root }) {
         const carried = Object.prototype.hasOwnProperty.call(nextData, "selected")
           ? toMultiSelected(nextData.selected)
           : prior;
-        const allowed = new Set(nextChoices.map((choice) => String(choice.value)));
-        const next = clampToCap(
-          nextChoices
-            .map((choice) => choice.value)
-            .filter((choiceValue) => carried.includes(choiceValue) && allowed.has(choiceValue))
-        );
+        const next = reconcileMultiSelection(nextChoices, carried, maxItemsRef.current);
         valueRef.current = next;
         setValue(next);
         setNativeMultiChoices(root, nextChoices, next);

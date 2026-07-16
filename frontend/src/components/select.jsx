@@ -28,7 +28,7 @@ function SingleSelectView({ payload, root }) {
   const [invalid, setInvalid] = useState(Boolean(props.invalid));
   const [size, setSize] = useState(props.size || "default");
   const [width, setWidth] = useState(props.width || "100%");
-  const [style, setStyle] = useState(props.style || {});
+  const [style] = useState(props.style || {});
   const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
   const {

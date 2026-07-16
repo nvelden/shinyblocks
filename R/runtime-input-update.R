@@ -6,6 +6,7 @@ runtime_input_update <- function(
   notify_key = "value",
   notify = TRUE
 ) {
+  notify <- validate_flag(notify, "notify")
   if (is.null(session)) {
     stop("`session` is required.", call. = FALSE)
   }
@@ -19,7 +20,7 @@ runtime_input_update <- function(
   validate_input_id(input_id)
 
   if (!is.null(notify_key)) {
-    payload$notify <- isTRUE(notify) && notify_key %in% names(payload)
+    payload$notify <- notify && notify_key %in% names(payload)
   }
 
   # `session$ns()` resolves the fully namespaced input id; baking it into the
@@ -91,18 +92,23 @@ field_style <- function(key, arg = key) {
 # arguments the caller explicitly supplied are emitted: `match.call()` on the
 # parent frame lists them exactly as `missing()` would, so defaulted arguments
 # are skipped.
-apply_update_fields <- function(payload, fields, env = parent.frame()) {
-  # If the updater was invoked through a `...`-forwarding wrapper
-  # (`function(...) update_block_x(...)`), its call contains a literal `...`
-  # that only exists in the *wrapper's* frame — `parent.frame(2L)` from here —
-  # so dots must be expanded there, not in the updater's own frame.
-  supplied <- names(match.call(
-    definition = sys.function(-1L),
-    call = sys.call(-1L),
-    envir = parent.frame(2L)
-  ))[-1L]
+apply_update_fields <- function(
+  payload,
+  fields,
+  supplied = NULL,
+  env = parent.frame()
+) {
+  if (is.null(supplied)) {
+    supplied <- names(match.call(
+      definition = sys.function(-1L),
+      call = sys.call(-1L),
+      envir = parent.frame(2L)
+    ))[-1L]
+  }
   for (f in fields) {
-    if (!f$arg %in% supplied) next
+    if (!f$arg %in% supplied) {
+      next
+    }
     value <- get(f$arg, envir = env)
     payload <- switch(
       f$method,
@@ -113,6 +119,8 @@ apply_update_fields <- function(payload, fields, env = parent.frame()) {
   }
   payload
 }
+
+supplied_args <- function(call = match.call()) names(call)[-1L]
 
 # Shared transform: a text input's value coerces to a string, treating NULL as
 # an empty string rather than dropping the field.
@@ -150,7 +158,12 @@ hidden_native_input <- function(
   )
 }
 
-hidden_native_textarea <- function(input_id, class, value = "", style = "display:none") {
+hidden_native_textarea <- function(
+  input_id,
+  class,
+  value = "",
+  style = "display:none"
+) {
   htmltools::tags$textarea(
     id = input_id,
     class = class,
@@ -162,7 +175,12 @@ hidden_native_textarea <- function(input_id, class, value = "", style = "display
   )
 }
 
-native_file_input <- function(input_id, multiple = FALSE, accept = NULL, disabled = FALSE) {
+native_file_input <- function(
+  input_id,
+  multiple = FALSE,
+  accept = NULL,
+  disabled = FALSE
+) {
   htmltools::tagList(
     htmltools::tags$input(
       id = input_id,

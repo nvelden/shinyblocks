@@ -86,13 +86,7 @@ block_task_button <- function(
     stop("`label_busy` must be a non-missing length-one string.", call. = FALSE)
   }
 
-  if (
-    !is.logical(auto_reset) ||
-      length(auto_reset) != 1 ||
-      is.na(auto_reset)
-  ) {
-    stop("`auto_reset` must be a non-missing length-one logical.", call. = FALSE)
-  }
+  auto_reset <- validate_flag(auto_reset, "auto_reset")
 
   variant <- match_arg(variant, TASK_BUTTON_VARIANTS)
   size <- match_arg(size, TASK_BUTTON_SIZES)
@@ -114,7 +108,11 @@ block_task_button <- function(
   # Style flows through the dedicated `style` prop (the same channel the updater
   # uses), not through `attrs`, so a later `update_block_task_button(style =)`
   # is not clobbered by a stale spread of the initial attrs.
-  style <- if (is.null(attrs$style)) NULL else normalize_runtime_style(attrs$style)
+  style <- if (is.null(attrs$style)) {
+    NULL
+  } else {
+    normalize_runtime_style(attrs$style)
+  }
   attrs$style <- NULL
 
   ready_icon <- task_button_icon(icon, icon_position)
@@ -240,11 +238,14 @@ update_block_task_button <- function(
     payload$spriteHref <- sprite_href()
   }
 
-  payload <- apply_update_fields(payload, list(
-    field("disabled", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    payload,
+    list(
+      field("disabled", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   runtime_input_update(
     session,

@@ -35,13 +35,19 @@ test_that("block_combobox emits a runtime combobox payload", {
 })
 
 test_that("block_combobox search/empty text default when not supplied", {
-  payload <- runtime_payload_from(block_combobox("plan", choices = c("Free", "Pro")))
+  payload <- runtime_payload_from(block_combobox(
+    "plan",
+    choices = c("Free", "Pro")
+  ))
   expect_identical(payload$props$searchPlaceholder, "Search...")
   expect_identical(payload$props$emptyMessage, "No results found.")
 })
 
 test_that("block_combobox defaults to first choice unless a placeholder is present", {
-  combobox <- runtime_payload_from(block_combobox("plan", choices = c("Free", "Pro")))
+  combobox <- runtime_payload_from(block_combobox(
+    "plan",
+    choices = c("Free", "Pro")
+  ))
   placeholder <- runtime_payload_from(
     block_combobox("plan", choices = c("Free", "Pro"), placeholder = "Choose")
   )
@@ -75,20 +81,40 @@ test_that("block_combobox emits a multiple runtime combobox payload", {
 
 test_that("block_combobox rejects an unknown selected value", {
   expect_error(
-    block_combobox("plan", choices = c(Free = "free", Pro = "pro"), selected = "z"),
+    block_combobox(
+      "plan",
+      choices = c(Free = "free", Pro = "pro"),
+      selected = "z"
+    ),
     "must match one of"
   )
 })
 
 test_that("block_combobox rejects non-string search/empty text", {
   expect_error(
-    block_combobox("plan", choices = c("Free", "Pro"), search_placeholder = c("a", "b")),
+    block_combobox(
+      "plan",
+      choices = c("Free", "Pro"),
+      search_placeholder = c("a", "b")
+    ),
     "search_placeholder"
   )
   expect_error(
     block_combobox("plan", choices = c("Free", "Pro"), empty_message = 1),
     "empty_message"
   )
+})
+
+test_that("block_combobox rejects malformed logical flags", {
+  expect_snapshot(error = TRUE, {
+    block_combobox("plan", c("Free", "Pro"), disabled = "yes")
+  })
+  expect_snapshot(error = TRUE, {
+    block_combobox("plan", c("Free", "Pro"), invalid = NA)
+  })
+  expect_snapshot(error = TRUE, {
+    block_combobox("plan", c("Free", "Pro"), multiple = 1)
+  })
 })
 
 test_that("update_block_combobox sends input binding messages", {

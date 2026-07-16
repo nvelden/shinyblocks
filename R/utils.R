@@ -2,6 +2,16 @@
   if (is.null(x)) y else x
 }
 
+validate_flag <- function(value, arg) {
+  if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+    stop(
+      sprintf("`%s` must be a non-missing length-one logical.", arg),
+      call. = FALSE
+    )
+  }
+  value
+}
+
 merge_classes <- function(...) {
   values <- unlist(list(...), use.names = FALSE)
   values <- values[!is.na(values) & nzchar(values)]

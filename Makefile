@@ -32,7 +32,7 @@ help:
 	@echo "  runtime-shiny-test - Shiny-backed browser smoke for runtime bindings"
 	@echo "  showcase-test   - Shiny showcase smoke for documented interactive controls"
 	@echo "  build-icons     - regenerate the Lucide sprite"
-	@echo "  lint            - lintr::lint_package()"
+	@echo "  lint            - R lintr plus frontend ESLint"
 	@echo "  spell           - devtools::spell_check()"
 	@echo "  urls            - urlchecker::url_check()"
 	@echo "  test            - devtools::test()"
@@ -127,6 +127,7 @@ showcase-test:
 
 lint:
 	$(R) -e 'lintr::lint_package()'
+	npm run lint
 
 spell:
 	$(R) -e 'devtools::spell_check()'

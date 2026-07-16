@@ -35,11 +35,13 @@ block_combobox <- function(
   max_items = NULL
 ) {
   validate_input_id(input_id)
+  disabled <- validate_flag(disabled, "disabled")
+  invalid <- validate_flag(invalid, "invalid")
+  multiple <- validate_flag(multiple, "multiple")
   size <- match_arg(size, c("default", "sm", "lg"))
   choices_df <- normalize_choices(choices)
   validate_select_choice_values(choices_df$value)
   choice_values <- choices_df$value
-  multiple <- isTRUE(multiple)
   max_items <- normalize_select_max_items(max_items)
   search_placeholder <- normalize_combobox_text(
     search_placeholder,
@@ -64,35 +66,13 @@ block_combobox <- function(
   } else {
     htmltools::validateCssUnit(width)
   }
-  native_options <- lapply(seq_len(nrow(choices_df)), function(i) {
-    option_value <- choices_df$value[[i]]
-    htmltools::tags$option(
-      value = option_value,
-      selected = if (option_value %in% selected_value) NA else NULL,
-      choices_df$label[[i]]
-    )
-  })
-
-  if (!multiple && !is.null(placeholder)) {
-    native_options <- c(
-      list(htmltools::tags$option(
-        value = "",
-        selected = if (identical(selected_value, "")) NA else NULL,
-        placeholder
-      )),
-      native_options
-    )
-  }
-
-  hidden_native <- htmltools::tags$select(
-    id = input_id,
-    class = "sb-select-native",
-    tabindex = "-1",
-    `aria-hidden` = "true",
-    `data-shiny-no-bind-input` = "",
-    disabled = if (isTRUE(disabled)) NA else NULL,
-    multiple = if (multiple) NA else NULL,
-    native_options
+  hidden_native <- build_select_native(
+    input_id,
+    choices_df,
+    selected_value,
+    placeholder,
+    disabled,
+    multiple
   )
 
   runtime_component(
@@ -102,11 +82,11 @@ block_combobox <- function(
       placeholder = placeholder,
       searchPlaceholder = search_placeholder,
       emptyMessage = empty_message,
-      disabled = isTRUE(disabled),
+      disabled = disabled,
       width = width_value,
       style = normalize_runtime_style(style),
       size = size,
-      invalid = isTRUE(invalid),
+      invalid = invalid,
       multiple = multiple,
       maxItems = max_items,
       spriteHref = sprite_href()
@@ -148,6 +128,7 @@ update_block_combobox <- function(
   invalid,
   notify = TRUE
 ) {
+  supplied <- supplied_args(match.call())
   payload <- list()
 
   if (!missing(choices)) {
@@ -185,11 +166,16 @@ update_block_combobox <- function(
           normalize_combobox_text(value, "No results found.", "empty_message")
         }
       ),
-      field("disabled", transform = isTRUE),
+      field("disabled", transform = function(value) {
+        validate_flag(value, "disabled")
+      }),
       field_clearable("width", transform = htmltools::validateCssUnit),
       field_clearable("class"),
-      field("invalid", transform = isTRUE)
-    )
+      field("invalid", transform = function(value) {
+        validate_flag(value, "invalid")
+      })
+    ),
+    supplied = supplied
   )
 
   if (!missing(size)) {

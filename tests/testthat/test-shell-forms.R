@@ -180,7 +180,12 @@ test_that("block_toggle_group validates selected, disabled, and icons", {
     "icon"
   )
   expect_error(
-    block_toggle_group("t", choices, icons = list(a = "list"), icon_only = TRUE),
+    block_toggle_group(
+      "t",
+      choices,
+      icons = list(a = "list"),
+      icon_only = TRUE
+    ),
     "cover every choice"
   )
 })
@@ -372,12 +377,23 @@ test_that("block_file_input serializes dropzone_content to html", {
       )
     )
   )
-  expect_match(payload$props$dropzoneContentHtml, "<strong>Upload</strong>", fixed = TRUE)
-  expect_match(payload$props$dropzoneContentHtml, "data-dropzone-trigger", fixed = TRUE)
+  expect_match(
+    payload$props$dropzoneContentHtml,
+    "<strong>Upload</strong>",
+    fixed = TRUE
+  )
+  expect_match(
+    payload$props$dropzoneContentHtml,
+    "data-dropzone-trigger",
+    fixed = TRUE
+  )
 })
 
 test_that("block_file_input has no dropzone icon/content by default", {
-  payload <- runtime_payload_from(block_file_input("upload", variant = "dropzone"))
+  payload <- runtime_payload_from(block_file_input(
+    "upload",
+    variant = "dropzone"
+  ))
   expect_null(payload$props$dropzoneIconName)
   expect_null(payload$props$dropzoneIconHtml)
   expect_null(payload$props$dropzoneContentHtml)
@@ -385,10 +401,20 @@ test_that("block_file_input has no dropzone icon/content by default", {
 
 test_that("block_file_input validates input id, accept, variant, and icon name", {
   expect_error(block_file_input(""), "`input_id` must be a non-empty string")
-  expect_error(block_file_input("upload", accept = 1), "`accept` must be NULL or a character vector")
-  expect_error(block_file_input("upload", variant = "tile"), "`variant` must be one of")
   expect_error(
-    block_file_input("upload", variant = "dropzone", dropzone_icon = "not-a-real-icon-xyz")
+    block_file_input("upload", accept = 1),
+    "`accept` must be NULL or a character vector"
+  )
+  expect_error(
+    block_file_input("upload", variant = "tile"),
+    "`variant` must be one of"
+  )
+  expect_error(
+    block_file_input(
+      "upload",
+      variant = "dropzone",
+      dropzone_icon = "not-a-real-icon-xyz"
+    )
   )
 })
 
@@ -462,9 +488,17 @@ test_that("slider emits runtime payload and binding metadata", {
   )
   expect_identical(payload$className, "custom")
   expect_match(slider_html, 'data-sb-component="slider"', fixed = TRUE)
-  expect_match(slider_html, '<input id="volume" type="hidden" class="sb-slider-native"', fixed = TRUE)
+  expect_match(
+    slider_html,
+    '<input id="volume" type="hidden" class="sb-slider-native"',
+    fixed = TRUE
+  )
   expect_match(slider_html, "data-shiny-no-bind-input", fixed = TRUE)
-  expect_match(render_html(disabled), 'data-sb-component="slider"', fixed = TRUE)
+  expect_match(
+    render_html(disabled),
+    'data-sb-component="slider"',
+    fixed = TRUE
+  )
 
   expect_identical(payload$component, "slider")
   expect_identical(payload$id, "volume")
@@ -651,7 +685,10 @@ test_that("aria-invalid reaches wrapped control types", {
 })
 
 test_that("buttons accept aria-invalid passthrough attrs", {
-  button <- runtime_payload_from(block_button("Delete", `aria-invalid` = "true"))
+  button <- runtime_payload_from(block_button(
+    "Delete",
+    `aria-invalid` = "true"
+  ))
 
   expect_identical(button$props$attrs[["aria-invalid"]], "true")
 })
@@ -702,7 +739,10 @@ test_that("block_select emits a runtime select payload", {
 })
 
 test_that("block_select defaults to first choice unless a placeholder is present", {
-  select <- runtime_payload_from(block_select("plan", choices = c("Free", "Pro")))
+  select <- runtime_payload_from(block_select(
+    "plan",
+    choices = c("Free", "Pro")
+  ))
   placeholder <- runtime_payload_from(
     block_select("plan", choices = c("Free", "Pro"), placeholder = "Choose")
   )
@@ -741,6 +781,18 @@ test_that("block_select multiple defaults to no selection", {
   )
 
   expect_identical(select$state$value, list())
+})
+
+test_that("block_select rejects malformed logical flags", {
+  expect_snapshot(error = TRUE, {
+    block_select("plan", c("Free", "Pro"), disabled = "yes")
+  })
+  expect_snapshot(error = TRUE, {
+    block_select("plan", c("Free", "Pro"), invalid = NA)
+  })
+  expect_snapshot(error = TRUE, {
+    block_select("plan", c("Free", "Pro"), multiple = 1)
+  })
 })
 
 test_that("block_select multiple keeps a single selection as an array", {
