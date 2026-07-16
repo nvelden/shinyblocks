@@ -33,18 +33,21 @@ allowlist <- data.frame(
   path = c(
     "^tests/testthat/test-runtime-css\\.R$",
     "^tools/runtime-shiny-(fixture\\.R|smoke\\.mjs)$",
+    "^tools/preflight-isolation-shiny-(fixture\\.R|smoke\\.mjs)$",
     "^tests/testthat/test-shell-layout\\.R$",
     "^R/style-profiles\\.R$"
   ),
   pattern = c(
     "selectize|irs-|nav-link|tab-pane",
     "selectize|Selectize|nav-link|shiny::textInput",
+    "selectize|Selectize",
     "shiny-tab-input|nav-link|tab-pane",
     "sb-button-radius"
   ),
   reason = c(
     "Runtime CSS test asserts these host selectors are absent from runtime CSS.",
     "Host collision fixture intentionally creates non-shinyblocks Bootstrap/Selectize-like nodes and one nested raw Shiny text input.",
+    "Preflight isolation fixture intentionally compares a host-owned Selectize-like node inside and outside block_page().",
     "Shell tests assert old tab internals are absent from the rendered contract.",
     "Style profiles expose an internal --sb-button-radius token; this is not a retired legacy class."
   ),
