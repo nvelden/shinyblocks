@@ -4,6 +4,14 @@ import { classNames, HtmlSlot, Icon, passthroughAttrs } from "./shared.jsx";
 export function Button({ payload, root }) {
   const initialProps = payload.props || {};
   const attrs = passthroughAttrs(initialProps.attrs);
+  delete attrs.type;
+  delete attrs["data-slot"];
+  delete attrs["data-variant"];
+  delete attrs["data-size"];
+  delete attrs.class;
+  delete attrs.className;
+  delete attrs.style;
+  delete attrs.disabled;
 
   const [labelHtml, setLabelHtml] = useState(initialProps.labelHtml || "");
   const [variant, setVariant] = useState(initialProps.variant || "default");
@@ -65,6 +73,7 @@ export function Button({ payload, root }) {
 
   return (
     <button
+      {...attrs}
       type="button"
       data-slot="button"
       data-variant={variant}
@@ -77,7 +86,6 @@ export function Button({ payload, root }) {
       )}
       disabled={disabled}
       style={style}
-      {...attrs}
     >
       {iconPosition === "inline-start" && <Icon payload={iconPayload} />}
       <HtmlSlot html={labelHtml} />

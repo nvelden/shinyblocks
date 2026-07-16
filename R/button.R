@@ -5,9 +5,10 @@
 #' @param size Button size.
 #' @param icon Optional icon tag or vendored icon name.
 #' @param icon_position Whether the icon appears before or after the label.
-#' @param ... Additional attributes passed to `htmltools::tags$button`. Pass
+#' @param ... Additional attributes passed to the rendered button. Pass
 #'   `id = "..."` here to make the button addressable via
-#'   [update_block_button()].
+#'   [update_block_button()]. Runtime-owned `type`, `data-slot`, variant/size,
+#'   class, style, and disabled attributes cannot be overridden here.
 #' @param class Additional classes.
 #'
 #' @return An `htmltools` tag.
@@ -44,9 +45,8 @@ block_button <- function(
   attrs$disabled <- NULL
   input_id <- if (is.null(attrs$id)) NULL else as.character(attrs$id)
   attrs$id <- NULL
-  if (!is.null(attrs$style)) {
-    attrs$style <- normalize_runtime_style(attrs$style)
-  }
+  style <- if (is.null(attrs$style)) NULL else normalize_runtime_style(attrs$style)
+  attrs$style <- NULL
 
   icon_name <- NULL
   icon_html <- NULL
@@ -76,6 +76,7 @@ block_button <- function(
       iconPosition = icon_position,
       spriteHref = sprite_href(),
       attrs = attrs,
+      style = style,
       disabled = disabled
     ),
     input_id = input_id,

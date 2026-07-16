@@ -13,6 +13,7 @@
 
 ### Bug fixes
 
+* `block_button()` now keeps constructor style in the same controlled channel as `update_block_button()`, so initial style can be replaced or cleared. Runtime-owned button attributes win over passthrough collisions while `title`, `name`, ARIA, and custom data attributes remain supported (issue #114).
 * Dialogs and alert dialogs now share a LIFO modal manager. In mixed or nested modal stacks, only the top modal handles Escape and traps focus, body scrolling stays locked until the final modal closes, layers follow stack order, and dynamic UI removal safely releases its modal entry (issue #113).
 * Portaled components now render into a portal owned by their originating runtime mount instead of the first document-global portal. Selects, comboboxes, dialogs, popovers, tooltips, menus, date pickers, and toasters therefore retain the correct scoped theme/style in multi-region dashboards, and dynamic mount removal removes its portal automatically (issue #112).
 * `block_image_output()` and `block_plot_output()` now apply aspect ratio, fit, border, radius, caption, and fill sizing when embedded directly in `fluidPage()`, bslib, or another host layout; their CSS is rooted narrowly at `.sb-output-frame` and does not target unrelated Shiny outputs (issue #111).

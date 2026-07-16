@@ -279,7 +279,14 @@ ui <- shiny::fluidPage(
   block_button(
     "Runtime button",
     id = "runtime_button",
-    class = "runtime-button-fixture"
+    class = "runtime-button-fixture",
+    style = "width: 100px;",
+    title = "Runtime title",
+    name = "runtime-button-name",
+    `aria-label` = "Runtime button label",
+    `data-test-button` = "preserved",
+    `data-slot` = "custom-slot",
+    type = "submit"
   ),
   block_task_button(
     "runtime_task_button",
@@ -480,6 +487,8 @@ ui <- shiny::fluidPage(
   shiny::actionButton("enable_slider", "Enable slider"),
   shiny::actionButton("disable_button", "Disable button"),
   shiny::actionButton("enable_button", "Enable button"),
+  shiny::actionButton("resize_button", "Resize button"),
+  shiny::actionButton("clear_button_style", "Clear button style"),
   shiny::actionButton("tb_hold_on", "Hold task busy on click"),
   shiny::actionButton("tb_hold_off", "Stop holding task busy"),
   shiny::actionButton("tb_ready", "Release task"),
@@ -1086,6 +1095,14 @@ server <- function(input, output, session) {
       input_id = "runtime_button",
       disabled = FALSE
     )
+  })
+
+  shiny::observeEvent(input$resize_button, {
+    update_block_button(session, "runtime_button", style = list(width = "200px"))
+  })
+
+  shiny::observeEvent(input$clear_button_style, {
+    update_block_button(session, "runtime_button", style = NULL)
   })
 
   tb_hold <- shiny::reactiveVal(FALSE)

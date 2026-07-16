@@ -462,9 +462,31 @@ test_that("button inline style is normalized for runtime rendering", {
     )
   )
 
-  expect_identical(button$props$attrs$style$color, "red")
-  expect_identical(button$props$attrs$style$minWidth, "10rem")
-  expect_identical(button$props$attrs$style$`--custom-accent`, "#f00")
+  expect_null(button$props$attrs$style)
+  expect_identical(button$props$style$color, "red")
+  expect_identical(button$props$style$minWidth, "10rem")
+  expect_identical(button$props$style$`--custom-accent`, "#f00")
+})
+
+test_that("button separates controlled fields from passthrough attributes", {
+  button <- runtime_payload_from(block_button(
+    "Save",
+    title = "Save changes",
+    name = "save-action",
+    `aria-label` = "Save now",
+    `data-test` = "save",
+    style = "width: 100px;",
+    disabled = FALSE
+  ))
+
+  expect_identical(button$props$attrs$title, "Save changes")
+  expect_identical(button$props$attrs$name, "save-action")
+  expect_identical(button$props$attrs$`aria-label`, "Save now")
+  expect_identical(button$props$attrs$`data-test`, "save")
+  expect_null(button$props$attrs$style)
+  expect_null(button$props$attrs$disabled)
+  expect_identical(button$props$style$width, "100px")
+  expect_false(button$props$disabled)
 })
 
 test_that("runtime inline style fails hard for malformed input", {

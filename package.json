@@ -16,6 +16,7 @@
     "test:select-overflow": "node tools/select-overflow-smoke.mjs",
     "test:runtime-shiny": "node tools/runtime-shiny-smoke.mjs",
     "test:output-frame-shiny": "node tools/output-frame-shiny-smoke.mjs",
+    "test:button-shiny": "node tools/button-shiny-smoke.mjs",
     "test:showcase": "node tools/showcase-smoke.mjs",
     "test:themes": "npm run test:themes-static && npm run test:themes-runtime && npm run test:style-parity",
     "test:themes-browser": "npm run test:themes-runtime && npm run test:style-parity",

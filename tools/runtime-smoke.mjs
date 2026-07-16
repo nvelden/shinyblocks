@@ -28,9 +28,9 @@ const buttonPayload = JSON.stringify({
     iconPosition: "inline-start",
     spriteHref: "shinyblocks-0.0.0.9000/icons/sprite.svg",
     attrs: {
-      "aria-invalid": "true",
-      style: { color: "rgb(255, 0, 0)" }
+      "aria-invalid": "true"
     },
+    style: { color: "rgb(255, 0, 0)" },
     disabled: false
   },
   slots: {},
@@ -307,7 +307,7 @@ try {
       return getComputedStyle(node).color;
     }),
     "rgb(255, 0, 0)",
-    "button runtime should apply normalized style attrs"
+    "button runtime should apply its controlled normalized style"
   );
   assert.equal(
     await page.locator("#runtime-button svg use").getAttribute("href"),

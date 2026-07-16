@@ -93,7 +93,7 @@ try {
   await assertCustomProperty(page, ".standalone-nav-fixture", "--foreground", "rgb(44, 55, 66)");
   await assertComputedStyle(page, ".standalone-nav-fixture .sb-nav-item", "minHeight", "22.5px");
   await assertCustomProperty(page, "#runtime-choice", "--background", "oklch(100% 0 0)");
-  await assertCustomProperty(page, "[data-shinyblocks-portal-root]", "--background", "oklch(100% 0 0)");
+  await assertCustomProperty(page, "#runtime-choice > [data-shinyblocks-portal-root]", "--background", "oklch(100% 0 0)");
 
   await page.fill("#nested", "from-browser");
   await assertText(page, "#nested_value", "from-browser");
@@ -492,8 +492,34 @@ try {
 
   await assertText(page, "#runtime_button_value", "0");
   await assertText(page, "#runtime_button_class", "shinyActionButtonValue,shiny.actionButton,integer");
-  await page.click("[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']");
+  const runtimeButton = "[data-sb-component='button'][data-sb-input-id='runtime_button'] [data-slot='button']";
+  assert.deepEqual(
+    await page.locator(runtimeButton).evaluate((node) => ({
+      type: node.type,
+      slot: node.dataset.slot,
+      title: node.title,
+      name: node.name,
+      ariaLabel: node.getAttribute("aria-label"),
+      customData: node.dataset.testButton,
+      width: node.style.width
+    })),
+    {
+      type: "button",
+      slot: "button",
+      title: "Runtime title",
+      name: "runtime-button-name",
+      ariaLabel: "Runtime button label",
+      customData: "preserved",
+      width: "100px"
+    },
+    "runtime-owned button attributes should win while safe passthrough attrs survive"
+  );
+  await page.click(runtimeButton);
   await assertText(page, "#runtime_button_value", "1");
+  await page.click("#resize_button");
+  await page.waitForFunction((selector) => document.querySelector(selector)?.style.width === "200px", runtimeButton);
+  await page.click("#clear_button_style");
+  await page.waitForFunction((selector) => document.querySelector(selector)?.style.width === "", runtimeButton);
   await page.click("#disable_button");
   await page.waitForFunction(() => {
     return document.querySelector(

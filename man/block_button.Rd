@@ -25,9 +25,10 @@ block_button(
 
 \item{icon_position}{Whether the icon appears before or after the label.}
 
-\item{...}{Additional attributes passed to \code{htmltools::tags$button}. Pass
+\item{...}{Additional attributes passed to the rendered button. Pass
 \code{id = "..."} here to make the button addressable via
-\code{\link[=update_block_button]{update_block_button()}}.}
+\code{\link[=update_block_button]{update_block_button()}}. Runtime-owned \code{type}, \code{data-slot}, variant/size,
+class, style, and disabled attributes cannot be overridden here.}
 
 \item{class}{Additional classes.}
 }

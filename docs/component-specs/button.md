@@ -39,7 +39,7 @@
 | `size` | One of `default`, `sm`, `lg`, `icon`. |
 | `icon` | Optional vendored icon name (validated against the icon manifest) or a custom `htmltools` tag. |
 | `icon_position` | `inline-start` (default) or `inline-end`. |
-| `...` | Additional HTML attributes. Recognized: `id` (enables the runtime binding), `disabled`, `style`, plus any extra HTML attrs passed through. |
+| `...` | Additional HTML attributes. Recognized: `id` (enables the runtime binding), `disabled`, `style`, plus safe passthrough attrs such as `title`, `name`, `aria-*`, and custom `data-*`. Runtime-owned behavior and styling hooks cannot be overridden. |
 | `class` | Extra classes merged onto the wrapper. |
 
 ### `update_block_button(session, id, ...)`
@@ -47,6 +47,11 @@
 Accepts `label`, `variant`, `size`, `icon`, `icon_position`, `disabled`,
 `style`, and `class`. Omitted arguments are preserved client-side.
 Passing `icon = NULL` or `style = NULL` explicitly clears those props.
+
+Passthrough attributes are applied before controlled runtime attributes.
+`type="button"`, `data-slot`, `data-variant`, `data-size`, required classes,
+inline style, and disabled state therefore remain runtime-owned; initial style
+can be replaced or cleared by `update_block_button()`.
 
 ## Runtime mapping
 
@@ -60,7 +65,7 @@ Passing `icon = NULL` or `style = NULL` explicitly clears those props.
 | `icon_position` | `props$iconPosition` | Applied to the runtime layout. |
 | `disabled` | `props$disabled` | Disables runtime + sets `aria-disabled`. |
 | `id` | mount id + receive-only binding | Required to receive `update_block_button()` messages. |
-| `style` | mount `style` | Normalised before serialisation. |
+| `style` | `props$style` | Normalised into the same controlled state channel used by the updater. |
 | `class` | `className` | Extra wrapper class. |
 
 ## Shiny state and update contract
