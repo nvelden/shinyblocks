@@ -635,11 +635,11 @@
     box-shadow: none;
   }
 
-  .sb-app .sb-input-group .shiny-input-container {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) .shiny-input-container {
     @apply mb-0 w-full min-w-0 flex-1;
   }
 
-  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
     @apply flex min-h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs;
     outline: none;
     transition:
@@ -647,11 +647,11 @@
       box-shadow 0.15s ease;
   }
 
-  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
     @apply rounded-none border-0 shadow-none;
   }
 
-  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus {
     outline: none;
     box-shadow: none;
   }
@@ -703,25 +703,25 @@
     @apply sr-only;
   }
 
-  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):disabled {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
 
-  .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
     border-color: var(--destructive);
     box-shadow:
       0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent),
       0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
-  [data-theme="dark"] .sb-app .sb-input-group :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
+  [data-theme="dark"] :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group) :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)[aria-invalid="true"] {
     box-shadow:
       0 0 0 3px color-mix(in oklch, var(--destructive) 40%, transparent),
       0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
-  .sb-app .sb-input-group:focus-within {
+  :is(.sb-app .sb-input-group, [data-shinyblocks-scope].sb-input-group):focus-within {
     border-color: var(--ring);
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
   }

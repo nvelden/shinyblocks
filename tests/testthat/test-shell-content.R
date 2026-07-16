@@ -75,9 +75,29 @@ test_that("card composition helpers render expected child markers", {
   # still be runtime mounts).
   expect_identical(tag_attr(card, "class"), "sb-card custom")
   expect_null(tag_attr(card, "data-shinyblocks-root"))
+  expect_identical(tag_attr(card, "data-shinyblocks-scope"), "")
   expect_null(tag_attr(card, "data-sb-component"))
   expect_identical(tag_attr(styled_card, "style"), "max-width: 20rem;")
   expect_identical(tag_attr(styled_card, "class"), "sb-card custom")
+})
+
+test_that("R-side composition primitives establish standalone token scopes", {
+  tags <- list(
+    block_card("Body"),
+    block_tabs(block_tab("One", "Panel")),
+    block_field("Field"),
+    block_input_group("Input"),
+    block_stack("Stack")
+  )
+
+  for (tag in tags) {
+    expect_identical(tag_attr(tag, "data-shinyblocks-scope"), "")
+    expect_null(tag_attr(tag, "data-shinyblocks-root"))
+  }
+
+  runtime <- block_button("Run")
+  expect_null(tag_attr(runtime, "data-shinyblocks-scope"))
+  expect_identical(tag_attr(runtime, "data-shinyblocks-root"), "")
 })
 
 test_that("card helper classes merge with user classes", {

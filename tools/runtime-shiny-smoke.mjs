@@ -81,6 +81,17 @@ try {
   await assertComputedStyle(page, "#portal-host-button", "boxSizing", "content-box");
   await assertComputedStyle(page, "#portal-host-button", "borderRadius", "17px");
   await assertCustomProperty(page, "#host-token-probe", "--background", "rgb(7, 8, 9)");
+  await assertCustomProperty(page, ".standalone-card-fixture", "--border", "rgb(11, 22, 33)");
+  await assertCustomProperty(page, ".standalone-tabs-fixture", "--foreground", "rgb(44, 55, 66)");
+  await assertComputedStyle(page, ".standalone-card-fixture", "borderTopColor", "rgb(11, 22, 33)");
+  await assertComputedStyle(page, ".standalone-card-fixture", "paddingTop", "22px");
+  await assertComputedStyle(page, ".standalone-tabs-fixture .sb-tabs-trigger:first-child", "color", "rgb(77, 88, 99)");
+  await assertComputedStyle(page, ".standalone-accordion-fixture .sb-accordion-item", "borderBottomColor", "rgb(11, 22, 33)");
+  await assertComputedStyle(page, ".standalone-breadcrumb-fixture .sb-breadcrumb-list", "color", "rgb(77, 88, 99)");
+  await assertCustomProperty(page, ".standalone-field-fixture", "--foreground", "rgb(44, 55, 66)");
+  await assertComputedStyle(page, ".standalone-input-group-fixture", "borderTopColor", "rgb(12, 23, 34)");
+  await assertCustomProperty(page, ".standalone-nav-fixture", "--foreground", "rgb(44, 55, 66)");
+  await assertComputedStyle(page, ".standalone-nav-fixture .sb-nav-item", "minHeight", "22.5px");
   await assertCustomProperty(page, "#runtime-choice", "--background", "oklch(100% 0 0)");
   await assertCustomProperty(page, "[data-shinyblocks-portal-root]", "--background", "oklch(100% 0 0)");
 

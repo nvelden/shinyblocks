@@ -145,6 +145,12 @@ test_that("block_style targets the profile selector and portal roots page-wide",
   css <- as.character(block_style("default", control_height = "2.5rem")$style)
 
   expect_match(css, '.sb-app[data-sb-style="default"]{', fixed = TRUE)
+  expect_match(
+    css,
+    '[data-shinyblocks-scope][data-sb-style="default"]{',
+    fixed = TRUE
+  )
+  expect_match(css, "[data-shinyblocks-scope],", fixed = TRUE)
   expect_match(css, "[data-shinyblocks-root],", fixed = TRUE)
   expect_match(css, "[data-shinyblocks-portal-root]{", fixed = TRUE)
 })
@@ -155,6 +161,7 @@ test_that("block_style confines overrides to scope when supplied", {
   )
 
   expect_match(css, ".demo{", fixed = TRUE)
+  expect_match(css, ".demo [data-shinyblocks-scope],", fixed = TRUE)
   expect_match(css, ".demo [data-shinyblocks-root],", fixed = TRUE)
   expect_match(css, ".demo [data-shinyblocks-portal-root]{", fixed = TRUE)
   expect_no_match(css, "data-sb-style", fixed = TRUE)

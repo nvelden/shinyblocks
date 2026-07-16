@@ -11,18 +11,20 @@
  *  - Token NAMES are part of shinyblocks's public theming contract.
  *    Renaming a token is a major-release change.
  *  - On upstream sync: copy the token VALUES fresh from shadcn upstream,
- *    bump the "Synced" line above. Keep the `.sb-app` / `[data-theme="dark"]
- *    .sb-app` selectors below (do not paste shadcn's `:root` / `.dark`
- *    selectors verbatim).
+ *    bump the "Synced" line above. Keep the package scope selectors below
+ *    (do not paste shadcn's `:root` / `.dark` selectors verbatim).
  *
- * Scoping: tokens are set on the `.sb-app` shell (not global `:root`) so
+ * Scoping: tokens are set on the `.sb-app` shell and package-owned standalone
+ * scopes (not global `:root`) so
  * shinyblocks can be embedded in a host page without colliding with another
  * shadcn-token consumer. Runtime component internals get the same tokens from
  * frontend/src/styles/runtime.css ([data-shinyblocks-root] /
- * [data-shinyblocks-portal-root]). See ADR 0022 (CSS isolation).
+ * [data-shinyblocks-portal-root]). Token drift is enforced by
+ * tools/theme/check-default-token-drift.mjs.
  */
 
-.sb-app {
+.sb-app,
+[data-shinyblocks-scope]:not(.sb-app [data-shinyblocks-scope]):not([data-shinyblocks-scope] [data-shinyblocks-scope]) {
   --radius: 0.625rem;
 
   --background: oklch(1 0 0);
@@ -111,7 +113,8 @@
   --sb-transition-duration: 0.15s;
 }
 
-[data-theme="dark"] .sb-app {
+[data-theme="dark"] .sb-app,
+[data-theme="dark"] [data-shinyblocks-scope]:not(.sb-app [data-shinyblocks-scope]):not([data-shinyblocks-scope] [data-shinyblocks-scope]) {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
 

@@ -31,7 +31,11 @@ shinyblocks_dependency <- function() {
   do.call(htmltools::htmlDependency, args)
 }
 
-attach_shinyblocks_deps <- function(tag) {
+attach_shinyblocks_deps <- function(tag, scope = TRUE) {
+  if (isTRUE(scope) && inherits(tag, "shiny.tag")) {
+    tag$attribs[["data-shinyblocks-scope"]] <- ""
+  }
+
   htmltools::attachDependencies(
     tag,
     shinyblocks_dependency(),

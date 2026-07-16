@@ -48,7 +48,7 @@ block_icon <- function(
     )
   }
 
-  attach_shinyblocks_deps(icon_tag)
+  attach_shinyblocks_deps(icon_tag, scope = FALSE)
 }
 
 validate_icon_name <- function(name) {

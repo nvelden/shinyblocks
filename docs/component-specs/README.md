@@ -19,6 +19,13 @@ contract, and any deliberate divergences. See
 The `test-doc-coverage.R` suite enforces that every exported
 `block_*()` has a written spec doc.
 
+R-side composition primitives establish a package-owned
+`[data-shinyblocks-scope]` on their emitted root. This supplies semantic and
+style-profile tokens when a primitive is embedded directly in a host layout
+such as `fluidPage()` or bslib, without applying `.sb-app` page-shell resets or
+styling host siblings. Composed child primitives inherit the nearest scope and
+also remain usable when rendered alone.
+
 For components already migrated into the Playwright parity harness,
 the committed computed-style baselines live separately under
 [`_parity/`](_parity/). Those JSON snapshots complement the written

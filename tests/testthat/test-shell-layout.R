@@ -26,8 +26,8 @@ test_that("block_page renders the shell landmarks", {
     perl = TRUE,
     info = "the mobile backdrop must paint before and therefore below the sidebar"
   )
-  expect_match(html, '<header class="sb-header">', fixed = TRUE)
-  expect_match(html, '<main class="sb-body">', fixed = TRUE)
+  expect_match(html, '<header class="sb-header"', fixed = TRUE)
+  expect_match(html, '<main class="sb-body"', fixed = TRUE)
   expect_match(html, 'data-shinyblocks-portal-root=""', fixed = TRUE)
   expect_match(
     html,
@@ -309,7 +309,7 @@ test_that("sidebar reuses a provided nav container instead of nesting nav landma
   )
   html <- render_html(sidebar)
 
-  expect_match(html, '<nav class="sb-nav sb-sidebar-nav">', fixed = TRUE)
+  expect_match(html, '<nav class="sb-nav sb-sidebar-nav"', fixed = TRUE)
   expect_false(grepl('<nav class="sb-sidebar-nav">\\s*<nav', html, perl = TRUE))
 })
 

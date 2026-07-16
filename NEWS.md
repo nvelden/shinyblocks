@@ -13,6 +13,7 @@
 
 ### Bug fixes
 
+* R-side composition components such as cards, tabs, accordions, breadcrumbs, fields, input groups, navigation, and layout primitives now establish an isolated standalone token scope, so their default theme and style-profile declarations work inside `fluidPage()`, bslib, and other host layouts without requiring `block_page()` or styling unrelated host markup (issue #110).
 * `block_date_picker()` and `block_date_range_picker()` now format `POSIXct`/`POSIXlt` values in the value's own timezone. Previously they routed through `as.Date()`, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).
 * `block_field_invalid()` now generates its error-message ids from an internal counter instead of `runif()`. Ids stay unique when the app seeds the RNG (previously two fields built after the same `set.seed()` shared an id, breaking `aria-describedby` wiring), and building UI no longer consumes from the user's RNG stream.
 * `update_block_*()` helpers no longer fail when called through a `...`-forwarding wrapper (`function(...) update_block_input(...)`), a common pattern in module helper code.

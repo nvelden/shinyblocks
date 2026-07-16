@@ -81,18 +81,29 @@ block_style <- function(profile = "default", ..., scope = NULL) {
       collapse = ""
     )
 
-    root <- scope %||% sprintf(".sb-app[data-sb-style=\"%s\"]", profile)
-    style_css <- paste0(
-      root, "{", decls, "}",
-      root, " [data-shinyblocks-root],",
-      root, " [data-shinyblocks-portal-root]{", decls, "}"
-    )
+    roots <- if (is.null(scope)) {
+      c(
+        sprintf(".sb-app[data-sb-style=\"%s\"]", profile),
+        sprintf("[data-shinyblocks-scope][data-sb-style=\"%s\"]", profile)
+      )
+    } else {
+      scope
+    }
+    style_css <- paste(vapply(roots, function(root) {
+      paste0(
+        root, "{", decls, "}",
+        root, " [data-shinyblocks-scope],",
+        root, " [data-shinyblocks-root],",
+        root, " [data-shinyblocks-portal-root]{", decls, "}"
+      )
+    }, character(1)), collapse = "")
 
     style_tag <- attach_shinyblocks_deps(
       htmltools::tags$style(
         class = "sb-style-overrides",
         htmltools::HTML(style_css)
-      )
+      ),
+      scope = FALSE
     )
   }
 

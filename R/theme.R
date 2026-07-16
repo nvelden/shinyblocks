@@ -2,8 +2,8 @@
 #'
 #' Emits a scoped `<style>` block that selects and overrides shadcn token
 #' variables.
-#' By default the overrides apply to the whole page (every `.sb-app` and
-#' runtime root). Pass `scope` to confine the overrides to a single
+#' By default the overrides apply to every `.sb-app`, standalone shinyblocks
+#' scope, and runtime root. Pass `scope` to confine the overrides to a single
 #' subtree, which is essential when several differently-themed regions
 #' share one page (for example a component gallery) so a local override
 #' does not leak into the rest of the app.
@@ -77,13 +77,20 @@ block_theme <- function(..., preset = NULL, scope = NULL, dark = NULL) {
     )
   }
 
-  root <- if (is.null(scope)) ".sb-app" else scope
+  roots <- if (is.null(scope)) {
+    c(".sb-app", "[data-shinyblocks-scope]")
+  } else {
+    scope
+  }
   rules <- function(prefix, decls) {
-    paste0(
-      prefix, root, "{", decls, "}",
-      prefix, root, " [data-shinyblocks-root],",
-      prefix, root, " [data-shinyblocks-portal-root]{", decls, "}"
-    )
+    paste(vapply(roots, function(root) {
+      paste0(
+        prefix, root, "{", decls, "}",
+        prefix, root, " [data-shinyblocks-scope],",
+        prefix, root, " [data-shinyblocks-root],",
+        prefix, root, " [data-shinyblocks-portal-root]{", decls, "}"
+      )
+    }, character(1)), collapse = "")
   }
 
   light_values <- overrides
@@ -107,7 +114,8 @@ block_theme <- function(..., preset = NULL, scope = NULL, dark = NULL) {
     htmltools::tags$style(
       class = "sb-theme-overrides",
       htmltools::HTML(theme_css)
-    )
+    ),
+    scope = FALSE
   )
 }
 

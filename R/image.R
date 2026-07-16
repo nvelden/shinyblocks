@@ -80,7 +80,9 @@ output_frame <- function(output_tag, kind, width, aspect, fit, border, rounded,
       if (!is.null(caption)) {
         htmltools::tags$figcaption(class = "sb-output-caption", caption)
       }
-    )
+    ),
+    # Output-frame standalone behavior is implemented and verified in #111.
+    scope = FALSE
   )
 }
 

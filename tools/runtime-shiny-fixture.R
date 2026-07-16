@@ -137,6 +137,56 @@ ui <- shiny::fluidPage(
       "Portal host button"
     )
   ),
+  block_theme(
+    border = "rgb(11, 22, 33)",
+    input = "rgb(12, 23, 34)",
+    foreground = "rgb(44, 55, 66)",
+    `muted-foreground` = "rgb(77, 88, 99)",
+    scope = "#standalone-themed"
+  ),
+  block_style(
+    "default",
+    surface_padding = "22px",
+    scope = "#standalone-themed"
+  )$style,
+  shiny::tags$section(
+    id = "standalone-themed",
+    block_card(
+      title = "Standalone card",
+      description = "Hosted by fluidPage",
+      class = "standalone-card-fixture"
+    ),
+    block_tabs(
+      block_tab("One", "First panel"),
+      block_tab("Two", "Second panel"),
+      id = "standalone_tabs",
+      class = "standalone-tabs-fixture"
+    ),
+    block_accordion(
+      block_accordion_item("one", "One", "First accordion panel"),
+      id = "standalone_accordion",
+      class = "standalone-accordion-fixture"
+    ),
+    block_breadcrumb(
+      block_breadcrumb_item("Home", href = "#"),
+      block_breadcrumb_item("Current", current = TRUE),
+      class = "standalone-breadcrumb-fixture"
+    ),
+    block_field(
+      block_field_label("Name"),
+      shiny::textInput("standalone_name", NULL),
+      class = "standalone-field-fixture"
+    ),
+    block_input_group(
+      block_input_group_addon("$"),
+      shiny::textInput("standalone_amount", NULL),
+      class = "standalone-input-group-fixture"
+    ),
+    block_nav(
+      block_nav_item("Overview", selected = TRUE),
+      class = "standalone-nav-fixture"
+    )
+  ),
   runtime$runtime_component(
     component = "fixture", .validate = FALSE,
     input_id = "choice",

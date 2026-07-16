@@ -86,7 +86,8 @@ runtime_component <- function(
       ),
       htmltools::tags$div(`data-shinyblocks-react` = ""),
       htmltools::tags$div(`data-shinyblocks-children` = "", children)
-    )
+    ),
+    scope = FALSE
   )
 }
 
