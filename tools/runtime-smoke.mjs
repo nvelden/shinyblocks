@@ -234,9 +234,9 @@ try {
   });
 
   assert.equal(
-    await page.locator("[data-shinyblocks-portal-root]").count(),
-    1,
-    "portal root should be created"
+    await page.locator("[data-shinyblocks-runtime='true'] > [data-shinyblocks-portal-root]").count(),
+    await page.locator("[data-shinyblocks-runtime='true']").count(),
+    "each runtime mount should own one direct portal root"
   );
 
   assert.deepEqual(
@@ -279,6 +279,13 @@ try {
   );
   await page.locator("#runtime-select [data-slot='select-trigger']").click();
   await page.waitForSelector("[data-slot='select-content'][data-state='open']");
+  assert.equal(
+    await page.locator("[data-slot='select-content'][data-state='open']").evaluate((node) => {
+      return node.closest("[data-shinyblocks-runtime='true']")?.id;
+    }),
+    "runtime-select",
+    "select content should portal into its originating runtime mount"
+  );
   const selectPosition = await page.locator("[data-slot='select-content'][data-state='open']").evaluate((node) => {
     const rect = node.getBoundingClientRect();
     return {
@@ -665,6 +672,13 @@ try {
 
   await page.locator(dialogTrigger).click();
   await page.waitForSelector(dialogContent);
+  assert.equal(
+    await page.locator(dialogContent).evaluate((node) => {
+      return node.closest("[data-shinyblocks-runtime='true']")?.id;
+    }),
+    "runtime-dialog",
+    "dialog content should portal into its originating runtime mount"
+  );
   assert.deepEqual(
     await page.locator(dialogContent).evaluate((node) => ({
       role: node.getAttribute("role"),
@@ -777,6 +791,11 @@ try {
   await page.waitForFunction(() => {
     return document.querySelector("#inserted")?.dataset.sbMounted === "true";
   });
+  assert.equal(
+    await page.locator("#inserted > [data-shinyblocks-portal-root]").count(),
+    1,
+    "dynamically inserted mounts should own a local portal"
+  );
 
   await page.locator("#root").evaluate((node) => node.remove());
   await page.waitForFunction(() => !document.querySelector("#root"));

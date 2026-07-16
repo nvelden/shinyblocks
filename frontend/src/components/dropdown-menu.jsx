@@ -242,7 +242,7 @@ export function DropdownMenu({ payload, root }) {
   }
 
   itemRefs.current = [];
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
   const triggerVariantClass = `sb-button-${triggerVariant}`;
 
   return (

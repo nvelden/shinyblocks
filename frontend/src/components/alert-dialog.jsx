@@ -166,7 +166,7 @@ export function AlertDialog({ payload, root }) {
             </div>
           </div>
         </div>,
-        ensurePortalRoot()
+        ensurePortalRoot(root)
       )}
     </>
   );

@@ -127,7 +127,7 @@ function mountRoot(root) {
     ariaDescribedby: root.getAttribute("aria-describedby")
   };
 
-  ensurePortalRoot();
+  ensurePortalRoot(root);
   const reactRoot = renderReactMount(root, payload);
 
   root.dataset.sbMounted = "true";

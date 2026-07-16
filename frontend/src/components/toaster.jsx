@@ -115,7 +115,7 @@ export function Toaster({ payload, root }) {
     };
   }, [root]);
 
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
   if (toasts.length === 0) return null;
 
   return createPortal(

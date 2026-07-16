@@ -37,7 +37,8 @@ overrides on top of it. A \emph{style profile} controls visual feel — control
 sizing, spacing, surface and overlay metrics, elevation, focus and disabled
 treatment, and motion — through a curated set of \verb{--sb-*} custom properties.
 This is separate from \code{\link[=block_theme]{block_theme()}}, which owns semantic light/dark
-\strong{colour} tokens.
+\strong{colour} tokens. Portaled overlays stay inside their originating runtime
+root and therefore retain scoped profile overrides.
 }
 \details{
 Pass the result to \code{\link[=block_page]{block_page()}} via its \code{style} argument. The profile is

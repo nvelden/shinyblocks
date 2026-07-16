@@ -138,7 +138,7 @@ export function DatePicker({ payload, root }) {
   }, [root]);
 
   const triggerLabel = value ? formatLabel(value, format) : (placeholder || "Pick a date");
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
 
   // Per-day selection / today markers for the shared calendar grid.
   function dayProps(iso) {

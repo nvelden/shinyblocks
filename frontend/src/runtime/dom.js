@@ -23,13 +23,16 @@ export function currentValue(payload) {
   return payload.state.value;
 }
 
-export function ensurePortalRoot() {
-  let portal = document.querySelector("[data-shinyblocks-portal-root]");
+export function ensurePortalRoot(originRoot) {
+  const owner = originRoot || document.body;
+  let portal = Array.from(owner.children || []).find((child) => {
+    return child.hasAttribute?.("data-shinyblocks-portal-root");
+  });
   if (portal) return portal;
 
   portal = document.createElement("div");
   portal.setAttribute("data-shinyblocks-portal-root", "");
-  document.body.appendChild(portal);
+  owner.appendChild(portal);
   return portal;
 }
 

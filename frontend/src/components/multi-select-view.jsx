@@ -322,7 +322,7 @@ export function MultiSelectView({ payload, root }) {
   const highlightedId = highlighted >= 0 ? `${inputId}-item-${highlighted}` : undefined;
   const selectedChoices = choices.filter((choice) => value.includes(choice.value));
   const showPlaceholder = selectedChoices.length === 0;
-  const portal = open ? ensurePortalRoot() : null;
+  const portal = open ? ensurePortalRoot(root) : null;
 
   return (
     <div

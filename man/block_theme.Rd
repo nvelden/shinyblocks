@@ -27,11 +27,12 @@ An \code{htmltools} tag.
 \description{
 Emits a scoped \verb{<style>} block that selects and overrides shadcn token
 variables.
-By default the overrides apply to the whole page (every \code{.sb-app} and
-runtime root). Pass \code{scope} to confine the overrides to a single
+By default the overrides apply to every \code{.sb-app}, standalone shinyblocks
+scope, and runtime root. Pass \code{scope} to confine the overrides to a single
 subtree, which is essential when several differently-themed regions
 share one page (for example a component gallery) so a local override
-does not leak into the rest of the app.
+does not leak into the rest of the app. Portaled overlays are mounted inside
+their originating runtime root, so they retain the same scoped overrides.
 }
 \details{
 Like shadcn, tokens have separate light and dark values. The \code{...}

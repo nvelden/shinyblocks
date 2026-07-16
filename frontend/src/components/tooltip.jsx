@@ -7,7 +7,7 @@ import {
 } from "../runtime/overlays.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
 
-export function Tooltip({ payload }) {
+export function Tooltip({ payload, root }) {
   const props = payload.props || {};
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -71,7 +71,7 @@ export function Tooltip({ payload }) {
     };
   }, [open]);
 
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
 
   return (
     <>

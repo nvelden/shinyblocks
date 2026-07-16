@@ -5,7 +5,8 @@
 #' sizing, spacing, surface and overlay metrics, elevation, focus and disabled
 #' treatment, and motion — through a curated set of `--sb-*` custom properties.
 #' This is separate from [block_theme()], which owns semantic light/dark
-#' **colour** tokens.
+#' **colour** tokens. Portaled overlays stay inside their originating runtime
+#' root and therefore retain scoped profile overrides.
 #'
 #' Pass the result to [block_page()] via its `style` argument. The profile is
 #' applied page-wide: `block_page()` places `data-sb-style="<profile>"` on the

@@ -6,7 +6,8 @@
 #' scope, and runtime root. Pass `scope` to confine the overrides to a single
 #' subtree, which is essential when several differently-themed regions
 #' share one page (for example a component gallery) so a local override
-#' does not leak into the rest of the app.
+#' does not leak into the rest of the app. Portaled overlays are mounted inside
+#' their originating runtime root, so they retain the same scoped overrides.
 #'
 #' Like shadcn, tokens have separate light and dark values. The `...`
 #' overrides apply to **both** light and dark mode. Pass `dark` to set

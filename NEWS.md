@@ -13,6 +13,7 @@
 
 ### Bug fixes
 
+* Portaled components now render into a portal owned by their originating runtime mount instead of the first document-global portal. Selects, comboboxes, dialogs, popovers, tooltips, menus, date pickers, and toasters therefore retain the correct scoped theme/style in multi-region dashboards, and dynamic mount removal removes its portal automatically (issue #112).
 * `block_image_output()` and `block_plot_output()` now apply aspect ratio, fit, border, radius, caption, and fill sizing when embedded directly in `fluidPage()`, bslib, or another host layout; their CSS is rooted narrowly at `.sb-output-frame` and does not target unrelated Shiny outputs (issue #111).
 * R-side composition components such as cards, tabs, accordions, breadcrumbs, fields, input groups, navigation, and layout primitives now establish an isolated standalone token scope, so their default theme and style-profile declarations work inside `fluidPage()`, bslib, and other host layouts without requiring `block_page()` or styling unrelated host markup (issue #110).
 * `block_date_picker()` and `block_date_range_picker()` now format `POSIXct`/`POSIXlt` values in the value's own timezone. Previously they routed through `as.Date()`, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).

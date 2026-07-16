@@ -152,7 +152,7 @@ export function Dialog({ payload, root }) {
     };
   }, [open]);
 
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
 
   return (
     <>

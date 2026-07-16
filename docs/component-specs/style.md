@@ -40,7 +40,7 @@ are emitted as `--sb-*` custom properties.
 
 Returns a `shinyblocks_style` object. Pass it to `block_page(style = )`, which
 places `data-sb-style="<profile>"` on `.sb-app` and injects the override
-`<style>`. Because the portal root sits inside `.sb-app`, profile tokens reach
+`<style>`. Because each portal root sits inside its originating runtime mount, profile tokens reach
 dialog, popover, tooltip, and select portal content.
 
 Unknown profile names, unnamed overrides, unknown override names, raw `--sb-*`

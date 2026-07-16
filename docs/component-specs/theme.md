@@ -15,7 +15,7 @@
   pack before applying any explicit token overrides.
 - **overridden** — supplied token values replace the vendored defaults
   for every component inside the page shell, including runtime portal
-  content (because the portal root sits inside `.sb-app`).
+  content (each portal root sits inside its originating runtime mount).
 - **scoped** — `scope =` confines emitted light and dark selectors to
   one subtree and its runtime roots.
 - **server-updated mode** — `update_block_theme()` sends a Shiny

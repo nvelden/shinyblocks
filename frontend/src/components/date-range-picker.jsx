@@ -244,7 +244,7 @@ export function DateRangePicker({ payload, root }) {
   const triggerLabel = hasRange
     ? `${formatLabel(start, format)}${separator}${formatLabel(end, format)}`
     : (placeholder || "Pick a date range");
-  const portal = ensurePortalRoot();
+  const portal = ensurePortalRoot(root);
 
   return (
     <div

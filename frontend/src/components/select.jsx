@@ -226,7 +226,7 @@ function SingleSelectView({ payload, root }) {
   const contentId = `${inputId}-content`;
   const highlightedId = highlighted >= 0 ? `${inputId}-item-${highlighted}` : undefined;
   const triggerLabel = labelForCurrentValue();
-  const portal = open ? ensurePortalRoot() : null;
+  const portal = open ? ensurePortalRoot(root) : null;
 
   return (
     <div
