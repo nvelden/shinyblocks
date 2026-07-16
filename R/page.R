@@ -112,9 +112,10 @@ block_body <- function(..., class = NULL) {
 
 # Minimal host-document reset for the page-owning entry point.
 #
-# The Tailwind Preflight reset is scoped to `.sb-app` so it never touches a
-# host page (ADR 0022). `block_page()` is the explicit "shinyblocks owns the
-# page" entry point, so it may reset the document `<body>` margin that the
+# The generated ownership reset targets only `.sb-app` and `sb-*` elements, so
+# host-package content slots keep their own base styles. `block_page()` is the
+# explicit "shinyblocks owns the page" entry point, so it may still reset the
+# document `<body>` margin that the
 # UA adds (and that the global Preflight used to zero) — without this the
 # `.sb-app` shell renders with an 8px gutter around it. Components used
 # standalone inside a host app do not emit this, so the host keeps its own

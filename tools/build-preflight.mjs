@@ -1,132 +1,88 @@
-// Generate a `.sb-app`-scoped copy of Tailwind's Preflight reset.
+// Generate the minimal reset required by shinyblocks-owned shell elements.
 //
-// shinyblocks ships compiled CSS that must be embeddable inside an existing
-// Shiny/bslib page without resetting the host document. Tailwind's bundled
-// Preflight (pulled in by `@import "tailwindcss"`) targets `*`, `html`,
-// headings, lists, images, form controls, `[hidden]`, etc. document-wide. This
-// script reads the upstream Preflight verbatim and rewrites every selector so
-// it only applies under `.sb-app`, then writes the result to
-// `inst/www/src/preflight.scoped.css`, which `inst/www/src/shinyblocks.css`
-// imports into `@layer base` instead of the global bundle.
-//
-// Run via `make build-css` (chained before the Tailwind compile) or directly:
-//   node tools/build-preflight.mjs
-//
-// Re-run on every Tailwind upgrade so the scoped reset stays in sync with the
-// installed version. See ADR 0022 (CSS isolation).
+// Tailwind Preflight cannot be scoped safely with a descendant prefix: a rule
+// such as `.sb-app button` still rewrites a host-package button placed in a
+// shinyblocks content slot. Instead, this generator emits an ownership reset
+// only for the `.sb-app` root and elements carrying an `sb-*` class. Runtime
+// components own their reset in `frontend/src/styles/runtime/`.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const SRC = resolve(root, "node_modules/tailwindcss/preflight.css");
 const OUT = resolve(root, "inst/www/src/preflight.scoped.css");
 const PKG = resolve(root, "node_modules/tailwindcss/package.json");
-const SCOPE = ".sb-app";
-
-function stripComments(css) {
-  return css.replace(/\/\*[\s\S]*?\*\//g, "");
-}
-
-// Split a selector list on top-level commas only (commas inside :where(),
-// :is(), [attr], etc. stay with their selector).
-function splitSelectorList(list) {
-  const parts = [];
-  let depth = 0;
-  let cur = "";
-  for (const ch of list) {
-    if (ch === "(" || ch === "[") depth++;
-    else if (ch === ")" || ch === "]") depth--;
-    if (ch === "," && depth === 0) {
-      parts.push(cur);
-      cur = "";
-    } else {
-      cur += ch;
-    }
-  }
-  if (cur.trim()) parts.push(cur);
-  return parts.map((s) => s.trim()).filter(Boolean);
-}
-
-// Scope one selector list under `.sb-app`.
-//   html / :host  -> the .sb-app root itself
-//   *             -> .sb-app and every descendant
-//   anything else -> descendant of .sb-app
-function scopeSelectorList(list) {
-  const out = [];
-  for (const sel of splitSelectorList(list)) {
-    if (sel === "html" || sel === ":host") {
-      out.push(SCOPE);
-    } else if (sel === "*") {
-      out.push(SCOPE);
-      out.push(`${SCOPE} *`);
-    } else {
-      out.push(`${SCOPE} ${sel}`);
-    }
-  }
-  return [...new Set(out)].join(",\n");
-}
-
-// Parse top-level rules: { prelude, body } where body keeps its outer braces.
-function parseRules(css) {
-  const rules = [];
-  let i = 0;
-  const n = css.length;
-  while (i < n) {
-    while (i < n && /\s/.test(css[i])) i++;
-    if (i >= n) break;
-    let prelude = "";
-    while (i < n && css[i] !== "{") {
-      prelude += css[i];
-      i++;
-    }
-    if (i >= n) break;
-    let depth = 0;
-    let body = "";
-    do {
-      const ch = css[i];
-      if (ch === "{") depth++;
-      else if (ch === "}") depth--;
-      body += ch;
-      i++;
-    } while (i < n && depth > 0);
-    rules.push({ prelude: prelude.replace(/\s+/g, " ").trim(), body });
-  }
-  return rules;
-}
-
-function transform(css) {
-  const rules = parseRules(stripComments(css));
-  const out = [];
-  for (const { prelude, body } of rules) {
-    if (prelude.startsWith("@")) {
-      // Conditional group rule (e.g. @supports): keep the prelude, scope the
-      // selectors of the rules nested one level inside.
-      const inner = body.slice(1, -1);
-      const innerRules = parseRules(inner)
-        .map((r) => `  ${scopeSelectorList(r.prelude)} ${r.body}`)
-        .join("\n");
-      out.push(`${prelude} {\n${innerRules}\n}`);
-    } else {
-      out.push(`${scopeSelectorList(prelude)} ${body}`);
-    }
-  }
-  return out.join("\n\n");
-}
-
 const version = JSON.parse(readFileSync(PKG, "utf8")).version;
-const header = `/*
+
+const owned = [
+  ".sb-app",
+  ":where(.sb-app, [data-shinyblocks-scope]) :where([class^='sb-'], [class*=' sb-'])",
+  "[data-shinyblocks-scope]:where([class^='sb-'], [class*=' sb-'])"
+].join(",\n");
+
+const ownedDescendants = [
+  ":where(.sb-app, [data-shinyblocks-scope]) :where([class^='sb-'], [class*=' sb-'])",
+  "[data-shinyblocks-scope]:where([class^='sb-'], [class*=' sb-'])"
+];
+const ownedDescendant = ownedDescendants.join(",\n");
+const withSuffix = (suffix) => ownedDescendants.map((selector) => `${selector}${suffix}`).join(",\n");
+
+const css = `/*
  * GENERATED FILE — do not edit by hand.
  *
- * Tailwind Preflight (\`node_modules/tailwindcss/preflight.css\`, v${version}),
- * with every selector scoped under \`${SCOPE}\` so the reset never leaks into a
- * host page. Imported into \`@layer base\` by inst/www/src/shinyblocks.css.
- *
- * Regenerate with \`node tools/build-preflight.mjs\` (chained into
- * \`make build-css\`). Re-run on every Tailwind upgrade. See ADR 0022.
+ * Minimal ownership reset for Tailwind v${version}. Unlike Tailwind Preflight,
+ * this targets only the .sb-app root and elements with shinyblocks-owned sb-*
+ * classes. Host-package descendants and content-slot markup are untouched.
+ * Regenerate with node tools/build-preflight.mjs.
  */
+
+${owned} {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+${withSuffix("::before")},
+${withSuffix("::after")} {
+  box-sizing: border-box;
+  border: 0 solid;
+}
+
+.sb-app {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+  font-family: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-tap-highlight-color: transparent;
+}
+
+${withSuffix(":is(button, input, select, optgroup, textarea)")} {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+${withSuffix(":is(button, input[type='button'], input[type='reset'], input[type='submit'])")} {
+  appearance: button;
+}
+
+${withSuffix(":is(img, svg, video, canvas)")} {
+  display: block;
+  vertical-align: middle;
+}
+
+${withSuffix(":is(img, video)")} {
+  max-width: 100%;
+  height: auto;
+}
+
+${withSuffix("[hidden]:not([hidden='until-found'])")} {
+  display: none !important;
+}
 `;
 
-writeFileSync(OUT, `${header}\n${transform(readFileSync(SRC, "utf8"))}\n`);
-console.log(`Wrote ${OUT} (scoped Preflight from Tailwind v${version}).`);
+writeFileSync(OUT, css);
+console.log(`Wrote ${OUT} (ownership-scoped reset for Tailwind v${version}).`);

@@ -40,6 +40,16 @@ hooks are reserved for package shell layout and must not become
 dependencies for runtime-rendered component visuals. The shell
 stylesheet guardrail enforces this contract.
 
+## Host-package isolation
+
+The generated base reset targets the `.sb-app` root and elements that carry a
+shinyblocks-owned `sb-*` class. It does not reset arbitrary descendants by
+element name. Native Shiny controls, bslib content, htmlwidgets, and other
+foreign markup placed in cards, tabs, accordions, dialogs, or layout slots keep
+their own typography, spacing, borders, media display, and focus treatment.
+Standalone shinyblocks components use the same ownership markers and do not
+establish a reset over surrounding host markup.
+
 ## Accessibility
 
 - `block_body()` is a `<main>` landmark; one per page.

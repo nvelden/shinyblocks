@@ -16,6 +16,14 @@ package_source_css <- function() {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
+preflight_source_css <- function() {
+  path <- testthat::test_path("..", "..", "inst", "www", "src", "preflight.scoped.css")
+  if (!file.exists(path)) {
+    testthat::skip("Preflight source is repo-only and not present in R CMD check build")
+  }
+  paste(readLines(path, warn = FALSE), collapse = "\n")
+}
+
 shell_token_source_css <- function() {
   path <- testthat::test_path("..", "..", "inst", "www", "src", "tokens.css")
   if (!file.exists(path)) {
@@ -333,6 +341,22 @@ test_that("runtime CSS does not reset all runtime children", {
   expect_no_match(css, "[data-shinyblocks-root] *", fixed = TRUE)
   expect_no_match(css, "*::before", fixed = TRUE)
   expect_no_match(css, "*::after", fixed = TRUE)
+})
+
+test_that("shell reset targets owned classes instead of host descendants", {
+  preflight <- preflight_source_css()
+  shell <- package_source_css()
+
+  expect_match(preflight, "[class^='sb-']", fixed = TRUE)
+  expect_no_match(preflight, ".sb-app *", fixed = TRUE)
+  expect_no_match(preflight, ".sb-app h1", fixed = TRUE)
+  expect_no_match(preflight, ".sb-app button", fixed = TRUE)
+  expect_no_match(preflight, ".sb-app img", fixed = TRUE)
+  expect_no_match(
+    shell,
+    ".sb-app :where(input, select, textarea, button, a):focus",
+    fixed = TRUE
+  )
 })
 
 test_that("runtime tokens are scoped to runtime and portal roots", {

@@ -13,6 +13,7 @@
 
 ### Bug fixes
 
+* `block_page()` no longer applies Tailwind Preflight or `!important` focus overrides to every descendant. The generated reset now targets only the app root and shinyblocks-owned `sb-*` elements, so native Shiny controls, bslib content, and htmlwidgets retain host typography, spacing, borders, media display, and focus treatment in content slots (issue #116).
 * Alert-dialog focus trapping now uses the same live focusable-element utility as dialog. Native and dynamically rendered inputs, selects, and textareas participate in both tab directions, while disabled, hidden, inert, `aria-hidden`, and negative-tabindex controls are skipped (issue #115).
 * `block_button()` now keeps constructor style in the same controlled channel as `update_block_button()`, so initial style can be replaced or cleared. Runtime-owned button attributes win over passthrough collisions while `title`, `name`, ARIA, and custom data attributes remain supported (issue #114).
 * Dialogs and alert dialogs now share a LIFO modal manager. In mixed or nested modal stacks, only the top modal handles Escape and traps focus, body scrolling stays locked until the final modal closes, layers follow stack order, and dynamic UI removal safely releases its modal entry (issue #113).
