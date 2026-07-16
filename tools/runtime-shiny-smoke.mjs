@@ -362,7 +362,9 @@ try {
     return document.querySelector("#runtime_slider")?.disabled === false &&
       document.querySelector("[data-sb-component='slider'] [data-slot='slider-thumb']")?.disabled === false;
   });
-  const sliderThumb = await page.locator("[data-sb-component='slider'] [data-slot='slider-thumb']").boundingBox();
+  const sliderThumbLocator = page.locator("[data-sb-component='slider'] [data-slot='slider-thumb']");
+  await sliderThumbLocator.scrollIntoViewIfNeeded();
+  const sliderThumb = await sliderThumbLocator.boundingBox();
   const sliderTrack = await page.locator("[data-sb-component='slider'] [data-slot='slider-track']").boundingBox();
   assert(sliderThumb, "runtime slider thumb should be measurable");
   assert(sliderTrack, "runtime slider track should be measurable");
@@ -1465,9 +1467,9 @@ try {
   await assertText(page, "#inserted_value", "y");
 
   assert.equal(
-    await page.locator("[data-shinyblocks-portal-root]").count(),
-    1,
-    "page should include one portal root"
+    await page.locator("[data-shinyblocks-runtime='true'] > [data-shinyblocks-portal-root]").count(),
+    await page.locator("[data-shinyblocks-runtime='true']").count(),
+    "each runtime root should include one scoped portal root"
   );
 
   // Alert dialog: explicit outcomes, alertdialog semantics, no scrim dismiss,
