@@ -1,23 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
+import { focusableElements } from "../runtime/focus.js";
+import { registerModal } from "../runtime/modal-manager.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
-
-const FOCUSABLE_SELECTOR = [
-  "a[href]",
-  "button:not([disabled])",
-  "textarea:not([disabled])",
-  "input:not([disabled]):not([type='hidden'])",
-  "select:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])"
-].join(",");
-
-function focusableChildren(container) {
-  if (!container) return [];
-  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
-    (el) => !el.hasAttribute("aria-hidden") && el.offsetParent !== null
-  );
-}
 
 export function Dialog({ payload, root }) {
   const props = payload.props || {};
@@ -96,59 +82,18 @@ export function Dialog({ payload, root }) {
   useEffect(() => {
     if (!open) return undefined;
 
-    const previousOverflow = document.body.style.overflow;
-    const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
-
-    const focusables = focusableChildren(contentRef.current);
+    const focusables = focusableElements(contentRef.current);
     const initial = focusables[0] || contentRef.current;
     initial && initial.focus({ preventScroll: true });
-
-    function onKeyDown(event) {
-      if (event.key === "Escape") {
-        event.stopPropagation();
-        setOpen(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const items = focusableChildren(contentRef.current);
-      if (items.length === 0) {
-        event.preventDefault();
-        contentRef.current && contentRef.current.focus();
-        return;
-      }
-
-      const first = items[0];
-      const last = items[items.length - 1];
-      const active = document.activeElement;
-
-      if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-
+    const unregister = registerModal({
+      container: () => contentRef.current,
+      layer: () => contentRef.current?.parentElement,
+      dismiss: () => setOpen(false),
+      returnFocus: returnFocusRef.current
+    });
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = previousPaddingRight;
-
-      const target = returnFocusRef.current;
+      unregister();
       returnFocusRef.current = null;
-      if (target && typeof target.focus === "function") {
-        requestAnimationFrame(() => target.focus({ preventScroll: true }));
-      }
     };
   }, [open]);
 

@@ -159,6 +159,38 @@ const dialogPayload = JSON.stringify({
   className: null
 });
 
+const secondDialogPayload = JSON.stringify({
+  ...JSON.parse(dialogPayload),
+  id: "runtime_dialog_two",
+  props: {
+    ...JSON.parse(dialogPayload).props,
+    titleHtml: "Second runtime dialog",
+    bodyHtml: "<input id='dialog-two-first' type='text' />",
+    triggerLabel: "Open second dialog"
+  }
+});
+
+const alertDialogPayload = JSON.stringify({
+  schemaVersion: 1,
+  component: "alert-dialog",
+  id: "runtime_alert_dialog",
+  props: {
+    titleHtml: "Confirm action",
+    descriptionHtml: "Stacked alert dialog",
+    bodyHtml: "<input id='alert-dialog-input' type='text' />",
+    confirmLabel: "Continue",
+    cancelLabel: "Cancel",
+    confirmVariant: "default",
+    triggerLabel: "Open alert dialog",
+    size: "default"
+  },
+  slots: {},
+  children: [],
+  state: { value: null, open: false },
+  binding: { input: true },
+  className: null
+});
+
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 220 } });
 
@@ -221,6 +253,16 @@ try {
         </div>
         <div id="runtime-dialog" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="dialog" data-sb-input-id="runtime_dialog">
           <script type="application/json" data-shinyblocks-payload>${dialogPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
+        </div>
+        <div id="runtime-dialog-two" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="dialog" data-sb-input-id="runtime_dialog_two">
+          <script type="application/json" data-shinyblocks-payload>${secondDialogPayload}</script>
+          <div data-shinyblocks-react></div>
+          <div data-shinyblocks-children></div>
+        </div>
+        <div id="runtime-alert-dialog" data-shinyblocks-root data-shinyblocks-runtime="true" data-sb-component="alert-dialog" data-sb-input-id="runtime_alert_dialog">
+          <script type="application/json" data-shinyblocks-payload>${alertDialogPayload}</script>
           <div data-shinyblocks-react></div>
           <div data-shinyblocks-children></div>
         </div>
@@ -777,6 +819,64 @@ try {
     await bodyOverflow(),
     "",
     "server-driven close should restore body scroll"
+  );
+
+  // The shared modal manager coordinates mixed modal stacks. Only the top
+  // modal handles Escape/Tab, lower removal cannot unlock the body, and an
+  // unmounted modal releases its entry without moving focus behind the stack.
+  await page.locator("#runtime-dialog").evaluate((node) =>
+    node.__sbDialogReceive({ open: true })
+  );
+  await page.waitForFunction(() => document.activeElement?.id === "dialog-first");
+  await page.locator("#runtime-dialog-two").evaluate((node) =>
+    node.__sbDialogReceive({ open: true })
+  );
+  await page.waitForSelector("#runtime-dialog-two [data-slot='dialog-content']");
+  await page.waitForFunction(() => document.activeElement?.id === "dialog-two-first");
+  assert.equal(await activeElementId(), "dialog-two-first", "the top dialog should own focus");
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("#runtime-dialog-two [data-slot='dialog-content']", { state: "detached" });
+  assert.equal(
+    await page.locator("#runtime-dialog [data-slot='dialog-content']").count(),
+    1,
+    "one Escape should close only the top dialog"
+  );
+  assert.equal(await bodyOverflow(), "hidden", "closing the top dialog should keep the body locked");
+
+  await page.locator("#runtime-dialog-two").evaluate((node) =>
+    node.__sbDialogReceive({ open: true })
+  );
+  await page.locator("#runtime-alert-dialog").evaluate((node) =>
+    node.__sbAlertDialogReceive({ open: true })
+  );
+  await page.waitForSelector("#runtime-alert-dialog [data-slot='alert-dialog-content']");
+  await page.locator("#runtime-dialog-two").evaluate((node) =>
+    node.__sbDialogReceive({ open: false })
+  );
+  assert.equal(await bodyOverflow(), "hidden", "closing a lower dialog must not unlock a stacked alert dialog");
+  assert.equal(
+    await page.locator("#runtime-alert-dialog [data-slot='alert-dialog-content']").evaluate(
+      (node) => node.contains(document.activeElement)
+    ),
+    true,
+    "lower-modal cleanup must not move focus behind the top alert dialog"
+  );
+
+  await page.locator("#runtime-alert-dialog").evaluate((node) => node.remove());
+  await page.waitForFunction(() => !document.querySelector("#runtime-alert-dialog"));
+  assert.equal(await bodyOverflow(), "hidden", "dynamic removal should retain the remaining modal lock");
+  await page.waitForFunction(() =>
+    document.querySelector("#runtime-dialog [data-slot='dialog-content']") === document.activeElement
+  );
+  await page.locator("#runtime-dialog").evaluate((node) =>
+    node.__sbDialogReceive({ open: false })
+  );
+  await page.waitForSelector("#runtime-dialog [data-slot='dialog-content']", { state: "detached" });
+  assert.equal(await bodyOverflow(), "", "the final modal close should restore body overflow");
+  assert.equal(
+    await page.evaluate(() => document.body.style.paddingRight),
+    "",
+    "the final modal close should restore body padding"
   );
 
   await page.evaluate((payloadText) => {

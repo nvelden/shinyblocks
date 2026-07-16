@@ -51,10 +51,13 @@
 - Content carries `role="dialog"` and `aria-modal="true"`.
 - `aria-labelledby` points at the runtime title slot.
 - `aria-describedby` points at the description slot when present.
-- Opening moves focus into the dialog; closing returns focus to the
-  previously focused element.
-- `Tab` and `Shift+Tab` cycle inside the dialog.
-- Body scroll is locked while the dialog is open and restored on close.
+- Opening moves focus into the dialog; closing the final modal returns focus
+  to the previously focused element.
+- Dialog and alert-dialog instances share a LIFO modal stack. Only the top
+  modal handles `Escape` and cycles `Tab` / `Shift+Tab`; removing or closing a
+  lower modal cannot unlock scrolling or move focus behind the top modal.
+- Body scroll is locked once for the stack and restored when its final modal
+  closes, including when dynamic UI removes an open modal.
 - Trigger button advertises `aria-haspopup="dialog"` and live
   `aria-expanded`.
 

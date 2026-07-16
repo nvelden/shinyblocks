@@ -1,16 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ensurePortalRoot } from "../runtime/dom.js";
+import { registerModal } from "../runtime/modal-manager.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
-
-const FOCUSABLE = "button:not([disabled]),a[href],[tabindex]:not([tabindex='-1'])";
-
-function focusableChildren(container) {
-  if (!container) return [];
-  return Array.from(container.querySelectorAll(FOCUSABLE)).filter(
-    (element) => element.offsetParent !== null
-  );
-}
 
 export function AlertDialog({ payload, root }) {
   const props = payload.props || {};
@@ -64,41 +56,16 @@ export function AlertDialog({ payload, root }) {
 
   useEffect(() => {
     if (!open) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     (cancelRef.current || contentRef.current)?.focus({ preventScroll: true });
-
-    function onKeyDown(event) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        event.stopPropagation();
-        choose("cancel");
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const items = focusableChildren(contentRef.current);
-      if (!items.length) {
-        event.preventDefault();
-        contentRef.current?.focus();
-        return;
-      }
-      const first = items[0];
-      const last = items[items.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-    document.addEventListener("keydown", onKeyDown);
+    const unregister = registerModal({
+      container: () => contentRef.current,
+      layer: () => contentRef.current?.parentElement,
+      dismiss: () => choose("cancel"),
+      returnFocus: returnFocusRef.current
+    });
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      const target = returnFocusRef.current;
+      unregister();
       returnFocusRef.current = null;
-      if (target?.focus) requestAnimationFrame(() => target.focus({ preventScroll: true }));
     };
   }, [open]);
 

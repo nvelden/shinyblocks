@@ -22,8 +22,12 @@
 ## Accessibility
 
 - Content uses `role="alertdialog"`, `aria-modal`, labelled title, and description.
-- Focus starts on Cancel, is trapped while open, and returns to the opener.
-- Escape reports cancel. Pointer interaction with the backdrop is ignored.
+- Focus starts on Cancel. Dialog and alert-dialog instances share a LIFO modal
+  stack, so only the top modal traps focus and handles Escape. Closing a lower
+  modal cannot unlock scrolling or move focus behind the top modal; dynamic
+  removal releases its stack entry safely.
+- Escape on the top alert dialog reports cancel. Pointer interaction with the
+  backdrop is ignored.
 
 ## Token contract
 
