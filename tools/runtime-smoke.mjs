@@ -177,7 +177,16 @@ const alertDialogPayload = JSON.stringify({
   props: {
     titleHtml: "Confirm action",
     descriptionHtml: "Stacked alert dialog",
-    bodyHtml: "<input id='alert-dialog-input' type='text' />",
+    bodyHtml: [
+      "<input id='alert-text' type='text' />",
+      "<select id='alert-select'><option>One</option></select>",
+      "<textarea id='alert-textarea'></textarea>",
+      "<input id='alert-disabled' disabled />",
+      "<input id='alert-hidden' type='hidden' />",
+      "<div inert><input id='alert-inert' /></div>",
+      "<input id='alert-aria-hidden' aria-hidden='true' />",
+      "<button id='alert-negative-tabindex' tabindex='-2'>Skip</button>"
+    ].join(""),
     confirmLabel: "Continue",
     cancelLabel: "Cancel",
     confirmVariant: "default",
@@ -850,6 +859,13 @@ try {
     node.__sbAlertDialogReceive({ open: true })
   );
   await page.waitForSelector("#runtime-alert-dialog [data-slot='alert-dialog-content']");
+  assert.equal(
+    await page.locator("#runtime-alert-dialog [data-slot='alert-dialog-cancel']").evaluate(
+      (node) => node === document.activeElement
+    ),
+    true,
+    "Cancel should remain the alert dialog's initial focus target"
+  );
   await page.locator("#runtime-dialog-two").evaluate((node) =>
     node.__sbDialogReceive({ open: false })
   );
@@ -860,6 +876,34 @@ try {
     ),
     true,
     "lower-modal cleanup must not move focus behind the top alert dialog"
+  );
+
+  await page.locator("#alert-text").focus();
+  await page.keyboard.press("Tab");
+  assert.equal(await activeElementId(), "alert-select", "Tab should reach a native select");
+  await page.keyboard.press("Tab");
+  assert.equal(await activeElementId(), "alert-textarea", "Tab should reach a native textarea");
+  await page.locator("#runtime-alert-dialog [data-slot='alert-dialog-body']").evaluate((node) => {
+    const input = document.createElement("input");
+    input.id = "alert-dynamic-input";
+    node.appendChild(input);
+  });
+  await page.keyboard.press("Tab");
+  assert.equal(
+    await activeElementId(),
+    "alert-dynamic-input",
+    "controls rendered after opening should join the live tab order"
+  );
+  await page.locator("#runtime-alert-dialog [data-slot='alert-dialog-action']").focus();
+  await page.keyboard.press("Tab");
+  assert.equal(await activeElementId(), "alert-text", "forward focus should wrap to the first eligible control");
+  await page.keyboard.press("Shift+Tab");
+  assert.equal(
+    await page.locator("#runtime-alert-dialog [data-slot='alert-dialog-action']").evaluate(
+      (node) => node === document.activeElement
+    ),
+    true,
+    "reverse focus should wrap past disabled, hidden, inert, and negative-tabindex controls"
   );
 
   await page.locator("#runtime-alert-dialog").evaluate((node) => node.remove());

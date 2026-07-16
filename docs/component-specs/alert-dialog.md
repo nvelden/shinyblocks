@@ -26,6 +26,10 @@
   stack, so only the top modal traps focus and handles Escape. Closing a lower
   modal cannot unlock scrolling or move focus behind the top modal; dynamic
   removal releases its stack entry safely.
+- The shared focus trap follows live DOM order and includes enabled links,
+  buttons, inputs, selects, textareas, and non-negative `tabindex` targets.
+  Hidden, disabled, inert, `aria-hidden`, and non-rendered descendants are
+  skipped; controls rendered after opening participate without reopening.
 - Escape on the top alert dialog reports cancel. Pointer interaction with the
   backdrop is ignored.
 
