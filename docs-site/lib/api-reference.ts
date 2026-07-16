@@ -924,7 +924,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Tab layout child views created via block_tab()." },
         { argument: "selected", type: "character", defaultVal: "NULL", description: "Name of initial selected active view." },
         { argument: "variant", type: "'default' | 'line'", defaultVal: "'default'", description: "Visual tab list style." },
-        { argument: "orientation", type: "'horizontal' | 'vertical'", defaultVal: "'horizontal'", description: "Tab list layout direction." },
+        { argument: "orientation", type: "'horizontal' | 'vertical'", defaultVal: "'horizontal'", description: "Tab list direction; horizontal lists scroll within narrow containers when labels do not fit." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Styling classes applied on layouts wrapper." }
       ]
     },

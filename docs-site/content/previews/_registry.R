@@ -199,7 +199,7 @@ registry <- list(
     name = "Tabs",
     slug = "tabs",
     file = "tabs.R",
-    description = "Structured navigation tabs that organize views and options.",
+    description = "Structured navigation tabs that keep horizontal labels reachable with contained scrolling on narrow layouts.",
     featured = TRUE
   ),
   list(

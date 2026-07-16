@@ -329,6 +329,26 @@ test_that("responsive grid is protected against mobile overflow", {
   )
 })
 
+test_that("horizontal tabs contain intrinsic-width labels on narrow screens", {
+  css <- package_source_css()
+  css_flat <- gsub("[[:space:]]+", " ", css)
+
+  expect_match(
+    css_flat,
+    ".sb-tabs { @apply flex flex-col gap-2; min-width: 0; }",
+    fixed = TRUE
+  )
+  expect_match(
+    css_flat,
+    paste(
+      ".sb-tabs-list[data-orientation=\"horizontal\"] {",
+      "max-width: 100%; justify-content: flex-start;",
+      "overflow-x: auto; overflow-y: hidden; }"
+    ),
+    fixed = TRUE
+  )
+})
+
 test_that("package theme aliases resolve inside the scoped app root", {
   css <- package_source_css()
 

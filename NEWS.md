@@ -13,6 +13,8 @@
 
 ### Bug fixes
 
+* Horizontal `block_tabs()` lists now stay within narrow cards and responsive grid columns. Their compact intrinsic width is preserved when labels fit; longer tab rows scroll horizontally instead of overflowing their container.
+
 * `block_select()` and `block_combobox()` now reject malformed logical flags instead of silently treating them as false; their shared native-select and multi-selection internals have also been consolidated.
 
 * `block_page()` no longer applies Tailwind Preflight or `!important` focus overrides to every descendant. The generated reset now targets only the app root and shinyblocks-owned `sb-*` elements, so native Shiny controls, bslib content, and htmlwidgets retain host typography, spacing, borders, media display, and focus treatment in content slots (issue #116).

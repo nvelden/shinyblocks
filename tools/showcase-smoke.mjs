@@ -154,6 +154,25 @@ try {
       previousPanel?.hasAttribute("hidden");
   });
 
+  // An intrinsic-width horizontal tab list must stay inside a narrow parent
+  // while retaining every full, non-wrapping trigger in a scrollable row.
+  await tabsRoot.evaluate((root) => {
+    root.style.width = "6rem";
+  });
+  const narrowTabs = await tabsRoot.evaluate((root) => {
+    const list = root.querySelector(".sb-tabs-list");
+    const rootRect = root.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    return {
+      contained: listRect.right <= rootRect.right + 0.5,
+      scrollable: list.scrollWidth > list.clientWidth,
+      overflowX: getComputedStyle(list).overflowX
+    };
+  });
+  assert.equal(narrowTabs.contained, true);
+  assert.equal(narrowTabs.scrollable, true);
+  assert.equal(narrowTabs.overflowX, "auto");
+
   // Sidebar-nav Shiny input (#layout). The nav is rendered through renderUI, so
   // this exercises the InputBinding binding on dynamically inserted markup
   // (Shiny.bindAll), delegated click selection, and the update_block_nav()

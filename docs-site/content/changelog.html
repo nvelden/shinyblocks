@@ -18,15 +18,42 @@
 </ul>
 <h3 id="bug-fixes">Bug fixes</h3>
 <ul>
-<li><code>block_date_picker()</code> and <code>block_date_range_picker()</code> now format <code>POSIXct</code>/<code>POSIXlt</code> values in the value&#39;s own timezone. Previously they routed through <code>as.Date()</code>, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).</li>
-<li><code>block_field_invalid()</code> now generates its error-message ids from an internal counter instead of <code>runif()</code>. Ids stay unique when the app seeds the RNG (previously two fields built after the same <code>set.seed()</code> shared an id, breaking <code>aria-describedby</code> wiring), and building UI no longer consumes from the user&#39;s RNG stream.</li>
-<li><code>update_block_*()</code> helpers no longer fail when called through a <code>...</code>-forwarding wrapper (<code>function(...) update_block_input(...)</code>), a common pattern in module helper code.</li>
-<li>Runtime mount ids are now collision-free across input ids that sanitize to the same slug (e.g. <code>&quot;a.b&quot;</code> vs <code>&quot;a-b&quot;</code>); a short hash disambiguates them, so server updates always reach the right element. Ids without special characters are unchanged.</li>
-<li><code>block_select()</code> and <code>update_block_select()</code> now reject grouped (nested) <code>choices</code> with a clear error instead of silently flattening them into mangled <code>&quot;Group.label&quot;</code> labels. Grouped choices were never supported; previously they produced wrong output without warning.</li>
-<li>Choice-style arguments are matched exactly everywhere: passing a partial vector of otherwise-valid values (e.g. <code>size = c(&quot;lg&quot;, &quot;sm&quot;)</code>) or a partial string (e.g. <code>type = &quot;pass&quot;</code>) is now an error instead of silently resolving to one of them. Function-signature defaults are unaffected.</li>
-<li><code>block_alert_dialog()</code> adds an accessible confirm/cancel overlay with destructive confirmation styling, explicit <code>&quot;confirm&quot;</code> / <code>&quot;cancel&quot;</code> Shiny events, Escape-to-cancel, and no outside-click dismissal (#90).</li>
-<li>Server updates for <code>update_block_dialog(class = )</code> and <code>update_block_file_input(class = )</code> now use the same payload key as every other component.</li>
-<li>The dependency asset-version stamp is computed once per R process instead of stat-ing every bundled asset file on each <code>block_*()</code> call. Set <code>options(shinyblocks.asset_version_cache = FALSE)</code> to recompute per call during asset development.</li>
+<li><p>Horizontal <code>block_tabs()</code> lists now stay within narrow cards and responsive grid columns. Their compact intrinsic width is preserved when labels fit; longer tab rows scroll horizontally instead of overflowing their container.</p>
+</li>
+<li><p><code>block_select()</code> and <code>block_combobox()</code> now reject malformed logical flags instead of silently treating them as false; their shared native-select and multi-selection internals have also been consolidated.</p>
+</li>
+<li><p><code>block_page()</code> no longer applies Tailwind Preflight or <code>!important</code> focus overrides to every descendant. The generated reset now targets only the app root and shinyblocks-owned <code>sb-*</code> elements, so native Shiny controls, bslib content, and htmlwidgets retain host typography, spacing, borders, media display, and focus treatment in content slots (issue #116).</p>
+</li>
+<li><p>Alert-dialog focus trapping now uses the same live focusable-element utility as dialog. Native and dynamically rendered inputs, selects, and textareas participate in both tab directions, while disabled, hidden, inert, <code>aria-hidden</code>, and negative-tabindex controls are skipped (issue #115).</p>
+</li>
+<li><p><code>block_button()</code> now keeps constructor style in the same controlled channel as <code>update_block_button()</code>, so initial style can be replaced or cleared. Runtime-owned button attributes win over passthrough collisions while <code>title</code>, <code>name</code>, ARIA, and custom data attributes remain supported (issue #114).</p>
+</li>
+<li><p>Dialogs and alert dialogs now share a LIFO modal manager. In mixed or nested modal stacks, only the top modal handles Escape and traps focus, body scrolling stays locked until the final modal closes, layers follow stack order, and dynamic UI removal safely releases its modal entry (issue #113).</p>
+</li>
+<li><p>Portaled components now render into a portal owned by their originating runtime mount instead of the first document-global portal. Selects, comboboxes, dialogs, popovers, tooltips, menus, date pickers, and toasters therefore retain the correct scoped theme/style in multi-region dashboards, and dynamic mount removal removes its portal automatically (issue #112).</p>
+</li>
+<li><p><code>block_image_output()</code> and <code>block_plot_output()</code> now apply aspect ratio, fit, border, radius, caption, and fill sizing when embedded directly in <code>fluidPage()</code>, bslib, or another host layout; their CSS is rooted narrowly at <code>.sb-output-frame</code> and does not target unrelated Shiny outputs (issue #111).</p>
+</li>
+<li><p>R-side composition components such as cards, tabs, accordions, breadcrumbs, fields, input groups, navigation, and layout primitives now establish an isolated standalone token scope, so their default theme and style-profile declarations work inside <code>fluidPage()</code>, bslib, and other host layouts without requiring <code>block_page()</code> or styling unrelated host markup (issue #110).</p>
+</li>
+<li><p><code>block_date_picker()</code> and <code>block_date_range_picker()</code> now format <code>POSIXct</code>/<code>POSIXlt</code> values in the value&#39;s own timezone. Previously they routed through <code>as.Date()</code>, which assumes UTC and could report the wrong calendar date (e.g. a morning timestamp in a UTC+ timezone normalized to the previous day).</p>
+</li>
+<li><p><code>block_field_invalid()</code> now generates its error-message ids from an internal counter instead of <code>runif()</code>. Ids stay unique when the app seeds the RNG (previously two fields built after the same <code>set.seed()</code> shared an id, breaking <code>aria-describedby</code> wiring), and building UI no longer consumes from the user&#39;s RNG stream.</p>
+</li>
+<li><p><code>update_block_*()</code> helpers no longer fail when called through a <code>...</code>-forwarding wrapper (<code>function(...) update_block_input(...)</code>), a common pattern in module helper code.</p>
+</li>
+<li><p>Runtime mount ids are now collision-free across input ids that sanitize to the same slug (e.g. <code>&quot;a.b&quot;</code> vs <code>&quot;a-b&quot;</code>); a short hash disambiguates them, so server updates always reach the right element. Ids without special characters are unchanged.</p>
+</li>
+<li><p><code>block_select()</code> and <code>update_block_select()</code> now reject grouped (nested) <code>choices</code> with a clear error instead of silently flattening them into mangled <code>&quot;Group.label&quot;</code> labels. Grouped choices were never supported; previously they produced wrong output without warning.</p>
+</li>
+<li><p>Choice-style arguments are matched exactly everywhere: passing a partial vector of otherwise-valid values (e.g. <code>size = c(&quot;lg&quot;, &quot;sm&quot;)</code>) or a partial string (e.g. <code>type = &quot;pass&quot;</code>) is now an error instead of silently resolving to one of them. Function-signature defaults are unaffected.</p>
+</li>
+<li><p><code>block_alert_dialog()</code> adds an accessible confirm/cancel overlay with destructive confirmation styling, explicit <code>&quot;confirm&quot;</code> / <code>&quot;cancel&quot;</code> Shiny events, Escape-to-cancel, and no outside-click dismissal (#90).</p>
+</li>
+<li><p>Server updates for <code>update_block_dialog(class = )</code> and <code>update_block_file_input(class = )</code> now use the same payload key as every other component.</p>
+</li>
+<li><p>The dependency asset-version stamp is computed once per R process instead of stat-ing every bundled asset file on each <code>block_*()</code> call. Set <code>options(shinyblocks.asset_version_cache = FALSE)</code> to recompute per call during asset development.</p>
+</li>
 </ul>
 <h2 id="0009003">0.0.0.9003</h2>
 <h3 id="components">Components</h3>

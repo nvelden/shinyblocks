@@ -373,6 +373,7 @@
 
   .sb-tabs {
     @apply flex flex-col gap-2;
+    min-width: 0;
   }
 
   .sb-tabs[data-orientation="vertical"] {
@@ -384,6 +385,16 @@
     width: fit-content;
     border-bottom: 0 !important;
     gap: 0.25rem;
+  }
+
+  /* Keep shadcn's compact fit-content list when labels fit, but contain long
+   * horizontal tab sets inside narrow cards and grid tracks. The list remains
+   * one row so its visual orientation matches its ARIA/keyboard contract. */
+  .sb-tabs-list[data-orientation="horizontal"] {
+    max-width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .sb-tabs-list[data-orientation="vertical"] {

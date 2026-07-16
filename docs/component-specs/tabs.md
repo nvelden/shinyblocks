@@ -23,6 +23,10 @@
   both `horizontal` and `vertical`.
 - **content** — tab content renders inside package-owned
   `.sb-tabs-content` / `.sb-tabs-panel` containers.
+- **narrow horizontal layouts** — the compact tab list keeps its intrinsic
+  width when it fits and becomes horizontally scrollable when its non-wrapping
+  labels exceed the available card or grid width. It does not wrap into a
+  second row or change the declared orientation and keyboard contract.
 
 ## R API
 
@@ -87,6 +91,9 @@ part of the rendered contract.
 - `shiny::tabPanel()` is accepted at the input boundary as a
   compatibility convenience, but the rendered DOM is always the
   package-owned contract above — no Bootstrap tab classes leak through.
+- Horizontal lists add overflow containment on narrow parents. Upstream's
+  intrinsic-width list is preserved when it fits; when it does not, scrolling
+  keeps every full label reachable without changing ARIA orientation.
 
 ## Reference screenshot
 
