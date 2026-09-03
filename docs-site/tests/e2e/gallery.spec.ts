@@ -3,9 +3,18 @@ import { PATH } from "./paths";
 
 test("landing page gallery lists featured components", async ({ page }) => {
   await page.goto(PATH.home);
+  await expect(
+    page.getByRole("heading", { name: "Build beautiful Shiny apps. In pure R." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Try shinyblocks live" }),
+  ).toBeVisible();
+  await expect(page.getByText("No Node. No build step. Just R.")).toHaveCount(0);
+
   const gallery = page.locator("iframe[title='Interactive components gallery']");
   await expect(gallery).toBeVisible();
   await expect(gallery).toHaveAttribute("src", "/shinyblocks/playgrounds/gallery/");
+  await expect(gallery).toHaveAttribute("loading", "eager");
 
   const response = await page.request.get(`${PATH.home}playgrounds/gallery/app.json`);
   expect(response.ok()).toBe(true);

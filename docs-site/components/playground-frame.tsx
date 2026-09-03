@@ -1,7 +1,13 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { type CSSProperties, useCallback, useEffect, useRef } from "react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface PlaygroundFrameProps {
   src: string;
@@ -9,6 +15,7 @@ interface PlaygroundFrameProps {
   className?: string;
   style?: CSSProperties;
   loading?: "eager" | "lazy";
+  showLoadingState?: boolean;
 }
 
 interface ShinyblocksWindow extends Window {
@@ -21,8 +28,10 @@ export function PlaygroundFrame({
   className,
   style,
   loading = "lazy",
+  showLoadingState = false,
 }: PlaygroundFrameProps) {
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const [isReady, setIsReady] = useState(false);
   const { resolvedTheme } = useTheme();
   const theme = resolvedTheme === "dark" ? "dark" : "light";
 
@@ -68,20 +77,24 @@ export function PlaygroundFrame({
   }, [theme]);
 
   useEffect(() => {
-    pushTheme();
+    setIsReady(false);
+    if (pushTheme()) setIsReady(true);
     // The app boots asynchronously (webR/WASM); retry until it is reachable,
     // then stop so the playground's own controls keep working between toggles.
     let tries = 0;
     const timer = window.setInterval(() => {
       tries += 1;
-      if (pushTheme() || tries > 25) {
+      if (pushTheme()) {
+        setIsReady(true);
+        window.clearInterval(timer);
+      } else if (tries > 90) {
         window.clearInterval(timer);
       }
     }, 700);
     return () => window.clearInterval(timer);
-  }, [pushTheme]);
+  }, [pushTheme, src]);
 
-  return (
+  const frame = (
     <iframe
       ref={frameRef}
       src={src}
@@ -89,7 +102,33 @@ export function PlaygroundFrame({
       loading={loading}
       className={className}
       style={style}
-      onLoad={() => pushTheme()}
+      onLoad={() => {
+        if (pushTheme()) setIsReady(true);
+      }}
     />
+  );
+
+  if (!showLoadingState) return frame;
+
+  return (
+    <div className="relative w-full" style={{ height: style?.height }}>
+      {frame}
+      {!isReady && (
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-background px-6 text-center"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex max-w-sm flex-col items-center gap-2 rounded-lg border border-border bg-card px-6 py-5 shadow-sm">
+            <span className="text-sm font-semibold text-foreground">
+              Starting the live R playground…
+            </span>
+            <span className="text-xs leading-relaxed text-muted-foreground">
+              The first visit loads Shiny in your browser. No server required.
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
