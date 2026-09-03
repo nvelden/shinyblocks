@@ -47,6 +47,7 @@ jobs:
           PKG_SYSREQS: "false"
         with:
           extra-packages: |
+            any::DT
             any::devtools
             any::lintr
             any::pkgdown
