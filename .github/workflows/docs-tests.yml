@@ -43,6 +43,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
+            any::devtools
             any::htmltools
             any::shinylive
             local::.
