@@ -50,6 +50,12 @@ block_page <- function(
   attach_shinyblocks_deps(
     htmltools::tagList(
       htmltools::tags$head(
+        # Without it, phones lay the page out at desktop width and the
+        # responsive sidebar and layouts never apply
+        htmltools::tags$meta(
+          name = "viewport",
+          content = "width=device-width, initial-scale=1"
+        ),
         htmltools::tags$title(title %||% "shinyblocks"),
         block_favicon_link(),
         block_page_chrome_style(),

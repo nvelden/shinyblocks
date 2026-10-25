@@ -57,6 +57,13 @@ test_that("block_page emits a page-owner body reset (Preflight is scoped to .sb-
   expect_match(head, "body{margin:0;padding:0}", fixed = TRUE)
 })
 
+test_that("block_page sets the viewport so phones use the responsive layout", {
+  head <- paste(htmltools::renderTags(block_page("Body"))$head, collapse = "")
+
+  expect_match(head, '<meta name="viewport" content="width=device-width, initial-scale=1"/>',
+               fixed = TRUE)
+})
+
 test_that("block_page applies a style profile and injects its overrides", {
   page <- block_page(
     title = "Example",
