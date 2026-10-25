@@ -895,6 +895,10 @@ try {
   await page.locator("#runtime-dialog-two").evaluate((node) =>
     node.__sbDialogReceive({ open: true })
   );
+  // Open the alert from inside the reopened dialog, as a user would. Without
+  // this wait the alert could open while focus was still on #dialog-first,
+  // and removing the alert then (correctly) returns focus there.
+  await page.waitForFunction(() => document.activeElement?.id === "dialog-two-first");
   await page.locator("#runtime-alert-dialog").evaluate((node) =>
     node.__sbAlertDialogReceive({ open: true })
   );
