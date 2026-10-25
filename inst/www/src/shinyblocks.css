@@ -233,7 +233,7 @@
   }
 
   /* A collapsed right sidebar keeps only its title row with the toggle. */
-  .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] > :not(.sb-sidebar-title) {
+  .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] > .sb-sidebar-content {
     display: none;
   }
 

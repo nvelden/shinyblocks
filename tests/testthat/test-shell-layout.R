@@ -84,6 +84,18 @@ test_that("block_page places a right sidebar after the main column", {
   expect_lt(regexpr("sb-page-main", html), regexpr('id="sb-sidebar-right"', html))
 })
 
+test_that("a right sidebar wraps its content, so collapsing can hide it", {
+  html <- as.character(block_sidebar(
+    shiny::conditionalPanel("true", "Panel"),
+    title = "Settings", side = "right", collapsible = TRUE
+  ))
+
+  expect_match(html, '<div class="sb-sidebar-content">', fixed = TRUE)
+  # the title row with the toggle stays outside the wrapper
+  expect_lt(regexpr("sb-sidebar-title", html), regexpr("sb-sidebar-content", html))
+  expect_false(grepl("sb-sidebar-content", as.character(block_sidebar("Nav")), fixed = TRUE))
+})
+
 test_that("block_page without a right sidebar keeps its markup", {
   html <- as.character(block_page("Body", sidebar = block_sidebar("Nav")))
 

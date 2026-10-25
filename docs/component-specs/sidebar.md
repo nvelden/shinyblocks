@@ -22,7 +22,7 @@
   `<aside>` and a `panel-right` toggle icon. It is sticky at viewport
   height on larger screens like the left sidebar. Collapsed
   (`data-sidebar-right-collapsed="true"` on `.sb-page`), it shrinks to a
-  3.5rem rail that keeps only its title row with the toggle — at every
+  3.5rem rail that keeps only its title row with the toggle (its content sits in a `.sb-sidebar-content` wrapper that is hidden, since Shiny styles `conditionalPanel()` and `uiOutput()` children inline) — at every
   screen size, since it has no mobile drawer. Below the mobile breakpoint
   it follows the page content at full width.
 - **nav-composed** — when passed a single `block_nav()` container, the

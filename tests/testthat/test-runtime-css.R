@@ -465,3 +465,13 @@ test_that("sidebar widths are set through variables the collapsed states overrid
   expect_match(css, "--sb-sidebar-right-col: var(--sb-sidebar-right-width, minmax(18rem, 20rem));", fixed = TRUE)
   expect_match(css, '[data-sidebar-right-collapsed="true"] {\n      --sb-sidebar-right-col: minmax(3.5rem, 3.5rem);', fixed = TRUE)
 })
+
+test_that("a collapsed right sidebar hides its content wrapper", {
+  css <- package_source_css()
+
+  expect_match(
+    css,
+    '[data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] > .sb-sidebar-content {\n    display: none;',
+    fixed = TRUE
+  )
+})

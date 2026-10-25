@@ -282,7 +282,14 @@ block_sidebar <- function(
           }
         )
       },
-      sidebar_content(children)
+      if (side == "right") {
+        # One package-owned wrapper to hide when collapsed: Shiny styles
+        # conditionalPanel() and uiOutput() children inline, which would
+        # override a rule on the children themselves
+        htmltools::tags$div(class = "sb-sidebar-content", sidebar_content(children))
+      } else {
+        sidebar_content(children)
+      }
     )
   )
 }
