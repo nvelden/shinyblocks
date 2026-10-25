@@ -552,6 +552,13 @@
     if (toggle) {
       toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
     }
+    relayout();
+  }
+
+  // Collapsing resizes the main column without resizing the window; tell
+  // htmlwidgets and Shiny plots, which refit on window resize.
+  function relayout() {
+    window.dispatchEvent(new Event("resize"));
   }
 
   function focusableIn(container) {
@@ -628,6 +635,7 @@
         page.setAttribute("data-sidebar-right-collapsed", value);
         right.setAttribute("data-collapsed", value);
         rightToggle.setAttribute("aria-expanded", String(value !== "true"));
+        relayout();
       });
     }
 

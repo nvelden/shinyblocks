@@ -212,3 +212,12 @@ test_that("app JS delegates dark-mode toggle clicks", {
   expect_match(js, "applyTheme(currentThemeMode())", fixed = TRUE)
   expect_no_match(js, "querySelectorAll(\"[data-sb-theme-toggle]\")\n    ).forEach(function (button) {\n      button.addEventListener(\"click\"", fixed = TRUE) # nolint: line_length_linter
 })
+
+test_that("collapsing a sidebar tells htmlwidgets and plots to refit", {
+  js <- app_js()
+
+  expect_match(js, 'window.dispatchEvent(new Event("resize"))', fixed = TRUE)
+  # both the left collapse and the right sidebar toggle call it
+  expect_match(js, "function setCollapsed[\\s\\S]*?relayout\\(\\);", perl = TRUE)
+  expect_match(js, "rightToggle\\.setAttribute[\\s\\S]*?relayout\\(\\);", perl = TRUE)
+})

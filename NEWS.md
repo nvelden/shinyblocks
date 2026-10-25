@@ -14,6 +14,7 @@
 
 ### Bug fixes
 
+* Collapsing or expanding a `block_sidebar()` now fires a window `resize` event, so htmlwidgets and Shiny plots refit to the wider or narrower main column, like they do for bslib sidebars.
 * The desktop `block_sidebar()` is now one viewport tall and stays in view, like the shadcn sidebar. A long nav scrolls inside the sidebar instead of stretching the page, and long pages scroll without taking the nav with them.
 * `block_page()` now sets the viewport meta tag. Phones laid shinyblocks pages out at desktop width, so the sidebar did not collapse and responsive layouts did not apply.
 * `block_nav_item()` labels are no longer underlined. Nav items are anchors and kept the browser's default link underline.
