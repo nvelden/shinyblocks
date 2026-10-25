@@ -64,6 +64,48 @@ test_that("block_page sets the viewport so phones use the responsive layout", {
                fixed = TRUE)
 })
 
+test_that("block_page places a right sidebar after the main column", {
+  page <- block_page(
+    "Body",
+    sidebar = block_sidebar("Nav", title = "App"),
+    sidebar_right = block_sidebar("Settings", title = "Settings", side = "right",
+                                  collapsible = TRUE, collapsed = TRUE)
+  )
+  html <- as.character(page)
+  shell <- regmatches(html, regexpr('<div class="sb-page[^>]*>', html))
+
+  expect_match(shell, "has-sidebar has-sidebar-right", fixed = TRUE)
+  expect_match(shell, 'data-sidebar-right-collapsed="true"', fixed = TRUE)
+  aside <- regmatches(html, regexpr('<aside[^>]*id="sb-sidebar-right"[^>]*>', html))
+  expect_match(aside, 'data-side="right"', fixed = TRUE)
+  expect_match(aside, 'data-collapsed="true"', fixed = TRUE)
+  expect_match(html, "#sb-icon-panel-right", fixed = TRUE)
+  # the right sidebar comes after the main column
+  expect_lt(regexpr("sb-page-main", html), regexpr('id="sb-sidebar-right"', html))
+})
+
+test_that("block_page without a right sidebar keeps its markup", {
+  html <- as.character(block_page("Body", sidebar = block_sidebar("Nav")))
+
+  expect_false(grepl("has-sidebar-right", html, fixed = TRUE))
+  expect_false(grepl("data-sidebar-right-collapsed", html, fixed = TRUE))
+  expect_false(grepl("data-side=", html, fixed = TRUE))
+})
+
+test_that("block_page checks the side of each sidebar", {
+  expect_error(
+    block_page(sidebar_right = block_sidebar("Settings")),
+    'block_sidebar(side = "right")',
+    fixed = TRUE
+  )
+  expect_error(
+    block_page(sidebar = block_sidebar("Settings", side = "right")),
+    'block_sidebar(side = "left")',
+    fixed = TRUE
+  )
+  expect_error(block_sidebar(side = "top"))
+})
+
 test_that("block_page applies a style profile and injects its overrides", {
   page <- block_page(
     title = "Example",

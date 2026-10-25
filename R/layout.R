@@ -234,8 +234,14 @@ block_grid <- function(
 #'
 #' @param ... Sidebar content.
 #' @param title Optional sidebar title.
-#' @param collapsible Whether the sidebar can collapse on larger screens.
-#' @param collapsed Whether the sidebar starts collapsed on larger screens.
+#' @param collapsible Whether the sidebar can collapse. A left sidebar
+#'   collapses to an icon rail on larger screens; a right sidebar collapses to
+#'   a slim rail with only its toggle, at every screen size. The toggle sits in
+#'   the title row, so a collapsible sidebar needs a `title`.
+#' @param collapsed Whether the sidebar starts collapsed.
+#' @param side Which side of the page the sidebar is on: `"left"` (the
+#'   default, passed as `block_page(sidebar = )`) or `"right"` (passed as
+#'   `block_page(sidebar_right = )`), e.g. for a settings or details panel.
 #' @param id Optional sidebar DOM id.
 #' @param class Additional classes.
 #'
@@ -247,15 +253,18 @@ block_sidebar <- function(
   title = NULL,
   collapsible = FALSE,
   collapsed = FALSE,
+  side = c("left", "right"),
   id = NULL,
   class = NULL
 ) {
+  side <- match_arg(side, c("left", "right"))
   children <- list(...)
 
   attach_shinyblocks_deps(
     htmltools::tags$aside(
       id = id,
       class = merge_classes("sb-sidebar", class),
+      `data-side` = if (side == "right") "right",
       `data-collapsible` = tolower(as.character(isTRUE(collapsible))),
       `data-collapsed` = tolower(as.character(isTRUE(collapsed))),
       if (!is.null(title)) {
@@ -268,7 +277,7 @@ block_sidebar <- function(
               type = "button",
               `aria-label` = "Toggle sidebar",
               `aria-expanded` = if (isTRUE(collapsed)) "false" else "true",
-              block_icon("panel-left")
+              block_icon(if (side == "right") "panel-right" else "panel-left")
             )
           }
         )

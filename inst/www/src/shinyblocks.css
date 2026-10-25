@@ -193,10 +193,20 @@
 
   .sb-page {
     @apply grid min-h-screen bg-background text-foreground;
+    --sb-sidebar-left-col: minmax(16rem, 18rem);
+    --sb-sidebar-right-col: minmax(18rem, 20rem);
   }
 
   .sb-page.has-sidebar {
-    grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+    grid-template-columns: var(--sb-sidebar-left-col) minmax(0, 1fr);
+  }
+
+  .sb-page.has-sidebar-right {
+    grid-template-columns: minmax(0, 1fr) var(--sb-sidebar-right-col);
+  }
+
+  .sb-page.has-sidebar.has-sidebar-right {
+    grid-template-columns: var(--sb-sidebar-left-col) minmax(0, 1fr) var(--sb-sidebar-right-col);
   }
 
   .sb-page-main {
@@ -214,6 +224,15 @@
 
   .sb-sidebar {
     @apply min-h-screen border-r border-sidebar-border bg-sidebar text-sidebar-foreground;
+  }
+
+  .sb-sidebar[data-side="right"] {
+    @apply border-r-0 border-l;
+  }
+
+  /* A collapsed right sidebar keeps only its title row with the toggle. */
+  .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] > :not(.sb-sidebar-title) {
+    display: none;
   }
 
   .sb-sidebar-title {
@@ -803,7 +822,7 @@
     /* Like the shadcn sidebar, the desktop sidebar is one viewport tall and
        stays in view: a long nav scrolls inside it instead of stretching the
        page, and a long page scrolls without taking the nav with it. */
-    .sb-page.has-sidebar .sb-sidebar {
+    .sb-page > .sb-sidebar {
       position: sticky;
       top: 0;
       align-self: start;
@@ -814,27 +833,40 @@
     }
 
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] {
-      grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
+      --sb-sidebar-left-col: minmax(4.5rem, 4.5rem);
+    }
+
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] {
+      --sb-sidebar-right-col: minmax(3.5rem, 3.5rem);
+    }
+
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] .sb-sidebar-title {
+      justify-content: center;
+      padding-inline: 0;
+    }
+
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-right-collapsed="true"] > .sb-sidebar[data-side="right"] .sb-sidebar-title-text {
+      display: none;
     }
 
     /* The icon-rail hover tooltip overflows the narrow sidebar into the main
        column, so the collapsed sidebar must be its own stacking layer above the
        page content — otherwise the main panel paints over the tooltip. */
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) {
       position: sticky;
       z-index: 40;
       overflow: visible;
     }
 
     /* The non-interactive sidebar title can drop out entirely when collapsed. */
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title-text {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-sidebar-title-text {
       display: none;
     }
 
     /* Nav labels must stay in the accessibility tree so each icon-only link keeps
        its accessible name (the icon is aria-hidden). Hide them visually rather
        than with `display: none`, which would also remove them from the a11y tree. */
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-label {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-label {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -846,16 +878,16 @@
       border: 0;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-section-label {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-section-label {
       display: none;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar-title {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-sidebar-title {
       @apply justify-center;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item,
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-item,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-group-trigger {
       @apply justify-center px-2;
       /* Anchor for the icon-rail hover/focus tooltip below. */
       position: relative;
@@ -863,10 +895,10 @@
 
     /* On the icon rail the visible label is sr-only; reveal it as a floating
        tooltip pill to the right on hover/focus so the icon keeps a name. */
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item:hover .sb-nav-label,
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-item:focus-visible .sb-nav-label,
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger:hover .sb-nav-label,
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger:focus-visible .sb-nav-label {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-item:hover .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-item:focus-visible .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-group-trigger:hover .sb-nav-label,
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-group-trigger:focus-visible .sb-nav-label {
       position: absolute;
       left: calc(100% + 0.5rem);
       top: 50%;
@@ -898,19 +930,21 @@
       pointer-events: none;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-items {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-group-items {
       @apply ml-0 border-l-0 pl-0;
     }
 
     /* The icon rail shows only the leading icon; drop the trailing chevron so
        the trigger reads as a single centered glyph like a leaf item. */
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-group-trigger > [data-icon="inline-end"] {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-group-trigger > [data-icon="inline-end"] {
       display: none;
     }
   }
 
   @media (max-width: 767px) {
-    .sb-page.has-sidebar {
+    .sb-page.has-sidebar,
+    .sb-page.has-sidebar-right,
+    .sb-page.has-sidebar.has-sidebar-right {
       grid-template-columns: minmax(0, 1fr);
     }
 
@@ -918,7 +952,11 @@
       @apply min-h-0 border-b border-r-0;
     }
 
-    .sb-page[data-sidebar-enhanced="true"] .sb-sidebar {
+    .sb-sidebar[data-side="right"] {
+      @apply border-b-0 border-l-0 border-t;
+    }
+
+    .sb-page[data-sidebar-enhanced="true"] > .sb-sidebar:not([data-side="right"]) {
       @apply fixed inset-y-0 left-0 min-h-screen w-72 border-r border-b-0;
       z-index: 80;
       transform: translateX(-100%);
@@ -936,7 +974,7 @@
       transition: opacity 150ms ease;
     }
 
-    .sb-page[data-sidebar-enhanced="true"][data-sidebar-mobile-open="true"] .sb-sidebar {
+    .sb-page[data-sidebar-enhanced="true"][data-sidebar-mobile-open="true"] > .sb-sidebar:not([data-side="right"]) {
       transform: translateX(0);
     }
 
@@ -951,7 +989,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sb-page[data-sidebar-enhanced="true"] .sb-sidebar,
+    .sb-page[data-sidebar-enhanced="true"] > .sb-sidebar:not([data-side="right"]),
     .sb-page[data-sidebar-enhanced="true"] .sb-sidebar-backdrop {
       transition: none;
     }

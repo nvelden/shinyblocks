@@ -527,10 +527,11 @@
     });
   }
 
+  var PAGE_SEL = ".sb-page.has-sidebar, .sb-page.has-sidebar-right";
+  var LEFT_SEL = '.sb-sidebar:not([data-side="right"])';
+
   function sidebarPages() {
-    return Array.prototype.slice.call(
-      document.querySelectorAll(".sb-page.has-sidebar")
-    );
+    return Array.prototype.slice.call(document.querySelectorAll(PAGE_SEL));
   }
 
   function navItems(container) {
@@ -540,7 +541,7 @@
   }
 
   function setCollapsed(page, collapsed) {
-    var sidebar = page.querySelector(".sb-sidebar");
+    var sidebar = page.querySelector(LEFT_SEL);
     if (!sidebar) return;
 
     var value = collapsed ? "true" : "false";
@@ -568,7 +569,7 @@
   }
 
   function setMobileOpen(page, open) {
-    var sidebar = page.querySelector(".sb-sidebar");
+    var sidebar = page.querySelector(LEFT_SEL);
     var trigger = page.querySelector(".sb-sidebar-mobile-trigger");
     if (!sidebar || !trigger) return;
 
@@ -618,7 +619,19 @@
     if (page.getAttribute("data-sidebar-enhanced") === "true") return;
     page.setAttribute("data-sidebar-enhanced", "true");
 
-    var sidebar = page.querySelector(".sb-sidebar");
+    // The right sidebar only collapses, to a rail with its toggle (no drawer)
+    var right = page.querySelector('.sb-sidebar[data-side="right"]');
+    var rightToggle = right && right.querySelector(".sb-sidebar-toggle");
+    if (rightToggle) {
+      rightToggle.addEventListener("click", function () {
+        var value = String(right.getAttribute("data-collapsed") !== "true");
+        page.setAttribute("data-sidebar-right-collapsed", value);
+        right.setAttribute("data-collapsed", value);
+        rightToggle.setAttribute("aria-expanded", String(value !== "true"));
+      });
+    }
+
+    var sidebar = page.querySelector(LEFT_SEL);
     if (!sidebar) return;
 
     var toggle = sidebar.querySelector(".sb-sidebar-toggle");
@@ -706,7 +719,7 @@
         var open = page.getAttribute("data-sidebar-mobile-open") === "true";
         if (!open) return;
         if (
-          event.target.closest(".sb-sidebar") ||
+          event.target.closest(LEFT_SEL) ||
           event.target.closest(".sb-sidebar-mobile-trigger")
         ) {
           return;
@@ -733,10 +746,10 @@
         nodes.forEach(function (node) {
           if (node.nodeType !== 1) return;
 
-          if (node.matches && node.matches(".sb-page.has-sidebar")) {
+          if (node.matches && node.matches(PAGE_SEL)) {
             needsPage = true;
           }
-          if (node.querySelector && node.querySelector(".sb-page.has-sidebar")) {
+          if (node.querySelector && node.querySelector(PAGE_SEL)) {
             needsPage = true;
           }
         });

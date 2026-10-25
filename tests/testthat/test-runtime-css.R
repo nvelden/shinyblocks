@@ -205,7 +205,7 @@ test_that("mobile sidebar establishes an explicit shell overlay stack", {
 
   expect_match(
     css,
-    '\\.sb-page\\[data-sidebar-enhanced="true"\\] \\.sb-sidebar \\{[\\s\\S]*z-index: 80;',
+    '\\.sb-page\\[data-sidebar-enhanced="true"\\] > \\.sb-sidebar:not\\(\\[data-side="right"\\]\\) \\{[\\s\\S]*z-index: 80;',
     perl = TRUE
   )
   expect_match(
@@ -276,7 +276,7 @@ test_that("nav group CSS keeps expansion state class-owned", {
   expect_match(css, ".sb-nav-section-label", fixed = TRUE)
   expect_match(css, '.sb-nav-group-trigger[data-expanded="true"] > [data-icon="inline-end"]', fixed = TRUE)
   expect_match(css, "transform: rotate(90deg);", fixed = TRUE)
-  expect_match(css, '.sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-nav-section-label', fixed = TRUE)
+  expect_match(css, '.sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] > .sb-sidebar:not([data-side="right"]) .sb-nav-section-label', fixed = TRUE)
   expect_no_match(css, ".sb-nav-group-items[hidden]", fixed = TRUE)
 })
 
@@ -450,7 +450,7 @@ test_that("nav items, which are anchors, have no link underline", {
 test_that("the desktop sidebar stays in view at viewport height", {
   path <- system.file("www", "shinyblocks.css", package = "shinyblocks", mustWork = TRUE)
   css <- paste(readLines(path, warn = FALSE), collapse = "\n")
-  rules <- regmatches(css, gregexpr("\\.sb-page\\.has-sidebar \\.sb-sidebar\\{[^}]*\\}", css))[[1]]
+  rules <- regmatches(css, gregexpr("\\.sb-page>\\.sb-sidebar\\{[^}]*\\}", css))[[1]]
   rule <- paste(rules, collapse = "")
 
   expect_match(rule, "position:sticky", fixed = TRUE)

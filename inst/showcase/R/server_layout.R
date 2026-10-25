@@ -52,6 +52,11 @@ layout_preview_users_table <- function() {
 
 register_layout_showcase <- function(input, output, session) {
   collapsed_state <- shiny::reactiveVal(FALSE)
+  right_collapsed_state <- shiny::reactiveVal(FALSE)
+
+  shiny::observeEvent(input$showcase_layout_preview_right_toggle, {
+    right_collapsed_state(!isTRUE(right_collapsed_state()))
+  })
 
   # Which page the sidebar nav has selected. `block_nav(id = ...)` reports the
   # clicked item's value here, and we keep it so the choice survives a preview
@@ -113,6 +118,8 @@ register_layout_showcase <- function(input, output, session) {
     profile_label <- trimws(profile_label)
     if (!nzchar(profile_label)) profile_label <- "NV"
     active_page <- preview_page() %||% "dashboard"
+    show_right <- isTRUE(input$showcase_layout_doc_right)
+    right_collapsed <- isTRUE(right_collapsed_state())
 
     htmltools::div(
       class = "sb-page has-sidebar",
@@ -242,7 +249,49 @@ register_layout_showcase <- function(input, output, session) {
             )
           )
         )
-      )
+      ),
+
+      # block_sidebar(side = "right") passed as block_page(sidebar_right = ):
+      # collapses to a slim rail that keeps only its toggle.
+      if (show_right) {
+        htmltools::div(
+          style = paste0(
+            "width: ", if (right_collapsed) "3.5rem" else "170px", ";",
+            "transition: width 0.3s ease; display: flex; flex-direction: column; overflow: hidden;",
+            "padding: ", if (right_collapsed) "1rem 0" else "1rem", ";",
+            "border-left: 1px solid var(--border); background: var(--sidebar);"
+          ),
+          htmltools::div(
+            class = "sb-sidebar-title",
+            style = paste0(
+              "border-bottom: 0; padding: 0; margin-bottom: 1rem; white-space: nowrap;",
+              if (right_collapsed) "justify-content: center;"
+            ),
+            if (!right_collapsed) {
+              htmltools::tags$span(
+                class = "sb-sidebar-title-text",
+                style = "font-weight: 700; font-size: 0.875rem;",
+                "Details"
+              )
+            },
+            block_button(
+              "",
+              id = "showcase_layout_preview_right_toggle",
+              variant = "ghost",
+              size = "icon",
+              icon = "panel-right",
+              style = "width: 1.75rem; height: 1.75rem;",
+              `aria-label` = "Toggle sidebar"
+            )
+          ),
+          if (!right_collapsed) {
+            htmltools::tags$div(
+              style = "font-size: 0.75rem; color: var(--muted-foreground);",
+              "Settings or details for the current page."
+            )
+          }
+        )
+      }
     )
   })
   shiny::outputOptions(
@@ -313,6 +362,17 @@ register_layout_showcase <- function(input, output, session) {
       "      )\n",
       "    )\n",
       "  ),\n",
+      if (isTRUE(input$showcase_layout_doc_right)) {
+        paste0(
+          "  # A collapsible settings or details panel on the right.\n",
+          "  sidebar_right = block_sidebar(\n",
+          "    title = \"Details\",\n",
+          "    collapsible = TRUE,\n",
+          "    side = \"right\",\n",
+          "    \"Settings or details for the current page.\"\n",
+          "  ),\n"
+        )
+      },
       "  header = block_header(\n",
       "    ", string_literal(title_val), profile_code, "\n",
       "  ),\n",

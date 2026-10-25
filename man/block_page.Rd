@@ -8,6 +8,7 @@ block_page(
   ...,
   title = NULL,
   sidebar = NULL,
+  sidebar_right = NULL,
   header = NULL,
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
@@ -20,7 +21,13 @@ block_page(
 
 \item{title}{Browser page title.}
 
-\item{sidebar}{Optional sidebar content.}
+\item{sidebar}{Optional \code{\link[=block_sidebar]{block_sidebar()}} on the left: usually the
+navigation.}
+
+\item{sidebar_right}{Optional \code{\link[=block_sidebar]{block_sidebar()}} with \code{side = "right"}, on
+the right of the page, e.g. a settings or details panel. Like the left
+sidebar it stays in view at viewport height on larger screens; on small
+screens it follows the page content.}
 
 \item{header}{Optional header content.}
 

@@ -29,6 +29,10 @@ htmltools::tagList(
         block_field(
           block_field_label("collapsed", `for` = "showcase_layout_doc_collapsed"),
           block_checkbox("showcase_layout_doc_collapsed", label = "Sidebar starts collapsed", value = FALSE)
+        ),
+        block_field(
+          block_field_label("sidebar_right", `for` = "showcase_layout_doc_right"),
+          block_checkbox("showcase_layout_doc_right", label = "Add a collapsible right sidebar (side = \"right\")", value = FALSE)
         )
       ),
       showcase_controls_group(

@@ -12,6 +12,11 @@
 - **with-sidebar** — page root carries `data-sidebar-enhanced`,
   `data-sidebar-mobile-open`, and `data-sidebar-collapsed` attributes
   consumed by the package runtime sidebar behavior.
+- **with-right-sidebar** — `sidebar_right` adds the `has-sidebar-right`
+  class and a `data-sidebar-right-collapsed` attribute, and places the
+  right `<aside>` after `.sb-page-main`. The grid columns come from the
+  `--sb-sidebar-left-col` and `--sb-sidebar-right-col` custom properties,
+  which the collapsed states narrow.
 - **theme-mode** — serializes the requested initial theme mode
   (`system`, `light`, or `dark`) into `window.shinyblocksInitialThemeMode`
   for the package theme runtime to apply.
@@ -26,6 +31,7 @@
 | `...` | Page body content. Wrapped in `block_body()` automatically. |
 | `title` | Browser tab title (defaults to `"shinyblocks"`). |
 | `sidebar` | Optional `block_sidebar()` tag. Triggers the mobile sidebar trigger and backdrop wiring. |
+| `sidebar_right` | Optional `block_sidebar(side = "right")` tag, placed after the main column. No mobile trigger or backdrop; it collapses to a rail with its toggle. |
 | `header` | Optional `block_header()` tag. Composed inside `.sb-header-shell` alongside the mobile sidebar trigger. |
 | `theme_mode` | Initial theme mode: `"system"`, `"light"`, or `"dark"`. |
 | `theme` | Optional `block_theme()` overrides injected into `<head>`. |

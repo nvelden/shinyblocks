@@ -9,6 +9,7 @@ block_sidebar(
   title = NULL,
   collapsible = FALSE,
   collapsed = FALSE,
+  side = c("left", "right"),
   id = NULL,
   class = NULL
 )
@@ -18,9 +19,16 @@ block_sidebar(
 
 \item{title}{Optional sidebar title.}
 
-\item{collapsible}{Whether the sidebar can collapse on larger screens.}
+\item{collapsible}{Whether the sidebar can collapse. A left sidebar
+collapses to an icon rail on larger screens; a right sidebar collapses to
+a slim rail with only its toggle, at every screen size. The toggle sits in
+the title row, so a collapsible sidebar needs a \code{title}.}
 
-\item{collapsed}{Whether the sidebar starts collapsed on larger screens.}
+\item{collapsed}{Whether the sidebar starts collapsed.}
+
+\item{side}{Which side of the page the sidebar is on: \code{"left"} (the
+default, passed as \code{block_page(sidebar = )}) or \code{"right"} (passed as
+\code{block_page(sidebar_right = )}), e.g. for a settings or details panel.}
 
 \item{id}{Optional sidebar DOM id.}
 

@@ -2,7 +2,12 @@
 #'
 #' @param ... Page body content.
 #' @param title Browser page title.
-#' @param sidebar Optional sidebar content.
+#' @param sidebar Optional [block_sidebar()] on the left: usually the
+#'   navigation.
+#' @param sidebar_right Optional [block_sidebar()] with `side = "right"`, on
+#'   the right of the page, e.g. a settings or details panel. Like the left
+#'   sidebar it stays in view at viewport height on larger screens; on small
+#'   screens it follows the page content.
 #' @param header Optional header content.
 #' @param theme_mode Initial theme mode.
 #' @param theme Optional `block_theme()` overrides.
@@ -19,6 +24,7 @@ block_page <- function(
   ...,
   title = NULL,
   sidebar = NULL,
+  sidebar_right = NULL,
   header = NULL,
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
@@ -37,7 +43,8 @@ block_page <- function(
     style_tag <- style$style
   }
 
-  sidebar <- prepare_sidebar(sidebar)
+  sidebar <- prepare_sidebar(sidebar, "left")
+  sidebar_right <- prepare_sidebar(sidebar_right, "right")
   sidebar_collapsed <- if (!is.null(sidebar)) {
     sidebar$attribs[["data-collapsed"]] %||% "false"
   } else {
@@ -69,11 +76,15 @@ block_page <- function(
         htmltools::tags$div(
           class = merge_classes(
             "sb-page",
-            if (!is.null(sidebar)) "has-sidebar"
+            if (!is.null(sidebar)) "has-sidebar",
+            if (!is.null(sidebar_right)) "has-sidebar-right"
           ),
           `data-sidebar-enhanced` = "false",
           `data-sidebar-mobile-open` = "false",
           `data-sidebar-collapsed` = sidebar_collapsed,
+          `data-sidebar-right-collapsed` = if (!is.null(sidebar_right)) {
+            sidebar_right$attribs[["data-collapsed"]] %||% "false"
+          },
           if (!is.null(sidebar)) {
             htmltools::tags$div(
               class = "sb-sidebar-backdrop",
@@ -91,7 +102,8 @@ block_page <- function(
               )
             },
             block_body(...)
-          )
+          ),
+          sidebar_right
         ),
         runtime_portal_root()
       )
@@ -142,13 +154,28 @@ block_theme_script <- function(theme_mode) {
   htmltools::tags$script(htmltools::HTML(script))
 }
 
-prepare_sidebar <- function(sidebar) {
+prepare_sidebar <- function(sidebar, side = c("left", "right")) {
+  side <- match_arg(side, c("left", "right"))
   if (is.null(sidebar)) {
     return(NULL)
   }
 
+  arg <- if (side == "right") "sidebar_right" else "sidebar"
+  sidebar_side <- if (inherits(sidebar, "shiny.tag")) {
+    sidebar$attribs[["data-side"]] %||% "left"
+  }
+  if (!identical(sidebar_side, side) && (side == "right" || identical(sidebar_side, "right"))) {
+    stop(
+      sprintf(
+        "`%s` must be a `block_sidebar(side = \"%s\")`.",
+        arg, side
+      ),
+      call. = FALSE
+    )
+  }
+
   if (is.null(sidebar$attribs$id) || !nzchar(sidebar$attribs$id)) {
-    sidebar$attribs$id <- "sb-sidebar"
+    sidebar$attribs$id <- if (side == "right") "sb-sidebar-right" else "sb-sidebar"
   }
 
   sidebar
