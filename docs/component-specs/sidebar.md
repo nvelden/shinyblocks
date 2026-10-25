@@ -73,6 +73,16 @@ attributes:
 - Arrow/Home/End traversal across child `.sb-nav-item` elements when
   the sidebar contains a nav region (see Nav).
 
+## Width
+
+The open widths come from `--sb-sidebar-left-width` (default
+`minmax(16rem, 18rem)`) and `--sb-sidebar-right-width` (default
+`minmax(18rem, 20rem)`), which apps may set on `.sb-page`, e.g.
+`.sb-page { --sb-sidebar-right-width: 23rem; }`. The grid reads them
+through `--sb-sidebar-left-col` / `--sb-sidebar-right-col`, which the
+collapsed states override, so a custom width never blocks collapsing
+(app CSS outside the package's cascade layers would otherwise win).
+
 ## Stable shell hooks
 
 `block_sidebar()` owns `.sb-sidebar`, `.sb-sidebar-title`,

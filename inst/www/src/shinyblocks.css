@@ -193,8 +193,10 @@
 
   .sb-page {
     @apply grid min-h-screen bg-background text-foreground;
-    --sb-sidebar-left-col: minmax(16rem, 18rem);
-    --sb-sidebar-right-col: minmax(18rem, 20rem);
+    /* Apps set the open widths with --sb-sidebar-left-width and
+       --sb-sidebar-right-width; the collapsed states override the columns. */
+    --sb-sidebar-left-col: var(--sb-sidebar-left-width, minmax(16rem, 18rem));
+    --sb-sidebar-right-col: var(--sb-sidebar-right-width, minmax(18rem, 20rem));
   }
 
   .sb-page.has-sidebar {
