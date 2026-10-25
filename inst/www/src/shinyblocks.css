@@ -800,6 +800,19 @@
   /* Sidebar collapse and mobile drawer behavior. */
 
   @media (min-width: 768px) {
+    /* Like the shadcn sidebar, the desktop sidebar is one viewport tall and
+       stays in view: a long nav scrolls inside it instead of stretching the
+       page, and a long page scrolls without taking the nav with it. */
+    .sb-page.has-sidebar .sb-sidebar {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100svh;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] {
       grid-template-columns: minmax(4.5rem, 4.5rem) minmax(0, 1fr);
     }
@@ -808,7 +821,7 @@
        column, so the collapsed sidebar must be its own stacking layer above the
        page content — otherwise the main panel paints over the tooltip. */
     .sb-page[data-sidebar-enhanced="true"][data-sidebar-collapsed="true"] .sb-sidebar {
-      position: relative;
+      position: sticky;
       z-index: 40;
       overflow: visible;
     }

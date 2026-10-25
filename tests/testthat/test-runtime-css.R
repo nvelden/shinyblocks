@@ -446,3 +446,14 @@ test_that("nav items, which are anchors, have no link underline", {
   nav_item_rules <- regmatches(css, gregexpr("\\.sb-nav-item\\{[^}]*\\}", css))[[1]]
   expect_true(any(grepl("text-decoration:none", nav_item_rules, fixed = TRUE)))
 })
+
+test_that("the desktop sidebar stays in view at viewport height", {
+  path <- system.file("www", "shinyblocks.css", package = "shinyblocks", mustWork = TRUE)
+  css <- paste(readLines(path, warn = FALSE), collapse = "\n")
+  rules <- regmatches(css, gregexpr("\\.sb-page\\.has-sidebar \\.sb-sidebar\\{[^}]*\\}", css))[[1]]
+  rule <- paste(rules, collapse = "")
+
+  expect_match(rule, "position:sticky", fixed = TRUE)
+  expect_match(rule, "height:100svh", fixed = TRUE)
+  expect_match(rule, "overflow-y:auto", fixed = TRUE)
+})
