@@ -482,6 +482,35 @@ try {
   // 06-20 max would otherwise be disabled and unable to take focus).
   await page.locator("#runtime-range").evaluate((node) => node.__sbDateRangePickerReceive({ min: null, max: null }));
 
+  // Regression: the open-focus animation frame must not pull focus back to the
+  // start day after an arrow key moved it (seen on slow CI runners). Hold
+  // animation frames back while opening and pressing ArrowRight, then run them.
+  const [focusBeforeFrame, focusAfterFrame] = await page.evaluate(async () => {
+    const held = [];
+    const realRaf = window.requestAnimationFrame;
+    window.requestAnimationFrame = (callback) => held.push(callback);
+    try {
+      document.querySelector("#runtime-range .sb-date-range-picker-trigger").click();
+      for (let i = 0; i < 50 && !document.activeElement?.dataset?.sbCalendarDate; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      document.activeElement.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+      );
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const before = document.activeElement.textContent;
+      held.splice(0).forEach((callback) => callback(performance.now()));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      return [before, document.activeElement.textContent];
+    } finally {
+      window.requestAnimationFrame = realRaf;
+    }
+  });
+  assert.equal(focusBeforeFrame, "15", "ArrowRight right after opening should move focus a day forward");
+  assert.equal(focusAfterFrame, "15", "the delayed open-focus frame must not move focus back");
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("[data-slot='date-range-picker-content']", { state: "detached" });
+
   // ARIA grid is well-formed: weeks are `role="row"` and days `role="gridcell"`.
   await page.locator("#runtime-range .sb-date-range-picker-trigger").click();
   await page.waitForSelector("[data-slot='date-range-picker-content']");

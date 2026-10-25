@@ -14,6 +14,7 @@
 
 ### Bug fixes
 
+* `block_date_picker()` and `block_date_range_picker()` no longer move keyboard focus back to the selected day when an arrow key is pressed right after opening. The open-focus fallback ran a frame later with the day from opening and could undo the move on a slow device.
 * Collapsing or expanding a `block_sidebar()` now fires a window `resize` event, so htmlwidgets and Shiny plots refit to the wider or narrower main column, like they do for bslib sidebars.
 * The desktop `block_sidebar()` is now one viewport tall and stays in view, like the shadcn sidebar. A long nav scrolls inside the sidebar instead of stretching the page, and long pages scroll without taking the nav with them.
 * `block_page()` now sets the viewport meta tag. Phones laid shinyblocks pages out at desktop width, so the sidebar did not collapse and responsive layouts did not apply.

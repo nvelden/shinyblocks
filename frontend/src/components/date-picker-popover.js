@@ -23,6 +23,9 @@ export function useDatePickerPopover({ root, disabled, nativeSelector, focused, 
   // a dependency of every consumer's `setOpen` call site.
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
+  // The latest focused day, for the open-focus frame that may run after it
+  const focusedRef = useRef(focused);
+  focusedRef.current = focused;
 
   function setOpen(next) {
     const nextOpen = Boolean(next);
@@ -48,7 +51,10 @@ export function useDatePickerPopover({ root, disabled, nativeSelector, focused, 
     if (!open) return undefined;
 
     const focusFrame = requestAnimationFrame(() => {
-      const node = dayRefs.current[focused];
+      // A fallback for when the day was not mounted yet: once focus is inside
+      // the calendar (e.g. an arrow key already moved it), leave it there.
+      if (contentRef.current?.contains(document.activeElement)) return;
+      const node = dayRefs.current[focusedRef.current];
       if (node && typeof node.focus === "function") {
         node.focus({ preventScroll: true });
       } else if (contentRef.current) {
