@@ -232,6 +232,8 @@
   .sb-nav-item {
     @apply flex min-h-9 items-center gap-2 rounded-md px-2 py-2 text-sm text-sidebar-foreground;
     outline: none;
+    /* Nav items are anchors: drop the browser's default link underline */
+    text-decoration: none;
     transition:
       color 0.15s ease,
       background-color 0.15s ease,

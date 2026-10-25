@@ -13,6 +13,8 @@
 
 ### Bug fixes
 
+* `block_nav_item()` labels are no longer underlined. Nav items are anchors and kept the browser's default link underline.
+
 * Horizontal `block_tabs()` lists now stay within narrow cards and responsive grid columns. Their compact intrinsic width is preserved when labels fit; longer tab rows scroll horizontally instead of overflowing their container.
 
 * `block_select()` and `block_combobox()` now reject malformed logical flags instead of silently treating them as false; their shared native-select and multi-selection internals have also been consolidated.

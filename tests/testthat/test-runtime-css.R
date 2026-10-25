@@ -439,3 +439,10 @@ test_that("runtime assets are attached and exist in the package", {
     )
   }
 })
+
+test_that("nav items, which are anchors, have no link underline", {
+  path <- system.file("www", "shinyblocks.css", package = "shinyblocks", mustWork = TRUE)
+  css <- paste(readLines(path, warn = FALSE), collapse = "\n")
+  nav_item_rules <- regmatches(css, gregexpr("\\.sb-nav-item\\{[^}]*\\}", css))[[1]]
+  expect_true(any(grepl("text-decoration:none", nav_item_rules, fixed = TRUE)))
+})
