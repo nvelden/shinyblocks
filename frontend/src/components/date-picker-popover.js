@@ -83,8 +83,7 @@ export function useDatePickerPopover({ root, disabled, nativeSelector, focused, 
     // Depend on `open` only: arrow-key navigation changes `focused`, and we must
     // not tear this effect down (returning focus to the trigger) while the
     // popover is still open. The separate `[focused, open]` effect below tracks
-    // focus to the active day; the initial focus here reads `focused` once on open.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // focus to the active day; the open-focus frame reads `focusedRef` instead.
   }, [open]);
 
   // Move keyboard focus to the active day as the user arrows around.
