@@ -15,6 +15,9 @@
 #'   `data-sb-style="<profile>"` is placed on the `.sb-app` shell and any
 #'   profile override `<style>` is injected, so the profile applies page-wide
 #'   (including portal overlays).
+#' @param favicon The browser tab icon. `NULL` (the default) uses the
+#'   shinyblocks icon; a path or URL, e.g. `"favicon.png"` for a file in the
+#'   app's `www/` folder, uses that image instead; `FALSE` sets no icon.
 #' @param class Additional classes for the app root.
 #'
 #' @return An `htmltools` tag list suitable for a Shiny UI.
@@ -29,9 +32,11 @@ block_page <- function(
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
   style = NULL,
+  favicon = NULL,
   class = NULL
 ) {
   theme_mode <- match_arg(theme_mode, c("system", "light", "dark"))
+  favicon_link <- page_favicon_link(favicon)
 
   data_sb_style <- NULL
   style_tag <- NULL
@@ -64,7 +69,7 @@ block_page <- function(
           content = "width=device-width, initial-scale=1"
         ),
         htmltools::tags$title(title %||% "shinyblocks"),
-        block_favicon_link(),
+        favicon_link,
         block_page_chrome_style(),
         block_theme_script(theme_mode),
         theme,
@@ -126,6 +131,30 @@ block_body <- function(..., class = NULL) {
       ...
     )
   )
+}
+
+page_favicon_link <- function(favicon) {
+  if (is.null(favicon)) {
+    return(block_favicon_link())
+  }
+  if (isFALSE(favicon)) {
+    return(NULL)
+  }
+  if (!is.character(favicon) || length(favicon) != 1 || is.na(favicon) || !nzchar(favicon)) {
+    stop("`favicon` must be `NULL`, `FALSE`, or a single path or URL.", call. = FALSE)
+  }
+  path <- sub("[?#].*$", "", favicon)
+  ext <- tolower(if (grepl("\\.[A-Za-z0-9]+$", path)) sub("^.*\\.", "", path) else "")
+  type <- switch(ext,
+    svg = "image/svg+xml",
+    png = "image/png",
+    ico = "image/x-icon",
+    gif = "image/gif",
+    jpg = ,
+    jpeg = "image/jpeg",
+    NULL
+  )
+  htmltools::tags$link(rel = "icon", type = type, href = favicon)
 }
 
 # Minimal host-document reset for the page-owning entry point.

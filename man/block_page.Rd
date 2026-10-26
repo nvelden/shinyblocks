@@ -13,6 +13,7 @@ block_page(
   theme_mode = c("system", "light", "dark"),
   theme = NULL,
   style = NULL,
+  favicon = NULL,
   class = NULL
 )
 }
@@ -39,6 +40,10 @@ screens it follows the page content.}
 \code{data-sb-style="<profile>"} is placed on the \code{.sb-app} shell and any
 profile override \verb{<style>} is injected, so the profile applies page-wide
 (including portal overlays).}
+
+\item{favicon}{The browser tab icon. \code{NULL} (the default) uses the
+shinyblocks icon; a path or URL, e.g. \code{"favicon.png"} for a file in the
+app's \verb{www/} folder, uses that image instead; \code{FALSE} sets no icon.}
 
 \item{class}{Additional classes for the app root.}
 }

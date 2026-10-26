@@ -2,6 +2,7 @@
 
 ### Components
 
+* `block_page(favicon = )` sets the browser tab icon: a path or URL (e.g. a file in the app's `www/` folder) replaces the shinyblocks icon, and `FALSE` sets none.
 * `block_sidebar(side = "right")` and `block_page(sidebar_right = )` add a sidebar on the right of the page, e.g. for a settings or details panel, next to or instead of the left navigation sidebar (shadcn `<Sidebar side="right">`). Like the left sidebar it stays in view at viewport height on larger screens. With `collapsible = TRUE` its toggle collapses it to a slim rail that keeps only the toggle, so it can always be reopened; on small screens it follows the page content. Set the open widths with the `--sb-sidebar-left-width` and `--sb-sidebar-right-width` CSS variables on `.sb-page`.
 * `block_pagination()` and `update_block_pagination()` are new. The standalone paging input reports an integer active page, renders previous/next bounds and ellipsis truncation, and supports server updates for page count, selection, and disabled state (issue #94).
 

@@ -32,6 +32,7 @@
 | `title` | Browser tab title (defaults to `"shinyblocks"`). |
 | `sidebar` | Optional `block_sidebar()` tag. Triggers the mobile sidebar trigger and backdrop wiring. |
 | `sidebar_right` | Optional `block_sidebar(side = "right")` tag, placed after the main column. No mobile trigger or backdrop; it collapses to a rail with its toggle. |
+| `favicon` | Browser tab icon: `NULL` keeps the shinyblocks icon, a path or URL replaces it (`type` inferred from the extension), `FALSE` emits none. |
 | `header` | Optional `block_header()` tag. Composed inside `.sb-header-shell` alongside the mobile sidebar trigger. |
 | `theme_mode` | Initial theme mode: `"system"`, `"light"`, or `"dark"`. |
 | `theme` | Optional `block_theme()` overrides injected into `<head>`. |

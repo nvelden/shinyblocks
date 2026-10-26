@@ -118,6 +118,21 @@ test_that("block_page checks the side of each sidebar", {
   expect_error(block_sidebar(side = "top"))
 })
 
+test_that("block_page sets the tab icon from favicon", {
+  head_of <- function(...) paste(htmltools::renderTags(block_page("Body", ...))$head, collapse = "")
+
+  # the default is the shinyblocks icon
+  expect_match(head_of(), '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml', fixed = TRUE)
+  png <- head_of(favicon = "favicon-32x32.png")
+  expect_match(png, '<link rel="icon" type="image/png" href="favicon-32x32.png"/>', fixed = TRUE)
+  # a custom icon replaces the shinyblocks icon
+  expect_false(grepl("data:image/svg+xml", png, fixed = TRUE))
+  expect_match(head_of(favicon = "https://example.org/icon.ico?v=2"), 'type="image/x-icon"', fixed = TRUE)
+  expect_false(grepl('rel="icon"', head_of(favicon = FALSE), fixed = TRUE))
+  expect_error(block_page("Body", favicon = c("a.png", "b.png")), "single path or URL")
+  expect_error(block_page("Body", favicon = TRUE), "single path or URL")
+})
+
 test_that("block_page applies a style profile and injects its overrides", {
   page <- block_page(
     title = "Example",
