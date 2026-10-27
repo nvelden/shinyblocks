@@ -5,7 +5,10 @@ test_that("block_button(id =) emits a runtime input id and shinyblocks.button bi
   expect_match(html, 'data-sb-component="button"', fixed = TRUE)
   expect_match(html, 'data-sb-input-id="confirm"', fixed = TRUE)
   expect_match(html, 'id="sb-runtime-button-confirm"', fixed = TRUE)
-  expect_match(html, '"binding":\\{"input":true,"type":"shinyblocks\\.button"\\}')
+  expect_match(
+    html,
+    '"binding":\\{"input":true,"type":"shinyblocks\\.button"\\}'
+  )
   # id moved into the runtime mount; it must not leak onto inner attrs
   expect_false(grepl('"attrs":\\{[^}]*"id"', html))
 })
@@ -218,7 +221,9 @@ test_that("update_block_toggle_group rejects icons without choices", {
 
   expect_error(
     update_block_toggle_group(
-      capture$session, "view", icons = list(a = "list")
+      capture$session,
+      "view",
+      icons = list(a = "list")
     ),
     "`icons` requires `choices`"
   )
@@ -348,7 +353,11 @@ test_that("update_block_file_input sets dropzone icon name and content html", {
   expect_identical(payload$dropzoneIconName, "upload")
   expect_null(payload$dropzoneIconHtml)
   expect_true(nzchar(payload$spriteHref))
-  expect_match(payload$dropzoneContentHtml, "<strong>Drop</strong>", fixed = TRUE)
+  expect_match(
+    payload$dropzoneContentHtml,
+    "<strong>Drop</strong>",
+    fixed = TRUE
+  )
 })
 
 test_that("update_block_file_input clears dropzone icon and content", {
@@ -371,8 +380,11 @@ test_that("update_block_input sends and clears number bounds", {
   capture <- local_input_message_session()
 
   update_block_input(
-    capture$session, "qty",
-    min = 0, max = 10, step = 2
+    capture$session,
+    "qty",
+    min = 0,
+    max = 10,
+    step = 2
   )
   payload <- capture$last_message()$payload
   expect_identical(payload$min, 0)
@@ -380,7 +392,13 @@ test_that("update_block_input sends and clears number bounds", {
   expect_identical(payload$step, 2)
 
   # NULL clears each bound: the key must be present with a NULL value.
-  update_block_input(capture$session, "qty", min = NULL, max = NULL, step = NULL)
+  update_block_input(
+    capture$session,
+    "qty",
+    min = NULL,
+    max = NULL,
+    step = NULL
+  )
   payload <- capture$last_message()$payload
   expect_true(all(c("min", "max", "step") %in% names(payload)))
   expect_null(payload$min)
@@ -414,4 +432,24 @@ test_that("updaters work when called through a dots-forwarding wrapper", {
   outer <- function(...) wrapper(...)
   expect_invisible(outer(placeholder = "deep"))
   expect_identical(capture$last_message()$payload$placeholder, "deep")
+})
+
+
+test_that("file list and append options can be updated with reset", {
+  capture <- local_input_message_session()
+  update_block_file_input(
+    capture$session,
+    "upload",
+    show_files = FALSE,
+    append = TRUE,
+    reset = TRUE
+  )
+  expect_identical(
+    capture$last_message()$input_id,
+    "sb-runtime-file-input-upload"
+  )
+  payload <- capture$last_payload()
+  expect_identical(payload$showFiles, FALSE)
+  expect_identical(payload$append, TRUE)
+  expect_identical(payload$reset, TRUE)
 })

@@ -1,7 +1,9 @@
 # File Input
 
 > Shinyblocks function: `block_file_input()`
-> Shadcn reference: none; styled from shadcn input/button conventions.
+> Shadcn reference: [Attachment](https://ui.shadcn.com/docs/components/attachment)
+> for labelled per-file remove actions; community [File Upload](https://www.shadcn.io/ui/file-upload)
+> for separate dropzone/list/delete/clear composition.
 > Status: Runtime form control that deliberately reuses Shiny's native
 > `FileUploadBinding`.
 
@@ -24,6 +26,24 @@
     `role="button"`. Nested `block_*()` runtime components are not hydrated
     inside the slot — use plain `htmltools` (text, `img`, a styled `<button>`,
     or a `block_icon()` svg).
+
+## Selected files
+
+- `show_files = TRUE` displays a sibling list outside the picker surface with
+  filename, size, a labelled X action per file, and Clear all for multiple files.
+  Actions respect disabled state and never open the picker. Removal restores
+  keyboard focus to the next action or picker.
+- `append = FALSE` preserves replacement behavior. With `multiple = TRUE`,
+  `append = TRUE` adds subsequent drops and picker selections to retained File
+  objects, including after Shiny clears the native input on upload completion.
+  Files matching a retained one by name, size, and last-modified time are
+  skipped.
+- Removal reuploads the remaining selection through Shiny's native transport;
+  empty selection dispatches change to abort uploads and explicitly sends NULL
+  to the namespaced `:shiny.file` input. Server reset uses the same path.
+- Let bridged drops bubble. Shiny's per-input drop handler only binds to a
+  `div.input-group` ancestor, which this markup does not create, and its
+  document-level drag tracker relies on seeing `drop` to reset its counter.
 
 ## States
 
@@ -49,6 +69,8 @@
 | --- | --- | --- |
 | `input_id` | native input `id` | Drives Shiny's native upload binding. |
 | `variant` | `props$variant` | `"button"` or `"dropzone"`. |
+| `show_files` | `props$showFiles` | Show removable file list; defaults TRUE. |
+| `append` | `props$append` | Add selections in multiple mode; defaults FALSE. |
 | `multiple` | `props$multiple` + native attr | Allows multiple files. |
 | `accept` | `props$accept` + native attr | Character vector comma-joined; also gates dropped files. |
 | `button_label` | `props$buttonLabel` | Visible trigger text (button variant). |

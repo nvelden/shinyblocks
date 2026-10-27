@@ -834,3 +834,18 @@ test_that("block_select multiple accepts a selection at the max_items cap", {
 
   expect_identical(select$state$value, list("free", "pro"))
 })
+
+
+test_that("file selection options serialize without changing replacement defaults", {
+  defaults <- runtime_payload_from(block_file_input("upload"))
+  expect_identical(defaults$props$showFiles, TRUE)
+  expect_identical(defaults$props$append, FALSE)
+  configured <- runtime_payload_from(block_file_input(
+    "upload",
+    multiple = TRUE,
+    show_files = FALSE,
+    append = TRUE
+  ))
+  expect_identical(configured$props$showFiles, FALSE)
+  expect_identical(configured$props$append, TRUE)
+})

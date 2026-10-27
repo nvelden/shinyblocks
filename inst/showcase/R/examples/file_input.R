@@ -2,9 +2,13 @@ htmltools::tagList(
   showcase_playground_layout(
     controls = htmltools::tagList(
       showcase_controls_group(
-        "Content", first = TRUE,
+        "Content",
+        first = TRUE,
         block_field(
-          block_field_label("variant", `for` = "showcase_file_input_doc_variant"),
+          block_field_label(
+            "variant",
+            `for` = "showcase_file_input_doc_variant"
+          ),
           block_select(
             "showcase_file_input_doc_variant",
             choices = c(button = "button", dropzone = "dropzone"),
@@ -13,67 +17,164 @@ htmltools::tagList(
           )
         ),
         block_field(
-          block_field_label("button label", `for` = "showcase_file_input_doc_button_label"),
+          block_field_label(
+            "button label",
+            `for` = "showcase_file_input_doc_button_label"
+          ),
           block_input("showcase_file_input_doc_button_label", value = "Browse")
         ),
         block_field(
-          block_field_label("placeholder", `for` = "showcase_file_input_doc_placeholder"),
-          block_input("showcase_file_input_doc_placeholder", value = "No file selected")
+          block_field_label(
+            "placeholder",
+            `for` = "showcase_file_input_doc_placeholder"
+          ),
+          block_input(
+            "showcase_file_input_doc_placeholder",
+            value = "No file selected"
+          )
         ),
         block_field(
-          block_field_label("dropzone label", `for` = "showcase_file_input_doc_dropzone_label"),
-          block_input("showcase_file_input_doc_dropzone_label", value = "Drag files here or click to browse")
+          block_field_label(
+            "dropzone label",
+            `for` = "showcase_file_input_doc_dropzone_label"
+          ),
+          block_input(
+            "showcase_file_input_doc_dropzone_label",
+            value = "Drag files here or click to browse"
+          )
         ),
         block_field(
-          block_field_label("dropzone hint", `for` = "showcase_file_input_doc_dropzone_hint"),
-          block_input("showcase_file_input_doc_dropzone_hint", value = "CSV up to 10MB", placeholder = "optional hint")
+          block_field_label(
+            "dropzone hint",
+            `for` = "showcase_file_input_doc_dropzone_hint"
+          ),
+          block_input(
+            "showcase_file_input_doc_dropzone_hint",
+            value = "CSV up to 10MB",
+            placeholder = "optional hint"
+          )
         ),
         block_field(
-          block_field_label("dropzone icon", `for` = "showcase_file_input_doc_dropzone_icon"),
+          block_field_label(
+            "dropzone icon",
+            `for` = "showcase_file_input_doc_dropzone_icon"
+          ),
           block_select(
             "showcase_file_input_doc_dropzone_icon",
-            choices = c(none = "none", upload = "upload", file = "file", image = "image"),
+            choices = c(
+              none = "none",
+              upload = "upload",
+              file = "file",
+              image = "image"
+            ),
             selected = "upload",
             size = "sm"
           )
         ),
         block_field(
-          block_field_label("custom content", `for` = "showcase_file_input_doc_dropzone_content"),
-          block_checkbox("showcase_file_input_doc_dropzone_content", "Use custom dropzone_content (icon + title + button)", value = FALSE)
+          block_field_label(
+            "custom content",
+            `for` = "showcase_file_input_doc_dropzone_content"
+          ),
+          block_checkbox(
+            "showcase_file_input_doc_dropzone_content",
+            "Use custom dropzone_content (icon + title + button)",
+            value = FALSE
+          )
         ),
         block_field(
           block_field_label("accept", `for` = "showcase_file_input_doc_accept"),
-          block_input("showcase_file_input_doc_accept", value = ".csv,text/csv", placeholder = ".csv,image/png")
+          block_input(
+            "showcase_file_input_doc_accept",
+            value = ".csv,text/csv",
+            placeholder = ".csv,image/png"
+          )
         )
       ),
       showcase_controls_group(
         "State",
         block_field(
-          block_field_label("multiple", `for` = "showcase_file_input_doc_multiple"),
-          block_checkbox("showcase_file_input_doc_multiple", "Allow multiple files", value = FALSE)
+          block_field_label(
+            "multiple",
+            `for` = "showcase_file_input_doc_multiple"
+          ),
+          block_checkbox(
+            "showcase_file_input_doc_multiple",
+            "Allow multiple files",
+            value = FALSE
+          )
         ),
         block_field(
-          block_field_label("disabled", `for` = "showcase_file_input_doc_disabled"),
-          block_checkbox("showcase_file_input_doc_disabled", "Disabled", value = FALSE)
+          block_checkbox(
+            "showcase_file_input_doc_show_files",
+            "Show removable file list",
+            value = TRUE
+          )
         ),
         block_field(
-          block_field_label("invalid", `for` = "showcase_file_input_doc_invalid"),
-          block_checkbox("showcase_file_input_doc_invalid", "Invalid", value = FALSE)
+          block_checkbox(
+            "showcase_file_input_doc_append",
+            "Append subsequent selections",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_field_label(
+            "disabled",
+            `for` = "showcase_file_input_doc_disabled"
+          ),
+          block_checkbox(
+            "showcase_file_input_doc_disabled",
+            "Disabled",
+            value = FALSE
+          )
+        ),
+        block_field(
+          block_field_label(
+            "invalid",
+            `for` = "showcase_file_input_doc_invalid"
+          ),
+          block_checkbox(
+            "showcase_file_input_doc_invalid",
+            "Invalid",
+            value = FALSE
+          )
         )
       ),
       showcase_controls_group(
         "Actions (Server Update)",
         block_cluster(
           gap = "sm",
-          showcase_action_button("showcase_file_input_to_dropzone", "Switch to dropzone"),
-          showcase_action_button("showcase_file_input_to_button", "Switch to button"),
-          showcase_action_button("showcase_file_input_relabel", "Relabel button"),
-          showcase_action_button("showcase_file_input_set_content", "Set custom content"),
-          showcase_action_button("showcase_file_input_clear_content", "Clear custom content"),
+          showcase_action_button(
+            "showcase_file_input_to_dropzone",
+            "Switch to dropzone"
+          ),
+          showcase_action_button(
+            "showcase_file_input_to_button",
+            "Switch to button"
+          ),
+          showcase_action_button(
+            "showcase_file_input_relabel",
+            "Relabel button"
+          ),
+          showcase_action_button(
+            "showcase_file_input_set_content",
+            "Set custom content"
+          ),
+          showcase_action_button(
+            "showcase_file_input_clear_content",
+            "Clear custom content"
+          ),
           showcase_action_button("showcase_file_input_disable", "Disable"),
           showcase_action_button("showcase_file_input_enable", "Enable"),
-          showcase_action_button("showcase_file_input_mark_invalid", "Mark invalid"),
-          showcase_action_button("showcase_file_input_clear_invalid", "Clear invalid"),
+          showcase_action_button(
+            "showcase_file_input_mark_invalid",
+            "Mark invalid"
+          ),
+          showcase_action_button(
+            "showcase_file_input_clear_invalid",
+            "Clear invalid"
+          ),
           showcase_action_button("showcase_file_input_reset", "Reset selection")
         )
       ),
@@ -81,15 +182,27 @@ htmltools::tagList(
         "Styling",
         block_field(
           block_field_label("width", `for` = "showcase_file_input_doc_width"),
-          block_input("showcase_file_input_doc_width", value = "100%", placeholder = "20rem or 100%")
+          block_input(
+            "showcase_file_input_doc_width",
+            value = "100%",
+            placeholder = "20rem or 100%"
+          )
         ),
         block_field(
           block_field_label("style", `for` = "showcase_file_input_doc_style"),
-          block_input("showcase_file_input_doc_style", value = "", placeholder = "e.g., max-width: 24rem;")
+          block_input(
+            "showcase_file_input_doc_style",
+            value = "",
+            placeholder = "e.g., max-width: 24rem;"
+          )
         ),
         block_field(
           block_field_label("class", `for` = "showcase_file_input_doc_class"),
-          block_checkbox("showcase_file_input_doc_class", "Use custom dashed-border class", value = FALSE)
+          block_checkbox(
+            "showcase_file_input_doc_class",
+            "Use custom dashed-border class",
+            value = FALSE
+          )
         )
       )
     ),
@@ -106,7 +219,10 @@ htmltools::tagList(
       )
     )
   ),
-  htmltools::tags$h3(style = "margin-top: 2rem; font-size: 1.125rem;", "API Reference"),
+  htmltools::tags$h3(
+    style = "margin-top: 2rem; font-size: 1.125rem;",
+    "API Reference"
+  ),
   shiny::uiOutput("showcase_file_input_api_table"),
   htmltools::tags$h3(
     style = "margin-top: 2rem; font-size: 1.125rem;",

@@ -42,10 +42,14 @@ register_file_input_showcase <- function(input, output, session) {
     accept_value <- input$showcase_file_input_doc_accept %||% ".csv,text/csv"
     accept <- trimws(strsplit(accept_value, ",", fixed = TRUE)[[1]])
     accept <- accept[nzchar(accept)]
-    if (!length(accept)) accept <- NULL
+    if (!length(accept)) {
+      accept <- NULL
+    }
 
     style_val <- input$showcase_file_input_doc_style %||% ""
-    if (!nzchar(style_val)) style_val <- NULL
+    if (!nzchar(style_val)) {
+      style_val <- NULL
+    }
 
     class_val <- if (isTRUE(input$showcase_file_input_doc_class)) {
       "border-dashed"
@@ -54,21 +58,29 @@ register_file_input_showcase <- function(input, output, session) {
     }
 
     dz_hint <- input$showcase_file_input_doc_dropzone_hint %||% ""
-    if (!nzchar(dz_hint)) dz_hint <- NULL
+    if (!nzchar(dz_hint)) {
+      dz_hint <- NULL
+    }
 
     dz_icon <- input$showcase_file_input_doc_dropzone_icon %||% "upload"
-    if (!nzchar(dz_icon) || identical(dz_icon, "none")) dz_icon <- NULL
+    if (!nzchar(dz_icon) || identical(dz_icon, "none")) {
+      dz_icon <- NULL
+    }
 
     list(
       variant = input$showcase_file_input_doc_variant %||% "button",
       button_label = input$showcase_file_input_doc_button_label %||% "Browse",
-      placeholder = input$showcase_file_input_doc_placeholder %||% "No file selected",
-      dropzone_label = input$showcase_file_input_doc_dropzone_label %||% "Drag files here or click to browse",
+      placeholder = input$showcase_file_input_doc_placeholder %||%
+        "No file selected",
+      dropzone_label = input$showcase_file_input_doc_dropzone_label %||%
+        "Drag files here or click to browse",
       dropzone_hint = dz_hint,
       dropzone_icon = dz_icon,
       use_content = isTRUE(input$showcase_file_input_doc_dropzone_content),
       accept = accept,
       multiple = isTRUE(input$showcase_file_input_doc_multiple),
+      show_files = !identical(input$showcase_file_input_doc_show_files, FALSE),
+      append = isTRUE(input$showcase_file_input_doc_append),
       width = input$showcase_file_input_doc_width %||% "100%",
       disabled = isTRUE(input$showcase_file_input_doc_disabled),
       invalid = isTRUE(input$showcase_file_input_doc_invalid),
@@ -86,36 +98,58 @@ register_file_input_showcase <- function(input, output, session) {
         "showcase_file_input_preview",
         variant = args$variant,
         multiple = args$multiple,
+        show_files = args$show_files,
+        append = args$append,
         accept = args$accept,
         button_label = args$button_label,
         placeholder = args$placeholder,
         dropzone_label = args$dropzone_label,
         dropzone_hint = args$dropzone_hint,
         dropzone_icon = args$dropzone_icon,
-        dropzone_content = if (args$use_content) dropzone_content_example() else NULL,
+        dropzone_content = if (args$use_content) {
+          dropzone_content_example()
+        } else {
+          NULL
+        },
         width = args$width,
         disabled = args$disabled,
         invalid = args$invalid,
         style = args$style,
         class = args$class
       ),
-      block_field_description("Server value uses Shiny's native fileInput() data frame.")
+      block_field_description(
+        "Server value uses Shiny's native fileInput() data frame."
+      )
     )
   })
-  shiny::outputOptions(output, "showcase_file_input_preview_ui", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "showcase_file_input_preview_ui",
+    suspendWhenHidden = FALSE
+  )
 
   output$showcase_file_input_preview_value <- showcase_render_code({
     value <- input$showcase_file_input_preview
     if (is.null(value)) {
       "input$showcase_file_input_preview = <NULL>"
     } else {
-      paste(c(
-        "input$showcase_file_input_preview =",
-        capture.output(print(value[, c("name", "size", "type", "datapath")], row.names = FALSE))
-      ), collapse = "\n")
+      paste(
+        c(
+          "input$showcase_file_input_preview =",
+          capture.output(print(
+            value[, c("name", "size", "type", "datapath")],
+            row.names = FALSE
+          ))
+        ),
+        collapse = "\n"
+      )
     }
   })
-  shiny::outputOptions(output, "showcase_file_input_preview_value", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "showcase_file_input_preview_value",
+    suspendWhenHidden = FALSE
+  )
 
   output$showcase_file_input_preview_code <- showcase_render_code({
     string_literal <- function(value) {
@@ -124,50 +158,153 @@ register_file_input_showcase <- function(input, output, session) {
     args <- file_input_args()
     code_args <- c('input_id = "showcase_file_input_preview"')
     if (!identical(args$variant, "button")) {
-      code_args <- c(code_args, paste0("variant = ", string_literal(args$variant)))
+      code_args <- c(
+        code_args,
+        paste0("variant = ", string_literal(args$variant))
+      )
     }
-    if (args$multiple) code_args <- c(code_args, "multiple = TRUE")
+    if (args$multiple) {
+      code_args <- c(code_args, "multiple = TRUE")
+    }
+    if (!args$show_files) {
+      code_args <- c(code_args, "show_files = FALSE")
+    }
+    if (args$append) {
+      code_args <- c(code_args, "append = TRUE")
+    }
     if (!is.null(args$accept)) {
-      quoted <- paste(vapply(args$accept, string_literal, character(1)), collapse = ", ")
+      quoted <- paste(
+        vapply(args$accept, string_literal, character(1)),
+        collapse = ", "
+      )
       code_args <- c(code_args, paste0("accept = c(", quoted, ")"))
     }
     if (!identical(args$button_label, "Browse")) {
-      code_args <- c(code_args, paste0("button_label = ", string_literal(args$button_label)))
+      code_args <- c(
+        code_args,
+        paste0("button_label = ", string_literal(args$button_label))
+      )
     }
     if (!identical(args$placeholder, "No file selected")) {
-      code_args <- c(code_args, paste0("placeholder = ", string_literal(args$placeholder)))
+      code_args <- c(
+        code_args,
+        paste0("placeholder = ", string_literal(args$placeholder))
+      )
     }
-    if (identical(args$variant, "dropzone") &&
-          !identical(args$dropzone_label, "Drag files here or click to browse")) {
-      code_args <- c(code_args, paste0("dropzone_label = ", string_literal(args$dropzone_label)))
+    if (
+      identical(args$variant, "dropzone") &&
+        !identical(args$dropzone_label, "Drag files here or click to browse")
+    ) {
+      code_args <- c(
+        code_args,
+        paste0("dropzone_label = ", string_literal(args$dropzone_label))
+      )
     }
     if (identical(args$variant, "dropzone") && !is.null(args$dropzone_hint)) {
-      code_args <- c(code_args, paste0("dropzone_hint = ", string_literal(args$dropzone_hint)))
+      code_args <- c(
+        code_args,
+        paste0("dropzone_hint = ", string_literal(args$dropzone_hint))
+      )
     }
     if (identical(args$variant, "dropzone") && args$use_content) {
       code_args <- c(code_args, dropzone_content_example_code)
-    } else if (identical(args$variant, "dropzone") &&
-                 !is.null(args$dropzone_icon) &&
-                 !identical(args$dropzone_icon, "upload")) {
-      code_args <- c(code_args, paste0("dropzone_icon = ", string_literal(args$dropzone_icon)))
+    } else if (
+      identical(args$variant, "dropzone") &&
+        !is.null(args$dropzone_icon) &&
+        !identical(args$dropzone_icon, "upload")
+    ) {
+      code_args <- c(
+        code_args,
+        paste0("dropzone_icon = ", string_literal(args$dropzone_icon))
+      )
     }
-    if (!is.null(args$width) && nzchar(args$width) && !identical(args$width, "100%")) {
+    if (
+      !is.null(args$width) &&
+        nzchar(args$width) &&
+        !identical(args$width, "100%")
+    ) {
       code_args <- c(code_args, paste0("width = ", string_literal(args$width)))
     }
-    if (args$disabled) code_args <- c(code_args, "disabled = TRUE")
-    if (args$invalid) code_args <- c(code_args, "invalid = TRUE")
-    if (!is.null(args$style)) code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
-    if (!is.null(args$class)) code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    if (args$disabled) {
+      code_args <- c(code_args, "disabled = TRUE")
+    }
+    if (args$invalid) {
+      code_args <- c(code_args, "invalid = TRUE")
+    }
+    if (!is.null(args$style)) {
+      code_args <- c(code_args, paste0("style = ", string_literal(args$style)))
+    }
+    if (!is.null(args$class)) {
+      code_args <- c(code_args, paste0("class = ", string_literal(args$class)))
+    }
 
     paste0("block_file_input(\n  ", paste(code_args, collapse = ",\n  "), "\n)")
   })
-  shiny::outputOptions(output, "showcase_file_input_preview_code", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "showcase_file_input_preview_code",
+    suspendWhenHidden = FALSE
+  )
 
   output$showcase_file_input_api_table <- shiny::renderUI({
     showcase_api_table(data.frame(
-      Argument = c("input_id", "variant", "multiple", "accept", "button_label", "placeholder", "dropzone_label", "dropzone_hint", "dropzone_icon", "dropzone_content", "width", "disabled", "invalid", "style", "class"),
-      Type = c("character", "character", "logical", "character", "character", "character", "character", "character", "character | tag", "tag | tagList", "character", "logical", "logical", "character | list", "character"),
-      Default = c("required", "\"button\"", "FALSE", "NULL", "\"Browse\"", "\"No file selected\"", "\"Drag files here or click to browse\"", "NULL", "NULL", "NULL", "NULL", "FALSE", "FALSE", "NULL", "NULL"),
+      Argument = c(
+        "input_id",
+        "variant",
+        "multiple",
+        "accept",
+        "button_label",
+        "placeholder",
+        "dropzone_label",
+        "dropzone_hint",
+        "dropzone_icon",
+        "dropzone_content",
+        "width",
+        "disabled",
+        "invalid",
+        "style",
+        "class",
+        "show_files",
+        "append"
+      ),
+      Type = c(
+        "character",
+        "character",
+        "logical",
+        "character",
+        "character",
+        "character",
+        "character",
+        "character",
+        "character | tag",
+        "tag | tagList",
+        "character",
+        "logical",
+        "logical",
+        "character | list",
+        "character",
+        "logical",
+        "logical"
+      ),
+      Default = c(
+        "required",
+        "\"button\"",
+        "FALSE",
+        "NULL",
+        "\"Browse\"",
+        "\"No file selected\"",
+        "\"Drag files here or click to browse\"",
+        "NULL",
+        "NULL",
+        "NULL",
+        "NULL",
+        "FALSE",
+        "FALSE",
+        "NULL",
+        "NULL",
+        "TRUE",
+        "FALSE"
+      ),
       Description = c(
         "Input id for the native Shiny file upload value.",
         "Picker variant: \"button\" trigger or \"dropzone\" drag surface.",
@@ -183,11 +320,17 @@ register_file_input_showcase <- function(input, output, session) {
         "Disables the visible picker and native file input.",
         "Sets aria-invalid='true' to surface destructive styling.",
         "Inline CSS styles applied to the visible control.",
-        "Additional class merged onto the visible control."
+        "Additional class merged onto the visible control.",
+        "Show selected files with Remove and Clear all actions.",
+        "Add subsequent selections when multiple is TRUE."
       )
     ))
   })
-  shiny::outputOptions(output, "showcase_file_input_api_table", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "showcase_file_input_api_table",
+    suspendWhenHidden = FALSE
+  )
 
   reactive_code <- shiny::reactiveVal(paste0(
     "# Click an action button to see\n",
@@ -197,10 +340,18 @@ register_file_input_showcase <- function(input, output, session) {
   output$showcase_file_input_reactive_code <- showcase_render_code({
     reactive_code()
   })
-  shiny::outputOptions(output, "showcase_file_input_reactive_code", suspendWhenHidden = FALSE)
+  shiny::outputOptions(
+    output,
+    "showcase_file_input_reactive_code",
+    suspendWhenHidden = FALSE
+  )
 
   shiny::observeEvent(input$showcase_file_input_to_dropzone, {
-    update_block_file_input(session, "showcase_file_input_preview", variant = "dropzone")
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      variant = "dropzone"
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -211,7 +362,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_to_button, {
-    update_block_file_input(session, "showcase_file_input_preview", variant = "button")
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      variant = "button"
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -222,7 +377,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_relabel, {
-    update_block_file_input(session, "showcase_file_input_preview", button_label = "Pick a file")
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      button_label = "Pick a file"
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -234,7 +393,8 @@ register_file_input_showcase <- function(input, output, session) {
 
   shiny::observeEvent(input$showcase_file_input_set_content, {
     update_block_file_input(
-      session, "showcase_file_input_preview",
+      session,
+      "showcase_file_input_preview",
       variant = "dropzone",
       dropzone_content = dropzone_content_example()
     )
@@ -243,14 +403,17 @@ register_file_input_showcase <- function(input, output, session) {
       "  session = session,\n",
       "  input_id = \"showcase_file_input_preview\",\n",
       "  variant = \"dropzone\",\n",
-      "  ", dropzone_content_example_code, "\n",
+      "  ",
+      dropzone_content_example_code,
+      "\n",
       ")"
     ))
   })
 
   shiny::observeEvent(input$showcase_file_input_clear_content, {
     update_block_file_input(
-      session, "showcase_file_input_preview",
+      session,
+      "showcase_file_input_preview",
       dropzone_content = NULL
     )
     reactive_code(paste0(
@@ -263,7 +426,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_disable, {
-    update_block_file_input(session, "showcase_file_input_preview", disabled = TRUE)
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      disabled = TRUE
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -274,7 +441,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_enable, {
-    update_block_file_input(session, "showcase_file_input_preview", disabled = FALSE)
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      disabled = FALSE
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -285,7 +456,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_mark_invalid, {
-    update_block_file_input(session, "showcase_file_input_preview", invalid = TRUE)
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      invalid = TRUE
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -296,7 +471,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_clear_invalid, {
-    update_block_file_input(session, "showcase_file_input_preview", invalid = FALSE)
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      invalid = FALSE
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",
@@ -307,7 +486,11 @@ register_file_input_showcase <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$showcase_file_input_reset, {
-    update_block_file_input(session, "showcase_file_input_preview", reset = TRUE)
+    update_block_file_input(
+      session,
+      "showcase_file_input_preview",
+      reset = TRUE
+    )
     reactive_code(paste0(
       "update_block_file_input(\n",
       "  session = session,\n",

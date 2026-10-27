@@ -33,15 +33,25 @@ module_ui <- function(id) {
   shiny::div(
     id = ns("root"),
     runtime$runtime_component(
-      component = "fixture", .validate = FALSE,
+      component = "fixture",
+      .validate = FALSE,
       input_id = ns("choice"),
       state = list(value = "m0"),
       binding = list(input = TRUE),
       mount_id = ns("runtime-choice")
     ),
     block_file_input(ns("upload"), button_label = "Module upload"),
-    block_date_picker(ns("date"), value = "2026-06-15", class = "runtime-mod-date-fixture"),
-    block_progress(ns("progress"), value = 0.1, show_value = TRUE, class = "runtime-mod-progress-fixture"),
+    block_date_picker(
+      ns("date"),
+      value = "2026-06-15",
+      class = "runtime-mod-date-fixture"
+    ),
+    block_progress(
+      ns("progress"),
+      value = 0.1,
+      show_value = TRUE,
+      class = "runtime-mod-progress-fixture"
+    ),
     shiny::actionButton(ns("set_progress_60"), "Set module progress 60"),
     shiny::verbatimTextOutput(ns("value")),
     shiny::verbatimTextOutput(ns("upload_value")),
@@ -188,7 +198,8 @@ ui <- shiny::fluidPage(
     )
   ),
   runtime$runtime_component(
-    component = "fixture", .validate = FALSE,
+    component = "fixture",
+    .validate = FALSE,
     input_id = "choice",
     state = list(value = "a"),
     binding = list(input = TRUE),
@@ -227,7 +238,12 @@ ui <- shiny::fluidPage(
   ),
   block_combobox(
     "runtime_combobox",
-    choices = c(Apple = "apple", Apricot = "apricot", Banana = "banana", Cherry = "cherry"),
+    choices = c(
+      Apple = "apple",
+      Apricot = "apricot",
+      Banana = "banana",
+      Cherry = "cherry"
+    ),
     selected = "apple",
     placeholder = "Choose fruit",
     class = "runtime-combobox-fixture"
@@ -335,6 +351,20 @@ ui <- shiny::fluidPage(
     class = "runtime-file-input-fixture"
   ),
   block_file_input(
+    "runtime_file_multi",
+    variant = "dropzone",
+    multiple = TRUE,
+    append = TRUE,
+    accept = ".txt",
+    class = "runtime-file-multi-fixture"
+  ),
+  shiny::actionButton("reset_file_multi", "Reset files"),
+  shiny::actionButton("replace_file_multi", "Replace selections"),
+  shiny::verbatimTextOutput("runtime_file_multi_content"),
+  shiny::actionButton("disable_file_multi", "Disable files"),
+  shiny::actionButton("enable_file_multi", "Enable files"),
+  shiny::verbatimTextOutput("runtime_file_multi_value"),
+  block_file_input(
     "runtime_file_disabled",
     button_label = "Disabled upload",
     disabled = TRUE,
@@ -376,7 +406,11 @@ ui <- shiny::fluidPage(
     class = "runtime-table-fixture"
   ),
   block_table(
-    data.frame(name = c("one", "two"), value = c(1, 2), stringsAsFactors = FALSE),
+    data.frame(
+      name = c("one", "two"),
+      value = c(1, 2),
+      stringsAsFactors = FALSE
+    ),
     id = "runtime_table_sel",
     selection = "multiple",
     class = "runtime-table-sel-fixture"
@@ -387,7 +421,10 @@ ui <- shiny::fluidPage(
     side = "bottom",
     align = "center",
     htmltools::tags$p("Popover body"),
-    htmltools::tags$p(shiny::textOutput("runtime_popover_slot_value", inline = TRUE)),
+    htmltools::tags$p(shiny::textOutput(
+      "runtime_popover_slot_value",
+      inline = TRUE
+    )),
     htmltools::tags$button(
       id = "runtime_popover_inner",
       type = "button",
@@ -452,7 +489,10 @@ ui <- shiny::fluidPage(
   shiny::actionButton("inc_progress", "Inc progress"),
   shiny::actionButton("reset_progress", "Reset progress"),
   shiny::actionButton("indeterminate_progress", "Indeterminate progress"),
-  shiny::actionButton("insert_late_progress", "Insert + immediately update progress"),
+  shiny::actionButton(
+    "insert_late_progress",
+    "Insert + immediately update progress"
+  ),
   shiny::div(id = "late_progress_target"),
   shiny::verbatimTextOutput("runtime_table_sel_value"),
   shiny::actionButton("update_table", "Update table"),
@@ -702,6 +742,44 @@ server <- function(input, output, session) {
     value <- input$runtime_range
     as.character(length(value))
   })
+  shiny::observeEvent(input$replace_file_multi, {
+    update_block_file_input(
+      session,
+      "runtime_file_multi",
+      append = FALSE,
+      show_files = FALSE
+    )
+  })
+  output$runtime_file_multi_content <- shiny::renderText({
+    value <- input$runtime_file_multi
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(
+      vapply(
+        value$datapath,
+        function(path) paste(readLines(path, warn = FALSE), collapse = ""),
+        character(1)
+      ),
+      collapse = "|"
+    )
+  })
+  shiny::observeEvent(input$reset_file_multi, {
+    update_block_file_input(session, "runtime_file_multi", reset = TRUE)
+  })
+  shiny::observeEvent(input$disable_file_multi, {
+    update_block_file_input(session, "runtime_file_multi", disabled = TRUE)
+  })
+  shiny::observeEvent(input$enable_file_multi, {
+    update_block_file_input(session, "runtime_file_multi", disabled = FALSE)
+  })
+  output$runtime_file_multi_value <- shiny::renderText({
+    value <- input$runtime_file_multi
+    if (is.null(value)) {
+      return("<NULL>")
+    }
+    paste(value$name, collapse = ",")
+  })
   output$runtime_file_input_value <- shiny::renderText({
     value <- input$runtime_file_input
     if (is.null(value)) {
@@ -805,7 +883,9 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$move_toaster, {
     update_block_toaster(session, "runtime_toaster", position = "top-left")
   })
-  output$runtime_alert_dialog_value <- shiny::renderText(input$runtime_alert_dialog %||% "<NULL>")
+  output$runtime_alert_dialog_value <- shiny::renderText(
+    input$runtime_alert_dialog %||% "<NULL>"
+  )
   shiny::observeEvent(input$open_alert_dialog, {
     update_block_alert_dialog(session, "runtime_alert_dialog", open = TRUE)
   })
@@ -1098,7 +1178,11 @@ server <- function(input, output, session) {
   })
 
   shiny::observeEvent(input$resize_button, {
-    update_block_button(session, "runtime_button", style = list(width = "200px"))
+    update_block_button(
+      session,
+      "runtime_button",
+      style = list(width = "200px")
+    )
   })
 
   shiny::observeEvent(input$clear_button_style, {
@@ -1113,15 +1197,19 @@ server <- function(input, output, session) {
   # the task busy. Because that runs before the auto-reset onFlush callback, the
   # manual-reset map suppresses the automatic ready reset and the button stays
   # busy until released.
-  shiny::observeEvent(input$runtime_task_button, {
-    if (isTRUE(tb_hold())) {
-      update_block_task_button(
-        session = session,
-        input_id = "runtime_task_button",
-        state = "busy"
-      )
-    }
-  }, ignoreInit = TRUE)
+  shiny::observeEvent(
+    input$runtime_task_button,
+    {
+      if (isTRUE(tb_hold())) {
+        update_block_task_button(
+          session = session,
+          input_id = "runtime_task_button",
+          state = "busy"
+        )
+      }
+    },
+    ignoreInit = TRUE
+  )
 
   shiny::observeEvent(input$tb_ready, {
     update_block_task_button(
@@ -1186,10 +1274,18 @@ server <- function(input, output, session) {
   # Full update coverage: label, variant, size, ready icon, style, and class all
   # reach the runtime through update_block_task_button().
   shiny::observeEvent(input$tb_set_label, {
-    update_block_task_button(session, "runtime_task_button", label = "Relabeled")
+    update_block_task_button(
+      session,
+      "runtime_task_button",
+      label = "Relabeled"
+    )
   })
   shiny::observeEvent(input$tb_set_variant, {
-    update_block_task_button(session, "runtime_task_button", variant = "secondary")
+    update_block_task_button(
+      session,
+      "runtime_task_button",
+      variant = "secondary"
+    )
   })
   shiny::observeEvent(input$tb_set_size, {
     update_block_task_button(session, "runtime_task_button", size = "lg")
@@ -1198,13 +1294,25 @@ server <- function(input, output, session) {
     update_block_task_button(session, "runtime_task_button", icon = "check")
   })
   shiny::observeEvent(input$tb_set_style, {
-    update_block_task_button(session, "runtime_task_button", style = "min-width: 22rem;")
+    update_block_task_button(
+      session,
+      "runtime_task_button",
+      style = "min-width: 22rem;"
+    )
   })
   shiny::observeEvent(input$tb_set_class, {
-    update_block_task_button(session, "runtime_task_button", class = "tb-updated-class")
+    update_block_task_button(
+      session,
+      "runtime_task_button",
+      class = "tb-updated-class"
+    )
   })
   shiny::observeEvent(input$tb_set_label_busy, {
-    update_block_task_button(session, "runtime_task_button", label_busy = "New busy label")
+    update_block_task_button(
+      session,
+      "runtime_task_button",
+      label_busy = "New busy label"
+    )
   })
   # Clear semantics: NULL clears the ready icon, busy icon (back to the spinner),
   # style, and class.
@@ -1263,7 +1371,9 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$remove_task, {
     shiny::removeUI(selector = "#task_inserted_host", immediate = TRUE)
   })
-  output$task_inserted_value <- shiny::renderText(input$inserted_task %||% "<NULL>")
+  output$task_inserted_value <- shiny::renderText(
+    input$inserted_task %||% "<NULL>"
+  )
 
   # Regression (#69 review): stale manual state must not survive a remount. An
   # auto_reset = TRUE button is set to manual busy, removed, then recreated with
@@ -1393,7 +1503,8 @@ server <- function(input, output, session) {
     }
 
     runtime$runtime_component(
-      component = "fixture", .validate = FALSE,
+      component = "fixture",
+      .validate = FALSE,
       input_id = "dynamic",
       state = list(value = "x"),
       binding = list(input = TRUE),
@@ -1411,7 +1522,8 @@ server <- function(input, output, session) {
       ui = shiny::div(
         id = "inserted_host",
         runtime$runtime_component(
-          component = "fixture", .validate = FALSE,
+          component = "fixture",
+          .validate = FALSE,
           input_id = "inserted",
           state = list(value = "y"),
           binding = list(input = TRUE),
@@ -1428,15 +1540,27 @@ server <- function(input, output, session) {
 
   # Progress is receive-only: `input$runtime_progress` should stay NULL even as
   # the server drives the bar.
-  output$runtime_progress_value <- shiny::renderText(input$runtime_progress %||% "<NULL>")
+  output$runtime_progress_value <- shiny::renderText(
+    input$runtime_progress %||% "<NULL>"
+  )
   shiny::observeEvent(input$set_progress_75, {
-    update_block_progress(session, "runtime_progress", value = 0.75, message = "Three quarters")
+    update_block_progress(
+      session,
+      "runtime_progress",
+      value = 0.75,
+      message = "Three quarters"
+    )
   })
   shiny::observeEvent(input$inc_progress, {
     inc_block_progress(session, "runtime_progress", amount = 0.1)
   })
   shiny::observeEvent(input$reset_progress, {
-    update_block_progress(session, "runtime_progress", value = 0, message = NULL)
+    update_block_progress(
+      session,
+      "runtime_progress",
+      value = 0,
+      message = NULL
+    )
   })
   shiny::observeEvent(input$indeterminate_progress, {
     update_block_progress(session, "runtime_progress", indeterminate = TRUE)
@@ -1461,7 +1585,12 @@ server <- function(input, output, session) {
       ),
       immediate = TRUE
     )
-    update_block_progress(session, "late_progress", value = 0.6, message = "Late update")
+    update_block_progress(
+      session,
+      "late_progress",
+      value = 0.6,
+      message = "Late update"
+    )
   })
 
   output$inserted_child <- shiny::renderText("inserted-child-ready")

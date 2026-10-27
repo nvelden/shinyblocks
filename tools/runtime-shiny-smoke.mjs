@@ -1005,11 +1005,68 @@ try {
         const el = document.querySelector(selector);
         if (!el) throw new Error(`drop target not found: ${selector}`);
         const dt = new DataTransfer();
-        files.forEach((f) => dt.items.add(new File([f.content], f.name, { type: f.type })));
+        files.forEach((f) => dt.items.add(new File([f.content], f.name, { type: f.type, lastModified: f.lastModified })));
         el.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt }));
       },
       { selector, files }
     );
+
+  // Retain File objects after Shiny clears native.files on upload completion.
+  const multi = "[data-sb-component='file-input']:has(#runtime_file_multi)";
+  const a = { name: "a.txt", type: "text/plain", content: "alpha", lastModified: 1 };
+  const b = { name: "b.txt", type: "text/plain", content: "beta", lastModified: 2 };
+  // Drops must reach <html> so Shiny's document drag tracker resets.
+  await page.evaluate(() => {
+    window.__sbHtmlDrops = 0;
+    document.documentElement.addEventListener("drop", () => window.__sbHtmlDrops++);
+  });
+  await dropFiles(".runtime-file-multi-fixture", [a, b]);
+  await assertText(page, "#runtime_file_multi_value", "a.txt,b.txt");
+  assert.equal(await page.evaluate(() => window.__sbHtmlDrops), 1);
+  await page.waitForFunction(() => document.querySelector("#runtime_file_multi").files.length === 0);
+  assert.equal(await page.locator(`${multi} [data-slot='file-input-remove']`).count(), 2);
+  await page.locator(`${multi} button[aria-label='Remove a.txt']`).click();
+  await assertText(page, "#runtime_file_multi_value", "b.txt");
+  await page.waitForFunction(() => document.querySelector("#runtime_file_multi").files.length === 0);
+  await dropFiles(".runtime-file-multi-fixture", [a]);
+  await assertText(page, "#runtime_file_multi_value", "b.txt,a.txt");
+  await page.waitForFunction(() => document.querySelector("#runtime_file_multi").files.length === 0);
+  // Re-dropping a retained file adds no duplicate.
+  await dropFiles(".runtime-file-multi-fixture", [a]);
+  await page.waitForFunction(() => document.querySelector("#runtime_file_multi").files.length === 0);
+  assert.equal(await page.locator(`${multi} [data-slot='file-input-remove']`).count(), 2);
+  await assertText(page, "#runtime_file_multi_value", "b.txt,a.txt");
+  await page.setInputFiles("#runtime_file_multi", { name: "c.txt", mimeType: "text/plain", buffer: Buffer.from("gamma") });
+  await assertText(page, "#runtime_file_multi_value", "b.txt,a.txt,c.txt");
+  await assertText(page, "#runtime_file_multi_content", "beta|alpha|gamma");
+  await page.click("#disable_file_multi");
+  await page.waitForFunction(() => document.querySelector("#runtime_file_multi").disabled);
+  assert.equal(await page.locator(`${multi} [data-slot='file-input-remove']:disabled`).count(), 3);
+  await page.click("#enable_file_multi");
+  await page.locator(`${multi} [data-slot='file-input-clear']`).click();
+  await assertText(page, "#runtime_file_multi_value", "<NULL>");
+  assert.equal(await page.locator(`${multi} [data-slot='file-input-list']`).count(), 0);
+  await dropFiles(".runtime-file-multi-fixture", [a]);
+  await assertText(page, "#runtime_file_multi_value", "a.txt");
+  await page.locator(`${multi} button[aria-label='Remove a.txt']`).focus();
+  await page.keyboard.press("Enter");
+  await assertText(page, "#runtime_file_multi_value", "<NULL>");
+  await dropFiles(".runtime-file-multi-fixture", [a, b]);
+  await assertText(page, "#runtime_file_multi_value", "a.txt,b.txt");
+  await page.click("#reset_file_multi");
+  await assertText(page, "#runtime_file_multi_value", "<NULL>");
+
+
+  await page.click("#replace_file_multi");
+  await page.waitForFunction(() => {
+    const root = document.querySelector("#runtime_file_multi").closest("[data-shinyblocks-runtime]");
+    return root && !root.querySelector("[data-slot='file-input-list']");
+  });
+  await dropFiles(".runtime-file-multi-fixture", [a, b]);
+  await assertText(page, "#runtime_file_multi_value", "a.txt,b.txt");
+  assert.equal(await page.locator(`${multi} [data-slot='file-input-list']`).count(), 0);
+  await dropFiles(".runtime-file-multi-fixture", [a]);
+  await assertText(page, "#runtime_file_multi_value", "a.txt");
 
   await assertText(page, "#runtime_file_dropzone_value", "<NULL>");
   await dropFiles(".runtime-file-dropzone-fixture", [
@@ -1575,6 +1632,9 @@ try {
   await assertText(page, "#mod-upload_value", "<NULL>");
   await page.setInputFiles("#mod-upload", uploadPath);
   await assertText(page, "#mod-upload_value", "shinyblocks-runtime-upload.txt");
+  // Namespaced native ids must clear the module's input too.
+  await page.locator("[data-sb-component='file-input']:has(#mod-upload) button[aria-label^='Remove ']").click();
+  await assertText(page, "#mod-upload_value", "<NULL>");
   await assertText(page, "#mod-date_value", "2026-06-15");
 
   // Under a moduleServer the namespaced progress mount registers its

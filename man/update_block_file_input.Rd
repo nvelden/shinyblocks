@@ -20,7 +20,9 @@ update_block_file_input(
   invalid,
   style,
   class,
-  reset = FALSE
+  reset = FALSE,
+  show_files,
+  append
 )
 }
 \arguments{
@@ -60,7 +62,11 @@ icon/label/hint stack.}
 
 \item{class}{Optional replacement classes for the visible control.}
 
-\item{reset}{Whether to clear the current file selection.}
+\item{reset}{Whether to clear the current file selection and Shiny value.}
+
+\item{show_files}{Optional flag to show the removable file list.}
+
+\item{append}{Optional flag to append subsequent selections in multiple mode.}
 }
 \value{
 Invisibly returns \code{NULL}.

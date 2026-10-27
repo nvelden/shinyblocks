@@ -92,21 +92,32 @@ update_block_textarea <- function(
   class,
   notify = TRUE
 ) {
-  payload <- apply_update_fields(list(), list(
-    field("value", transform = as_text_value),
-    field_clearable("placeholder"),
-    field("disabled", transform = isTRUE),
-    field("invalid", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    list(),
+    list(
+      field("value", transform = as_text_value),
+      field_clearable("placeholder"),
+      field("disabled", transform = isTRUE),
+      field("invalid", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   if (!missing(rows)) {
-    check_number(rows, "rows", min = 1, msg = "`rows` must be a positive number.")
+    check_number(
+      rows,
+      "rows",
+      min = 1,
+      msg = "`rows` must be a positive number."
+    )
     payload$rows <- as.integer(rows)
   }
   if (!missing(resize)) {
-    payload$resize <- match_arg(resize, c("vertical", "none", "both", "horizontal"))
+    payload$resize <- match_arg(
+      resize,
+      c("vertical", "none", "both", "horizontal")
+    )
   }
 
   runtime_input_update(session, input_id, "textarea", payload, notify = notify)
@@ -159,7 +170,10 @@ block_input <- function(
   class = NULL
 ) {
   validate_input_id(input_id)
-  type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+  type <- match_arg(
+    type,
+    c("text", "password", "email", "url", "tel", "search", "number")
+  )
   if ((!is.null(min) || !is.null(max) || !is.null(step)) && type != "number") {
     stop(
       "`min`, `max`, and `step` are only supported when `type = \"number\"`.",
@@ -167,18 +181,25 @@ block_input <- function(
     )
   }
   check_number(
-    min, "min", null_ok = TRUE,
+    min,
+    "min",
+    null_ok = TRUE,
     msg = "`min` must be a single numeric value."
   )
   check_number(
-    max, "max", null_ok = TRUE,
+    max,
+    "max",
+    null_ok = TRUE,
     msg = "`max` must be a single numeric value."
   )
   if (!is.null(min) && !is.null(max) && min >= max) {
     stop("`min` must be strictly less than `max`.", call. = FALSE)
   }
   check_number(
-    step, "step", positive = TRUE, null_ok = TRUE,
+    step,
+    "step",
+    positive = TRUE,
+    null_ok = TRUE,
     msg = "`step` must be a single positive numeric value."
   )
 
@@ -237,7 +258,12 @@ resolve_dropzone_icon <- function(icon) {
 #'   with filename text) or `"dropzone"` (a focusable drag-and-drop surface).
 #'   The dropzone is cosmetic chrome over the same native Shiny upload binding;
 #'   `input$<id>` is identical for both variants.
-#' @param multiple Whether to allow selecting more than one file.
+#' @param multiple Whether to allow selecting or dropping more than one file.
+#' @param show_files Show a list of selected files with individual remove buttons
+#'   and a Clear all action. Removal updates the Shiny value; empty is `NULL`.
+#' @param append With `multiple = TRUE`, add subsequent selections and drops to
+#'   the current files instead of replacing them. Remaining files are uploaded
+#'   again after additions or removals using Shiny's native upload transport.
 #' @param accept Optional character vector of accepted MIME types or file
 #'   extensions. Values are comma-joined for the native `accept` attribute.
 #' @param button_label Text shown on the picker button.
@@ -284,12 +310,16 @@ block_file_input <- function(
   disabled = FALSE,
   invalid = FALSE,
   style = NULL,
-  class = NULL
+  class = NULL,
+  show_files = TRUE,
+  append = FALSE
 ) {
   validate_input_id(input_id)
   variant <- match_arg(variant, c("button", "dropzone"))
   check_character(
-    accept, "accept", null_ok = TRUE,
+    accept,
+    "accept",
+    null_ok = TRUE,
     msg = "`accept` must be NULL or a character vector."
   )
   dropzone_icon <- resolve_dropzone_icon(dropzone_icon)
@@ -304,7 +334,9 @@ block_file_input <- function(
   } else {
     paste(accept[nzchar(accept)], collapse = ",")
   }
-  if (!is.null(accept_value) && !nzchar(accept_value)) accept_value <- NULL
+  if (!is.null(accept_value) && !nzchar(accept_value)) {
+    accept_value <- NULL
+  }
 
   wrapper_style <- normalize_width_style(width)
   native_input <- native_file_input(
@@ -320,13 +352,23 @@ block_file_input <- function(
       variant = variant,
       buttonLabel = as.character(button_label %||% ""),
       placeholder = as.character(placeholder %||% ""),
-      dropzoneLabel = if (is.null(dropzone_label)) NULL else as.character(dropzone_label),
-      dropzoneHint = if (is.null(dropzone_hint)) NULL else as.character(dropzone_hint),
+      dropzoneLabel = if (is.null(dropzone_label)) {
+        NULL
+      } else {
+        as.character(dropzone_label)
+      },
+      dropzoneHint = if (is.null(dropzone_hint)) {
+        NULL
+      } else {
+        as.character(dropzone_hint)
+      },
       dropzoneIconName = dropzone_icon$name,
       dropzoneIconHtml = dropzone_icon$html,
       dropzoneContentHtml = dropzone_content_html,
       spriteHref = sprite_href(),
       multiple = isTRUE(multiple),
+      showFiles = isTRUE(show_files),
+      append = isTRUE(append),
       accept = accept_value,
       disabled = isTRUE(disabled),
       invalid = isTRUE(invalid),
@@ -373,7 +415,9 @@ block_file_input <- function(
 #' @param invalid Optional invalid flag.
 #' @param style Optional replacement inline CSS styles for the visible control.
 #' @param class Optional replacement classes for the visible control.
-#' @param reset Whether to clear the current file selection.
+#' @param show_files Optional flag to show the removable file list.
+#' @param append Optional flag to append subsequent selections in multiple mode.
+#' @param reset Whether to clear the current file selection and Shiny value.
 #'
 #' @return Invisibly returns `NULL`.
 #' @family forms
@@ -394,27 +438,42 @@ update_block_file_input <- function(
   invalid,
   style,
   class,
-  reset = FALSE
+  reset = FALSE,
+  show_files,
+  append
 ) {
-  payload <- apply_update_fields(list(), list(
-    field_clearable("buttonLabel", "button_label", as.character),
-    field_clearable("placeholder", transform = as.character),
-    field_clearable("dropzoneLabel", "dropzone_label", as.character),
-    field_clearable("dropzoneHint", "dropzone_hint", as.character),
-    field("multiple", transform = isTRUE),
-    field("disabled", transform = isTRUE),
-    field("invalid", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    list(),
+    list(
+      field_clearable("buttonLabel", "button_label", as.character),
+      field_clearable("placeholder", transform = as.character),
+      field_clearable("dropzoneLabel", "dropzone_label", as.character),
+      field_clearable("dropzoneHint", "dropzone_hint", as.character),
+      field("multiple", transform = isTRUE),
+      field("showFiles", "show_files", isTRUE),
+      field("append", transform = isTRUE),
+      field("disabled", transform = isTRUE),
+      field("invalid", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   if (!missing(variant)) {
     payload$variant <- match_arg(variant, c("button", "dropzone"))
   }
   if (!missing(dropzone_icon)) {
     icon_parts <- resolve_dropzone_icon(dropzone_icon)
-    payload <- payload_set_clearable(payload, "dropzoneIconName", icon_parts$name)
-    payload <- payload_set_clearable(payload, "dropzoneIconHtml", icon_parts$html)
+    payload <- payload_set_clearable(
+      payload,
+      "dropzoneIconName",
+      icon_parts$name
+    )
+    payload <- payload_set_clearable(
+      payload,
+      "dropzoneIconHtml",
+      icon_parts$html
+    )
     if (!is.null(icon_parts$name)) payload$spriteHref <- sprite_href()
   }
   if (!missing(dropzone_content)) {
@@ -423,11 +482,17 @@ update_block_file_input <- function(
     } else {
       html_fragment(dropzone_content)
     }
-    payload <- payload_set_clearable(payload, "dropzoneContentHtml", content_html)
+    payload <- payload_set_clearable(
+      payload,
+      "dropzoneContentHtml",
+      content_html
+    )
   }
   if (!missing(accept)) {
     check_character(
-      accept, "accept", null_ok = TRUE,
+      accept,
+      "accept",
+      null_ok = TRUE,
       msg = "`accept` must be NULL or a character vector."
     )
     accept_value <- if (is.null(accept)) {
@@ -435,14 +500,22 @@ update_block_file_input <- function(
     } else {
       paste(accept[nzchar(accept)], collapse = ",")
     }
-    if (!is.null(accept_value) && !nzchar(accept_value)) accept_value <- NULL
+    if (!is.null(accept_value) && !nzchar(accept_value)) {
+      accept_value <- NULL
+    }
     payload <- payload_set_clearable(payload, "accept", accept_value)
   }
   if (isTRUE(reset)) {
     payload$reset <- TRUE
   }
 
-  runtime_input_update(session, input_id, "file-input", payload, notify_key = NULL)
+  runtime_input_update(
+    session,
+    input_id,
+    "file-input",
+    payload,
+    notify_key = NULL
+  )
 }
 
 #' Update a runtime text input
@@ -483,17 +556,23 @@ update_block_input <- function(
   class,
   notify = TRUE
 ) {
-  payload <- apply_update_fields(list(), list(
-    field("value", transform = as_text_value),
-    field_clearable("placeholder"),
-    field("disabled", transform = isTRUE),
-    field("invalid", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    list(),
+    list(
+      field("value", transform = as_text_value),
+      field_clearable("placeholder"),
+      field("disabled", transform = isTRUE),
+      field("invalid", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   if (!missing(type)) {
-    payload$type <- match_arg(type, c("text", "password", "email", "url", "tel", "search", "number"))
+    payload$type <- match_arg(
+      type,
+      c("text", "password", "email", "url", "tel", "search", "number")
+    )
   }
   if (!missing(min)) {
     if (is.null(min)) {
@@ -511,8 +590,13 @@ update_block_input <- function(
       payload$max <- as.numeric(max)
     }
   }
-  if (!missing(min) && !missing(max) &&
-        !is.null(min) && !is.null(max) && min >= max) {
+  if (
+    !missing(min) &&
+      !missing(max) &&
+      !is.null(min) &&
+      !is.null(max) &&
+      min >= max
+  ) {
     stop("`min` must be strictly less than `max`.", call. = FALSE)
   }
   if (!missing(step)) {
@@ -520,7 +604,9 @@ update_block_input <- function(
       payload["step"] <- list(NULL)
     } else {
       check_number(
-        step, "step", positive = TRUE,
+        step,
+        "step",
+        positive = TRUE,
         msg = "`step` must be a single positive numeric value."
       )
       payload$step <- as.numeric(step)
@@ -600,16 +686,23 @@ update_block_checkbox <- function(
   class,
   notify = TRUE
 ) {
-  payload <- apply_update_fields(list(), list(
-    field("checked", transform = isTRUE),
-    field("disabled", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    list(),
+    list(
+      field("checked", transform = isTRUE),
+      field("disabled", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   runtime_input_update(
-    session, input_id, "checkbox", payload,
-    notify_key = "checked", notify = notify
+    session,
+    input_id,
+    "checkbox",
+    payload,
+    notify_key = "checked",
+    notify = notify
   )
 }
 
@@ -689,20 +782,27 @@ update_block_switch <- function(
   class,
   notify = TRUE
 ) {
-  payload <- apply_update_fields(list(), list(
-    field("checked", transform = isTRUE),
-    field("disabled", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    list(),
+    list(
+      field("checked", transform = isTRUE),
+      field("disabled", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   if (!missing(size)) {
     payload$size <- match_arg(size, c("default", "sm", "lg"))
   }
 
   runtime_input_update(
-    session, input_id, "switch", payload,
-    notify_key = "checked", notify = notify
+    session,
+    input_id,
+    "switch",
+    payload,
+    notify_key = "checked",
+    notify = notify
   )
 }
 
@@ -752,8 +852,13 @@ block_slider <- function(
 ) {
   validate_input_id(input_id)
   orientation <- match_arg(orientation, c("horizontal", "vertical"))
-  if (missing(value) || !is.numeric(value) || length(value) < 1 ||
-        length(value) > 2 || any(is.na(value))) {
+  if (
+    missing(value) ||
+      !is.numeric(value) ||
+      length(value) < 1 ||
+      length(value) > 2 ||
+      any(is.na(value))
+  ) {
     stop(
       "`value` must be one or two numeric values.",
       call. = FALSE
@@ -769,7 +874,10 @@ block_slider <- function(
     stop("`min` must be strictly less than `max`.", call. = FALSE)
   }
   check_number(
-    step, "step", positive = TRUE, null_ok = TRUE,
+    step,
+    "step",
+    positive = TRUE,
+    null_ok = TRUE,
     msg = "`step` must be a single positive numeric value."
   )
 
@@ -857,8 +965,13 @@ update_block_slider <- function(
   payload <- list()
 
   if (!missing(value)) {
-    if (is.null(value) || !is.numeric(value) || length(value) < 1 ||
-          length(value) > 2 || any(is.na(value))) {
+    if (
+      is.null(value) ||
+        !is.numeric(value) ||
+        length(value) < 1 ||
+        length(value) > 2 ||
+        any(is.na(value))
+    ) {
       stop("`value` must be one or two numeric values.", call. = FALSE)
     }
     payload <- payload_set_if_present(payload, "value", value, as.numeric)
@@ -879,7 +992,9 @@ update_block_slider <- function(
       payload["step"] <- list(NULL)
     } else {
       check_number(
-        step, "step", positive = TRUE,
+        step,
+        "step",
+        positive = TRUE,
         msg = "`step` must be a single positive numeric value."
       )
       payload$step <- as.numeric(step)
@@ -889,15 +1004,18 @@ update_block_slider <- function(
     payload$orientation <- match_arg(orientation, c("horizontal", "vertical"))
   }
 
-  payload <- apply_update_fields(payload, list(
-    field("showValue", "show_value", isTRUE),
-    field_clearable("minLabel", "min_label", as.character),
-    field_clearable("maxLabel", "max_label", as.character),
-    field("disabled", transform = isTRUE),
-    field("invalid", transform = isTRUE),
-    field_style("style"),
-    field_clearable("class")
-  ))
+  payload <- apply_update_fields(
+    payload,
+    list(
+      field("showValue", "show_value", isTRUE),
+      field_clearable("minLabel", "min_label", as.character),
+      field_clearable("maxLabel", "max_label", as.character),
+      field("disabled", transform = isTRUE),
+      field("invalid", transform = isTRUE),
+      field_style("style"),
+      field_clearable("class")
+    )
+  )
 
   runtime_input_update(session, input_id, "slider", payload, notify = notify)
 }

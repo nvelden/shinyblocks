@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { labelIdForInput } from "../runtime/dom.js";
 import { nativeFileInput } from "../runtime/native-inputs.js";
 import { classNames, HtmlSlot } from "./shared.jsx";
 
-function selectedFileText(nativeInput) {
-  const files = nativeInput?.files ? Array.from(nativeInput.files) : [];
+function selectedFileText(files) {
   if (!files.length) return "";
   if (files.length === 1) return files[0].name;
   return `${files.length} files`;
+}
+
+function sameFile(a, b) {
+  return a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
 }
 
 // Parse the native `accept` attribute into matcher tokens. Empty accepts all.
@@ -70,13 +73,18 @@ export function FileInput({ payload, root }) {
     dropzoneIconHtml: props.dropzoneIconHtml ?? null,
     dropzoneContentHtml: props.dropzoneContentHtml ?? null,
     spriteHref: props.spriteHref ?? "",
+    showFiles: props.showFiles !== false,
+    append: Boolean(props.append),
     disabled: Boolean(props.disabled),
     invalid: Boolean(props.invalid),
     style: props.style || {},
     className: payload.className || ""
   });
   // Empty string means "no file selected"; the placeholder is shown instead.
-  const [selectedText, setSelectedText] = useState("");
+  const [files, setFiles] = useState([]);
+  const selectedFiles = useRef([]);
+  const replacing = useRef(false);
+  const selectedText = selectedFileText(files);
   const [dragover, setDragover] = useState(false);
   const dropRef = useRef(null);
   const rejectTimer = useRef(null);
@@ -98,15 +106,49 @@ export function FileInput({ payload, root }) {
   // Mirror native file selection into the visible label.
   useEffect(() => {
     if (!native) return undefined;
-    const handleChange = () => setSelectedText(selectedFileText(native));
-    native.addEventListener("change", handleChange);
-    handleChange();
-    return () => native.removeEventListener("change", handleChange);
-  }, [native]);
+    const handleChange = () => {
+      let next = Array.from(native.files || []);
+      // Capture before Shiny's bubbling listener starts the upload. Shiny clears
+      // native.files after completion, so retain File objects independently.
+      if (!replacing.current && !next.length) return; // picker cancellation
+      if (!replacing.current && state.append && native.multiple) {
+        // Skip files already in the selection so a repeated drop adds no copy.
+        const added = next.filter((file) => !selectedFiles.current.some(
+          (kept) => sameFile(kept, file)
+        ));
+        next = [...selectedFiles.current, ...added];
+        const transfer = new DataTransfer();
+        next.forEach((file) => transfer.items.add(file));
+        native.files = transfer.files;
+      }
+      selectedFiles.current = next;
+      setFiles(next);
+    };
+    native.addEventListener("change", handleChange, true);
+    return () => native.removeEventListener("change", handleChange, true);
+  }, [native, state.append]);
 
   useEffect(() => () => {
     if (rejectTimer.current) clearTimeout(rejectTimer.current);
   }, []);
+
+  const replaceFiles = useCallback((next) => {
+    if (!native) return;
+    const transfer = new DataTransfer();
+    next.forEach((file) => transfer.items.add(file));
+    native.files = transfer.files;
+    replacing.current = true;
+    try {
+      // Even an empty change aborts Shiny's current uploader. Shiny does not
+      // publish an empty selection itself, so explicitly clear its server value.
+      native.dispatchEvent(new Event("change", { bubbles: true }));
+    } finally {
+      replacing.current = false;
+    }
+    if (!next.length) {
+      window.Shiny?.setInputValue(`${native.id}:shiny.file`, null, { priority: "event" });
+    }
+  }, [native]);
 
   // Install the receiver used by `update_block_file_input()`.
   useEffect(() => {
@@ -125,6 +167,8 @@ export function FileInput({ payload, root }) {
         if ("dropzoneIconHtml" in data) next.dropzoneIconHtml = data.dropzoneIconHtml ?? null;
         if ("dropzoneContentHtml" in data) next.dropzoneContentHtml = data.dropzoneContentHtml ?? null;
         if ("spriteHref" in data) next.spriteHref = data.spriteHref ?? "";
+        if ("showFiles" in data) next.showFiles = Boolean(data.showFiles);
+        if ("append" in data) next.append = Boolean(data.append);
         if ("disabled" in data) next.disabled = Boolean(data.disabled);
         if ("invalid" in data) next.invalid = Boolean(data.invalid);
         if ("style" in data) next.style = data.style || {};
@@ -141,15 +185,53 @@ export function FileInput({ payload, root }) {
           else native.removeAttribute("multiple");
         }
         if (data.reset) {
-          native.value = "";
-          setSelectedText("");
+          replaceFiles([]);
         }
       }
     };
     return () => {
       if (root.__sbFileInputReceive) delete root.__sbFileInputReceive;
     };
-  }, [root, native]);
+  }, [root, native, replaceFiles]);
+
+
+  function removeFile(index) {
+    if (state.disabled) return;
+    replaceFiles(index < 0 ? [] : selectedFiles.current.filter((_, i) => i !== index));
+    // Restore keyboard focus after the removed row unmounts.
+    requestAnimationFrame(() => {
+      const buttons = root?.querySelectorAll("[data-slot='file-input-remove']");
+      const target = buttons?.[Math.min(index, buttons.length - 1)] ||
+        root?.querySelector("[data-slot='file-input-button'], [data-dropzone-trigger], [data-slot='file-dropzone']");
+      target?.focus();
+    });
+  }
+
+  const fileList = state.showFiles && files.length > 0 ? (
+    <div className="sb-file-list" data-slot="file-input-list">
+      <ul aria-label="Selected files">
+        {files.map((file, index) => (
+          <li className="sb-file-item" key={index}>
+            <span className="sb-file-item-name" title={file.name}>{file.name}</span>
+            <span className="sb-file-item-size">{Math.ceil(file.size / 1024)} KB</span>
+            <button type="button" className="sb-button sb-button-ghost sb-button-size-icon"
+              data-slot="file-input-remove" aria-label={`Remove ${file.name}`}
+              disabled={state.disabled} onClick={() => removeFile(index)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="m18 6-12 12M6 6l12 12" />
+              </svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {files.length > 1 ? (
+        <button type="button" className="sb-button sb-button-ghost sb-button-size-sm"
+          data-slot="file-input-clear" disabled={state.disabled} onClick={() => removeFile(-1)}>
+          Clear all
+        </button>
+      ) : null}
+    </div>
+  ) : null;
 
   function openPicker() {
     if (state.disabled || !native) return;
@@ -260,6 +342,7 @@ export function FileInput({ payload, root }) {
       // Drop region: author owns the interior; an explicit
       // `[data-dropzone-trigger]` element opens the picker (see handleTriggerClick).
       return (
+        <>
         <div
           {...sharedProps}
           data-content="custom"
@@ -275,12 +358,15 @@ export function FileInput({ payload, root }) {
           />
           {selectedSummary}
         </div>
+        {fileList}
+        </>
       );
     }
 
     // Easy path: the whole surface is the picker button (click anywhere /
     // Enter-Space), optionally fronted by an icon above the label/hint.
     return (
+      <>
       <div
         {...sharedProps}
         role="button"
@@ -307,10 +393,13 @@ export function FileInput({ payload, root }) {
         ) : null}
         {selectedSummary}
       </div>
+      {fileList}
+      </>
     );
   }
 
   return (
+    <>
     <div
       className={classNames("sb-file-input-control", state.className)}
       data-slot="file-input-control"
@@ -339,5 +428,7 @@ export function FileInput({ payload, root }) {
         {displayText}
       </span>
     </div>
+    {fileList}
+    </>
   );
 }

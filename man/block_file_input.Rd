@@ -19,7 +19,9 @@ block_file_input(
   disabled = FALSE,
   invalid = FALSE,
   style = NULL,
-  class = NULL
+  class = NULL,
+  show_files = TRUE,
+  append = FALSE
 )
 }
 \arguments{
@@ -30,7 +32,7 @@ with filename text) or \code{"dropzone"} (a focusable drag-and-drop surface).
 The dropzone is cosmetic chrome over the same native Shiny upload binding;
 \verb{input$<id>} is identical for both variants.}
 
-\item{multiple}{Whether to allow selecting more than one file.}
+\item{multiple}{Whether to allow selecting or dropping more than one file.}
 
 \item{accept}{Optional character vector of accepted MIME types or file
 extensions. Values are comma-joined for the native \code{accept} attribute.}
@@ -70,6 +72,13 @@ button styling.}
 \item{style}{Inline CSS styles for the visible control.}
 
 \item{class}{Additional classes for the visible control.}
+
+\item{show_files}{Show a list of selected files with individual remove buttons
+and a Clear all action. Removal updates the Shiny value; empty is \code{NULL}.}
+
+\item{append}{With \code{multiple = TRUE}, add subsequent selections and drops to
+the current files instead of replacing them. Remaining files are uploaded
+again after additions or removals using Shiny's native upload transport.}
 }
 \value{
 An \code{htmltools} tag.
