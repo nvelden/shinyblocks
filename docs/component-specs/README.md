@@ -27,8 +27,8 @@ styling host siblings. Composed child primitives inherit the nearest scope and
 also remain usable when rendered alone.
 
 For components already migrated into the Playwright parity harness,
-the committed computed-style baselines live separately under
-[`_parity/`](_parity/). Those JSON snapshots complement the written
+the computed-style baselines live separately under
+`docs/component-specs/_parity/` (local, not committed). Those JSON snapshots complement the written
 specs; they do not replace them.
 
 ## Screenshot capture

@@ -20,10 +20,12 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "UI content elements placed inside the body." },
         { argument: "title", type: "character", defaultVal: "NULL", description: "Optional browser page window title." },
         { argument: "sidebar", type: "shiny.tag", defaultVal: "NULL", description: "Layout sidebar element created by block_sidebar()." },
+        { argument: "sidebar_right", type: "shiny.tag", defaultVal: "NULL", description: "Sidebar on the right of the page, created by block_sidebar(side = \"right\")." },
         { argument: "header", type: "shiny.tag", defaultVal: "NULL", description: "Layout header element created by block_header()." },
         { argument: "theme_mode", type: "'system' | 'light' | 'dark'", defaultVal: "'system'", description: "Initial light/dark theme mode." },
         { argument: "theme", type: "shiny.tag", defaultVal: "NULL", description: "Optional theme tags created by block_theme()." },
         { argument: "style", type: "shiny.tag", defaultVal: "NULL", description: "Optional style profile created by block_style()." },
+        { argument: "favicon", type: "character | FALSE", defaultVal: "NULL", description: "Browser tab icon: a path or URL replaces the shinyblocks icon; FALSE sets none." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the page shell." }
       ]
     },
@@ -36,6 +38,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "id", type: "character", defaultVal: "NULL", description: "Optional unique ID for sidebar state." },
         { argument: "collapsible", type: "logical", defaultVal: "FALSE", description: "Whether the sidebar can be collapsed." },
         { argument: "collapsed", type: "logical", defaultVal: "FALSE", description: "Whether a collapsible sidebar starts collapsed." },
+        { argument: "side", type: "'left' | 'right'", defaultVal: "'left'", description: "Side of the page: pass a right sidebar as block_page(sidebar_right = )." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes." }
       ]
     },
@@ -650,7 +653,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable the visible picker and native file input." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Apply invalid visual highlights." },
         { argument: "style", type: "character | object", defaultVal: "NULL", description: "Inline styles applied to the visible control." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class applied to the visible control." }
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class applied to the visible control." },
+        { argument: "show_files", type: "logical", defaultVal: "TRUE", description: "Show the selected files with a remove button each and a Clear all action." },
+        { argument: "append", type: "logical", defaultVal: "FALSE", description: "With multiple = TRUE, add later selections and drops to the current files." }
       ]
     },
     {
@@ -672,7 +677,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle invalid visual highlights." },
         { argument: "style", type: "character | object", defaultVal: "NULL", description: "Replace inline styles on the visible control." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Replace classes on the visible control." },
-        { argument: "reset", type: "logical", defaultVal: "FALSE", description: "Clear the current file selection (the value itself cannot be set from the server)." }
+        { argument: "reset", type: "logical", defaultVal: "FALSE", description: "Clear the current file selection and set the server value to NULL." },
+        { argument: "show_files", type: "logical", defaultVal: "NULL", description: "Show or hide the removable file list." },
+        { argument: "append", type: "logical", defaultVal: "NULL", description: "Turn append mode on or off for later selections." }
       ]
     }
   ],
