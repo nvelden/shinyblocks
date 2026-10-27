@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ensurePortalRoot, labelIdForInput } from "../runtime/dom.js";
 import {
   installNativeFocusForwarding,
@@ -10,7 +9,6 @@ import {
   setNativeValue,
   toSingleSelected
 } from "../runtime/native-inputs.js";
-import { moveHighlightIndex, useSelectPopover } from "../runtime/select-popover.js";
 import {
   clampSelected,
   orderSelectedByChoices,
@@ -18,6 +16,15 @@ import {
   toMultiSelected
 } from "../runtime/multi-select-state.js";
 import { classNames } from "./shared.jsx";
+import {
+  ComboboxOptions,
+  ComboboxPopover,
+  ComboboxSearch,
+  handleSearchNavigation,
+  hasOwn,
+  useComboboxPopover,
+  useRuntimeControlProps
+} from "./combobox-shared.jsx";
 
 // One runtime identity (`component = "combobox"`), two implementations. The
 // combobox is a searchable [block_select()]: same hidden `<select>` value
@@ -32,36 +39,26 @@ export function Combobox({ payload, root }) {
   return <ComboboxSingleView payload={payload} root={root} />;
 }
 
-// Case-insensitive substring filter over choice labels (falling back to value).
-function filterChoices(choices, query) {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return choices;
-  return choices.filter((choice) => {
-    const label = String(choice.label == null ? choice.value : choice.label);
-    return (
-      label.toLowerCase().includes(needle) ||
-      String(choice.value).toLowerCase().includes(needle)
-    );
-  });
-}
-
 function ComboboxSingleView({ payload, root }) {
   const props = payload.props || {};
   const state = payload.state || {};
   const inputId = payload.id;
   const [choices, setChoices] = useState(props.choices || []);
   const [value, setValue] = useState(state.value ?? "");
-  const [placeholder, setPlaceholder] = useState(props.placeholder || "");
-  const [searchPlaceholder, setSearchPlaceholder] = useState(props.searchPlaceholder || "Search...");
-  const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || "No results found.");
-  const [disabled, setDisabled] = useState(Boolean(props.disabled));
-  const [invalid, setInvalid] = useState(Boolean(props.invalid));
-  const [size, setSize] = useState(props.size || "default");
-  const [width, setWidth] = useState(props.width || "100%");
-  const [style] = useState(props.style || {});
-  const [className, setClassName] = useState(payload.className || "");
   const [labelledBy, setLabelledBy] = useState(null);
-  const [query, setQuery] = useState("");
+  const control = useRuntimeControlProps(payload, root);
+  const {
+    placeholder,
+    searchPlaceholder,
+    emptyMessage,
+    disabled,
+    invalid,
+    size,
+    width,
+    style,
+    className,
+    applyCommonMessage
+  } = control;
   const {
     open,
     setOpen,
@@ -70,10 +67,14 @@ function ComboboxSingleView({ payload, root }) {
     position,
     triggerRef,
     contentRef,
-    updatePosition,
-    closePopover
-  } = useSelectPopover({ choicesCount: choices.length, layoutDeps: [choices, size, query] });
-  const searchRef = useRef(null);
+    query,
+    setQuery,
+    filtered,
+    searchRef,
+    openCombobox,
+    closeCombobox,
+    moveHighlight
+  } = useComboboxPopover(choices, size);
   const valueRef = useRef(value);
   const choicesRef = useRef(choices);
   const placeholderRef = useRef(placeholder);
@@ -81,21 +82,6 @@ function ComboboxSingleView({ payload, root }) {
   useEffect(() => { valueRef.current = value; }, [value]);
   useEffect(() => { choicesRef.current = choices; }, [choices]);
   useEffect(() => { placeholderRef.current = placeholder; }, [placeholder]);
-
-  const filtered = useMemo(() => filterChoices(choices, query), [choices, query]);
-
-  function openCombobox() {
-    if (disabled) return;
-    setQuery("");
-    setHighlighted(0);
-    setOpen(true);
-    updatePosition();
-  }
-
-  const closeCombobox = useCallback(({ focus = false } = {}) => {
-    closePopover({ focus });
-    setQuery("");
-  }, [closePopover]);
 
   function commit(nextValue) {
     if (disabled) return;
@@ -120,20 +106,13 @@ function ComboboxSingleView({ payload, root }) {
     root.__sbComboboxReceive = (data) => {
       const nextData = data || {};
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "placeholder")) {
+      if (hasOwn(nextData, "placeholder")) {
         const nextPlaceholder = nextData.placeholder || "";
         placeholderRef.current = nextPlaceholder;
-        setPlaceholder(nextPlaceholder);
         setNativeChoices(root, choicesRef.current, nextPlaceholder, valueRef.current);
       }
-      if (Object.prototype.hasOwnProperty.call(nextData, "searchPlaceholder")) {
-        setSearchPlaceholder(nextData.searchPlaceholder || "Search...");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "emptyMessage")) {
-        setEmptyMessage(nextData.emptyMessage || "No results found.");
-      }
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "choices")) {
+      if (hasOwn(nextData, "choices")) {
         const nextChoices = nextData.choices || [];
         choicesRef.current = nextChoices;
         setChoices(nextChoices);
@@ -142,51 +121,29 @@ function ComboboxSingleView({ payload, root }) {
         setNativeChoices(
           root,
           nextChoices,
-          Object.prototype.hasOwnProperty.call(nextData, "placeholder")
+          hasOwn(nextData, "placeholder")
             ? nextData.placeholder
             : placeholderRef.current,
-          Object.prototype.hasOwnProperty.call(nextData, "selected")
+          hasOwn(nextData, "selected")
             ? nextData.selected
             : valueRef.current
         );
       }
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "selected")) {
+      if (hasOwn(nextData, "selected")) {
         const next = toSingleSelected(nextData.selected);
         valueRef.current = next;
         setValue(next);
         setNativeValue(root, next, Boolean(nextData.notify));
       }
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
-        const nextDisabled = Boolean(nextData.disabled);
-        setDisabled(nextDisabled);
-        root.toggleAttribute("data-disabled", nextDisabled);
-        const native = nativeSelect(root);
-        if (native) native.disabled = nextDisabled;
-        if (nextDisabled) closeCombobox();
-      }
-
-      if (Object.prototype.hasOwnProperty.call(nextData, "width")) {
-        setWidth(nextData.width || "100%");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
-        setClassName(nextData.class || "");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
-        setSize(nextData.size || "default");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "invalid")) {
-        const nextInvalid = Boolean(nextData.invalid);
-        setInvalid(nextInvalid);
-        root.toggleAttribute("data-invalid", nextInvalid);
-      }
+      applyCommonMessage(nextData, { closeCombobox });
     };
 
     return () => {
       delete root.__sbComboboxReceive;
     };
-  }, [closeCombobox, inputId, root, setHighlighted, setOpen]);
+  }, [applyCommonMessage, closeCombobox, inputId, root, setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!root) return;
@@ -195,57 +152,15 @@ function ComboboxSingleView({ payload, root }) {
     if (native) native.disabled = disabled;
   }, [choices, disabled, placeholder, root, value]);
 
-  // Focus the filter box whenever the popover opens so typing filters at once.
-  useEffect(() => {
-    if (open) requestAnimationFrame(() => searchRef.current?.focus());
-  }, [open]);
-
-  // Keep the highlight in range as the filtered list shrinks/grows.
-  useEffect(() => {
-    if (!open) return;
-    setHighlighted(filtered.length ? 0 : -1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  function moveHighlight(delta) {
-    if (filtered.length === 0) return;
-    setHighlighted((current) => moveHighlightIndex(current, delta, filtered.length, 0));
-  }
-
   function onSearchKeyDown(event) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      moveHighlight(1);
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      moveHighlight(-1);
-      return;
-    }
-    if (event.key === "Home") {
-      event.preventDefault();
-      setHighlighted(0);
-      return;
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      setHighlighted(Math.max(filtered.length - 1, 0));
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      if (highlighted >= 0 && filtered[highlighted]) commit(filtered[highlighted].value);
-      return;
-    }
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeCombobox({ focus: true });
-      return;
-    }
-    if (event.key === "Tab") {
-      closeCombobox();
-    }
+    handleSearchNavigation(event, {
+      filtered,
+      highlighted,
+      setHighlighted,
+      moveHighlight,
+      closeCombobox,
+      onEnter: (choice) => commit(choice.value)
+    });
   }
 
   function onTriggerKeyDown(event) {
@@ -299,85 +214,35 @@ function ComboboxSingleView({ payload, root }) {
           <use href={`${props.spriteHref}#sb-icon-chevron-down`} />
         </svg>
       </button>
-      {open && portal && createPortal(
-        <div
-          ref={contentRef}
-          className="sb-select-content sb-combobox-content"
-          data-slot="select-content"
-          data-state="open"
-          id={contentId}
-          style={position ? {
-            position: "fixed",
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-            minWidth: `${position.minWidth}px`,
-            maxHeight: `${position.maxHeight}px`,
-            transform: position.side === "top" ? "translateY(-100%)" : undefined
-          } : undefined}
-          data-side={position?.side}
+      {open && (
+        <ComboboxPopover
+          portal={portal}
+          contentRef={contentRef}
+          contentId={contentId}
+          position={position}
         >
-          <div className="sb-combobox-search" data-slot="combobox-search">
-            <svg className="sb-combobox-search-icon" aria-hidden="true" focusable="false">
-              <use href={`${props.spriteHref}#sb-icon-search`} />
-            </svg>
-            <input
-              ref={searchRef}
-              type="text"
-              className="sb-combobox-input"
-              role="combobox"
-              aria-expanded="true"
-              aria-controls={listId}
-              aria-activedescendant={highlightedId}
-              aria-autocomplete="list"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder={searchPlaceholder}
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={onSearchKeyDown}
-            />
-          </div>
-          {filtered.length === 0 ? (
-            <div className="sb-combobox-empty" data-slot="combobox-empty" role="presentation">
-              {emptyMessage}
-            </div>
-          ) : (
-            <div
-              className="sb-select-viewport"
-              data-slot="select-viewport"
-              id={listId}
-              role="listbox"
-            >
-              {filtered.map((choice, index) => {
-                const selected = choice.value === value;
-                return (
-                  <div
-                    key={choice.value}
-                    id={`${inputId}-item-${index}`}
-                    className="sb-select-item"
-                    data-slot="select-item"
-                    data-sb-index={index}
-                    data-highlighted={highlighted === index ? "true" : undefined}
-                    data-state={selected ? "checked" : "unchecked"}
-                    role="option"
-                    aria-selected={selected ? "true" : "false"}
-                    onMouseEnter={() => setHighlighted(index)}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => commit(choice.value)}
-                  >
-                    <span className="sb-select-item-text">{choice.label}</span>
-                    <span className="sb-select-item-indicator" aria-hidden="true">
-                      <svg aria-hidden="true" focusable="false">
-                        <use href={`${props.spriteHref}#sb-icon-check`} />
-                      </svg>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>,
-        portal
+          <ComboboxSearch
+            searchRef={searchRef}
+            spriteHref={props.spriteHref}
+            listId={listId}
+            highlightedId={highlightedId}
+            searchPlaceholder={searchPlaceholder}
+            query={query}
+            setQuery={setQuery}
+            onKeyDown={onSearchKeyDown}
+          />
+          <ComboboxOptions
+            inputId={inputId}
+            listId={listId}
+            choices={filtered}
+            highlighted={highlighted}
+            setHighlighted={setHighlighted}
+            emptyMessage={emptyMessage}
+            spriteHref={props.spriteHref}
+            isSelected={(choiceValue) => choiceValue === value}
+            onSelect={commit}
+          />
+        </ComboboxPopover>
       )}
     </div>
   );
@@ -393,18 +258,21 @@ function ComboboxMultiView({ payload, root }) {
     const cap = props.maxItems == null ? null : Number(props.maxItems);
     return clampSelected(ordered, cap);
   });
-  const [placeholder, setPlaceholder] = useState(props.placeholder || "");
-  const [searchPlaceholder, setSearchPlaceholder] = useState(props.searchPlaceholder || "Search...");
-  const [emptyMessage, setEmptyMessage] = useState(props.emptyMessage || "No results found.");
-  const [disabled, setDisabled] = useState(Boolean(props.disabled));
-  const [invalid, setInvalid] = useState(Boolean(props.invalid));
-  const [size, setSize] = useState(props.size || "default");
-  const [width, setWidth] = useState(props.width || "100%");
-  const [style] = useState(props.style || {});
-  const [className, setClassName] = useState(payload.className || "");
   const [maxItems, setMaxItems] = useState(props.maxItems == null ? null : Number(props.maxItems));
   const [labelledBy, setLabelledBy] = useState(null);
-  const [query, setQuery] = useState("");
+  const control = useRuntimeControlProps(payload, root);
+  const {
+    placeholder,
+    searchPlaceholder,
+    emptyMessage,
+    disabled,
+    invalid,
+    size,
+    width,
+    style,
+    className,
+    applyCommonMessage
+  } = control;
   const {
     open,
     setOpen,
@@ -413,10 +281,14 @@ function ComboboxMultiView({ payload, root }) {
     position,
     triggerRef,
     contentRef,
-    updatePosition,
-    closePopover
-  } = useSelectPopover({ choicesCount: choices.length, layoutDeps: [choices, size, query] });
-  const searchRef = useRef(null);
+    query,
+    setQuery,
+    filtered,
+    searchRef,
+    openCombobox,
+    closeCombobox,
+    moveHighlight
+  } = useComboboxPopover(choices, size);
   const valueRef = useRef(value);
   const choicesRef = useRef(choices);
   const maxItemsRef = useRef(maxItems);
@@ -426,7 +298,6 @@ function ComboboxMultiView({ payload, root }) {
   useEffect(() => { maxItemsRef.current = maxItems; }, [maxItems]);
 
   const atCap = maxItems != null && value.length >= maxItems;
-  const filtered = useMemo(() => filterChoices(choices, query), [choices, query]);
 
   function orderByChoices(set) {
     return orderSelectedByChoices(choicesRef.current, set);
@@ -470,19 +341,6 @@ function ComboboxMultiView({ payload, root }) {
     removeValue(current[current.length - 1]);
   }
 
-  function openCombobox() {
-    if (disabled) return;
-    setQuery("");
-    setHighlighted(0);
-    setOpen(true);
-    updatePosition();
-  }
-
-  const closeCombobox = useCallback(({ focus = false } = {}) => {
-    closePopover({ focus });
-    setQuery("");
-  }, [closePopover]);
-
   function isRowDisabled(choiceValue) {
     if (disabled) return true;
     if (maxItemsRef.current == null) return false;
@@ -499,30 +357,20 @@ function ComboboxMultiView({ payload, root }) {
     root.__sbComboboxReceive = (data) => {
       const nextData = data || {};
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "placeholder")) {
-        setPlaceholder(nextData.placeholder || "");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "searchPlaceholder")) {
-        setSearchPlaceholder(nextData.searchPlaceholder || "Search...");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "emptyMessage")) {
-        setEmptyMessage(nextData.emptyMessage || "No results found.");
-      }
-
-      if (Object.prototype.hasOwnProperty.call(nextData, "maxItems")) {
+      if (hasOwn(nextData, "maxItems")) {
         const nextMax = nextData.maxItems == null ? null : Number(nextData.maxItems);
         maxItemsRef.current = nextMax;
         setMaxItems(nextMax);
       }
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "choices")) {
+      if (hasOwn(nextData, "choices")) {
         const nextChoices = nextData.choices || [];
         choicesRef.current = nextChoices;
         setChoices(nextChoices);
         setOpen(false);
         setHighlighted(-1);
         const prior = valueRef.current;
-        const carried = Object.prototype.hasOwnProperty.call(nextData, "selected")
+        const carried = hasOwn(nextData, "selected")
           ? toMultiSelected(nextData.selected)
           : prior;
         const next = reconcileMultiSelection(nextChoices, carried, maxItemsRef.current);
@@ -531,48 +379,26 @@ function ComboboxMultiView({ payload, root }) {
         setNativeMultiChoices(root, nextChoices, next);
         const changed =
           next.length !== prior.length || next.some((v, i) => v !== prior[i]);
-        const shouldNotify = Object.prototype.hasOwnProperty.call(nextData, "selected")
+        const shouldNotify = hasOwn(nextData, "selected")
           ? Boolean(nextData.notify)
           : changed;
         if (shouldNotify) {
           const native = nativeSelect(root);
           if (native) native.dispatchEvent(new Event("change", { bubbles: true }));
         }
-      } else if (Object.prototype.hasOwnProperty.call(nextData, "selected")) {
+      } else if (hasOwn(nextData, "selected")) {
         const requested = new Set(toMultiSelected(nextData.selected));
         const next = clampToCap(orderByChoices(requested));
         applyValue(next, Boolean(nextData.notify));
       }
 
-      if (Object.prototype.hasOwnProperty.call(nextData, "disabled")) {
-        const nextDisabled = Boolean(nextData.disabled);
-        setDisabled(nextDisabled);
-        root.toggleAttribute("data-disabled", nextDisabled);
-        const native = nativeSelect(root);
-        if (native) native.disabled = nextDisabled;
-        if (nextDisabled) closeCombobox();
-      }
-
-      if (Object.prototype.hasOwnProperty.call(nextData, "width")) {
-        setWidth(nextData.width || "100%");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "class")) {
-        setClassName(nextData.class || "");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "size")) {
-        setSize(nextData.size || "default");
-      }
-      if (Object.prototype.hasOwnProperty.call(nextData, "invalid")) {
-        const nextInvalid = Boolean(nextData.invalid);
-        setInvalid(nextInvalid);
-        root.toggleAttribute("data-invalid", nextInvalid);
-      }
+      applyCommonMessage(nextData, { closeCombobox });
     };
 
     return () => {
       delete root.__sbComboboxReceive;
     };
-  }, [applyValue, closeCombobox, inputId, root, setHighlighted, setOpen]);
+  }, [applyCommonMessage, applyValue, closeCombobox, inputId, root, setHighlighted, setOpen]);
 
   useEffect(() => {
     if (!root) return;
@@ -581,63 +407,22 @@ function ComboboxMultiView({ payload, root }) {
     if (native) native.disabled = disabled;
   }, [choices, disabled, root, value]);
 
-  useEffect(() => {
-    if (open) requestAnimationFrame(() => searchRef.current?.focus());
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    setHighlighted(filtered.length ? 0 : -1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  function moveHighlight(delta) {
-    if (filtered.length === 0) return;
-    setHighlighted((current) => moveHighlightIndex(current, delta, filtered.length, 0));
-  }
-
   function onSearchKeyDown(event) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      moveHighlight(1);
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      moveHighlight(-1);
-      return;
-    }
-    if (event.key === "Home") {
-      event.preventDefault();
-      setHighlighted(0);
-      return;
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      setHighlighted(Math.max(filtered.length - 1, 0));
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      if (highlighted >= 0 && filtered[highlighted]) {
-        const choiceValue = filtered[highlighted].value;
-        if (!isRowDisabled(choiceValue)) toggleValue(choiceValue);
+    handleSearchNavigation(event, {
+      filtered,
+      highlighted,
+      setHighlighted,
+      moveHighlight,
+      closeCombobox,
+      onEnter: (choice) => {
+        if (!isRowDisabled(choice.value)) toggleValue(choice.value);
+      },
+      onBackspace: (backspaceEvent) => {
+        if (query.length !== 0) return;
+        backspaceEvent.preventDefault();
+        removeLast();
       }
-      return;
-    }
-    if (event.key === "Backspace" && query.length === 0) {
-      event.preventDefault();
-      removeLast();
-      return;
-    }
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeCombobox({ focus: true });
-      return;
-    }
-    if (event.key === "Tab") {
-      closeCombobox();
-    }
+    });
   }
 
   function onTriggerKeyDown(event) {
@@ -729,91 +514,38 @@ function ComboboxMultiView({ payload, root }) {
           <use href={`${props.spriteHref}#sb-icon-chevron-down`} />
         </svg>
       </div>
-      {open && portal && createPortal(
-        <div
-          ref={contentRef}
-          className="sb-select-content sb-combobox-content"
-          data-slot="select-content"
-          data-state="open"
-          data-multiple="true"
-          id={contentId}
-          style={position ? {
-            position: "fixed",
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-            minWidth: `${position.minWidth}px`,
-            maxHeight: `${position.maxHeight}px`,
-            transform: position.side === "top" ? "translateY(-100%)" : undefined
-          } : undefined}
-          data-side={position?.side}
+      {open && (
+        <ComboboxPopover
+          portal={portal}
+          contentRef={contentRef}
+          contentId={contentId}
+          position={position}
+          multiple
         >
-          <div className="sb-combobox-search" data-slot="combobox-search">
-            <svg className="sb-combobox-search-icon" aria-hidden="true" focusable="false">
-              <use href={`${props.spriteHref}#sb-icon-search`} />
-            </svg>
-            <input
-              ref={searchRef}
-              type="text"
-              className="sb-combobox-input"
-              role="combobox"
-              aria-expanded="true"
-              aria-controls={listId}
-              aria-activedescendant={highlightedId}
-              aria-autocomplete="list"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder={searchPlaceholder}
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={onSearchKeyDown}
-            />
-          </div>
-          {filtered.length === 0 ? (
-            <div className="sb-combobox-empty" data-slot="combobox-empty" role="presentation">
-              {emptyMessage}
-            </div>
-          ) : (
-            <div
-              className="sb-select-viewport"
-              data-slot="select-viewport"
-              id={listId}
-              role="listbox"
-              aria-multiselectable="true"
-            >
-              {filtered.map((choice, index) => {
-                const selected = value.includes(choice.value);
-                const rowDisabled = !selected && atCap;
-                return (
-                  <div
-                    key={choice.value}
-                    id={`${inputId}-item-${index}`}
-                    className="sb-select-item"
-                    data-slot="select-item"
-                    data-sb-index={index}
-                    data-highlighted={highlighted === index ? "true" : undefined}
-                    data-state={selected ? "checked" : "unchecked"}
-                    role="option"
-                    aria-selected={selected ? "true" : "false"}
-                    aria-disabled={rowDisabled ? "true" : undefined}
-                    onMouseEnter={() => setHighlighted(index)}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => {
-                      if (!rowDisabled) toggleValue(choice.value);
-                    }}
-                  >
-                    <span className="sb-select-item-indicator" aria-hidden="true">
-                      <svg aria-hidden="true" focusable="false">
-                        <use href={`${props.spriteHref}#sb-icon-check`} />
-                      </svg>
-                    </span>
-                    <span className="sb-select-item-text">{choice.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>,
-        portal
+          <ComboboxSearch
+            searchRef={searchRef}
+            spriteHref={props.spriteHref}
+            listId={listId}
+            highlightedId={highlightedId}
+            searchPlaceholder={searchPlaceholder}
+            query={query}
+            setQuery={setQuery}
+            onKeyDown={onSearchKeyDown}
+          />
+          <ComboboxOptions
+            inputId={inputId}
+            listId={listId}
+            choices={filtered}
+            highlighted={highlighted}
+            setHighlighted={setHighlighted}
+            emptyMessage={emptyMessage}
+            spriteHref={props.spriteHref}
+            multiple
+            isSelected={(choiceValue) => value.includes(choiceValue)}
+            isDisabled={(choiceValue) => !value.includes(choiceValue) && atCap}
+            onSelect={toggleValue}
+          />
+        </ComboboxPopover>
       )}
     </div>
   );
