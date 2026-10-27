@@ -233,6 +233,12 @@
   color: var(--muted-foreground);
 }
 
+[data-shinyblocks-portal-root]
+  .sb-dropdown-menu-item[data-highlighted="true"]
+  .sb-dropdown-menu-shortcut {
+  color: inherit;
+}
+
 [data-shinyblocks-portal-root] .sb-tooltip-content {
   z-index: 70;
   max-width: 18rem;

@@ -57,6 +57,25 @@ function run() {
   const findings = [];
   let scanned = 0;
 
+  const runtimeSource = fs.readFileSync(path.join(ROOT, "R", "runtime.R"), "utf8");
+  const ownershipMatch = runtimeSource.match(
+    /RUNTIME_CONTENT_STYLE_COMPONENTS\s*<-\s*c\(([\s\S]*?)\)/
+  );
+  if (!ownershipMatch) {
+    throw new Error("Could not find RUNTIME_CONTENT_STYLE_COMPONENTS in R/runtime.R.");
+  }
+  const rOwners = [...ownershipMatch[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+  const jsOwners = OWNERSHIP_ALLOWLIST.map((entry) => entry.file.replace(/\.jsx$/, ""));
+  const missingOwners = rOwners.filter((component) => !jsOwners.includes(component));
+  const extraOwners = jsOwners.filter((component) => !rOwners.includes(component));
+  if (missingOwners.length || extraOwners.length) {
+    console.error("Style ownership gate FAILED. Portal-owner registries are out of sync:\n");
+    if (missingOwners.length) console.error(`  missing JS allowlist owners: ${missingOwners.join(", ")}`);
+    if (extraOwners.length) console.error(`  unknown JS allowlist owners: ${extraOwners.join(", ")}`);
+    process.exitCode = 1;
+    return;
+  }
+
   const files = fs
     .readdirSync(COMPONENTS_DIR)
     .filter((f) => f.endsWith(".jsx"))

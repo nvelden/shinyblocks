@@ -13,6 +13,7 @@
     "build:icons": "node tools/build-icons.mjs",
     "lint": "eslint frontend/src --max-warnings=0",
     "test:runtime": "npm run test:receive-queue && node tools/runtime-smoke.mjs && npm run test:select-overflow",
+    "test:runtime-registry": "node tools/check-runtime-registry.mjs",
     "test:receive-queue": "node tools/check-receive-queue.mjs",
     "test:select-overflow": "node tools/select-overflow-smoke.mjs",
     "test:runtime-shiny": "node tools/runtime-shiny-smoke.mjs",

@@ -437,6 +437,7 @@
 
   .sb-tabs-trigger {
     @apply inline-flex h-8 items-center justify-center rounded-md px-2.5 py-1 text-sm font-medium whitespace-nowrap text-muted-foreground shadow-none;
+    color: color-mix(in oklch, var(--muted-foreground), var(--foreground) 15%);
     border: 0 !important;
     background: transparent !important;
     margin-bottom: 0 !important;

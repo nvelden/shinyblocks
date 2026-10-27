@@ -17,7 +17,7 @@ export function SiteHeader() {
         </Link>
         {/* min-w-0 + overflow-x-auto lets the links scroll instead of widening
             the page on narrow viewports. */}
-        <nav className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm font-medium">
+        <nav aria-label="Primary" className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm font-medium">
           <Link
             href="/get-started"
             className="whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground"

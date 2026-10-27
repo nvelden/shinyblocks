@@ -1,52 +1,51 @@
 # Multi-artifact coverage tests. Whenever a new block_*() is exported,
-# the same commit must update every artifact that documents it. The
-# ROADMAP's gate-exit rule mirrors these tests; a green test here is a
-# necessary (not sufficient) condition for a phase exit.
+# the same commit must update every artifact that documents it. A green test
+# here is a necessary (not sufficient) condition for a phase exit.
 
 repo_root <- function() {
   testthat::test_path("..", "..")
-}
-
-read_pkgdown_yml <- function() {
-  path <- file.path(repo_root(), "_pkgdown.yml")
-  if (!file.exists(path)) {
-    skip(sprintf("_pkgdown.yml missing at %s", path))
-  }
-  readLines(path, warn = FALSE)
 }
 
 block_exports <- function() {
   sort(grep("^block_", getNamespaceExports("shinyblocks"), value = TRUE))
 }
 
-extract_yml_block_names <- function(lines) {
-  hits <- grep("^\\s*-\\s+block_[a-z_]+\\s*$", lines, value = TRUE)
-  unique(trimws(sub("^\\s*-\\s+", "", hits)))
+docs_api_block_names <- function() {
+  path <- file.path(repo_root(), "docs-site", "lib", "api-reference.ts")
+  if (!file.exists(path)) {
+    skip("docs-site API reference is repo-only and absent from the package build")
+  }
+
+  text <- paste(readLines(path, warn = FALSE), collapse = "\n")
+  matches <- regmatches(
+    text,
+    gregexpr('name: "block_[a-z0-9_]+"', text, perl = TRUE)
+  )[[1]]
+  sort(unique(sub('"$', "", sub('^name: "', "", matches))))
 }
 
-test_that("every exported block_*() appears in _pkgdown.yml reference", {
-  yml <- read_pkgdown_yml()
-  in_yml <- extract_yml_block_names(yml)
+test_that("every exported block_*() appears in the docs-site API reference", {
+  documented <- docs_api_block_names()
   exported <- block_exports()
 
-  missing <- setdiff(exported, in_yml)
+  missing <- setdiff(exported, documented)
   expect_identical(
     missing,
     character(),
     label = paste(
-      "Components exported but absent from _pkgdown.yml.",
-      "Add each name under the matching `reference:` group.",
+      "Components exported but absent from docs-site/lib/api-reference.ts.",
+      "Add each name under the matching component slug.",
       "Missing:",
       paste(missing, collapse = ", ")
     )
   )
 
-  stale <- setdiff(in_yml, exported)
+  stale <- setdiff(documented, exported)
   expect_identical(
     stale,
     character(),
     label = paste(
-      "_pkgdown.yml references components that are not exported.",
+      "The docs-site API reference names components that are not exported.",
       "Remove the entry or restore the export.",
       "Stale:",
       paste(stale, collapse = ", ")
@@ -76,7 +75,7 @@ test_that("every exported block_*() has a component spec doc", {
     label = paste(
       "Components exported but missing a spec under",
       "docs/component-specs/. Each new block_*() must ship with a",
-      "spec per ADR 0015. Missing:",
+      "component contract. Missing:",
       paste(missing, collapse = ", ")
     )
   )

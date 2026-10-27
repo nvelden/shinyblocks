@@ -1,4 +1,4 @@
-.PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-test runtime-shiny-test showcase-test dev showcase showcase-health npm-lock-check \
+.PHONY: help setup watch-css build-preflight build-css build-runtime build-icons runtime-registry runtime-test runtime-shiny-test showcase-test dev showcase showcase-health npm-lock-check \
 	check-fast check-slice lint spell urls test docs docs-verify check check-local pkgdown budget \
 	doc-links legacy-audit layout-audit theme-static theme-test style-parity style-leanness style-ownership style-registry parity-install parity-build-css parity-setup parity parity-stop \
 	parity-ci gate gate-release clean deploy-showcase preview preview-docs \
@@ -89,7 +89,7 @@ dev:
 # defaults with the other preview targets.
 
 check-fast:
-	$(R) -e 'devtools::test(filter = "style|utils")'
+	$(R) -e 'devtools::test(filter = "style|utils", stop_on_failure = TRUE)'
 	$(MAKE) layout-audit
 	npm run test:themes-static
 	npm run test:themes-drift
@@ -100,7 +100,7 @@ check-fast:
 
 # ---------- Slice boundary ----------
 
-check-slice: build-css build-runtime test doc-links legacy-audit layout-audit theme-static style-leanness style-ownership style-registry
+check-slice: build-css build-runtime test doc-links legacy-audit layout-audit theme-static style-leanness style-ownership style-registry runtime-registry
 	@git diff --exit-code -- inst/www/shinyblocks.css inst/www/shinyblocks-runtime.js inst/www/shinyblocks-runtime.css \
 		|| ( echo ""; echo "Built assets differ from what is committed. Rebuild (make build-css build-runtime) and commit the output."; exit 1 )
 	git diff --check
@@ -119,6 +119,9 @@ build-runtime:
 
 build-icons:
 	node tools/build-icons.mjs
+
+runtime-registry:
+	npm run test:runtime-registry
 
 runtime-test:
 	npm run test:runtime
@@ -140,7 +143,7 @@ urls:
 	$(R) -e 'urlchecker::url_check()'
 
 test:
-	$(R) -e 'devtools::test()'
+	$(R) -e 'devtools::test(stop_on_failure = TRUE)'
 
 docs:
 	# Force a UTF-8 LC_CTYPE so roxygen writes non-ASCII defaults (e.g. the

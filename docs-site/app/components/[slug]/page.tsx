@@ -61,7 +61,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
         <aside className="hidden lg:block w-48 shrink-0">
           <div className="sticky top-20 flex flex-col gap-2">
             <div className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-2 px-2">Components</div>
-            <nav className="flex flex-col gap-1">
+            <nav aria-label="Components" className="flex flex-col gap-1">
               {manifest
                 .filter((c) => c.slug !== "gallery")
                 .map((c) => {
@@ -212,7 +212,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
                                   className="whitespace-nowrap px-2 py-2 align-middle font-mono text-xs"
                                 >
                                   {arg.defaultVal === "required" ? (
-                                    <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-destructive">required</span>
+                                    <span className="rounded border border-destructive/30 bg-background px-1.5 py-0.5 text-[10px] font-semibold uppercase text-destructive">required</span>
                                   ) : (
                                     <code className="text-muted-foreground">{arg.defaultVal}</code>
                                   )}

@@ -5,7 +5,8 @@
   "packageManager": "npm@11.6.2",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "Rscript scripts/generate-previews.R && tsx scripts/generate-changelog.ts && tsx scripts/generate-get-started-playground.ts && Rscript scripts/generate-playgrounds.R",
+    "prebuild": "tsx scripts/check-api-reference.ts && Rscript scripts/generate-previews.R && tsx scripts/generate-changelog.ts && tsx scripts/generate-get-started-playground.ts && Rscript scripts/generate-playgrounds.R",
+    "check:api-reference": "tsx scripts/check-api-reference.ts",
     "build": "next build",
     "start": "next start",
     "preview": "npm run build && node scripts/serve-preview.mjs",

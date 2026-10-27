@@ -21,7 +21,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "title", type: "character", defaultVal: "NULL", description: "Optional browser page window title." },
         { argument: "sidebar", type: "shiny.tag", defaultVal: "NULL", description: "Layout sidebar element created by block_sidebar()." },
         { argument: "header", type: "shiny.tag", defaultVal: "NULL", description: "Layout header element created by block_header()." },
-        { argument: "theme", type: "shiny.tag", defaultVal: "NULL", description: "Optional theme tags created by block_theme()." }
+        { argument: "theme_mode", type: "'system' | 'light' | 'dark'", defaultVal: "'system'", description: "Initial light/dark theme mode." },
+        { argument: "theme", type: "shiny.tag", defaultVal: "NULL", description: "Optional theme tags created by block_theme()." },
+        { argument: "style", type: "shiny.tag", defaultVal: "NULL", description: "Optional style profile created by block_style()." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the page shell." }
       ]
     },
     {
@@ -32,6 +35,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "title", type: "character", defaultVal: "NULL", description: "Sidebar branding or header title text." },
         { argument: "id", type: "character", defaultVal: "NULL", description: "Optional unique ID for sidebar state." },
         { argument: "collapsible", type: "logical", defaultVal: "FALSE", description: "Whether the sidebar can be collapsed." },
+        { argument: "collapsed", type: "logical", defaultVal: "FALSE", description: "Whether a collapsible sidebar starts collapsed." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes." }
       ]
     },
@@ -70,6 +74,16 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "icon", type: "character", defaultVal: "NULL", description: "Lucide icon glyph name." },
         { argument: "selected", type: "logical", defaultVal: "FALSE", description: "Initial selected state class highlight." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the .sb-nav-item element." }
+      ]
+    },
+    {
+      name: "update_block_nav",
+      description: "Selects an item in an id-bound navigation block from the server.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Active Shiny session." },
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Input id passed to block_nav()." },
+        { argument: "selected", type: "character", defaultVal: "required", description: "Nav item value to activate." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether Shiny receives an input event." }
       ]
     }
   ],
@@ -201,9 +215,12 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "title", type: "character", defaultVal: "required", description: "Descriptive label for the metric." },
         { argument: "value", type: "character", defaultVal: "required", description: "Numeric or key value indicator string." },
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "none", description: "Additional content." },
         { argument: "description", type: "character", defaultVal: "NULL", description: "Subtext copy under the main value." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "Leading decorative Lucide icon glyph name." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom style classes." }
+        { argument: "variant", type: "character", defaultVal: "'default'", description: "Semantic visual variant." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom style classes." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles." }
       ]
     }
   ],
@@ -214,7 +231,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "label", type: "character", defaultVal: "required", description: "Text description inside the badge." },
         { argument: "variant", type: "'default' | 'secondary' | 'outline' | 'destructive'", defaultVal: "'default'", description: "Visual variant preset theme styles." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom classes applied to the badge wrapper." }
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Badge size." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom classes applied to the badge wrapper." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles." }
       ]
     }
   ],
@@ -224,10 +243,37 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Inline warning panels communicating status callouts to users.",
       arguments: [
         { argument: "title", type: "character", defaultVal: "required", description: "Alert title text." },
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "none", description: "Additional alert body content." },
         { argument: "description", type: "character", defaultVal: "NULL", description: "Supporting description subtext inside the alert." },
+        { argument: "action", type: "character | shiny.tag", defaultVal: "NULL", description: "Optional alert action content." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "Leading Lucide icon name." },
         { argument: "variant", type: "'default' | 'destructive' | 'success' | 'warning' | 'info'", defaultVal: "'default'", description: "Stylesheet visual color preset category." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom container class classes." }
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Custom container class classes." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles." }
+      ]
+    },
+    {
+      name: "block_alert_title",
+      description: "Creates a marked alert-title slot.",
+      arguments: [
+        { argument: "...", type: "character | shiny.tag", defaultVal: "required", description: "Title content." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." }
+      ]
+    },
+    {
+      name: "block_alert_description",
+      description: "Creates a marked alert-description slot.",
+      arguments: [
+        { argument: "...", type: "character | shiny.tag", defaultVal: "required", description: "Description content." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." }
+      ]
+    },
+    {
+      name: "block_alert_action",
+      description: "Creates a marked alert-action slot.",
+      arguments: [
+        { argument: "...", type: "shiny.tag", defaultVal: "required", description: "Action content such as block_button()." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." }
       ]
     }
   ],
@@ -243,7 +289,8 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "header", type: "logical", defaultVal: "FALSE", description: "Display macOS window control dots and language header bar." },
         { argument: "variant", type: "'default' | 'outline'", defaultVal: "'default'", description: "Thematic background card styling variant." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes to apply." },
-        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline custom CSS styles." }
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline custom CSS styles." },
+        { argument: "...", type: "named attributes", defaultVal: "none", description: "Additional HTML attributes." }
       ]
     }
   ],
@@ -304,20 +351,20 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
   button: [
     {
       name: "block_button",
-      description: "High-fidelity interactive triggers supporting click events, loading indicators, and form submissions.",
+      description: "High-fidelity buttons that optionally become Shiny action inputs when an input_id is supplied through named attributes.",
       arguments: [
         { argument: "label", type: "character", defaultVal: "required", description: "Label string on the button face." },
-        { argument: "input_id", type: "character", defaultVal: "NULL", description: "Optional Shiny input trigger name." },
         { argument: "variant", type: "'default' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link'", defaultVal: "'default'", description: "Thematic button style type." },
         { argument: "size", type: "'default' | 'sm' | 'lg' | 'icon'", defaultVal: "'default'", description: "Dimension size variant presets." },
         { argument: "icon", type: "character | shiny.tag", defaultVal: "NULL", description: "Inner icon element or Lucide name." },
-        { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Whether the button is disabled." },
+        { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "'inline-start'", description: "Icon placement relative to the label." },
+        { argument: "...", type: "named attributes", defaultVal: "none", description: "Additional button attributes, including input_id and disabled." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Custom styling classes to merge." }
       ]
     },
     {
       name: "update_block_button",
-      description: "Dynamically refreshes buttons from R server logic, triggering loading spinners or locking user inputs.",
+      description: "Updates the label, appearance, icon, disabled state, style, or classes of an id-bound button.",
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Standard active R/Shiny session." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Input trigger identifier to update." },
@@ -325,8 +372,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "variant", type: "character", defaultVal: "NULL", description: "Update the button's visual preset." },
         { argument: "size", type: "character", defaultVal: "NULL", description: "Update button dimension sizing." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "New Lucide icon glyph name." },
+        { argument: "icon_position", type: "'inline-start' | 'inline-end'", defaultVal: "NULL", description: "Update icon placement." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Enable/Disable button state." },
-        { argument: "loading", type: "logical", defaultVal: "NULL", description: "Show spinner icon next to button label." }
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." }
       ]
     }
   ],
@@ -395,8 +444,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
         { argument: "choices", type: "list | character", defaultVal: "NULL", description: "New selection choices list." },
         { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Value selector key or vector to choose." },
+        { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Replacement empty-selection placeholder." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle input disabled state." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." }
+        { argument: "width, class, size", type: "character", defaultVal: "NULL", description: "Replacement layout and presentation values." },
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a selected-value change notifies Shiny." }
       ]
     }
   ],
@@ -429,10 +481,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input ID." },
         { argument: "choices", type: "list | character", defaultVal: "NULL", description: "New selection choices list." },
         { argument: "selected", type: "character | character[]", defaultVal: "NULL", description: "Value selector key or vector to choose." },
+        { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Replacement trigger placeholder." },
         { argument: "search_placeholder", type: "character", defaultVal: "NULL", description: "Replacement filter-box placeholder." },
         { argument: "empty_message", type: "character", defaultVal: "NULL", description: "Replacement empty-state message." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle input disabled state." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." }
+        { argument: "width, class, size", type: "character", defaultVal: "NULL", description: "Replacement layout and presentation values." },
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update invalid border styling." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a selected-value change notifies Shiny." }
       ]
     }
   ],
@@ -467,6 +522,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "placeholder", type: "character", defaultVal: "missing", description: "Replacement placeholder text." },
         { argument: "disabled", type: "logical", defaultVal: "missing", description: "Toggle input disabled state." },
         { argument: "invalid", type: "logical", defaultVal: "missing", description: "Update invalid border styling." },
+        { argument: "class, style", type: "character | list", defaultVal: "missing", description: "Replacement classes or inline styles." },
         { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a value change fires a Shiny input event. Cosmetic-only updates never notify." },
         { argument: "clear", type: "logical", defaultVal: "FALSE", description: "Clear the selected date (sends an explicit empty value). Takes precedence over value." }
       ]
@@ -507,6 +563,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "placeholder", type: "character", defaultVal: "missing", description: "Replacement placeholder text." },
         { argument: "disabled", type: "logical", defaultVal: "missing", description: "Toggle input disabled state." },
         { argument: "invalid", type: "logical", defaultVal: "missing", description: "Update invalid border styling." },
+        { argument: "class, style", type: "character | list", defaultVal: "missing", description: "Replacement classes or inline styles." },
         { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a range change fires a Shiny input event. Cosmetic-only updates never notify." },
         { argument: "clear", type: "logical", defaultVal: "FALSE", description: "Clear the selected range (sends an explicit empty range). Takes precedence over start/end." }
       ]
@@ -527,13 +584,15 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
     },
     {
       name: "update_block_checkbox",
-      description: "Modifies checking state, labels, or interactiveness on the fly.",
+      description: "Modifies checking state, presentation, or interactiveness on the fly.",
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Shiny web session object context." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Checkbox input ID." },
-        { argument: "label", type: "character", defaultVal: "NULL", description: "Update label copy text." },
         { argument: "checked", type: "logical", defaultVal: "NULL", description: "Set active checked state." },
-        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Lock checkbox interaction." }
+        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Lock checkbox interaction." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a checked-state change notifies Shiny." }
       ]
     }
   ],
@@ -543,10 +602,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Renders multi-line text input fields styled with premium boundary tokens.",
       arguments: [
         { argument: "input_id", type: "character", defaultVal: "required", description: "Text area selector target." },
+        { argument: "value", type: "character", defaultVal: "''", description: "Initial textarea value." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Hint inside input field." },
         { argument: "rows", type: "integer", defaultVal: "3", description: "Default vertical lines size." },
+        { argument: "width", type: "character", defaultVal: "'100%'", description: "Control width." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Freeze interactive inputs." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Show validation highlights." },
+        { argument: "resize", type: "character", defaultVal: "'vertical'", description: "Allowed resize direction." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Custom inline style overrides." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional CSS styles." }
       ]
@@ -559,8 +621,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target textarea component ID." },
         { argument: "value", type: "character", defaultVal: "NULL", description: "Replace full inner text area content." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "New descriptive hint text." },
+        { argument: "rows", type: "integer", defaultVal: "NULL", description: "Replacement row count." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Set text inputs blocked." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update validation border color." }
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update validation border color." },
+        { argument: "resize", type: "character", defaultVal: "NULL", description: "Replacement resize direction." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a value change notifies Shiny." }
       ]
     }
   ],
@@ -615,11 +682,13 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Builds a standard single-line interactive form input element.",
       arguments: [
         { argument: "input_id", type: "character", defaultVal: "required", description: "Input identifier." },
+        { argument: "value", type: "character | numeric", defaultVal: "''", description: "Initial input value." },
         { argument: "type", type: "'text' | 'password' | 'email' | 'url' | 'tel' | 'search' | 'number'", defaultVal: "'text'", description: "HTML text field variant category type. The number type renders stepper buttons and reports a numeric value (NA while empty)." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Preview text before typing." },
         { argument: "min", type: "numeric", defaultVal: "NULL", description: "Lower bound for the stepper and arrow keys (number type only)." },
         { argument: "max", type: "numeric", defaultVal: "NULL", description: "Upper bound for the stepper and arrow keys (number type only)." },
         { argument: "step", type: "numeric", defaultVal: "NULL", description: "Positive step size (number type only; browser default 1)." },
+        { argument: "width", type: "character", defaultVal: "'100%'", description: "Control width." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disable user inputs." },
         { argument: "invalid", type: "logical", defaultVal: "FALSE", description: "Highlight validation error borders." },
         { argument: "style", type: "character", defaultVal: "NULL", description: "Custom layout wrapper styling." },
@@ -634,11 +703,15 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target input control ID." },
         { argument: "value", type: "character", defaultVal: "NULL", description: "Update text input value." },
         { argument: "placeholder", type: "character", defaultVal: "NULL", description: "Set new placeholder copy." },
+        { argument: "type", type: "character", defaultVal: "NULL", description: "Replacement input type." },
         { argument: "min", type: "numeric", defaultVal: "NULL", description: "Replace the lower bound (number type only); NULL clears it." },
         { argument: "max", type: "numeric", defaultVal: "NULL", description: "Replace the upper bound (number type only); NULL clears it." },
         { argument: "step", type: "numeric", defaultVal: "NULL", description: "Replace the step size (number type only); NULL resets to 1." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Freeze/unfreeze input." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle validation visual highlights." }
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Toggle validation visual highlights." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a value change notifies Shiny." }
       ]
     }
   ],
@@ -666,7 +739,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "choices", type: "list | character", defaultVal: "NULL", description: "New options layout database choices." },
         { argument: "selected", type: "character", defaultVal: "NULL", description: "Value to programmatically select." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Block/allow group item selection." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Apply invalid highlight state borders." }
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Apply invalid highlight state borders." },
+        { argument: "orientation", type: "character", defaultVal: "NULL", description: "Replacement layout orientation." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a selection change notifies Shiny." }
       ]
     }
   ],
@@ -699,7 +776,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "icons", type: "named list", defaultVal: "NULL", description: "Icons for the replacement choices; requires choices." },
         { argument: "disabled", type: "logical | character", defaultVal: "NULL", description: "Group flag or per-item choice values." },
         { argument: "variant", type: "'default' | 'outline'", defaultVal: "NULL", description: "New visual variant." },
-        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "NULL", description: "New item size." }
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "NULL", description: "New item size." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a selection change notifies Shiny." }
       ]
     }
   ],
@@ -727,6 +807,8 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "pages", type: "integer", defaultVal: "NULL", description: "New total page count." },
         { argument: "selected", type: "integer", defaultVal: "NULL", description: "New active page." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "New disabled state." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
         { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Notify Shiny when selection changes." }
       ]
     }
@@ -740,6 +822,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "label", type: "character", defaultVal: "required", description: "Visible label rendered next to the toggle." },
         { argument: "value", type: "logical", defaultVal: "FALSE", description: "Initial checked state (TRUE/FALSE)." },
         { argument: "disabled", type: "logical", defaultVal: "FALSE", description: "Disables the switch while preserving server updates." },
+        { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Switch size." },
         { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline CSS styles applied to the switch wrapper." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional class merged onto the runtime switch wrapper." }
       ]
@@ -751,7 +834,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Standard active R/Shiny session." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Target switch input ID." },
         { argument: "checked", type: "logical", defaultVal: "NULL", description: "Set new active toggled checked state." },
-        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle lock input interface interactions." }
+        { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Toggle lock input interface interactions." },
+        { argument: "size", type: "character", defaultVal: "NULL", description: "Replacement switch size." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a checked-state change notifies Shiny." }
       ]
     }
   ],
@@ -769,7 +856,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Wraps text, badges, or svg glyphs to merge adjacent to text input elements.",
       arguments: [
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "UI content text, icon or badge addon." },
-        { argument: "position", type: "'leading' | 'trailing'", defaultVal: "required", description: "Addon slot placement alignment sides." }
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." }
       ]
     }
   ],
@@ -846,7 +933,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "border", type: "logical", defaultVal: "FALSE", description: "Draw a border around the media box." },
         { argument: "rounded", type: "logical", defaultVal: "TRUE", description: "Round the media box corners (and clip overflow)." },
         { argument: "caption", type: "character", defaultVal: "NULL", description: "Optional <figcaption> text below the media box." },
-        { argument: "click / dblclick / hover / brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged." },
+        { argument: "click, dblclick, hover, brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged." },
         { argument: "inline", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output unchanged." },
         { argument: "fill", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output; matches shiny::imageOutput()." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the <figure> wrapper." },
@@ -866,7 +953,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "border", type: "logical", defaultVal: "FALSE", description: "Draw a border around the media box." },
         { argument: "rounded", type: "logical", defaultVal: "TRUE", description: "Round the media box corners (and clip overflow)." },
         { argument: "caption", type: "character", defaultVal: "NULL", description: "Optional <figcaption> text below the media box." },
-        { argument: "click / dblclick / hover / brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged (plot click/hover/brush inputs)." },
+        { argument: "click, dblclick, hover, brush", type: "character | *Opts()", defaultVal: "NULL", description: "Forwarded to the Shiny output unchanged (plot click/hover/brush inputs)." },
         { argument: "inline", type: "logical", defaultVal: "FALSE", description: "Forwarded to the Shiny output unchanged." },
         { argument: "fill", type: "logical", defaultVal: "!inline", description: "Forwarded to the Shiny output; matches shiny::plotOutput()." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes for the <figure> wrapper." },
@@ -911,7 +998,10 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "min_label", type: "character", defaultVal: "NULL", description: "Update or clear the minimum label." },
         { argument: "max_label", type: "character", defaultVal: "NULL", description: "Update or clear the maximum label." },
         { argument: "disabled", type: "logical", defaultVal: "NULL", description: "Freeze/unfreeze slider controls." },
-        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update validation error border outlines." }
+        { argument: "invalid", type: "logical", defaultVal: "NULL", description: "Update validation error border outlines." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Replacement inline styles." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Replacement classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether a value change notifies Shiny." }
       ]
     }
   ],
@@ -953,15 +1043,31 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       name: "block_theme",
       description: "Application-wide style engine managing design tokens, boundary rounding, and accent oklch color palettes.",
       arguments: [
-        { argument: "...", type: "character", defaultVal: "required", description: "Accent token styles matching oklch colors or custom CSS properties (e.g. accent = 'oklch(0.6 0.15 150)', radius = '1rem')." }
+        { argument: "...", type: "character", defaultVal: "none", description: "Named light-mode design-token overrides." },
+        { argument: "preset", type: "character", defaultVal: "NULL", description: "Built-in palette name from block_theme_presets()." },
+        { argument: "scope", type: "character", defaultVal: "NULL", description: "Optional CSS selector to scope the theme." },
+        { argument: "dark", type: "named list", defaultVal: "NULL", description: "Dark-mode token overrides." }
+      ]
+    },
+    {
+      name: "block_theme_presets",
+      description: "Returns the built-in palette names accepted by block_theme().",
+      arguments: []
+    },
+    {
+      name: "block_dark_mode_toggle",
+      description: "Creates a button that cycles the application light/dark mode.",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "'Theme'", description: "Visible button label." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." }
       ]
     },
     {
       name: "update_block_theme",
-      description: "Dynamically refreshes CSS tokens, theme states, or colors at runtime.",
+      description: "Changes the active system, light, or dark theme mode.",
       arguments: [
-        { argument: "session", type: "ShinySession", defaultVal: "required", description: "Shiny active web app session." },
-        { argument: "...", type: "character", defaultVal: "required", description: "Custom accent token properties to override at runtime." }
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Shiny active web app session." },
+        { argument: "mode", type: "'system' | 'light' | 'dark'", defaultVal: "'system'", description: "Theme mode to activate." }
       ]
     }
   ],
@@ -1085,11 +1191,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "getDefaultReactiveDomain()", description: "The Shiny session." },
         { argument: "id", type: "character", defaultVal: "required", description: "Component id passed to block_progress()." },
-        { argument: "value / min / max", type: "numeric", defaultVal: "—", description: "Replacement scale; clamped/reconciled client-side." },
-        { argument: "message / detail / label", type: "character", defaultVal: "—", description: "Replacement text; NULL clears." },
-        { argument: "show_value / indeterminate", type: "logical", defaultVal: "—", description: "Replacement state flags." },
+        { argument: "value, min, max", type: "numeric", defaultVal: "—", description: "Replacement scale; clamped/reconciled client-side." },
+        { argument: "message, detail, label", type: "character", defaultVal: "—", description: "Replacement text; NULL clears." },
+        { argument: "show_value, indeterminate", type: "logical", defaultVal: "—", description: "Replacement state flags." },
         { argument: "variant", type: "character", defaultVal: "—", description: "Replacement indicator color." },
-        { argument: "class / style", type: "character | list", defaultVal: "—", description: "Replacement classes/styles; NULL clears." }
+        { argument: "class, style", type: "character | list", defaultVal: "—", description: "Replacement classes/styles; NULL clears." }
       ]
     },
     {
@@ -1099,7 +1205,7 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "session", type: "ShinySession", defaultVal: "getDefaultReactiveDomain()", description: "The Shiny session." },
         { argument: "id", type: "character", defaultVal: "required", description: "Component id passed to block_progress()." },
         { argument: "amount", type: "numeric", defaultVal: "0.1", description: "Signed amount added to the current value (may be negative)." },
-        { argument: "message / detail", type: "character", defaultVal: "—", description: "Optional text updates applied alongside the increment." }
+        { argument: "message, detail", type: "character", defaultVal: "—", description: "Optional text updates applied alongside the increment." }
       ]
     }
   ],
@@ -1109,10 +1215,12 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Sleek placeholders displaying zero-state details and call-to-action buttons.",
       arguments: [
         { argument: "title", type: "character", defaultVal: "required", description: "Primary headline text inside card." },
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "none", description: "Additional empty-state content." },
         { argument: "description", type: "character", defaultVal: "NULL", description: "Supporting narrative instructions." },
         { argument: "icon", type: "character", defaultVal: "NULL", description: "SVG Lucide graphic glyph name." },
         { argument: "action", type: "shiny.tag", defaultVal: "NULL", description: "Custom click call trigger button tags." },
-        { argument: "class", type: "character", defaultVal: "NULL", description: "Style stylesheet override classes." }
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Style stylesheet override classes." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles." }
       ]
     }
   ],
@@ -1124,11 +1232,15 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "id", type: "character", defaultVal: "required", description: "Outcome input id." },
         { argument: "title", type: "character | tag", defaultVal: "required", description: "Accessible title." },
         { argument: "description", type: "character | tag", defaultVal: "NULL", description: "Supporting description." },
+        { argument: "...", type: "shiny.tag | tagList", defaultVal: "none", description: "Additional dialog body content." },
         { argument: "confirm_label", type: "character", defaultVal: '"Continue"', description: "Confirmation label." },
         { argument: "cancel_label", type: "character", defaultVal: '"Cancel"', description: "Cancellation label." },
         { argument: "trigger", type: "character", defaultVal: "NULL", description: "Optional opener label." },
+        { argument: "open", type: "logical", defaultVal: "FALSE", description: "Whether the dialog starts open." },
         { argument: "confirm_variant", type: '"default" | "destructive"', defaultVal: '"default"', description: "Confirmation styling." },
-        { argument: "size", type: "character", defaultVal: '"default"', description: "Width preset." }
+        { argument: "size", type: "character", defaultVal: '"default"', description: "Width preset." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline content styles." }
       ]
     },
     {
@@ -1137,7 +1249,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "current", description: "Active session." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Alert dialog id." },
-        { argument: "open", type: "logical", defaultVal: "missing", description: "Optional open state." }
+        { argument: "open", type: "logical", defaultVal: "missing", description: "Optional open state." },
+        { argument: "title, description", type: "character | tag", defaultVal: "missing", description: "Replacement accessible text." },
+        { argument: "confirm_label, cancel_label", type: "character", defaultVal: "missing", description: "Replacement action labels." },
+        { argument: "confirm_variant, size", type: "character", defaultVal: "missing", description: "Replacement presentation values." },
+        { argument: "class, style", type: "character | list", defaultVal: "missing", description: "Replacement classes or inline styles." }
       ]
     }
   ],
@@ -1146,14 +1262,16 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       name: "block_dialog",
       description: "Fully accessible portal-rendered modal dialog screens containing interactive elements, focus trapping, and backdrop overlay clicks.",
       arguments: [
-        { argument: "input_id", type: "character", defaultVal: "required", description: "Unique ID for dialog open/close state." },
+        { argument: "id", type: "character", defaultVal: "required", description: "Unique ID for dialog open/close state." },
         { argument: "title", type: "character", defaultVal: "NULL", description: "Header title text." },
         { argument: "description", type: "character", defaultVal: "NULL", description: "Subheader description text." },
         { argument: "trigger", type: "character", defaultVal: "NULL", description: "Button label to open the dialog." },
+        { argument: "open", type: "logical", defaultVal: "FALSE", description: "Whether the dialog starts open." },
         { argument: "footer", type: "shiny.tag", defaultVal: "NULL", description: "Action buttons at the bottom." },
         { argument: "size", type: "'default' | 'sm' | 'lg'", defaultVal: "'default'", description: "Width sizing preset." },
         { argument: "hide_title", type: "logical", defaultVal: "FALSE", description: "Visually hide header." },
         { argument: "class", type: "character", defaultVal: "NULL", description: "Custom wrapper styles." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline content styles." },
         { argument: "...", type: "shiny.tag | tagList", defaultVal: "required", description: "Dialog body content." }
       ]
     },
@@ -1163,7 +1281,11 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active Shiny session." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Dialog input identifier." },
-        { argument: "open", type: "logical", defaultVal: "NULL", description: "Set open/close dialog state (TRUE/FALSE)." }
+        { argument: "open", type: "logical", defaultVal: "NULL", description: "Set open/close dialog state (TRUE/FALSE)." },
+        { argument: "title, description, footer", type: "character | tag", defaultVal: "missing", description: "Replacement dialog content." },
+        { argument: "size", type: "character", defaultVal: "missing", description: "Replacement width preset." },
+        { argument: "class, style", type: "character | list", defaultVal: "missing", description: "Replacement classes or inline styles." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether an open-state change notifies Shiny." }
       ]
     }
   ],
@@ -1177,8 +1299,9 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "id", type: "character", defaultVal: "NULL", description: "Optional Shiny input trigger name." },
         { argument: "side", type: "'bottom' | 'top' | 'left' | 'right'", defaultVal: "'bottom'", description: "Anchor alignment orientation sides." },
         { argument: "align", type: "'center' | 'start' | 'end'", defaultVal: "'center'", description: "Placement centering alignment." },
-        { argument: "content_style", type: "character", defaultVal: "NULL", description: "Inline styles on popover bubble wrapper." },
-        { argument: "content_class", type: "character", defaultVal: "NULL", description: "Additional custom classes style." }
+        { argument: "open", type: "logical", defaultVal: "FALSE", description: "Whether an id-bound popover starts open." },
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline styles on popover bubble wrapper." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom classes." }
       ]
     },
     {
@@ -1186,8 +1309,12 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       description: "Forces contextual popovers to hide or expand dynamically.",
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Standard active R/Shiny session." },
-        { argument: "id", type: "character", defaultVal: "required", description: "Popover identifier." },
-        { argument: "open", type: "logical", defaultVal: "NULL", description: "Programmatically open/close popover popups." }
+        { argument: "input_id", type: "character", defaultVal: "required", description: "Popover identifier." },
+        { argument: "open", type: "logical", defaultVal: "NULL", description: "Programmatically open/close popover popups." },
+        { argument: "trigger, body", type: "character | tag", defaultVal: "missing", description: "Replacement trigger or body content." },
+        { argument: "side, align", type: "character", defaultVal: "missing", description: "Replacement placement." },
+        { argument: "style, class", type: "character | list", defaultVal: "missing", description: "Replacement styles or classes." },
+        { argument: "notify", type: "logical", defaultVal: "TRUE", description: "Whether an open-state change notifies Shiny." }
       ]
     }
   ],
@@ -1221,13 +1348,28 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     },
     {
+      name: "dropdown_menu_label",
+      description: "Creates a non-interactive section label within a dropdown menu.",
+      arguments: [
+        { argument: "label", type: "character", defaultVal: "required", description: "Section label text." }
+      ]
+    },
+    {
+      name: "dropdown_menu_separator",
+      description: "Creates a visual separator between dropdown-menu groups.",
+      arguments: []
+    },
+    {
       name: "update_block_dropdown_menu",
       description: "Server-driven update: replace items, open/close, reposition, disable, or restyle the menu.",
       arguments: [
         { argument: "session", type: "ShinySession", defaultVal: "required", description: "Active R/Shiny session." },
         { argument: "input_id", type: "character", defaultVal: "required", description: "Dropdown-menu input id." },
         { argument: "items", type: "menu parts", defaultVal: "-", description: "Replacement menu parts." },
-        { argument: "open", type: "logical", defaultVal: "-", description: "Programmatically open/close the menu." }
+        { argument: "open", type: "logical", defaultVal: "-", description: "Programmatically open/close the menu." },
+        { argument: "side, align", type: "character", defaultVal: "-", description: "Replacement placement." },
+        { argument: "disabled", type: "logical", defaultVal: "-", description: "Replacement disabled state." },
+        { argument: "style, class", type: "character | list", defaultVal: "-", description: "Replacement styles or classes." }
       ]
     }
   ],
@@ -1268,6 +1410,51 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
       ]
     }
   ],
+  toast: [
+    {
+      name: "block_toaster",
+      description: "Creates a portal-rendered region for transient server-driven toast notifications.",
+      arguments: [
+        { argument: "id", type: "character", defaultVal: "required", description: "Toaster input id and update target." },
+        { argument: "position", type: "character", defaultVal: "'bottom-right'", description: "Screen edge or corner for the toast stack." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional classes on the toaster region." },
+        { argument: "style", type: "character | list", defaultVal: "NULL", description: "Inline styles on the toaster region." }
+      ]
+    },
+    {
+      name: "show_toast",
+      description: "Pushes a transient notification to a block_toaster().",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Active Shiny session." },
+        { argument: "toaster_id", type: "character", defaultVal: "required", description: "Target toaster id." },
+        { argument: "title", type: "character | tag", defaultVal: "required", description: "Toast title." },
+        { argument: "description", type: "character | tag", defaultVal: "NULL", description: "Optional supporting text." },
+        { argument: "variant", type: "character", defaultVal: "'default'", description: "Semantic visual variant." },
+        { argument: "icon", type: "character | tag", defaultVal: "'info'", description: "Optional icon name or tag." },
+        { argument: "duration", type: "numeric", defaultVal: "5000", description: "Milliseconds before automatic dismissal; non-positive values persist." },
+        { argument: "dismissible", type: "logical", defaultVal: "TRUE", description: "Whether the close button is shown." },
+        { argument: "id", type: "character", defaultVal: "NULL", description: "Optional stable toast id." }
+      ]
+    },
+    {
+      name: "dismiss_toast",
+      description: "Dismisses one toast by id, or all visible toasts when toast_id is NULL.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Active Shiny session." },
+        { argument: "toaster_id", type: "character", defaultVal: "required", description: "Target toaster id." },
+        { argument: "toast_id", type: "character", defaultVal: "NULL", description: "Toast id to dismiss; NULL clears all." }
+      ]
+    },
+    {
+      name: "update_block_toaster",
+      description: "Moves an existing toaster region to another screen position.",
+      arguments: [
+        { argument: "session", type: "ShinySession", defaultVal: "current domain", description: "Active Shiny session." },
+        { argument: "toaster_id", type: "character", defaultVal: "required", description: "Target toaster id." },
+        { argument: "position", type: "character", defaultVal: "required", description: "New screen edge or corner." }
+      ]
+    }
+  ],
   tooltip: [
     {
       name: "block_tooltip",
@@ -1278,8 +1465,8 @@ export const API_REFERENCE_DATABASE: Record<string, ApiFunction[]> = {
         { argument: "side", type: "'top' | 'bottom' | 'left' | 'right'", defaultVal: "'top'", description: "Tooltip placement side relative to trigger." },
         { argument: "align", type: "'center' | 'start' | 'end'", defaultVal: "'center'", description: "Placement alignment along the chosen side." },
         { argument: "delay_duration", type: "integer", defaultVal: "700", description: "Time in milliseconds to wait before showing tooltip on hover." },
-        { argument: "content_style", type: "character", defaultVal: "NULL", description: "Inline CSS overrides on tooltip popover." },
-        { argument: "content_class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes." }
+        { argument: "style", type: "character", defaultVal: "NULL", description: "Inline CSS overrides on tooltip popover." },
+        { argument: "class", type: "character", defaultVal: "NULL", description: "Additional custom styling classes." }
       ]
     }
   ]

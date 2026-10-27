@@ -8,7 +8,7 @@ export default function HomePage() {
   const gallery = manifest.find((c) => c.slug === "gallery");
 
   return (
-    <div className="flex flex-col gap-12 py-10 sm:gap-14 sm:py-12">
+    <main className="flex flex-col gap-12 py-10 sm:gap-14 sm:py-12">
       <section className="mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
         <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/80 px-4 py-1.5 text-xs font-semibold text-secondary-foreground shadow-sm backdrop-blur-md">
           <Sparkles className="size-3.5 animate-pulse text-primary" />
@@ -98,6 +98,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

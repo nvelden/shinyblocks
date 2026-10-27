@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   assetPrefix: `${basePath}/`,
   trailingSlash: true,
   images: { unoptimized: true },
+  // The maintainer checkout can sit below unrelated lockfiles. Pin discovery
+  // here so Turbopack does not select an ancestor as the workspace root.
+  turbopack: { root: process.cwd() },
   // The static export lands in `out/`. CI copies it to GitHub Pages.
   // `.nojekyll` is created in public/ so GH Pages doesn't eat `_next/`.
 };

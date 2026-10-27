@@ -31,6 +31,7 @@
 ^package-lock\.json$
 ^node_modules$
 ^tsconfig\.json$
+^eslint\.config\.js$
 ^\.tool-versions$
 ^Makefile$
 ^tools$

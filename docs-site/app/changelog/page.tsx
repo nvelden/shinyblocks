@@ -63,7 +63,7 @@ export default function ChangelogPage() {
         <aside className="hidden xl:block">
           <div className="sticky top-20 flex flex-col gap-4 border-l border-border/60 pl-6">
             <h2 className="text-sm font-semibold text-foreground">On This Page</h2>
-            <nav className="flex flex-col gap-2">
+            <nav aria-label="On this page" className="flex flex-col gap-2">
               {toc.map((item) => (
                 <Link
                   key={item.slug}

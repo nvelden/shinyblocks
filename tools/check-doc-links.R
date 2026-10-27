@@ -10,9 +10,16 @@
 roots <- c(
   "CONTRIBUTING.md",
   "README.md",
-  "NEWS.md"
+  "NEWS.md",
+  "docs-site/README.md",
+  list.files(
+    "docs/component-specs",
+    pattern = "\\.md$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
 )
-roots <- roots[file.exists(roots)]
+roots <- sort(unique(roots[file.exists(roots)]))
 
 pattern <- "\\[[^\\]]*\\]\\(([^)#?]+)(#[^)]*)?\\)"
 

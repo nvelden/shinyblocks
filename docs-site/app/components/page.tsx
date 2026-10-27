@@ -18,7 +18,7 @@ export default function ComponentsIndexPage() {
         <aside className="hidden lg:block w-48 shrink-0">
           <div className="sticky top-20 flex flex-col gap-2">
             <div className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-2 px-2">Components</div>
-            <nav className="flex flex-col gap-1">
+            <nav aria-label="Components" className="flex flex-col gap-1">
               {manifest
                 .filter((c) => c.slug !== "gallery")
                 .map((component) => (
